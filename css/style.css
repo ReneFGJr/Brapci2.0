@@ -1,0 +1,25 @@
+.h1 {
+    font-size: 26px;
+    text-transform: uppercase;
+}
+.h2 {
+    font-size: 23px;
+    text-transform: uppercase;
+}
+.h3 {
+    font-size: 20px;
+    text-transform: uppercase;
+}
+.h4 {
+    font-size: 16px;
+}
+.h5 {
+    font-size: 14px;
+}
+.h6 {
+    font-size: 12px;
+}
+.small
+    {
+        font-size: 10px;    
+    }
