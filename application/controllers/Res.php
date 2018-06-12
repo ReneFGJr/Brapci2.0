@@ -33,6 +33,8 @@ class res extends CI_Controller {
     public function index() {
         $this -> load -> model('sources');
         $this -> cab();
+        
+        $this->load->view('brapci/resume.php');
 
         $data = array();
         $data['content'] = $this -> sources -> list_sources();

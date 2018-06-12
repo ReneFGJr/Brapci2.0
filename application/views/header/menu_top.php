@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     body {
         margin-top: 200px;
     }
-/****************** NAV BAR ***************/
+    /****************** NAV BAR ***************/
     .navbar {
         box-shadow: 0 4px 20px -4px #ababab;
         background: rgba(249, 249, 249, .8);
@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     }
 
     .navbar:hover {
-        background: #003677;
+        background: #C0D6FF;
     }
     /**************** LARGE */
     .fsz-lg {
@@ -43,20 +43,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </style>
 <header>
 	<nav class="navbar fixed-top navbar-expand-lg">
-		<a href="<?php echo base_url(PATH); ?>"> <img src="<?php echo base_url('img/logo/logo-brapci.png'); ?>" id="logo" class="logo-lg col-lg-0" border=0>
+		<a href="<?php echo base_url(PATH); ?>"><img src="<?php echo base_url('img/logo/logo-brapci.png'); ?>" id="logo" class="logo-lg col-lg-0" border=0>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto">
+			<ul class="navbar-nav ml-auto">
 				<li class="nav-item active">
-					<a class="nav-link fsz " href="<?php echo base_url(PATH);?>">Home <span class="sr-only">(current)</span></a>
+					<a class="nav-link fsz " href="<?php echo base_url(PATH); ?>">&nbsp;<?php echo msg('home'); ?>&nbsp;<span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link fsz " href="<?php echo base_url(PATH.'about');?>"><?php echo msg('About');?></a>
+					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'about'); ?>">&nbsp;<?php echo msg('about'); ?>&nbsp;</a>
 				</li>
 				<li class="nav-item dropdown">
-					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Dropdown </a>
+					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('tools'); ?>&nbsp;</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="#">Action</a>
 						<a class="dropdown-item" href="#">Another action</a>
@@ -64,13 +64,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						<a class="dropdown-item" href="#">Something else here</a>
 					</div>
 				</li>
+                <li class="nav-item active">
+                    <a class="nav-link fsz " href="<?php echo base_url(PATH); ?>social/signin">&nbsp;<b><?php echo msg('signin'); ?></b>&nbsp;</span></a>
+                </li>				
 			</ul>
+			<!---
 			<form class="form-inline my-2 my-lg-0">
-				<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-					Search
-				</button>
+			<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+			Search
+			</button>
 			</form>
+			--->
 		</div>
 	</nav>
 
@@ -82,7 +87,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				if ($menu_size == 0) {
 					$("#logo").switchClass("logo-lg", "logo", 1000, "easeInOutQuad");
 					$("header").switchClass("menu_large", "menu_small", 1000, "easeInOutQuad");
-					$(".fsz").animate({fontSize: "20px" }, 1000 );
+					$(".fsz").animate({
+						fontSize : "20px"
+					}, 1000);
 					$menu_size = 1;
 				}
 				//TROCA P CLASSE MENOR
@@ -90,7 +97,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				if ($menu_size == 1) {
 					$("header").switchClass("menu_small", "menu_large", 1000, "easeInOutQuad");
 					$("#logo").switchClass("logo", "logo-lg", 1000, "easeInOutQuad");
-					$(".fsz").animate({fontSize: "40px" }, 1000 );
+					$(".fsz").animate({
+						fontSize : "40px"
+					}, 1000);
 					$menu_size = 0;
 				}
 			}

@@ -34,4 +34,16 @@ if (!function_exists(('msg')))
 /* Cited */
 $lang['current'] = 'atual';
 $lang['Validity'] = 'Vigência';
+
+$lang['about'] = 'sobre';
+$lang['home'] = 'home';
+$lang['tools'] = 'ferramentas';
+$lang['signin'] = 'login';
+$lang['search_term'] = 'informe o(s) termo(s) de busca';
+$lang['search_1'] = 'todos os campos';
+$lang['search_2'] = 'autores';
+$lang['search_3'] = 'título';
+$lang['search_4'] = 'palavras-chave';
+$lang['search_5'] = 'resumo';
+$lang['search_6'] = 'referências';
 ?>
