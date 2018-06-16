@@ -23,28 +23,3 @@
     {
         font-size: 10px;    
     }
-body
-	{
-		background-color: #f0f8ff;
-	}
-.container
-	{
-		background-color: white;
-		border: 1px solid #e0e0e0;
-		border-radius: 10px;
-		padding: 20px 0px 50px 0px;
-	}
-
-.link_0, .link_0 a 
-	{
-		color: #c0c0c0;
-	}
-.link_0 a:hover 
-	{
-		color: #505050;
-	}	
-	
-.link_1, .link_1 a, .link_1 a:hover 
-	{
-		color: #8080FF;
-	}	
