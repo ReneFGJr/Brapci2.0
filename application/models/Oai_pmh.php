@@ -253,6 +253,7 @@ class oai_pmh extends CI_model {
 			for ($r = 0; $r < count($is); $r++) {
 				$tit = (string)$rcn -> subject[$r];
 				$tit = troca($tit, '.', ';');
+				$tit = troca($tit, ',', ';');
 				$tit = splitx(';', $tit);
 				$lang = '';
 				foreach ($rcn -> subject[$r] -> attributes() as $atrib => $value) {
