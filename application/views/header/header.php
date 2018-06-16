@@ -8,7 +8,7 @@ if (!isset($title)) { $title = 'no title';
     <meta charset="utf-8">
     <title><?php echo $title; ?></title>    
     
-    <META NAME="title" CONTENT="Brapci - Base de Dados em Ciência da Informação">
+    <META NAME="title" CONTENT="Curadoria Digital">
     <META NAME="url" CONTENT="http://www.brapci.inf.br/">
     <META NAME="description" CONTENT="Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.">
     <META NAME="keywords" CONTENT="artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia">
@@ -26,6 +26,7 @@ if (!isset($title)) { $title = 'no title';
     <link href="<?php echo base_url('css/bootstrap.min.css?v4.0'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('css/style.css?v0.1'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('css/jquery-ui.css?v1.12.1'); ?>" rel="stylesheet">
+    <link href="<?php echo base_url('css/style.css?v1.0.1'); ?>" rel="stylesheet">
     
     <!--- JS ---->
     <script src="<?php echo base_url('js/jquery-3.3.1.min.js?v3.3.1'); ?>"></script>
@@ -51,6 +52,6 @@ if (!isset($title)) { $title = 'no title';
 </script>
     
 </head>
-<body>
+<body style="margin-top: 100px;">
     
 </body>
