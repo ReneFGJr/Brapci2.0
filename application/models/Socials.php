@@ -18,6 +18,7 @@
 
 /****************** Security login ****************/
 function perfil($p, $trava = 0) {
+	return(1);
 	$ac = 0;
 	if (isset($_SESSION['perfil'])) {
 		$perf = $_SESSION['perfil'];

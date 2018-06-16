@@ -55,10 +55,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				<li class="nav-item">
 					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'about'); ?>">&nbsp;<?php echo msg('about'); ?>&nbsp;</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'indice'); ?>">&nbsp;<?php echo msg('indexs'); ?>&nbsp;</a>
+				</li>				
 				<li class="nav-item dropdown">
 					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('tools'); ?>&nbsp;</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="#">Action</a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'journals'); ?>"><?php msg('journals');?>xx</a>
 						<a class="dropdown-item" href="#">Another action</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="#">Something else here</a>

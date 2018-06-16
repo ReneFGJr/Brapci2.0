@@ -2,6 +2,35 @@
 class sources extends CI_Model {
     var $table = 'source_source';
 
+	function cp($id='')
+		{
+			$cp = array();
+			array_push($cp,array('$H8','id_jnl','',False,True));
+			array_push($cp,array('$S100','jnl_name',msg('jnl_name'),False,True));
+			array_push($cp,array('$S30','jnl_name_abrev',msg('jnl_name_abrev'),False,True));
+			
+			array_push($cp,array('$S100','jnl_url',msg('jnl_url'),False,True));
+			array_push($cp,array('$S100','jnl_url_oai',msg('jnl_url_oai'),False,True));
+			
+			array_push($cp,array('$S30','jnl_issn',msg('jnl_issn'),False,True));
+			array_push($cp,array('$S30','jnl_eissn',msg('jnl_eissn'),False,True));
+			array_push($cp,array('$[1950-'.date("Y").']','jnl_ano_inicio',msg('jnl_ano_inicio'),False,True));
+			array_push($cp,array('$[1950-'.date("Y").']','jnl_ano_final',msg('jnl_ano_final'),False,True));
+			
+			
+			array_push($cp,array('$HV','jnl_oai_last_harvesting',date("Y-m-d"),True,True));
+			array_push($cp,array('$HV','jnl_cidade','0',False,True));
+			array_push($cp,array('$HV','jnl_scielo','0',False,True));
+			array_push($cp,array('$HV','jnl_collection','',False,True));
+			$op = '1:'.msg('yes, with OAI');
+			$op .= '&2:'.msg('yes, without OAI');
+			$op .= '&3:'.msg('No, finished');
+			$op .= '&0:'.msg('canceled');
+			array_push($cp,array('$O 1:Yes','jnl_active',msg('active'),True,True));
+			
+			return($cp);
+		}
+
     function jnl_name($line) {
         $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
         $sx = $link . $line['jnl_name'] . '</a>';
@@ -24,6 +53,23 @@ class sources extends CI_Model {
             return ( array());
         }
     }
+	
+	function button_new_sources($id='')
+		{
+			$sx = '';
+			$sx .= '<div class="row">';
+			$sx .= '<div class="col-1">';
+			if (strlen($id) == 0)
+				{
+					$sx .= '<a href="'.base_url(PATH.'jnl_edit').'" class="btn btn-secondary">'.msg("new_source").'</a>';		
+				} else {
+					$sx .= '<a href="'.base_url(PATH.'jnl_edit/'.$id).'" class="btn btn-secondary">'.msg("edit_source").'</a>';
+				}
+			
+			$sx .= '</div>';
+			$sx .= '</div>'.CR;
+			return($sx);
+		}
 
     function list_sources() {
         $sql = "select * from " . $this -> table . " 
@@ -33,12 +79,14 @@ class sources extends CI_Model {
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         /**************************** MOUNT HTML ***********/
-        $sx = '<ul class="journals">';
+        $sx = '<div class="col-12">'.CR;
+        $sx .= '<ul class="journals">';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $sx .= '<li>' . $this -> jnl_name($line) . '</li>';
         }
         $sx .= '</ul>';
+		$sx .= '</div>'.CR;
         return ($sx);
     }
 

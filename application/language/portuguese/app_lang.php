@@ -46,4 +46,13 @@ $lang['search_3'] = 'título';
 $lang['search_4'] = 'palavras-chave';
 $lang['search_5'] = 'resumo';
 $lang['search_6'] = 'referências';
+$lang['indexs'] = 'índices';
+
+
+$lang['propriety'] = 'propriedade';
+$lang['value'] = 'valor';
+$lang['affiliatedWith'] = 'Afiliação com';
+$lang['prefLabel'] = 'Descritor';
+$lang['hasAuthor'] = 'Autor de';
+$lang['hasEmail'] = 'e-mail';
 ?>

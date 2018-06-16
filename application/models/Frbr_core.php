@@ -16,17 +16,27 @@ class frbr_core extends CI_model {
         }
         return (0);
     }
+	
+	function check_language()
+		{
+			$sql = "update rdf_name set n_lang = 'pt-BR' where n_lang = 'pt_BR'";
+			$rlt = $this -> db -> query($sql);
+		}
     
     function index_list($lt = '', $class='Person') {
         $f = $this -> find_class($class);
+		$this->check_language();
 
         $sql = "select * from rdf_concept 
                         INNER JOIN rdf_name ON cc_pref_term = id_n
-                        where cc_class = " . $f . " 
+                        where cc_class = " . $f . " and n_lang = 'pt-BR'
                         ORDER BY n_name";
+
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
-        $sx = '<ul>';
+		$sx = '<div class="col"><div class="col-12">';
+		$sx .= '<h5>'.msg('total_subject').' '.number_format(count($rlt),0,',','.').' '.msg('registers').'</h5>';
+        $sx .= '<ul>';
         $l = '';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
@@ -40,6 +50,7 @@ class frbr_core extends CI_model {
             $sx .= '<li>' . $name . '</li>' . cr();
         }
         $sx .= '<ul>';
+        $sx .= '</div></div>';
         return ($sx);
     }
     
@@ -59,7 +70,7 @@ class frbr_core extends CI_model {
     }
 
     /******************************************************************* RDF NAME ***/
-    function frbr_name($n = '', $lang='pt_BR', $new = 1) {
+    function frbr_name($n = '', $lang='pt-BR', $new = 1) {
         $n = trim($n);
         $lang = trim($lang);
         $lang = troca($lang,'@','');
@@ -145,7 +156,7 @@ class frbr_core extends CI_model {
                         } 
                     $sx .= '<tr>';
                     $sx .= '<td align="right" valign="top">';
-                    $sx .= '<i>'.$line['c_class'].'</i>';
+                    $sx .= '<i>'.msg($line['c_class']).'</i>';
                     $sx .= '</td>';
                     $sx .= '<td>';
                     $sx .= $this->mostra_dados($line['n_name'],$link);
@@ -235,7 +246,7 @@ class frbr_core extends CI_model {
     }
 
     /*****************************************************************  RDF CONCEPT **/
-    function rdf_concept_create($class, $term, $orign = '' , $lang='pt_BR') {
+    function rdf_concept_create($class, $term, $orign = '' , $lang='pt-BR') {
         $cl = $this -> find_class($class);
         $term = $this -> frbr_name($term,$lang);
 
