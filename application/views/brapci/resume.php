@@ -17,11 +17,7 @@
         background-size: cover;
     }
 </style>
-<div class="container">
-                <?php
-                require ("form.php");
-            ?>
-</div>
+
 
 <div class="container-fluid parallax parallax_background_2">
      	<div class="row" style="padding: 10px;">

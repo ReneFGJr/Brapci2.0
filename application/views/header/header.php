@@ -24,7 +24,7 @@ if (!isset($title)) { $title = 'no title';
     
     <!--- CSS --->
     <link href="<?php echo base_url('css/bootstrap.min.css?v4.0'); ?>" rel="stylesheet">
-    <link href="<?php echo base_url('css/style.css?v0.1'); ?>" rel="stylesheet">
+    <link href="<?php echo base_url('css/style.css?v0.3'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('css/jquery-ui.css?v1.12.1'); ?>" rel="stylesheet">
     
     <!--- JS ---->

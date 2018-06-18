@@ -51,8 +51,13 @@ $lang['indexs'] = 'índices';
 
 $lang['propriety'] = 'propriedade';
 $lang['value'] = 'valor';
-$lang['affiliatedWith'] = 'Afiliação com';
+$lang['affiliatedWith'] = 'Afiliação';
 $lang['prefLabel'] = 'Descritor';
-$lang['hasAuthor'] = 'Autor de';
+$lang['hasAuthor'] = 'Autor';
 $lang['hasEmail'] = 'e-mail';
+
+$lang['Search'] = 'Pesquisar';
+
+$lang['hasIssueOf'] = 'Artigo';
+$lang['hasSubject'] = 'Tema';
 ?>

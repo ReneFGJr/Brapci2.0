@@ -252,8 +252,19 @@ class oai_pmh extends CI_model {
 			$key = '';
 			for ($r = 0; $r < count($is); $r++) {
 				$tit = (string)$rcn -> subject[$r];
+                /******************************************************* excpetions ************/
+                for ($q=0;$q <= 9;$q++)
+                    {
+                        $tit = troca($tit,$q.'.',$q.'¢');
+                    }
+                $tit = troca($tit, '.', ';');
+                $tit = troca($tit, ' - ', ';');
 				$tit = troca($tit, '.', ';');
 				$tit = troca($tit, ',', ';');
+                
+                /*******************************/
+                $tit = troca($tit,'¢','.');
+                
 				$tit = splitx(';', $tit);
 				$lang = '';
 				foreach ($rcn -> subject[$r] -> attributes() as $atrib => $value) {
@@ -341,10 +352,52 @@ class oai_pmh extends CI_model {
 
 	public function cache_link($line = array()) {
 		$sx = '';
-		$link = '<a href="' . base_url(PATH . 'oai/harvesting/' . $line['li_s']) . '">';
+		$link = '<a href="' . base_url(PATH . 'oai/cache/' . $line['li_jnl'].'/' . $line['li_s']) . '">';
 		$sx .= $link . msg('cache_status_' . $line['li_s']) . '</a>';
 		return ($sx);
 	}
+    
+    public function cache_change_to($id,$id2,$id3='') {
+        $sx = '';
+        if (strlen($id3) > 0)
+            {
+                $sql = "update source_listidentifier
+                            set li_s = $id3
+                        where li_jnl = $id and li_s = $id2";
+                $rlt = $this -> db -> query($sql);
+                $sx .= '
+                    <div class="alert alert-success" role="alert">
+                      Success! Changed this status!
+                    </div>                
+                ';
+            }
+        $sx .= msg('change_to').':<br>';
+        $sx .= '<ul>';
+        for ($r=1;$r < 10;$r++)
+            {
+                $link = '<a href="' . base_url(PATH . 'oai/cache/' . $id.'/' . $id2.'/'.$r) . '">';
+                $sx .= '<li>';
+                $sx .= $link . msg('cache_status_' . $r) . '</a>';
+                $sx .= '</li>';                
+            }
+        $sx .= '</ul>';
+        return ($sx);
+    }
+    public function list_cache($id,$id2)
+        {
+            $sql = "select * from source_listidentifier 
+                        where li_jnl = $id and li_s = $id2";
+            $rlt = $this -> db -> query($sql);
+            $rlt = $rlt->result_array();  
+            $sx = '<ul>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $sx .= '<li>'.$line['li_identifier'].'</li>'.cr();
+                }
+            $sx .= '</ul>';
+            return ($sx);
+        }
 
 	public function cache_resume($id) {
 		/* Alter status - Deleted registers */
@@ -352,10 +405,10 @@ class oai_pmh extends CI_model {
 		$rlt = $this -> db -> query($sql);
 
 		/* Counter Registers */
-		$sql = "select count(*) as total, li_s 
+		$sql = "select count(*) as total, li_s, li_jnl 
                         FROM source_listidentifier
                         WHERE li_jnl = $id 
-                        GROUP BY li_s
+                        GROUP BY li_s, li_jnl
                         ORDER BY li_s ";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();

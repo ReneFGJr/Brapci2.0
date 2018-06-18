@@ -4,6 +4,18 @@ class frbr extends CI_model {
         $this -> load -> model("frbr_core");
         return ($this -> frbr_core -> vv($id));
     }
+    
+    function show_v($i)
+        {
+            $filename = 'c/'.$i.'/name.oai';
+            if (file_exists($filename))
+                {
+                    $t = load_file_local($filename);                    
+                } else {
+                    $t = msg('not_registred').' - '.$i;
+                }
+            return($t);
+        }
 
     function article_create($dt) {
         $name = $dt['li_identifier'];

@@ -19,7 +19,126 @@
 .h6 {
     font-size: 12px;
 }
-.small
+.small {
+    font-size: 10px;
+}
+.result
     {
-        font-size: 10px;    
+        color: #303030;
     }
+.result a
+    {
+        color: #303030;
+    }
+.result a:hover
+    {
+        color: #000000;
+    }
+.ucase
+    {
+        text-transform: uppercase;
+    }
+/**************************************************** FORM ***************/
+/* NOTE: The styles were added inline because Prefixfree needs access to your styles and they must be inlined if they are on local disk! */
+.cf:before, .cf:after {
+    content: "";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    zoom: 1;
+}
+
+/* Form wrapper styling */
+.search-wrapper {
+    width: 100%;
+    margin: 45px auto 50px auto;
+}
+
+/* Form text input */
+
+.search-wrapper input {
+    font: bold 15px 'lucida sans', 'trebuchet MS', 'Tahoma';
+    border: 0;
+    background: #EEE;
+    border-radius: 3px 0 0 3px;
+}
+
+.search-wrapper input:focus {
+    outline: 0;
+    background: #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,.8) inset;
+}
+
+.search-wrapper input::-webkit-input-placeholder {
+    color: #999;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.search-wrapper input:-moz-placeholder {
+    color: #999;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.search-wrapper input:-ms-input-placeholder {
+    color: #999;
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Form submit button */
+.search-wrapper button {
+    overflow: visible;
+    position: relative;
+    float: right;
+    border: 0;
+    padding: 0px 20px 0px 20px;
+    cursor: pointer;
+    height: 40px;
+    /* width: 72px; */
+    font: bold 15px/40px 'lucida sans', 'trebuchet MS', 'Tahoma';
+    color: white;
+    text-transform: uppercase;
+    background: #8080FF;
+    border-radius: 0 3px 3px 0;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
+}
+
+.search-wrapper button:hover {
+    background: #4040e5;
+}
+
+.search-wrapper button:active, .search-wrapper button:focus {
+    background: #2f2fc4;
+    outline: 0;
+}
+
+.search-wrapper button:before {/* left arrow */
+    content: '';
+    position: absolute;
+    border-width: 8px 8px 8px 0;
+    border-style: solid solid solid none;
+    border-color: transparent #3c3cd8 transparent;
+    top: 12px;
+    left: -6px;
+}
+
+.search-wrapper button:hover:before {
+    border-right-color: #4040e5;
+}
+
+.search-wrapper button:focus:before, .search-wrapper button:active:before {
+    border-right-color: #2f2fc4;
+}
+
+.search-wrapper button::-moz-focus-inner {/* remove extra button spacing for Mozilla Firefox */
+    border: 0;
+    padding: 0;
+}
+

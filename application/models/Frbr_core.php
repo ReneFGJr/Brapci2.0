@@ -2,6 +2,17 @@
 class frbr_core extends CI_model {
     var $limit = 20;
     
+    function link($line,$tp=1)
+        {
+            $id = $line['d_r2'];
+            if ($id == 0)
+                {
+                    $id = $line['d_r1'];
+                }            
+            $link = '<a href="'.base_url(PATH.'v/'.$id).'" class="'.$line['c_class'].'">';
+            return($link);
+        }
+    
     function find($n, $prop = '') {
         $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
                         INNER JOIN rdf_data on d_literal = id_n 
@@ -156,10 +167,17 @@ class frbr_core extends CI_model {
                         } 
                     $sx .= '<tr>';
                     $sx .= '<td align="right" valign="top">';
-                    $sx .= '<i>'.msg($line['c_class']).'</i>';
+                    $sx .= '<i>'.msg(trim($line['c_class'])).'</i>';
                     $sx .= '</td>';
                     $sx .= '<td>';
-                    $sx .= $this->mostra_dados($line['n_name'],$link);
+                    /********* INVERT ********/
+                    if (($line['d_r1'] == $id) and ($line['d_r2'] != 0))
+                        {
+                            $idv = $line['d_r2'];
+                            $line['d_r2'] = $line['d_r1'];
+                            $line['d_r1'] = $idv;
+                        }
+                    $sx .= $this->mostra_dados($line['n_name'],$link,$line);
                     $sx .= '</td>';
                     $sx .= '</tr>';        
                 }
@@ -167,7 +185,7 @@ class frbr_core extends CI_model {
             return($sx);
         }
 
-    function mostra_dados($n,$l='')
+    function mostra_dados($n,$l='',$line)
         {
             $la = '';
             /****************** HTTP *********/
@@ -180,6 +198,12 @@ class frbr_core extends CI_model {
                 {
                     $l = '<a href="http://dx.doi.org/'.$n.'" target="new_'.date("mis").'" title="DOI Link'.$n.'">';
                     $n = 'DOI: '.$n;
+                }
+             /****************** OAI *********/
+             if ((lowercase(substr($n,0,4))=='oai:'))
+                {
+                    $n = $this->frbr->show_v($line['d_r1']);
+                    $l = '<a href="'.base_url(PATH.'v/'.$line['d_r1']).'" target="new_'.date("mis").'" title="View Article" class="result">';
                 }
                           
              
@@ -197,7 +221,7 @@ class frbr_core extends CI_model {
         } else {
             $tela = '';
             if (strlen($data['n_name']) > 0) {
-                $tela .= '<div class="row">';
+                $tela .= '<div class="row result">';
                 $tela .= '<div class="col-md-12">';
                 $linkc = '<a href="' . base_url(PATH.'v/' . $id) . '" class="middle">';
                 $linkca = '</a>';
