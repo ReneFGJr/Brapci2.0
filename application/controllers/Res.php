@@ -30,6 +30,18 @@ class res extends CI_Controller {
         $this -> load -> view('header/footer.php');
     }
 
+	public function zera()
+		{
+			$this->cab();
+			$sql = "TRUNCATE source_listidentifier;";
+			$this->db->query($sql);
+			$sql = "TRUNCATE rdf_concept;";
+			$this->db->query($sql);
+			$sql = "TRUNCATE rdf_data;";
+			$this->db->query($sql);
+			$sql = "TRUNCATE rdf_name;";
+			$this->db->query($sql);
+		}
     public function index() {
         $this -> load -> model('sources');
         $this -> load -> model('frbr');
@@ -40,7 +52,7 @@ class res extends CI_Controller {
         if (strlen(get("q")) > 0)
             {
                 $this->load->model('searchs');
-                $term = get("q");
+                $term = $this->searchs->convert(get("q"));
                 $type = get("type");
                 $data['content'] = '<div class="col-12">'.$this->searchs->s($term,$type).'</div>';
                 $this->load->view('show',$data);
@@ -223,6 +235,7 @@ class res extends CI_Controller {
 
     public function oai($verb = '', $id = 0, $id2 = '', $id3 = '') {
         $this -> load -> model('sources');
+		$this -> load -> model('searchs');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');

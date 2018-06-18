@@ -126,6 +126,10 @@ class export extends CI_Model {
         $class = 'Subject';
         $sz = 5000000000;
         $f = $this -> frbr_core -> find_class($class);
+		$P1 = $this -> frbr_core -> find_class('prefLabel');
+		$P2 = $this -> frbr_core -> find_class('altLabel');
+		$P3 = $this -> frbr_core -> find_class('hiddenLabel');
+		
         $sql = "select n_name, id_cc, n_lang, cc_use, d_r1, d_r2
                         FROM rdf_concept 
                         INNER JOIN rdf_name ON cc_pref_term = id_n
@@ -133,6 +137,15 @@ class export extends CI_Model {
                         where cc_class = " . $f . " and n_lang = 'pt-BR'
                         ORDER BY n_name
                         LIMIT $sz OFFSET " . ($pg * $sz) . "    ";
+						
+		$sql = "SELECT n_name, id_cc, n_lang, cc_use, d_r1, d_r2 FROM `rdf_data` 
+					INNER JOIN rdf_name ON d_literal = id_n
+					INNER JOIN rdf_concept on d_r1 = id_cc
+					where ((cc_class = " . $f . ")) and (n_lang = 'pt-BR')
+						AND ((d_p) = $P1 or (d_p = $P2) or (d_p = $P3))
+					ORDER BY n_name
+                        LIMIT $sz OFFSET " . ($pg * $sz) . "";
+
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 

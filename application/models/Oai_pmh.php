@@ -50,6 +50,8 @@ class oai_pmh extends CI_model {
 	}
 
 	function process($dt) {
+		$this->load->model('searchs');
+		
 		/*********************************** PROCESS **************************************/
 		$dt2 = $this -> le_cache($dt['idc']);
 		$dt3 = $this -> sources -> le($dt2['li_jnl']);
@@ -258,9 +260,12 @@ class oai_pmh extends CI_model {
                         $tit = troca($tit,$q.'.',$q.'¢');
                     }
                 $tit = troca($tit, '.', ';');
+				$tit = troca($tit, '/', ';');
                 $tit = troca($tit, ' - ', ';');
 				$tit = troca($tit, '.', ';');
 				$tit = troca($tit, ',', ';');
+				$tit = troca($tit, ':', ';');
+				$tit = troca($tit, '–', ';');
                 
                 /*******************************/
                 $tit = troca($tit,'¢','.');
@@ -280,7 +285,7 @@ class oai_pmh extends CI_model {
 			$is = $this -> xml_values($rcn -> description);
 			$abstract = array();
 			for ($r = 0; $r < count($is); $r++) {
-				$tit = (string)$rcn -> description[$r];
+				$tit = trim((string)$rcn -> description[$r]);
 				$lang = '';
 				foreach ($rcn -> description[$r] -> attributes() as $atrib => $value) {
 					if ($atrib == 'lang') { $lang = (string)$value;

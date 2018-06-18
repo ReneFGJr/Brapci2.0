@@ -28,6 +28,9 @@ class frbr extends CI_model {
         if (isset($dt['issue']['section']))
             {
                 $section = trim($dt['issue']['section']);
+				$section = $this->searchs->ucwords($section);
+				$section = $this->searchs->convert($section);
+
                 $id_section = $this -> frbr_core -> rdf_concept_create('ArticleSection', $section, '');
                 
                 $section_id = $dt['li_setSpec'];
@@ -46,7 +49,7 @@ class frbr extends CI_model {
         $this -> frbr_core -> set_propriety($idf, $prop, $idj, 0);
         
                 
-        /******************************************************************************/
+        /****************************************************** SUBJECT *************/
         $prop = 'hasSubject';
         $tt = $dt['subject'];
 
@@ -54,9 +57,24 @@ class frbr extends CI_model {
             $name = $tt[$r];
             $lang = substr($name,strpos($name,'@')+1,strlen($name));
             $name = substr($name,0,strpos($name,'@'));
+			
             /* TERMO */
-            $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name, '', $lang);            
-            $this -> frbr_core -> set_propriety($idf, $prop, $idterm, 0);
+            
+			$name = $this->searchs->ucwords($name);		
+			$name2 = $name;
+            if ($lang == 'pt-BR')
+				{
+					$name2 = $this->searchs->convert($name);
+				}
+            $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name2, '', $lang);            
+            $this -> frbr_core -> set_propriety($idf, $prop, $idterm, 0);			
+			if ($name2 != $name)
+				{
+					
+					$prop2 = 'altLabel';
+					$term = $this -> frbr_core -> frbr_name($name);
+					$this -> frbr_core -> set_propriety($idterm, $prop2, 0 , $term);	
+				}
         }        
 
         /******************************************************************************/
@@ -140,10 +158,11 @@ class frbr extends CI_model {
             }
         }
         /************** ISSUE id **********************************************/
-        $name = 'Jnl: '.$dt['id_jnl'].' Issue:'.$dt['issue']['issue_id'];        
+        $name = 'Issue:'.$dt['issue']['issue_id'].' Jnl: '.$dt['id_jnl'];        
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
-        $name = $nm;
+        $name = $this->searchs->ucwords($nm);
+        $nm = $this->searchs->convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
         $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);

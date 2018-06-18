@@ -63,6 +63,7 @@ class searchs extends CI_Model
                     'aces'=>'ace',
                     'ais'=>'al',
                     'aos'=>'ao',
+                    'ãos'=>'ao',
                     'ares'=>'ar',
                     'ubes'=>'ube',
                     'bens'=>'bem',
@@ -75,6 +76,7 @@ class searchs extends CI_Model
                     'chas'=>'cha',                    
                     'cos'=>'co',
                     'coes'=>'cao',
+                    'ções'=>'ção',
                     'dados'=>'dado',
                     'des'=>'de',
                     'dios'=>'dio',
@@ -84,6 +86,7 @@ class searchs extends CI_Model
                     'nios'=>'nio',
                     'dores'=>'dor',
                     'eias'=>'eia',
+                    'eis'=>'el',
                     'eios'=>'eio',
                     'fias'=>'fia',
                     'fins'=>'fim',
@@ -91,10 +94,12 @@ class searchs extends CI_Model
                     'gens'=>'gem',
                     'gias'=>'gia',
                     'gios'=>'gio',
+                    'gos'=>'go',
                     'guas'=>'gua',
                     'gos'=>'go',                    
                     'iais'=>'ial',
                     'ioes'=>'iao',
+                    'ões'=>'ão',
                     'ices'=>'ice',
                     'jos'=>'jo',
                     'leis'=>'lei',
@@ -111,6 +116,7 @@ class searchs extends CI_Model
                     'nas'=>'na',
                     'nes'=>'ne',
                     'nos'=>'no',
+                    'nhos'=>'nho',
                     'nais'=>'nal',
                     'nias'=>'ina',
                     'pas'=>'pa',
@@ -153,6 +159,7 @@ class searchs extends CI_Model
                     'xos'=>'xo',
                     'xoes'=>'xao',                   
                     'zes'=>'z',
+                    
                     );
                 foreach ($a as $key => $value) {
                     $t = troca($t,$key.' ',$value.' ');    
@@ -163,8 +170,34 @@ class searchs extends CI_Model
                         $t = troca($t,'  ',' ');
                     }
 
-                $t = trim($t);                                
+                $t = trim($t);
+
                 return($t);
-            }                  
+            }     
+		function ucwords($t)
+			{
+				$t = trim($t);
+				$t = ucwords($t);
+				$t = troca($t, ' A ',' a ');
+				$t = troca($t, ' E ',' e ');
+				$t = troca($t, ' O ',' o ');
+				$t = troca($t, ' Com ',' com ');
+				$t = troca($t, ' Em ',' em ');				
+				$t = troca($t, ' Na ',' na ');
+				$t = troca($t, ' No ',' no ');
+				$t = troca($t, ' Da ',' da ');
+				$t = troca($t, ' Das ',' das ');
+				$t = troca($t, ' De ',' de ');                                
+				$t = troca($t, ' Do ',' do ');
+				$t = troca($t, ' Dos ',' dos ');
+				$t = troca($t, ' Of ',' of ');
+				$t = troca($t, ' The ',' the ');
+				$t = troca($t, ' And ',' and ');
+				
+                /************** Espanol ************/
+				$t = troca($t, ' En ',' en ');
+				
+				return($t);				
+			}             
     }
 ?>
