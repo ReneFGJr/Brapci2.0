@@ -119,6 +119,7 @@ class searchs extends CI_Model
                     'nhos'=>'nho',
                     'nais'=>'nal',
                     'nias'=>'ina',
+                    'pias'=>'pia',
                     'pas'=>'pa',
                     'pes'=>'pe',
                     'pios'=>'pio',
