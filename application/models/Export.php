@@ -138,14 +138,17 @@ class export extends CI_Model {
                         ORDER BY n_name
                         LIMIT $sz OFFSET " . ($pg * $sz) . "    ";
 						
-		$sql = "SELECT n_name, id_cc, n_lang, cc_use, d_r1, d_r2 FROM `rdf_data` 
-					INNER JOIN rdf_name ON d_literal = id_n
-					INNER JOIN rdf_concept on d_r1 = id_cc
+		$sql = "SELECT n_name, id_cc, n_lang, cc_use, d1.d_r1 as d_r1, d2.d_r2 as d_r2 , 
+		            d2.d_r1 as e_r1, d2.d_r2 as e_r2
+                    FROM rdf_data as d1
+                    INNER JOIN rdf_name ON d_literal = id_n 
+                    INNER JOIN rdf_concept on d_r1 = id_cc 
+                    INNER JOIN rdf_data AS d2 ON d2.d_r2 = d1.d_r1
 					where ((cc_class = " . $f . ")) and (n_lang = 'pt-BR')
-						AND ((d_p) = $P1 or (d_p = $P2) or (d_p = $P3))
+						AND ((d1.d_p) = $P1 or (d1.d_p = $P2) or (d1.d_p = $P3))
 					ORDER BY n_name
                         LIMIT $sz OFFSET " . ($pg * $sz) . "";
-
+        echo $sql;
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
@@ -156,6 +159,7 @@ class export extends CI_Model {
         $sx = '';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
+            
             $term = $line['n_name'];
             $term = lowercasesql($term);
             $to = $this->searchs->convert($term);
@@ -165,7 +169,7 @@ class export extends CI_Model {
                     $term = $to;
                 }
             $tr = '['.$term.']';
-            $id = $line['d_r1'];
+            $id = $line['e_r1'];
             if ($tx != $tr) {
                 /*******************************************/
                 if ($ti > 0) {

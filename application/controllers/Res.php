@@ -16,6 +16,7 @@ class res extends CI_Controller {
         $this -> load -> helper('xml');
         #$this -> load -> helper('xml_dom');
         $this -> load -> model("socials");
+        $this -> load -> helper('email');
         date_default_timezone_set('America/Sao_Paulo');
     }
 
@@ -30,34 +31,33 @@ class res extends CI_Controller {
         $this -> load -> view('header/footer.php');
     }
 
-	public function zera()
-		{
-			$this->cab();
-			$sql = "TRUNCATE source_listidentifier;";
-			$this->db->query($sql);
-			$sql = "TRUNCATE rdf_concept;";
-			$this->db->query($sql);
-			$sql = "TRUNCATE rdf_data;";
-			$this->db->query($sql);
-			$sql = "TRUNCATE rdf_name;";
-			$this->db->query($sql);
-		}
+    public function zera() {
+        $this -> cab();
+        $sql = "TRUNCATE source_listidentifier;";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE rdf_concept;";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE rdf_data;";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE rdf_name;";
+        $this -> db -> query($sql);
+    }
+
     public function index() {
         $this -> load -> model('sources');
         $this -> load -> model('frbr');
         $this -> cab();
 
         $this -> load -> view('brapci/form');
-        
-        if (strlen(get("q")) > 0)
-            {
-                $this->load->model('searchs');
-                $term = $this->searchs->convert(get("q"));
-                $type = get("type");
-                $data['content'] = '<div class="col-12">'.$this->searchs->s($term,$type).'</div>';
-                $this->load->view('show',$data);
-            }
-        
+
+        if (strlen(get("q")) > 0) {
+            $this -> load -> model('searchs');
+            $term = $this -> searchs -> convert(get("q"));
+            $type = get("type");
+            $data['content'] = '<div class="col-12">' . $this -> searchs -> s($term, $type) . '</div>';
+            $this -> load -> view('show', $data);
+        }
+
         $this -> load -> view('brapci/resume');
 
         $data = array();
@@ -235,7 +235,7 @@ class res extends CI_Controller {
 
     public function oai($verb = '', $id = 0, $id2 = '', $id3 = '') {
         $this -> load -> model('sources');
-		$this -> load -> model('searchs');
+        $this -> load -> model('searchs');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
@@ -360,37 +360,97 @@ class res extends CI_Controller {
         $this -> footer();
     }
 
-    function export($tp='',$pg = 0) {
+    function export($tp = '', $pg = 0) {
         $this -> load -> model('export');
         $this -> load -> model('frbr_core');
         $this -> cab();
 
-        switch($tp)
-            {
-                case 'article':
-                    $tela = $this -> export -> export_Article($pg);
-                    break;
-                case 'subject':
-                    $tela = $this -> export -> export_subject($pg);
-                    break;
-                case 'subject_reverse':
-                    $tela = $this -> export -> export_subject_reverse($pg);
-                    break;
-                default:
-                    $tela = '<h1>'.msg('export').'</h1>';
-                    $tela .= '<ul>'.cr();
-                    $tela .= '<li><a href="'.base_url(PATH.'export/article').'">'.msg('export').' '.msg('article').'</a></li>'.cr();
-                    $tela .= '<li><a href="'.base_url(PATH.'export/subject').'">'.msg('export').' '.msg('subject').'</a></li>'.cr();
-                    $tela .= '<li><a href="'.base_url(PATH.'export/subject_reverse').'">'.msg('export').' '.msg('subject_reverse').'</a></li>'.cr();
-                    $tela .= '</ul>'.cr();
-                    break;
-            }
-        
+        switch($tp) {
+            case 'article' :
+                $tela = $this -> export -> export_Article($pg);
+                break;
+            case 'subject' :
+                $tela = $this -> export -> export_subject($pg);
+                break;
+            case 'subject_reverse' :
+                $tela = $this -> export -> export_subject_reverse($pg);
+                break;
+            default :
+                $tela = '<h1>' . msg('export') . '</h1>';
+                $tela .= '<ul>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/article') . '">' . msg('export') . ' ' . msg('article') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/subject') . '">' . msg('export') . ' ' . msg('subject') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export') . ' ' . msg('subject_reverse') . '</a></li>' . cr();
+                $tela .= '</ul>' . cr();
+                break;
+        }
+
         $data['content'] = $tela;
         $data['title'] = '';
         $this -> load -> view('show', $data);
-        
+
         $this -> footer();
+    }
+
+    /* LOGIN */
+    function social($act = '') {
+        switch($act) {
+            case 'pwsend' :
+                $this -> cab();
+                $this -> socials -> resend();
+                break;
+                break;
+            case 'signup' :
+                $this -> cab();
+                $this -> socials -> signup();
+                break;
+            case 'logout' :
+                $this -> socials -> logout();
+                break;
+            case 'npass' :
+                $this -> cab();
+                $email = get("dd0");
+                $chk = get("chk");
+                $chk2 = checkpost_link($email . $email);
+
+                if (($chk != $chk2) AND (!isset($_POST['dd1']))) {
+                    $data['content'] = 'Erro de Check';
+                    $this -> load -> view('content', $data);
+                } else {
+                    $dt = $this -> socials -> le_email($email);
+                    if (count($dt) > 0) {
+                        $id = $dt['id_us'];
+                        $data['title'] = '';
+                        $tela = '<br><br><h1>' . msg('change_password') . '</h1>';
+                        $new = 1;
+                        // Novo registro
+                        $data['content'] = $tela . $this -> socials -> change_password($id, $new);
+                        $this -> load -> view('content', $data);
+                        //redirect(base_url("index.php/thesa/social/login"));
+                    } else {
+                        $data['content'] = 'Email não existe!';
+                        $this -> load -> view('error', $data);
+                    }
+                }
+
+                $this -> footer();
+                break;
+            case 'login' :
+                $this -> cab();
+                $this -> socials -> login();
+                break;
+            case 'login_local' :
+                $ok = $this -> socials -> login_local();
+                if ($ok == 1) {
+                    redirect(base_url(PATH));
+                } else {
+                    redirect(base_url(PATH . 'social/login/') . '?erro=ERRO_DE_LOGIN');
+                }
+                break;
+            default :
+                echo "Function not found";
+                break;
+        }
     }
 
 }

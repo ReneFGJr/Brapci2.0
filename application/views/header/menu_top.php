@@ -68,7 +68,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					</div>
 				</li>
                 <li class="nav-item active">
-                    <a class="nav-link fsz " href="<?php echo base_url(PATH); ?>social/signin">&nbsp;<b><?php echo msg('signin'); ?></b>&nbsp;</span></a>
+                    <a class="nav-link fsz " href="<?php echo base_url(PATH.'social/login'); ?>">&nbsp;<b><?php echo msg('signin'); ?></b>&nbsp;</span></a>
                 </li>				
 			</ul>
 			<!---

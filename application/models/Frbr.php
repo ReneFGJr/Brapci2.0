@@ -4,18 +4,16 @@ class frbr extends CI_model {
         $this -> load -> model("frbr_core");
         return ($this -> frbr_core -> vv($id));
     }
-    
-    function show_v($i)
-        {
-            $filename = 'c/'.$i.'/name.oai';
-            if (file_exists($filename))
-                {
-                    $t = load_file_local($filename);                    
-                } else {
-                    $t = msg('not_registred').' - '.$i;
-                }
-            return($t);
+
+    function show_v($i) {
+        $filename = 'c/' . $i . '/name.oai';
+        if (file_exists($filename)) {
+            $t = load_file_local($filename);
+        } else {
+            $t = msg('not_registred') . ' - ' . $i;
         }
+        return ($t);
+    }
 
     function article_create($dt) {
         $name = $dt['li_identifier'];
@@ -25,57 +23,51 @@ class frbr extends CI_model {
         $this -> frbr_core -> set_propriety($dt['issue_uri'], $prop, $idf, 0);
 
         /***************************************************** SECTION ****************/
-        if (isset($dt['issue']['section']))
-            {
-                $section = trim($dt['issue']['section']);
-				$section = $this->searchs->ucwords($section);
-				$section = $this->searchs->convert($section);
+        if (isset($dt['issue']['section'])) {
 
-                $id_section = $this -> frbr_core -> rdf_concept_create('ArticleSection', $section, '');
-                
-                $section_id = $dt['li_setSpec'];
-                $term = $this -> frbr_core -> frbr_name($section_id);
-                $this -> frbr_core -> set_propriety($id_section, $prop, 0, $term);
-                
-                /* ASSOCIA ARTIGO A SESSÃO */
-                $prop = 'hasSectionOf';
-                $this -> frbr_core -> set_propriety($idf, $prop, $id_section, 0);
-            }
+            $section = trim($dt['issue']['section']);
+            $id_section = $this -> frbr_core -> find($section, 'ArticleSection');
+
+            $section_id = $dt['li_setSpec'];
+            $term = $this -> frbr_core -> frbr_name($section_id);
+            $this -> frbr_core -> set_propriety($id_section, $prop, 0, $term);
+
+            /* ASSOCIA ARTIGO A SESSÃO */
+            $prop = 'hasSectionOf';
+            $this -> frbr_core -> set_propriety($idf, $prop, $id_section, 0);
+        }
 
         /***************************************************** JOURNAL ****************/
-        $jnl = 'jnl:'.$dt['id_jnl'];
-        $idj = $this->frbr_core->find($jnl);
+        $jnl = 'jnl:' . $dt['id_jnl'];
+        $idj = $this -> frbr_core -> find($jnl);
         $prop = 'isPubishIn';
         $this -> frbr_core -> set_propriety($idf, $prop, $idj, 0);
-        
-                
+
         /****************************************************** SUBJECT *************/
         $prop = 'hasSubject';
         $tt = $dt['subject'];
 
         for ($r = 0; $r < count($tt); $r++) {
             $name = $tt[$r];
-            $lang = substr($name,strpos($name,'@')+1,strlen($name));
-            $name = substr($name,0,strpos($name,'@'));
-			
+            $lang = substr($name, strpos($name, '@') + 1, strlen($name));
+            $name = substr($name, 0, strpos($name, '@'));
+
             /* TERMO */
-            
-			$name = $this->searchs->ucwords($name);		
-			$name2 = $name;
-            if ($lang == 'pt-BR')
-				{
-					$name2 = $this->searchs->convert($name);
-				}
-            $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name2, '', $lang);            
-            $this -> frbr_core -> set_propriety($idf, $prop, $idterm, 0);			
-			if ($name2 != $name)
-				{
-					
-					$prop2 = 'altLabel';
-					$term = $this -> frbr_core -> frbr_name($name);
-					$this -> frbr_core -> set_propriety($idterm, $prop2, 0 , $term);	
-				}
-        }        
+
+            $name = $this -> searchs -> ucwords($name);
+            $name2 = $name;
+            if ($lang == 'pt-BR') {
+                $name2 = $this -> searchs -> convert($name);
+            }
+            $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name2, '', $lang);
+            $this -> frbr_core -> set_propriety($idf, $prop, $idterm, 0);
+            if ($name2 != $name) {
+
+                $prop2 = 'altLabel';
+                $term = $this -> frbr_core -> frbr_name($name);
+                $this -> frbr_core -> set_propriety($idterm, $prop2, 0, $term);
+            }
+        }
 
         /******************************************************************************/
         $prop = 'hasTitle';
@@ -95,32 +87,30 @@ class frbr extends CI_model {
 
             $term = $this -> frbr_core -> frbr_name($title, $lang);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
-        } 
+        }
         /*********************************************************************** DATE */
         $prop = 'dateOfAvailability';
-        if (isset($dt['date']))
-            {
-                for ($r=0;$r < count($dt['date']);$r++)
-                    {                
-                        $name = $dt['date'][$r];
-                        $id_date = $this -> frbr_core -> rdf_concept_create('Date', $name,'');
-                        $this -> frbr_core -> set_propriety($idf, $prop, $id_date, 0);
-                    }  
+        if (isset($dt['date'])) {
+            for ($r = 0; $r < count($dt['date']); $r++) {
+                $name = $dt['date'][$r];
+                $id_date = $this -> frbr_core -> rdf_concept_create('Date', $name, '');
+                $this -> frbr_core -> set_propriety($idf, $prop, $id_date, 0);
             }
-               
+        }
+
         /******************************************************************************/
         $prop = 'hasUrl';
         for ($r = 0; $r < count($dt['relation']); $r++) {
             $title = $dt['relation'][$r];
             $term = $this -> frbr_core -> frbr_name($title);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
-        }               
+        }
         /******************************************************************************/
         $prop = 'hasSource';
         for ($r = 0; $r < count($dt['source']); $r++) {
             $title = $dt['source'][$r]['name'];
             $lang = $dt['source'][$r]['lang'];
-            $term = $this -> frbr_core -> frbr_name($title,$lang);
+            $term = $this -> frbr_core -> frbr_name($title, $lang);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
         /******************************************************************************/
@@ -130,8 +120,8 @@ class frbr extends CI_model {
             $term = $this -> frbr_core -> frbr_name($title);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
-        /*         
-        //******************************************************************************/
+        /*
+         //******************************************************************************/
         return ($idf);
     }
 
@@ -158,18 +148,18 @@ class frbr extends CI_model {
             }
         }
         /************** ISSUE id **********************************************/
-        $name = 'Issue:'.$dt['issue']['issue_id'].' Jnl: '.$dt['id_jnl'];        
+        $name = 'Issue:' . $dt['issue']['issue_id'] . ' Jnl: ' . $dt['id_jnl'];
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
-        $name = $this->searchs->ucwords($nm);
-        $nm = $this->searchs->convert($nm);
+        $name = $this -> searchs -> ucwords($nm);
+        $nm = $this -> searchs -> convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
         $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
 
         /******************************************************************************/
         $jnl = 'jnl:' . $dt['id_jnl'];
-        $jnl = $this -> frbr_core->find($jnl);
+        $jnl = $this -> frbr_core -> find($jnl);
         $prop = 'hasIssue';
         $this -> frbr_core -> set_propriety($idf, $prop, $jnl, 0);
 
@@ -181,14 +171,14 @@ class frbr extends CI_model {
         }
         if (isset($iss['vol']) and (strlen(trim($iss['vol'])) > 0)) {
             $prop = 'hasVolumeNumber';
-            $term = $this -> frbr_core -> frbr_name('v. '.$iss['vol']);
+            $term = $this -> frbr_core -> frbr_name('v. ' . $iss['vol']);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
         if (isset($iss['nr']) and (strlen(trim($iss['nr'])) > 0)) {
             $prop = 'hasVolumeNumber';
-            $term = $this -> frbr_core -> frbr_name('n. '.$iss['nr']);
+            $term = $this -> frbr_core -> frbr_name('n. ' . $iss['nr']);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
-        }        
+        }
         return ($idf);
     }
 
@@ -238,8 +228,8 @@ class frbr extends CI_model {
                 if (strlen($aff) > 0) {
                     $id_aff = $this -> frbr_core -> rdf_concept_create('Corporate Body', $aff, '');
                     $this -> frbr_core -> set_propriety($idf, 'affiliatedWith', $id_aff, 0);
-                }                
-                
+                }
+
             }
             return ($idf);
         }

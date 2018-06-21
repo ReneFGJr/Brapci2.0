@@ -58,6 +58,6 @@ $lang['hasEmail'] = 'e-mail';
 
 $lang['Search'] = 'Pesquisar';
 
-$lang['hasIssueOf'] = 'Artigo';
+//$lang['hasIssueOf'] = 'Artigo';
 $lang['hasSubject'] = 'Tema';
 ?>
