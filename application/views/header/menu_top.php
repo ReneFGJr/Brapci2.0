@@ -67,9 +67,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('export');?></a>
 					</div>
 				</li>
-                <li class="nav-item active">
-                    <a class="nav-link fsz " href="<?php echo base_url(PATH.'social/login'); ?>">&nbsp;<b><?php echo msg('signin'); ?></b>&nbsp;</span></a>
-                </li>				
+				<?php
+				if ((isset($_SESSION['user'])) and (strlen($_SESSION['user']) > 0))
+                    {
+                        echo '
+                            <li class="nav-item dropdown">
+                                <a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;'.$_SESSION['user'].'&nbsp;</a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="'.base_url(PATH . 'social/perfil').'">'.msg('perfil').'</a>
+                                    <a class="dropdown-item" href="'.base_url(PATH . 'social/logoff').'">'.msg('logout').'</a>
+                                </div>
+                            </li>                        
+                        ';                        
+                    } else {
+                        echo '
+                            <li class="nav-item active">
+                                <a class="nav-link fsz " href="'.base_url(PATH.'social/login').'">&nbsp;<b>'.msg('signin').'</b>&nbsp;</span></a>
+                            </li>                        
+                        ';        
+                    }
+                ?>
 			</ul>
 			<!---
 			<form class="form-inline my-2 my-lg-0">

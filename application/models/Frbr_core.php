@@ -1,18 +1,16 @@
 <?php
 class frbr_core extends CI_model {
     var $limit = 20;
-    
-    function link($line,$tp=1)
-        {
-            $id = $line['d_r2'];
-            if ($id == 0)
-                {
-                    $id = $line['d_r1'];
-                }            
-            $link = '<a href="'.base_url(PATH.'v/'.$id).'" class="'.$line['c_class'].'">';
-            return($link);
+
+    function link($line, $tp = 1) {
+        $id = $line['d_r2'];
+        if ($id == 0) {
+            $id = $line['d_r1'];
         }
-    
+        $link = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="' . $line['c_class'] . '">';
+        return ($link);
+    }
+
     function find($n, $prop = '') {
         $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
                         INNER JOIN rdf_data on d_literal = id_n 
@@ -27,26 +25,37 @@ class frbr_core extends CI_model {
         }
         return (0);
     }
-	
-	function check_language()
-		{
-			$sql = "update rdf_name set n_lang = 'pt-BR' where n_lang = 'pt_BR'";
-			$rlt = $this -> db -> query($sql);
-		}
-    
-    function index_list($lt = '', $class='Person') {
+
+    function language($lang) {
+        switch($lang) {
+            case 'pt_BR' :
+                $lang = 'pt-BR';
+                break;
+            case 'en-US' :
+                $lang = 'en';
+                break;
+        }
+        return ($lang);
+    }
+
+    function check_language() {
+        $sql = "update rdf_name set n_lang = 'pt-BR' where n_lang = 'pt_BR'";
+        $rlt = $this -> db -> query($sql);
+    }
+
+    function index_list($lt = '', $class = 'Person') {
         $f = $this -> find_class($class);
-		$this->check_language();
+        $this -> check_language();
 
         $sql = "select * from rdf_concept 
                         INNER JOIN rdf_name ON cc_pref_term = id_n
-                        where cc_class = " . $f . " and n_lang = 'pt-BR'
+                        where cc_class = " . $f . " 
                         ORDER BY n_name";
 
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
-		$sx = '<div class="col"><div class="col-12">';
-		$sx .= '<h5>'.msg('total_subject').' '.number_format(count($rlt),0,',','.').' '.msg('registers').'</h5>';
+        $sx = '<div class="col"><div class="col-12">';
+        $sx .= '<h5>' . msg('total_subject') . ' ' . number_format(count($rlt), 0, ',', '.') . ' ' . msg('registers') . '</h5>';
         $sx .= '<ul>';
         $l = '';
         for ($r = 0; $r < count($rlt); $r++) {
@@ -56,16 +65,15 @@ class frbr_core extends CI_model {
                 $sx .= '<h4>' . $xl . '</h4>';
                 $l = $xl;
             }
-            $link = '<a href="' . base_url(PATH.'v/' . $line['id_cc']) . '">';
-            $name = $link . $line['n_name'] .'</a> <sup style="font-size: 70%;">('.$line['n_lang'].')</sup>';
+            $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
+            $name = $link . $line['n_name'] . '</a> <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
             $sx .= '<li>' . $name . '</li>' . cr();
         }
         $sx .= '<ul>';
         $sx .= '</div></div>';
         return ($sx);
     }
-    
-        
+
     /***  FIND CLASS **/
     function find_class($class) {
         $sql = "select * from rdf_class
@@ -81,22 +89,27 @@ class frbr_core extends CI_model {
     }
 
     /******************************************************************* RDF NAME ***/
-    function frbr_name($n = '', $lang='pt-BR', $new = 1) {
+    function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
         $n = trim($n);
         $lang = trim($lang);
-        $lang = troca($lang,'@','');
-        if (strlen($lang) > 5) { $lang = substr($lang,0,5); }
+        $lang = troca($lang, '@', '');
+        if (strlen($lang) > 5) { $lang = substr($lang, 0, 5);
+        }
         $n = troca($n, "'", "´");
         $n = troca($n, "  ", " ");
         if (strlen($n) == 0) {
             return (0);
         }
+        /***************************************************************** LANGUAGE */
+        $lang = $this -> language($lang);
+        $md5 = md5(trim($n));
+
         /************ BUSCA NOMES **************************************/
-        $sql = "select * from rdf_name where n_name = '" . $n . "' and n_lang = '$lang'";
+        $sql = "select * from rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) == 0) {
-            $sqli = "insert into rdf_name (n_name, n_lang) values ('$n','$lang')";
+            $sqli = "insert into rdf_name (n_name, n_lang, n_md5) values ('$n','$lang','$md5')";
             $rlt = $this -> db -> query($sqli);
             $rlt = $this -> db -> query($sql);
             $rlt = $rlt -> result_array();
@@ -144,76 +157,66 @@ class frbr_core extends CI_model {
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
     }
-    
-    function view_data($id)
-        {
-            $data = $this->le_data($id);
-            $sx = '<table class="table">';
-            $sx .= '<tr>';
-            $sx .= '<th width="20%" style="text-align: right;">'.msg('propriety').'</th>';
-            $sx .= '<th width="80%">'.msg('value').'</th>';
-            $sx .= '</tr>';
-            for ($r=0;$r < count($data);$r++)
-                {
-                    $line = $data[$r];
-                    $link = ''; 
-                    if ($line['d_r2'] > 0)
-                        {
-                            $link = '<a href="'.base_url(PATH.'v/'.$line['d_r2']).'">';
-                            if ($line['d_r2'] == $id)
-                            {
-                            $link = '<a href="'.base_url(PATH.'v/'.$line['d_r1']).'">';
-                            }   
-                        } 
-                    $sx .= '<tr>';
-                    $sx .= '<td align="right" valign="top">';
-                    $sx .= '<i>'.msg(trim($line['c_class'])).'</i>';
-                    $sx .= '</td>';
-                    $sx .= '<td>';
-                    /********* INVERT ********/
-                    if (($line['d_r1'] == $id) and ($line['d_r2'] != 0))
-                        {
-                            $idv = $line['d_r2'];
-                            $line['d_r2'] = $line['d_r1'];
-                            $line['d_r1'] = $idv;
-                        }
-                    $sx .= $this->mostra_dados($line['n_name'],$link,$line);
-                    $sx .= '</td>';
-                    $sx .= '</tr>';        
+
+    function view_data($id) {
+        $data = $this -> le_data($id);
+        $sx = '<table class="table">';
+        $sx .= '<tr>';
+        $sx .= '<th width="20%" style="text-align: right;">' . msg('propriety') . '</th>';
+        $sx .= '<th width="80%">' . msg('value') . '</th>';
+        $sx .= '</tr>';
+        for ($r = 0; $r < count($data); $r++) {
+            $line = $data[$r];
+            $link = '';
+            if ($line['d_r2'] > 0) {
+                $link = '<a href="' . base_url(PATH . 'v/' . $line['d_r2']) . '">';
+                if ($line['d_r2'] == $id) {
+                    $link = '<a href="' . base_url(PATH . 'v/' . $line['d_r1']) . '">';
                 }
-            $sx .= '</table>';
-            return($sx);
+            }
+            $sx .= '<tr>';
+            $sx .= '<td align="right" valign="top">';
+            $sx .= '<i>' . msg(trim($line['c_class'])) . '</i>';
+            $sx .= '</td>';
+            $sx .= '<td>';
+            /********* INVERT ********/
+            if (($line['d_r1'] == $id) and ($line['d_r2'] != 0)) {
+                $idv = $line['d_r2'];
+                $line['d_r2'] = $line['d_r1'];
+                $line['d_r1'] = $idv;
+            }
+            $sx .= $this -> mostra_dados($line['n_name'], $link, $line);
+            $sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
+            $sx .= '</td>';
+            $sx .= '</tr>';
+        }
+        $sx .= '</table>';
+        return ($sx);
+    }
+
+    function mostra_dados($n, $l = '', $line) {
+        $la = '';
+        /****************** HTTP *********/
+        if ((lowercase(substr($n, 0, 4)) == 'http') and (strlen($l) == 0)) {
+            $l = '<a href="' . $n . '" target="new_' . date("mis") . '" title="' . msg('Link:') . $n . '">';
+        }
+        /****************** DOI *********/
+        if ((lowercase(substr($n, 0, 3)) == '10.') and (strlen($l) == 0) and (strpos($n, '/') > 0)) {
+            $l = '<a href="http://dx.doi.org/' . $n . '" target="new_' . date("mis") . '" title="DOI Link' . $n . '">';
+            $n = 'DOI: ' . $n;
+        }
+        /****************** OAI *********/
+        if ((lowercase(substr($n, 0, 4)) == 'oai:')) {
+            $n = $this -> frbr -> show_v($line['d_r1']);
+            $l = '<a href="' . base_url(PATH . 'v/' . $line['d_r1']) . '" target="new_' . date("mis") . '" title="View Article" class="result">';
         }
 
-    function mostra_dados($n,$l='',$line)
-        {
-            $la = '';
-            /****************** HTTP *********/
-             if ((lowercase(substr($n,0,4))=='http') and (strlen($l) ==0))
-                {
-                    $l = '<a href="'.$n.'" target="new_'.date("mis").'" title="'.msg('Link:').$n.'">';
-                }
-             /****************** DOI *********/
-             if ((lowercase(substr($n,0,3))=='10.') and (strlen($l) ==0) and (strpos($n,'/') > 0))
-                {
-                    $l = '<a href="http://dx.doi.org/'.$n.'" target="new_'.date("mis").'" title="DOI Link'.$n.'">';
-                    $n = 'DOI: '.$n;
-                }
-             /****************** OAI *********/
-             if ((lowercase(substr($n,0,4))=='oai:'))
-                {
-                    $n = $this->frbr->show_v($line['d_r1']);
-                    $l = '<a href="'.base_url(PATH.'v/'.$line['d_r1']).'" target="new_'.date("mis").'" title="View Article" class="result">';
-                }
-                          
-             
-                             
-             if (strlen($l) > 0)
-                {
-                    $la = '</a>';
-                }
-             return($l.$n.$la);
+        if (strlen($l) > 0) {
+            $la = '</a>';
         }
+        return ($l . $n . $la);
+    }
+
     function vv($id) {
         $data = $this -> le($id);
         if (count($data) == 0) {
@@ -223,13 +226,13 @@ class frbr_core extends CI_model {
             if (strlen($data['n_name']) > 0) {
                 $tela .= '<div class="row result">';
                 $tela .= '<div class="col-md-12">';
-                $linkc = '<a href="' . base_url(PATH.'v/' . $id) . '" class="middle">';
+                $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="middle">';
                 $linkca = '</a>';
                 $tela .= '<h2>' . $linkc . $data['n_name'] . $linkca . '</h2>';
                 $tela .= '</div>';
                 $tela .= '</div>';
             }
-            
+
             /******** line #2 ***********/
             $tela .= '<div class="row">';
             $tela .= '<div class="col-md-11">';
@@ -237,31 +240,35 @@ class frbr_core extends CI_model {
             $tela .= '</div>';
             $tela .= '<div class="col-md-1 text-right">';
             if (perfil("#ADMIN")) {
-                $tela .= '<a href="' . base_url(PATH.'a/' . $id) . '" class="btn btn-secondary">' . msg('edit') . '</a>';
+                $tela .= '<a href="' . base_url(PATH . 'a/' . $id) . '" class="btn btn-secondary">' . msg('edit') . '</a>';
             }
             $tela .= '</div>';
             $tela .= '</div>';
 
             $tela .= '<hr>';
             $class = trim($data['c_class']);
-            
+
             switch ($class) {
-                case 'Issue':
-                    $tela .= $this->view_data($id);
+                case 'Article' :
+                    $tela = $this-> frbr->show_article($id);
+                    
+                    break;                
+                case 'Issue' :
+                    $tela .= $this -> view_data($id);
                     break;
                 case 'Corporate Body' :
-                    $tela .= $this->view_data($id);
+                    $tela .= $this -> view_data($id);
                     break;
                 case 'Person' :
                     $tela = $this -> person_show($id);
-                    $tela .= $this->view_data($id);
+                    $tela .= $this -> view_data($id);
                     break;
                 case 'Journal' :
                     $tela = $this -> person_show($id);
-                    $tela .= $this->view_data($id);
+                    $tela .= $this -> view_data($id);
                     break;
                 default :
-                    $tela .= $this->view_data($id);
+                    $tela .= $this -> view_data($id);
                     $tela .= $this -> related($id);
                     break;
             }
@@ -270,9 +277,9 @@ class frbr_core extends CI_model {
     }
 
     /*****************************************************************  RDF CONCEPT **/
-    function rdf_concept_create($class, $term, $orign = '' , $lang='pt-BR') {
+    function rdf_concept_create($class, $term, $orign = '', $lang = 'pt-BR') {
         $cl = $this -> find_class($class);
-        $term = $this -> frbr_name($term,$lang);
+        $term = $this -> frbr_name($term, $lang);
 
         $dt = date("Y/m/d H:i:s");
         $date = date("Y-m-d");
@@ -364,8 +371,8 @@ class frbr_core extends CI_model {
     }
 
     function le_data($id) {
-        $cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name';
-        $cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name';
+        $cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
+        $cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';
         $sql = "select $cp from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r2 = id_cc 
@@ -419,13 +426,14 @@ class frbr_core extends CI_model {
         }
         return ($wk);
     }
+
     /********************************************************************************** RELATED **/
     /*********************************************************************************************/
     /*********************************************************************************************/
     /*********************************************************************************************/
     function related($id) {
         $pg = round('0' . get("pg"));
-        $limit = $this->limit;
+        $limit = $this -> limit;
         $offset = $limit * $pg;
         /******************************************** by manifestation ********/
         $cl1 = $this -> find_class('isEmbodiedIn');
@@ -532,6 +540,7 @@ class frbr_core extends CI_model {
         $sx .= '</div>';
         return ($sx);
     }
+
     function show_class($wk) {
         $sx = '';
         $ss = '<h5>' . msg('hasColaboration') . '</h5><ul>';
@@ -549,11 +558,11 @@ class frbr_core extends CI_model {
                 //echo '<br>===>'.$cl;
                 switch ($cl) {
                     case 'hasTitle' :
-                        $link = '<a href="' . base_url(PATH.'v/' . $id1) . '">';
+                        $link = '<a href="' . base_url(PATH . 'v/' . $id1) . '">';
                         array_push($wks, $id1);
                         break;
                     case 'hasAuthor' :
-                        $link = '<a href="' . base_url(PATH.'v/' . $id2) . '">';
+                        $link = '<a href="' . base_url(PATH . 'v/' . $id2) . '">';
                         $ss .= '<li>' . $link . $vl . ' (' . ($cl) . ')</a></li>' . cr();
                         break;
                     default :
@@ -572,6 +581,7 @@ class frbr_core extends CI_model {
 
         return ($sx);
     }
+
 }
 
 function person_work($id) {

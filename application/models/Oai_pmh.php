@@ -238,13 +238,13 @@ class oai_pmh extends CI_model {
         $cnt = troca($cnt, 'dc:', '');
         $cnt = troca($cnt, 'xml:', '');
         $xml = simplexml_load_string($cnt);
+        
 
         $rcn = $xml -> ListSets -> set;
         for ($r = 0; $r < count($rcn); $r++) {
             $line = $rcn[$r];
             $setSpec = (string)$line -> setSpec;
             $setName = (string)$line -> setName;
-
             
             if (strpos($setName,'Ã') > 0)
                 {
@@ -253,7 +253,8 @@ class oai_pmh extends CI_model {
             $setName = LowerCase(($setName));
             $setName = $this->searchs->convert($setName);
             $setName = $this->searchs->ucwords($setName);
-            $id_section = $this -> frbr_core -> rdf_concept_create('ArticleSection', $setName, '');
+            $class = 'ArticleSection';
+            $id_section = $this -> frbr_core -> rdf_concept_create($class, $setName);
             $term = $this -> frbr_core -> frbr_name($setSpec);
             $prop = 'altLabel';
             $this -> frbr_core -> set_propriety($id_section, $prop, 0, $term);
@@ -493,7 +494,6 @@ class oai_pmh extends CI_model {
         $dt['responseDate'] = $this -> xml_value($xml -> responseDate);
         $dt = array_merge($data, $dt);
         $this -> frbr -> journal($dt);
-
         $this -> getListSets($id);
     }
 
@@ -529,15 +529,35 @@ class oai_pmh extends CI_model {
         return ($sx);
     }
 
-    public function list_cache($id, $id2) {
+    function cache_reprocess($id)
+        {
+            $sql = "update source_listidentifier
+                            set li_s = 1
+                        where id_li = $id";
+            $rlt = $this -> db -> query($sql);
+            return(1); 
+        }
+
+    public function list_cache($id, $id2, $id3='') {
+        if (strlen($id3) > 0)
+            {
+                $wh = " AND (id_li = $id3) ";
+            } else {
+                $wh = " AND (li_s = $id2)";
+            }
         $sql = "select * from source_listidentifier 
-                        where li_jnl = $id and li_s = $id2";
+                        where li_jnl = $id 
+                        $wh
+                        ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $sx = '<ul>';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
-            $sx .= '<li>' . $line['li_identifier'] . '</li>' . cr();
+            $idc = $line['id_li'];
+            $link = ' <a href="' . base_url(PATH . 'oai/cache_status_to/' . $id . '/' . $id2 . '/' . $idc) . '">';
+            $link .= '('.msg('reprocess').'</a>)';
+            $sx .= '<li>' . $line['li_identifier'] . $link. '</li>' . cr();
         }
         $sx .= '</ul>';
         return ($sx);
@@ -567,6 +587,8 @@ class oai_pmh extends CI_model {
     }
 
     public function ListIdentifiers($id) {
+        $this -> getListSets($id);
+        
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListIdentifiers');
 
@@ -1020,10 +1042,7 @@ class oai_pmh extends CI_model {
                             if (isset($article['keywords'])) {
                                 for ($r = 0; $r < count($article['keywords']); $r++) {
                                     $ido = $article['keywords'][$r]['idioma'];
-                                    if ($ido == 'pt_BR') { $ido = 'pt-BR';
-                                    }
-                                    if ($ido == 'en-US') { $ido = 'en';
-                                    }
+                                    $ido = $this->frbr_core->language($ido);
                                     $au = $article['keywords'][$r]['term'];
                                     if (isset($keys[$ido])) {
                                         $keys[$ido] .= $au . ';';
@@ -1201,7 +1220,6 @@ class oai_pmh extends CI_model {
 
         /* Registro deletado, nao processar */
         if ($status == 'deleted') {
-            //echo '<br>'.$status;
             $doc['status'] = 'deleted';
             return ($doc);
         } else {
@@ -1291,10 +1309,7 @@ class oai_pmh extends CI_model {
             foreach ($titles as $title) {
                 $value = $title -> nodeValue;
                 $lang = $title -> attributes -> getNamedItem('lang') -> value;
-                if ($lang == 'pt_BR') { $lang = 'pt-BR';
-                }
-                if ($lang == 'en-US') { $lang = 'en';
-                }
+                $lang = $this->frbr_core->language($lang);
                 $dt = array();
 
                 $value = troca($value, '  ', ' ');

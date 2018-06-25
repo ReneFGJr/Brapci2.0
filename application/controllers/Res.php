@@ -272,12 +272,19 @@ class res extends CI_Controller {
                 break;
             case 'cache' :
                 $html = $this -> sources -> info($id);
-
                 $html .= '<div class="col-2">';
                 $html .= '<h1>CACHE</h1>';
                 $html .= $this -> oai_pmh -> cache_change_to($id, $id2, $id3) . '</div>';
                 $html .= '<div class="col-4">' . $this -> oai_pmh -> list_cache($id, $id2) . '</div>';
-                break;
+                break;               
+            case 'cache_status_to':
+                $html = $this -> sources -> info($id);
+                $html .= '<div class="col-2">';
+                $html .= '<h1>CACHE ID</h1>';   
+                $this -> oai_pmh -> cache_reprocess($id3);             
+                $html .= $this -> oai_pmh -> list_cache($id, $id2, $id3);
+                $html .= '</div>';
+                break;                
             case 'Identify' :
                 $html = $this -> sources -> info($id);
                 $html .= $this -> oai_pmh -> Identify($id);
@@ -395,10 +402,13 @@ class res extends CI_Controller {
     /* LOGIN */
     function social($act = '') {
         switch($act) {
+            case 'perfil' :
+                $this -> cab();
+                
+                break;            
             case 'pwsend' :
                 $this -> cab();
                 $this -> socials -> resend();
-                break;
                 break;
             case 'signup' :
                 $this -> cab();

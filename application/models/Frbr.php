@@ -15,6 +15,18 @@ class frbr extends CI_model {
         return ($t);
     }
 
+    function show_article($id) {
+        $tela = '';
+        $data = $this -> frbr_core -> le_data($id);
+        $article = $dados['article'] = $data;
+        
+
+        $tela .= $this -> load -> view('brapci/view/article', $dados, true);
+            
+        //$tela .= $this -> frbr_core -> view_data($id);
+        return ($tela);
+    }
+
     function article_create($dt) {
         $name = $dt['li_identifier'];
         $idf = $this -> frbr_core -> rdf_concept_create('Article', $name, '');
@@ -52,13 +64,16 @@ class frbr extends CI_model {
             $lang = substr($name, strpos($name, '@') + 1, strlen($name));
             $name = substr($name, 0, strpos($name, '@'));
 
-            /* TERMO */
+            /* LANGUAGE */
+            $lang = $this -> frbr_core -> language($lang);
 
+            /* TERMO */
             $name = $this -> searchs -> ucwords($name);
             $name2 = $name;
             if ($lang == 'pt-BR') {
                 $name2 = $this -> searchs -> convert($name);
             }
+
             $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name2, '', $lang);
             $this -> frbr_core -> set_propriety($idf, $prop, $idterm, 0);
             if ($name2 != $name) {
@@ -84,9 +99,10 @@ class frbr extends CI_model {
         for ($r = 0; $r < count($dt['abstract']); $r++) {
             $title = $dt['abstract'][$r]['descript'];
             $lang = $dt['abstract'][$r]['lang'];
-
-            $term = $this -> frbr_core -> frbr_name($title, $lang);
-            $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
+            if (strlen($title) > 10) {
+                $term = $this -> frbr_core -> frbr_name($title, $lang);
+                $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
+            }
         }
         /*********************************************************************** DATE */
         $prop = 'dateOfAvailability';
@@ -122,6 +138,7 @@ class frbr extends CI_model {
         }
         /*
          //******************************************************************************/
+        $this -> frbr_core -> check_language();
         return ($idf);
     }
 

@@ -132,7 +132,7 @@ class searchs extends CI_Model
                     'leos'=>'leo',
                     'los'=>'lo',
                     'lores'=>'lor',
-                    'mas'=>'me',
+                    'mas'=>'ma',
                     'mes'=>'me',
                     'mias'=>'mia',
                     'mías'=>'mía',
@@ -166,6 +166,7 @@ class searchs extends CI_Model
                     'soes'=>'sao',
                     'sas'=>'sa',                    
                     'ses'=>'se',
+                    'temas'=>'tema',
                     'seus'=>'sel',                    
                     'sos'=>'so',
                     'soas'=>'soa',
@@ -182,6 +183,7 @@ class searchs extends CI_Model
                     'uns'=>'um',
                     'vas'=>'va',
                     'ves'=>'ve',
+                    'veis'=>'vel',
                     'vis'=>'vil',
                     'vos'=>'vo',
                     'xos'=>'xo',
@@ -223,6 +225,7 @@ class searchs extends CI_Model
 				$t = troca($t, ' Para ',' para ');
 				$t = troca($t, ' Dos ',' dos ');
 				$t = troca($t, ' Of ',' of ');
+                $t = troca($t, ' Ou ',' ou ');
 				$t = troca($t, ' The ',' the ');
 				$t = troca($t, ' And ',' and ');
 				$t = troca($t, ' For ',' for ');

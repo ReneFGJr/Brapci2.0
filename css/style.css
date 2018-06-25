@@ -1,4 +1,18 @@
-
+/****************************************************** article ***********/
+.article_title_0
+    {
+        font: bold 150%/120% 'lucida sans', 'trebuchet MS', 'Tahoma';
+        /* text-transform: uppercase; */
+        text-align: center;    
+    }
+    
+.article_title_1
+    {
+        font: italic 110%/90% 'lucida sans', 'trebuchet MS', 'Tahoma';
+        /* text-transform: uppercase; */
+        text-align: center;    
+    }
+        
 .h1 {
     font-size: 26px;
     text-transform: uppercase;
