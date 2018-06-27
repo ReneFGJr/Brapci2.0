@@ -251,7 +251,7 @@ class frbr_core extends CI_model {
             switch ($class) {
                 case 'Article' :
                     $tela = $this-> frbr->show_article($id);
-                    
+                    $tela .= $this -> view_data($id);
                     break;                
                 case 'Issue' :
                     $tela .= $this -> view_data($id);
