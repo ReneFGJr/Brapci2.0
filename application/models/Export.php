@@ -138,17 +138,16 @@ class export extends CI_Model {
                         ORDER BY n_name
                         LIMIT $sz OFFSET " . ($pg * $sz) . "    ";
 						
-		$sql = "SELECT n_name, id_cc, n_lang, cc_use, d1.d_r1 as d_r1, d2.d_r2 as d_r2 , 
+		$sql = "SELECT trim(n_name) as n_name, id_cc, n_lang, cc_use, d1.d_r1 as d_r1, d2.d_r2 as d_r2 , 
 		            d2.d_r1 as e_r1, d2.d_r2 as e_r2
                     FROM rdf_data as d1
                     INNER JOIN rdf_name ON d_literal = id_n 
                     INNER JOIN rdf_concept on d_r1 = id_cc 
                     INNER JOIN rdf_data AS d2 ON d2.d_r2 = d1.d_r1
-					where ((cc_class = " . $f . ")) and (n_lang = 'pt-BR')
+					where ((cc_class = " . $f . ")) 
 						AND ((d1.d_p) = $P1 or (d1.d_p = $P2) or (d1.d_p = $P3))
 					ORDER BY n_name
                         LIMIT $sz OFFSET " . ($pg * $sz) . "";
-        echo $sql;
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
@@ -157,6 +156,8 @@ class export extends CI_Model {
         $tt = '';
         $ti = 0;
         $sx = '';
+        $st = '';
+        $i = 0;
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             
@@ -168,13 +169,15 @@ class export extends CI_Model {
                     //echo '<br>'.$term.'=>'.$to;
                     $term = $to;
                 }
-            $tr = '['.$term.']';
+            $tr = '['.trim($term).']';
             $id = $line['e_r1'];
             if ($tx != $tr) {
                 /*******************************************/
                 if ($ti > 0) {
                     $ss = $tx . $tt;
                     $sx .= $ss.'¢';
+                    $i++;
+					$st .= ($i).'. '.$ss.cr();
                 }
                 $tx = $tr;
                 $tt = '';
@@ -198,7 +201,7 @@ class export extends CI_Model {
                 <div class="alert alert-success" role="alert">
                   Success! Export Reverse Index
                 </div>';     
-        return('<div class="col-12">'.$mss.'<pre>'.$sx.'</pre></div>');
+        return('<div class="col-12">'.$mss.'<pre>'.$st.'</pre></div>');
     }
 
     function export_subject($pg = 0) {

@@ -15,14 +15,14 @@
 	}
 	/**************** LARGE */
 	.fsz-lg {
-		font-size: 50px;
+		font-size: 40px;
 	}
 	.logo-lg {
 		height: 100px;
 	}
 	/****************** SMALL *********/
 	.fsz {
-		font-size: 40px;
+		font-size: 30px;
 	}
 	.logo {
 		height: 40px;
@@ -50,9 +50,15 @@
       <li class="nav-item active">
         <a class="nav-link" href="<?php echo base_url(PATH); ?>">&nbsp;<?php echo msg('home'); ?>&nbsp;<span class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="<?php echo base_url(PATH . 'about'); ?>">&nbsp;<?php echo msg('about'); ?>&nbsp;</a>
-      </li>
+
+				<li class="nav-item dropdown">
+					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('about'); ?>&nbsp;</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'about'); ?>">&nbsp;<?php echo msg('about_brapci'); ?>&nbsp;</a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'collections'); ?>"><?php echo msg('collections'); ?></a>
+					</div>
+				</li>      
+
 				<li class="nav-item">
 					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'indice'); ?>">&nbsp;<?php echo msg('indexs'); ?>&nbsp;</a>
 				</li>      
@@ -66,12 +72,27 @@
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('export'); ?></a>
 					</div>
 				</li>
-
+    
+				<?php
+				if ((isset($_SESSION['user'])) and (strlen($_SESSION['user']) > 0)) {
+					echo '
+                            <li class="nav-item dropdown">
+                                <a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;' . $_SESSION['user'] . '&nbsp;</a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="' . base_url(PATH . 'social/perfil') . '">' . msg('perfil') . '</a>
+                                    <a class="dropdown-item" href="' . base_url(PATH . 'social/logoff') . '">' . msg('logout') . '</a>
+                                </div>
+                            </li>                        
+                        ';
+				} else {
+					echo '
+                            <li class="nav-item active">
+                                <a class="nav-link fsz " href="' . base_url(PATH . 'social/login') . '">&nbsp;<b>' . msg('signin') . '</b>&nbsp;</span></a>
+                            </li>                        
+                        ';
+				}
+                ?>
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-		<form class="form-inline my-2 my-lg-0">
-		<a class="dropdown-item" href="<?php echo base_url(PATH . 'social/login'); ?>"><?php echo msg('signin'); ?></a>
-    </form>
   </div>
 </nav>
 
@@ -84,7 +105,7 @@
 				$("#logo").switchClass("logo-lg", "logo", 1000, "easeInOutQuad");
 				$("header").switchClass("menu_large", "menu_small", 1000, "easeInOutQuad");
 				$(".fsz").animate({
-					fontSize : "20px"
+					fontSize : "16px"
 				}, 1000);
 				$menu_size = 1;
 			}
@@ -94,7 +115,7 @@
 				$("header").switchClass("menu_small", "menu_large", 1000, "easeInOutQuad");
 				$("#logo").switchClass("logo", "logo-lg", 1000, "easeInOutQuad");
 				$(".fsz").animate({
-					fontSize : "40px"
+					fontSize : "30px"
 				}, 1000);
 				$menu_size = 0;
 			}

@@ -8,9 +8,7 @@
         transition: background .8s ease;
         z-index: 10;
     }
-    .footer:hover {
-        background: #C0D6FF;
-    }
+
 </style>
 <div style="height: 150px;"></div>
 
@@ -46,14 +44,14 @@
 			<br>
 			<br>
 		</div>
-		<div class="col-md-3">
+		<div class="col-md-1">
 		</div>
 		<div class="col-md-1">
 			<div class="fb-like" data-href="https://www.facebook.com/brapci.ci/" data-layout="box_count" data-action="like" data-size="large" data-show-faces="true" data-share="true"></div>
 			<br>
 			<br>
 		</div>
-		<div class="col-md-3 hidden-xs text-right">
+		<div class="col-md-5 hidden-xs text-right">
 			<div class="fb-page"
 			data-href="https://www.facebook.com/brapci.ci/"
 			data-width="400"

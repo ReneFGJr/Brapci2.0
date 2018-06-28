@@ -51,6 +51,7 @@ class oai_pmh extends CI_model {
 
     function process($dt) {
         $this -> load -> model('searchs');
+		$this -> load -> model('indexer');
 
         /*********************************** PROCESS **************************************/
         $dt2 = $this -> le_cache($dt['idc']);
@@ -91,6 +92,10 @@ class oai_pmh extends CI_model {
         }
         $link = '<a href="' . base_url(PATH . 'v/' . $article_id) . '" target="_new' . $article_id . '">';
         $this -> cache_alter_status($dt['idc'], 3);
+		
+		$dt['article_id'] = $article_id;
+		$this->indexer->indexing($dt);
+		
         return ("<h1>Index Article: " . $link . $article_id . '</a></h1>');
     }
 

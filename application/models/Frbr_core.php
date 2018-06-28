@@ -90,7 +90,9 @@ class frbr_core extends CI_model {
 
     /******************************************************************* RDF NAME ***/
     function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
+    	$this->load->model('indexer');
         $n = trim($n);
+		$n = $this->utf8_detect($n);
         $lang = trim($lang);
         $lang = troca($lang, '@', '');
         if (strlen($lang) > 5) { $lang = substr($lang, 0, 5);
@@ -103,6 +105,7 @@ class frbr_core extends CI_model {
         /***************************************************************** LANGUAGE */
         $lang = $this -> language($lang);
         $md5 = md5(trim($n));
+		$dt['title'] = $n;
 
         /************ BUSCA NOMES **************************************/
         $sql = "select * from rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
@@ -581,6 +584,34 @@ class frbr_core extends CI_model {
 
         return ($sx);
     }
+
+	function utf8_detect($n)
+		{
+			$type = mb_detect_encoding($n, "auto");
+			if ($type != 'UTF-8')
+				{
+					return($n);
+				}
+			/************* UTF8 **************/				
+			$utf = 0;
+			$conv = 0;
+			for ($r=0;$r < strlen($n);$r++)
+				{
+					$c = substr($n,$r,1);
+					$co = ord($c);
+					if (($co > 195) and ($utf == 0))
+						{
+							$conv = 1;
+						}
+					if ($co == 195) { $utf = 1; }
+					//echo '<br>'.$c.'=>'.$co;
+				}
+			if ($conv == 1)
+				{
+					$n = utf8_encode($n);
+				}
+			return($n);
+		}
 
 }
 

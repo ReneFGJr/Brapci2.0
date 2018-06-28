@@ -156,31 +156,36 @@ class sources extends CI_Model {
     /*********************************************************** Timeline *********/
     function timelines($i = 0) {
         $sql = "select * from " . $this -> table . "
-                            where jnl_ano_inicio > 0 
+                            where jnl_ano_inicio >= $i 
                             order by jnl_ano_inicio desc";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $xano = date("Y");
-        $sx = '';
+        $sx = '<div class="row">';
+		$sx .= '<div class="col-md-12">';
         $sx .= '<h2>'.msg('journal_timeline').'</h2>';
-        $sx .= '<br>';
         $sx .= '<tt>';
+		$i = 0;
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             /*****************************/
             $ano = $line['jnl_ano_inicio'];
             while ($xano >= $ano) {
-                $sx .= '<br>' . $this -> year($xano) . ' +';
+            	if ($i > 0)
+					{ $sx .= '<br>'; }
+                $sx .= $this -> year($xano) . ' +';
                 $xano--;
+				$i++;
             }
             $sx .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this -> jnl_name($line);
         }
 
-        while ($xano >= 1950) {
+        while ($xano <= $i) {
             $sx .= '<br>' . $this -> year($xano) . ' +';
             $xano--;
         }
         $sx .= '</tt>';
+        $sx .= '</div></div>';
         return ($sx);
     }
 
