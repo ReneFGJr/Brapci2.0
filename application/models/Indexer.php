@@ -60,7 +60,7 @@ class indexer extends CI_model {
         for ($r = 0; $r < count($wds); $r++) {
             $name2 = $wds[$r];
             $name = $wds[$r];
-            $name = $this -> searchs -> ucwords($name);
+            $name = ucwords($name);
             $name = convert($name);
 
             $prop = 'hasContent';

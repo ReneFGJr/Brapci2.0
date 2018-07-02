@@ -85,7 +85,7 @@ class frbr extends CI_model {
             $lang = $this -> frbr_core -> language($lang);
 
             /* TERMO */
-            $name = $this -> searchs -> ucwords($name);
+            $name = ucwords($name);
             $name2 = $name;
             if ($lang == 'pt-BR') {
                 $name2 = convert($name);
@@ -185,7 +185,7 @@ class frbr extends CI_model {
         $name = 'Issue:' . $dt['issue']['issue_id'] . ' Jnl: ' . $dt['id_jnl'];
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
-        $name = $this -> searchs -> ucwords($nm);
+        $name = ucwords($nm);
         $nm = convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
