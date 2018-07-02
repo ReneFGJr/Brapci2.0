@@ -48,16 +48,27 @@ $lang['search_5'] = 'resumo';
 $lang['search_6'] = 'referências';
 $lang['indexs'] = 'índices';
 
-
 $lang['propriety'] = 'propriedade';
 $lang['value'] = 'valor';
 $lang['affiliatedWith'] = 'Afiliação';
 $lang['prefLabel'] = 'Descritor';
 $lang['hasAuthor'] = 'Autor';
 $lang['hasEmail'] = 'e-mail';
+//$lang['hasIssueOf'] = 'Artigo';
+$lang['hasSubject'] = 'Tema';  
+
+$lang['cache_status_1'] = 'Para coletar';
+$lang['cache_status_2'] = 'Em processamento';
+$lang['cache_status_3'] = 'Processado';
+$lang['cache_status_9'] = 'Excluído';
+
 
 $lang['Search'] = 'Pesquisar';
 
-//$lang['hasIssueOf'] = 'Artigo';
-$lang['hasSubject'] = 'Tema';
+
+$lang['admin_journals'] = 'Fontes indexadas';
+$lang['admin_export'] = 'Exportar dados';
+$lang['export_article'] = 'Exportar Artigos';
+$lang['export_subject'] = 'Exportar Palavras';
+$lang['export_subject_reverse'] = 'Exportar Índice Invertido';
 ?>

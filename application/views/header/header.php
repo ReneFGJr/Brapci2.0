@@ -2,6 +2,7 @@
 <?php
 if (!isset($title)) { $title = 'no title';
 }
+$HTTP = 'http://[::1]/projeto/Brapci2.0/Brapci2.0/';
 ?>
 <head>
     <head lang="pt-br">
@@ -20,7 +21,10 @@ if (!isset($title)) { $title = 'no title';
     <META NAME="State" content="PR - Paraná / RS - Rio Grande do Sul">
     <META NAME="revisit-after" CONTENT="7 days">
     <META HTTP-EQUIV="Content-Language" CONTENT="pt_BR">
-    <meta name="google-site-verification" content="VZpzNVBfl5kOEtr9Upjmed96smfsO9p4N79DZT38toA" />    
+    <meta name="google-site-verification" content="VZpzNVBfl5kOEtr9Upjmed96smfsO9p4N79DZT38toA" />
+    
+    <link rel="icon" href="<?php echo $HTTP.'img/favicon.png';?>" type="image/x-icon" />
+    <link rel="shortcut icon" href="<?php echo $HTTP.'img/favicon.png';?>" type="image/x-icon" />    
     
     <!--- CSS --->
     <link href="<?php echo base_url('css/bootstrap.min.css?v4.0'); ?>" rel="stylesheet">

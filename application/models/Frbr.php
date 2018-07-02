@@ -1,5 +1,11 @@
 <?php
 class frbr extends CI_model {
+    function api_thesa($id=0)
+        {
+            
+        }
+    
+    
     function vv($id) {
         $this -> load -> model("frbr_core");
         return ($this -> frbr_core -> vv($id));
@@ -26,6 +32,17 @@ class frbr extends CI_model {
         //$tela .= $this -> frbr_core -> view_data($id);
         return ($tela);
     }
+    
+    function show_subject($id) {
+        $this->load->model("thesa_api");
+        $tela = '';
+        $data = $this -> frbr_core -> le_data($id);
+           
+        $tela .= $this -> frbr_core -> view_data($id);
+        $tela .= $this -> thesa_api -> update_thesa($data);
+        return ($tela);
+    }
+    
 
     function article_create($dt) {
         $name = $dt['li_identifier'];
@@ -71,7 +88,7 @@ class frbr extends CI_model {
             $name = $this -> searchs -> ucwords($name);
             $name2 = $name;
             if ($lang == 'pt-BR') {
-                $name2 = $this -> searchs -> convert($name);
+                $name2 = convert($name);
             }
 
             $idterm = $this -> frbr_core -> rdf_concept_create('Subject', $name2, '', $lang);
@@ -169,7 +186,7 @@ class frbr extends CI_model {
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
         $name = $this -> searchs -> ucwords($nm);
-        $nm = $this -> searchs -> convert($nm);
+        $nm = convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
         $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);

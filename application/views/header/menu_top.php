@@ -40,7 +40,7 @@
 	}
 </style>
 <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
-  <a href="#"><img src="<?php echo base_url('img/logo/logo-brapci.png'); ?>" id="logo" class="logo-lg col-lg-0 navbar-brand" border=0></a>
+  <a href="<?php echo base_url(PATH); ?>"><img src="<?php echo base_url('img/logo/logo-brapci.png'); ?>" id="logo" class="logo-lg col-lg-0 navbar-brand" border=0></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -56,22 +56,23 @@
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'about'); ?>">&nbsp;<?php echo msg('about_brapci'); ?>&nbsp;</a>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'collections'); ?>"><?php echo msg('collections'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'help'); ?>"><?php echo msg('help'); ?></a>
 					</div>
 				</li>      
 
 				<li class="nav-item">
 					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'indice'); ?>">&nbsp;<?php echo msg('indexs'); ?>&nbsp;</a>
 				</li>      
-			
+			    <?php if (perfil("#ADM#GER")) { ?>
 				<li class="nav-item dropdown">
 					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('tools'); ?>&nbsp;</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="<?php echo base_url(PATH . 'journals'); ?>"><?php echo msg('journals'); ?></a>
-						<a class="dropdown-item" href="#">Another action</a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'journals'); ?>"><?php echo msg('admin_journals'); ?></a>
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('export'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('admin_export'); ?></a>
 					</div>
 				</li>
+				<?php } ?>
     
 				<?php
 				if ((isset($_SESSION['user'])) and (strlen($_SESSION['user']) > 0)) {

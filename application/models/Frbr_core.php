@@ -1,6 +1,37 @@
 <?php
 class frbr_core extends CI_model {
     var $limit = 20;
+    
+    function prefTerm_chage($c = '', $t1 = '') {
+        $sql = "select * from rdf_concept
+                    INNER JOIN rdf_name on id_n = cc_pref_term  
+                    where id_cc = $c ";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) == 1)
+            {
+                $line = $rlt[0];
+                if ($line['cc_pref_term'] != $t1)
+                    {
+                        $prop = $this->frbr_core->find_class("prefLabel");
+                        $lit = $line['cc_pref_term'];
+                        /****************** UPDATE *******************/
+                        $sql = "update rdf_data set d_literal = $t1 where d_p = $prop AND d_r1 = ".$c;
+                        $rrr = $this->db->query($sql);
+                        
+                        $sql = "update rdf_concept set cc_pref_term = $t1 where id_cc = ".$c;
+                        $rrr = $this->db->query($sql);
+
+                        /****************** SET HIDDEN ***************/
+                        $prop = 'altLabel';
+                        $this->frbr_core->set_propriety($c, $prop, 0, $lit); 
+                        return(1);
+                    } else {
+                        return(0);
+                    }
+            }
+        return (0);
+    }    
 
     function link($line, $tp = 1) {
         $id = $line['d_r2'];
@@ -10,7 +41,22 @@ class frbr_core extends CI_model {
         $link = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="' . $line['c_class'] . '">';
         return ($link);
     }
-
+    
+    function prefTerm($data)
+        {
+            for ($r=0;$r < count($data);$r++)
+                {
+                    $line = $data[$r];
+                    $prop = $line['c_class'];
+                    if ($prop == 'prefLabel')
+                        {
+                            $name = trim($line['n_name']).'@'.trim($line['n_lang']);
+                            return($name);
+                        }
+                }
+            return("");
+        }
+    
     function find($n, $prop = '') {
         $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
                         INNER JOIN rdf_data on d_literal = id_n 
@@ -28,9 +74,15 @@ class frbr_core extends CI_model {
 
     function language($lang) {
         switch($lang) {
+            case 'por' :
+                $lang = 'pt-BR';
+                break;            
             case 'pt_BR' :
                 $lang = 'pt-BR';
                 break;
+            case 'eng' :
+                $lang = 'en';
+                break;            
             case 'en-US' :
                 $lang = 'en';
                 break;
@@ -259,6 +311,9 @@ class frbr_core extends CI_model {
                 case 'Issue' :
                     $tela .= $this -> view_data($id);
                     break;
+                case 'Subject' :
+                    $tela .= $this-> frbr->show_Subject($id);
+                    break;                    
                 case 'Corporate Body' :
                     $tela .= $this -> view_data($id);
                     break;
@@ -393,7 +448,7 @@ class frbr_core extends CI_model {
                         LEFT JOIN rdf_concept ON d_r2 = id_cc 
                         LEFT JOIN rdf_name on d_literal = id_n
                         WHERE d_r1 = $id and d_r2 = 0";
-        $sql .= " order by c_order, c_class, id_d";
+        $sql .= " order by c_order, c_class, n_lang desc, id_d";
 
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
