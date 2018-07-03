@@ -183,7 +183,7 @@ if ( ! function_exists('camelize'))
 	 */
 	function camelize($str)
 	{
-		return strtolower($str[0]).substr(str_replace(' ', '', ucwords(preg_replace('/[\s_]+/', ' ', $str))), 1);
+		return strtolower($str[0]).substr(str_replace(' ', '', ucase(preg_replace('/[\s_]+/', ' ', $str))), 1);
 	}
 }
 
@@ -220,7 +220,7 @@ if ( ! function_exists('humanize'))
 	 */
 	function humanize($str, $separator = '_')
 	{
-		return ucwords(preg_replace('/['.preg_quote($separator).']+/', ' ', trim(MB_ENABLED ? mb_strtolower($str) : strtolower($str))));
+		return ucase(preg_replace('/['.preg_quote($separator).']+/', ' ', trim(MB_ENABLED ? mb_strtolower($str) : strtolower($str))));
 	}
 }
 

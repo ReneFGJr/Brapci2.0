@@ -72,7 +72,7 @@ function extenso($valor = 0, $maiusculas = false) {
         return ($rt ? $rt : "zero");
     } else {
         if ($rt)
-            $rt = ereg_replace(" E ", " e ", ucwords($rt));
+            $rt = ereg_replace(" E ", " e ", ucase($rt));
         return (($rt) ? ($rt) : "Zero");
     }
 
@@ -2825,7 +2825,7 @@ function convert($t) {
     return ($t);
 }
 
-function ucwords2($t) {
+function ucase($t) {
     $t = trim($t);
     $t = ucwords($t);
     $t = troca($t, ' A ', ' a ');
@@ -2846,9 +2846,40 @@ function ucwords2($t) {
     $t = troca($t, ' Dos ', ' dos ');
     $t = troca($t, ' Of ', ' of ');
     $t = troca($t, ' Ou ', ' ou ');
+	
+	/* SPANISH */
+	$t = troca($t, ' Las ', ' la ');
+	$t = troca($t, ' Los ', ' lo ');
+	$t = troca($t, ' La ', ' la ');
+		
+	/* ENGLISH */
     $t = troca($t, ' The ', ' the ');
     $t = troca($t, ' And ', ' and ');
     $t = troca($t, ' For ', ' for ');
+	$t = troca($t, ' In ', ' in ');
+	$t = troca($t, ' On ', ' on ');
+	$t = troca($t, ' On ', ' on ');
+	
+	$t = troca($t, 'cs ', 'c ');
+	$t = troca($t, 'ces ', 'ce ');
+	$t = troca($t, 'cles ', 'cle ');
+	$t = troca($t, 'ems ', 'em ');
+	$t = troca($t, 'ges ', 'ge ');
+	$t = troca($t, 'isms ', 'ism ');
+	$t = troca($t, 'ians ', 'iam ');
+	
+	$t = troca($t, 'ions ', 'iom ');
+	$t = troca($t, 'nes ', 'ne ');
+	$t = troca($t, 'oups ', 'oup ');
+	$t = troca($t, 'ries ', 'ry ');
+	$t = troca($t, 'tals ', 'tal ');
+	$t = troca($t, 'ties ', 'ty ');
+	$t = troca($t, 'umns ', 'umn ');
+	$t = troca($t, 'yses ', 'ys ');
+	$t = troca($t, 'ysis ', 'ys ');
+	
+	
+	
 
     /************** Espanol ************/
     $t = troca($t, ' En ', ' en ');

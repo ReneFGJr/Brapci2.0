@@ -35,7 +35,7 @@ $HTTP = 'http://[::1]/projeto/Brapci2.0/Brapci2.0/';
     <script src="<?php echo base_url('js/jquery-3.3.1.min.js?v3.3.1'); ?>"></script>
     <script src="<?php echo base_url('js/bootstrap.min.js?v4.0'); ?>"></script>
     <script src="<?php echo base_url('js/jquery-ui.js?v1.12.1'); ?>"></script>
-    
+<!---    
 <script>
 	(function(i, s, o, g, r, a, m) {
 		i['GoogleAnalyticsObject'] = r;
@@ -53,7 +53,7 @@ $HTTP = 'http://[::1]/projeto/Brapci2.0/Brapci2.0/';
 	ga('create', 'UA-12713129-1', 'auto');
 	ga('send', 'pageview'); 
 </script>
-    
+--->   
 </head>
 <body>
     

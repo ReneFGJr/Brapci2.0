@@ -258,7 +258,7 @@ class oai_pmh extends CI_model {
                 }
             $setName = LowerCase(($setName));
             $setName = convert($setName);
-            $setName = ucwords($setName);
+            $setName = ucase($setName);
             $class = 'ArticleSection';
             $id_section = $this -> frbr_core -> rdf_concept_create($class, $setName);
             $term = $this -> frbr_core -> frbr_name($setSpec);

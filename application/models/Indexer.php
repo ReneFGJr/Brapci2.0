@@ -2,6 +2,7 @@
 class indexer extends CI_model {
 
     function indexing_word($n='', $lang='', $article_id=0) {
+    	return(0);
         $s = '';
         $n = lowercasesql($n);
         for ($r = 0; $r < strlen($n); $r++) {
@@ -60,7 +61,7 @@ class indexer extends CI_model {
         for ($r = 0; $r < count($wds); $r++) {
             $name2 = $wds[$r];
             $name = $wds[$r];
-            $name = ucwords($name);
+            $name = ucase($name);
             $name = convert($name);
 
             $prop = 'hasContent';
@@ -75,7 +76,7 @@ class indexer extends CI_model {
     }
 
     function indexing($dt) {
-
+		return(0);
         $s = '';
         $article_id = $dt['article_id'];
         /****************************** TITULO ***************************************/
