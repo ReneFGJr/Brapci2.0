@@ -2854,8 +2854,10 @@ function ucase($t) {
 		
 	/* ENGLISH */
     $t = troca($t, ' The ', ' the ');
+	$t = troca($t, ' At ', ' at ');
     $t = troca($t, ' And ', ' and ');
     $t = troca($t, ' For ', ' for ');
+	$t = troca($t, ' To ', ' to ');
 	$t = troca($t, ' In ', ' in ');
 	$t = troca($t, ' On ', ' on ');
 	$t = troca($t, ' On ', ' on ');

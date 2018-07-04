@@ -2,6 +2,20 @@
 class frbr_core extends CI_model {
     var $limit = 20;
     
+    function equivalentClass($id, $idp)
+        {
+            $prop = 'equivalentClass';
+            $this->frbr_core->set_propriety($id, $prop, $idp, 0);
+            
+            /* Atualiza remissiva */
+            $sql = "update rdf_concept set cc_use = $idp where id_cc = $id";
+            $rlt = $this->db->query($sql);
+            
+            /* Transfere todas as remissivas e relações para o termo principal */
+            $sql = "update ????";
+            return(1);
+        }
+    
     function prefTerm_chage($c = '', $t1 = '') {
         $sql = "select * from rdf_concept
                     INNER JOIN rdf_name on id_n = cc_pref_term  
@@ -99,10 +113,15 @@ class frbr_core extends CI_model {
         $f = $this -> find_class($class);
         $this -> check_language();
 
-        $sql = "select * from rdf_concept 
-                        INNER JOIN rdf_name ON cc_pref_term = id_n
-                        where cc_class = " . $f . " 
-                        ORDER BY n_name";
+        $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                        FROM rdf_concept as C1
+                        INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+                        LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                        LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                        where C1.cc_class = " . $f . " 
+                        ORDER BY N1.n_name";
+                        echo $sql;
 
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -117,8 +136,19 @@ class frbr_core extends CI_model {
                 $sx .= '<h4>' . $xl . '</h4>';
                 $l = $xl;
             }
+            $name_use = '';
             $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
-            $name = $link . $line['n_name'] . '</a> <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
+            $linka = '</a>';
+            if ($line['id_cc_use'] > 0)
+                {
+                    $link = '';
+                    $linka = '';
+                    $x2 = ucase($line['n_name_use']);
+                    $link_use = '<a href="' . base_url(PATH . 'v/' . $line['id_cc_use']) . '">';
+                    $name_use = ' <i>use</i> '.$link_use . $x2 .'</a>';
+                }
+            $name = $link . $line['n_name'] . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
+            $name .= $name_use;
             $sx .= '<li>' . $name . '</li>' . cr();
         }
         $sx .= '<ul>';
@@ -448,6 +478,13 @@ class frbr_core extends CI_model {
                         LEFT JOIN rdf_concept ON d_r2 = id_cc 
                         LEFT JOIN rdf_name on d_literal = id_n
                         WHERE d_r1 = $id and d_r2 = 0";
+        $sql .= ' union ';
+        /* USE */
+        $sql .= "select $cp_reverse from rdf_data as rdata
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
+                        INNER JOIN rdf_concept ON d_r1 = id_cc 
+                        INNER JOIN rdf_name on cc_pref_term = id_n
+                        WHERE d_r2 = $id and d_r1 > 0";
         $sql .= " order by c_order, c_class, n_lang desc, id_d";
 
         $rlt = $this -> db -> query($sql);

@@ -132,7 +132,7 @@ class oai_pmh extends CI_model {
 
     function getRecordNlM($id = 0, $dt) {
         $this -> load -> model("sources");
-
+        
         $sql = "select * from source_listidentifier where id_li = $id";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -143,6 +143,7 @@ class oai_pmh extends CI_model {
             $data = $this -> sources -> le($jnl);
             $url = $this -> oai_url($data, 'GetRecordNlm') . $line['li_identifier'];
             $cnt = $this -> readfile($url);
+
             $cnt = troca($cnt, 'abstract-', 'abstract_');
             $cnt = troca($cnt, 'article-', 'article_');
             $cnt = troca($cnt, 'contrib-', 'contrib_');
@@ -239,6 +240,7 @@ class oai_pmh extends CI_model {
         $this -> load -> model("sources");
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListSets');
+
         $cnt = $this -> readfile($url);
         $cnt = troca($cnt, 'oai_dc:', 'oai_');
         $cnt = troca($cnt, 'dc:', '');
@@ -277,7 +279,8 @@ class oai_pmh extends CI_model {
             $jnl = $line['li_jnl'];
 
             $data = $this -> sources -> le($jnl);
-            $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];
+            $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];          
+            
             $cnt = $this -> readfile($url);
             $cnt = troca($cnt, 'oai_dc:', 'oai_');
             $cnt = troca($cnt, 'dc:', '');

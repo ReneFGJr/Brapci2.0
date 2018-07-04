@@ -2,6 +2,9 @@
 class thesa_api extends CI_model {
 	function ajax($id = '') {
 		$name = trim(get("dd1"));
+        $name = troca($name,'"','');
+        $name = troca($name,"'",'');
+        
 		$id = trim(get("id"));
 
 		echo msg('find') . ' <b>' . $name . '</b>';
@@ -9,16 +12,17 @@ class thesa_api extends CI_model {
 		$data = array("term" => $name, );
 
 		$curl = curl_init();
-		$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/api/64?term=' . $name;
+		$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/api/64';
 		curl_setopt_array($curl, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => $url));
 		curl_setopt($curl, CURLOPT_POST, 1);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 		$result = curl_exec($curl);
+        
+        $result = load_file_local($url.'?term='.$name);
 		echo '<br>'.$url;
 
 		if (strlen($result) == 0) {
 			echo '<br><span style="color: red">Empty Result</span> =>' . count($result);
-
 			return ("");
 		}
 		$xml = simplexml_load_string($result);
@@ -29,9 +33,21 @@ class thesa_api extends CI_model {
 			$pref_lang = $this -> frbr_core -> language((string)$xml -> prefLabel -> lang);
 			echo '<hr>' . $pref . ' <sup>(' . $pref_lang . ')</sup>';
 			if (strlen($pref) > 0) {
+			    /* Checa se já não existe Termo Preferencial */
+			    $idpref = $this->frbr_core->find($pref);
+                
+                if ($idpref != $id)
+                    {
+                        echo '<h2>'.$idpref.'=='.$id.'</h2>';
+                        $prop = 'equivalentClass';
+                        $this -> frbr_core -> equivalentClass($id, $idpref);
+                    } else {
+                        
+                    }
+                
 				$idt = $this -> frbr_core -> frbr_name($pref, $pref_lang);
-
-				$rsp = $this -> frbr_core -> prefTerm_chage($id, $idt);
+				//$rsp = $this -> frbr_core -> prefTerm_chage($id, $idt);
+				$rsp = 0;
 				if ($rsp == 1) {
 					echo " - Atualizado (prefTerm)";
 				} else {
@@ -58,7 +74,7 @@ class thesa_api extends CI_model {
 			}
 
 		} else {
-			Echo "ERRO: " . $erro;
+			Echo "<br>ERRO: " . $erro;
 		}
 
 	}
