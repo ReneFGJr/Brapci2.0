@@ -55,6 +55,7 @@ class frbr extends CI_model {
         if (isset($dt['issue']['section'])) {
 
             $section = trim($dt['issue']['section']);
+			
             $id_section = $this -> frbr_core -> find($section, 'ArticleSection');
 
             $section_id = $dt['li_setSpec'];

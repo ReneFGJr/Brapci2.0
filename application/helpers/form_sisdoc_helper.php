@@ -2843,6 +2843,7 @@ function ucase($t) {
     $t = troca($t, ' Nas ', ' no ');
     $t = troca($t, ' Nos ', ' no ');
     $t = troca($t, ' Para ', ' para ');
+    $t = troca($t, ' Por ', ' por ');
     $t = troca($t, ' Dos ', ' dos ');
     $t = troca($t, ' Of ', ' of ');
     $t = troca($t, ' Ou ', ' ou ');

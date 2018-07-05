@@ -1,6 +1,15 @@
 <?php
 class frbr_core extends CI_model {
     var $limit = 20;
+	
+	function transfRemissive($id, $idp)
+		{
+			$prop = $this->find_class("altLabel");
+			$sql = "update rdf_data set d_r1 = $idp where d_r1 = $id and d_p = $prop";
+			$this->db->query($sql);
+			
+			return(1);
+		}
     
     function equivalentClass($id, $idp)
         {
@@ -71,11 +80,27 @@ class frbr_core extends CI_model {
             return("");
         }
     
-    function find($n, $prop = '') {
-        $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
+    function find($n, $prop = '',$equal=0) {
+        /* EQUAL */
+        $wh = "(n_name like '%" . $n . "%')";
+        if ($equal == 1)
+            {
+                $wh = "(n_name = '" . $n . "')";        
+            }
+        /* PROPRIETY */
+        if (strlen($prop) > 0)
+            {
+                $class = $this->find_class($prop);
+                $wh .= "and ((d_p = $class) or (cc_class = $class))";
+            } else {
+                $wh .= '';
+            }
+
+                    $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
                         INNER JOIN rdf_data on d_literal = id_n 
                         INNER JOIN rdf_class ON d_p = id_c
-                        where n_name like '%" . $n . "%'";
+                        INNER JOIN rdf_concept ON id_cc = d_r1
+                        where $wh";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
@@ -121,7 +146,6 @@ class frbr_core extends CI_model {
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
                         where C1.cc_class = " . $f . " 
                         ORDER BY N1.n_name";
-                        echo $sql;
 
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -272,6 +296,7 @@ class frbr_core extends CI_model {
             }
             $sx .= $this -> mostra_dados($line['n_name'], $link, $line);
             $sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
+            $sx .= ' <sup>'.$line['rule'].'</sup>';
             $sx .= '</td>';
             $sx .= '</tr>';
         }
@@ -461,32 +486,49 @@ class frbr_core extends CI_model {
     function le_data($id) {
         $cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
         $cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';
-        $sql = "select $cp from rdf_data as rdata
+        $sql = "select $cp,1 as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r2 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r1 = $id and d_r2 > 0";
-        $sql .= ' union ';
-        $sql .= "select $cp_reverse from rdf_data as rdata
+                        WHERE d_r1 = $id and d_r2 > 0".cr().cr();
+        $sql .= ' union '.cr().cr();
+        /* TRABALHOS */
+        $sql .= "select $cp_reverse,2 as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r1 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r2 = $id and d_r1 > 0";
-        $sql .= ' union ';
-        $sql .= "select $cp from rdf_data as rdata
+                        WHERE d_r2 = $id and d_r1 > 0".cr().cr();
+        $sql .= ' union '.cr().cr();
+        $sql .= "select $cp,3 as rule from rdf_data as rdata
                         LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
                         LEFT JOIN rdf_concept ON d_r2 = id_cc 
                         LEFT JOIN rdf_name on d_literal = id_n
-                        WHERE d_r1 = $id and d_r2 = 0";
-        $sql .= ' union ';
+                        WHERE d_r1 = $id and d_r2 = 0".cr().cr();
+        
         /* USE */
-        $sql .= "select $cp_reverse from rdf_data as rdata
+        $prop = $this->frbr_core->find_class("equivalentClass");
+        $sqll = "SELECT * FROM rdf_data where (d_r2 = $id or d_r1 = $id) and d_p = $prop";
+        
+        //$sqll = "select * from rdf_concept where (cc_use = $id) and (id_cc <> cc_use)";
+        $rrr = $this->db->query($sqll);
+        $rrr = $rrr->result_array();
+        for ($r=0;$r < count($rrr);$r++)
+            {
+                $line = $rrr[$r];
+                $iduse = $line['d_r1'];
+                if ($iduse == $id)
+                    {
+                     $iduse = $line['d_r2'];   
+                    }                   
+                $sql .= ' union '.cr().cr();
+                $sql .= "select $cp_reverse, ".(10+$r)." as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r1 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r2 = $id and d_r1 > 0";
-        $sql .= " order by c_order, c_class, n_lang desc, id_d";
-
+                        WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop".cr().cr();                    
+            }
+        $sql .= " order by c_order, c_class, rule, n_lang desc, id_d";
+          
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         return ($rlt);

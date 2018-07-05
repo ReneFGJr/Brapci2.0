@@ -145,7 +145,8 @@ class export extends CI_Model {
                     INNER JOIN rdf_concept on d_r1 = id_cc 
                     where ((cc_class = " . $f1 . ") or (cc_class = " . $f2 . ")) 
                         AND ((d1.d_p) = $P1 or (d1.d_p = $P2) or (d1.d_p = $P3))
-                    ORDER BY n_name desc
+                        
+                    ORDER BY n_name 
                         LIMIT $sz OFFSET " . ($pg * $sz) . "";
 
         $rlt = $this -> db -> query($sql);
@@ -166,10 +167,7 @@ class export extends CI_Model {
             $line = $rlt[$r];
             $term = $line['n_name'];
             $term = lowercasesql($term);
-            $to = convert($term);
-            if ($to != $term) {
-                $term = $to;
-            }
+            $term = convert($term);
             $tr = '[' . trim($term) . ']';
 
             /* ID do conceito / termo */
@@ -196,6 +194,7 @@ class export extends CI_Model {
         }
         if ($ti > 0) {
             $ss = $tx . $tt;
+			$st .= ($i) . '. ' . $ss . cr();
             $sx .= $ss . '¢';
         }
         dircheck('c');

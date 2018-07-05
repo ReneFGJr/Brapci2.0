@@ -65,6 +65,8 @@ $lang['cache_status_9'] = 'Excluído';
 
 $lang['Search'] = 'Pesquisar';
 
+$lang['edit_source'] = 'Editar';
+
 
 $lang['admin_journals'] = 'Fontes indexadas';
 $lang['admin_export'] = 'Exportar dados';

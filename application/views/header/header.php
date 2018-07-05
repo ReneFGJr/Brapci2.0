@@ -2,7 +2,7 @@
 <?php
 if (!isset($title)) { $title = 'no title';
 }
-$HTTP = 'http://[::1]/projeto/Brapci2.0/Brapci2.0/';
+$HTTP = 'http://www.brapci.inf.br/';
 ?>
 <head>
     <head lang="pt-br">
