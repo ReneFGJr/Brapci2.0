@@ -64,6 +64,17 @@ $lang['cache_status_9'] = 'Excluído';
 
 
 $lang['Search'] = 'Pesquisar';
+$lang['Subject'] = 'Índices das Palavras-chave';
+$lang['index_sections'] = 'Seções';
+$lang['Sections'] = 'Seções indexadas';
+$lang['Corporate Body'] = 'Afiliação institucional';
+$lang['Authors'] = 'Autores indexados';
+$lang['Journal'] = 'Publicações indexadas';
+$lang['Words'] = 'Termos indexados';
+
+$lang['about_brapci'] = 'Sobra a Brapci';
+$lang['collections'] = 'Coleções Indexadas';
+$lang['help'] = 'Ajuda sobre a Brapci';
 
 $lang['edit_source'] = 'Editar';
 

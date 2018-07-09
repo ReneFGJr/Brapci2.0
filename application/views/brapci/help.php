@@ -14,6 +14,18 @@
 					<br/>
 					<br/>
 				</li>
+				
+                <li>
+                    <h4>Busca pela variações de termos</h4>
+                    <p>
+                        Termo e suas variações: <b>Nome do termo com asterisco "*"</b>
+                    </p>
+                    <code>
+                        ex: Bibliomet*
+                    </code>
+                    <br/>
+                    <br/>
+                </li>				
 
 				<li>
 					<h4>Busca Composta</h4>

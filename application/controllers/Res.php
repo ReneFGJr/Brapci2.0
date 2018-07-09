@@ -44,6 +44,7 @@ class res extends CI_Controller {
     }
 
     public function index() {
+        $this -> load -> model('elasticsearch');
         $this -> load -> model('libraries');
         $this -> load -> model('sources');
         $this -> load -> model('frbr');
@@ -52,6 +53,7 @@ class res extends CI_Controller {
         $this -> load -> view('brapci/form');
 
         if (strlen(get("q")) > 0) {
+            $this->elasticsearch->getStatus();
             $this -> load -> model('searchs');
             $term = convert(get("q"));
             $type = get("type");
