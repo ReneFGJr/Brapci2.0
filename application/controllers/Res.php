@@ -9,7 +9,7 @@ class res extends CI_Controller {
         $this -> lang -> load("app", "portuguese");
         $this -> load -> database();
         $this -> load -> helper('url');
-        $this -> load -> library('session');
+        $this -> load -> library('session');		
 
         $this -> load -> helper('form');
         $this -> load -> helper('form_sisdoc');
@@ -30,6 +30,17 @@ class res extends CI_Controller {
     private function footer($data = array()) {
         $this -> load -> view('header/footer.php');
     }
+	
+	function ea()
+		{
+			//$this->cab();
+			$this -> load -> model('Elasticsearch');
+			$id = 1337;
+			echo '<pre>';
+			print_r($this->Elasticsearch->status());
+			
+			//$result = $client->index($params);			
+		}
 
     public function zera() {
         $this -> cab();
