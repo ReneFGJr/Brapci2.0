@@ -35,9 +35,15 @@ class res extends CI_Controller {
 		{
 			//$this->cab();
 			$this -> load -> model('Elasticsearch');
-			$id = 1337;
+			$id = date("s");
+            $data = array('nome'=>'Viviane Gabriel','genero'=>'Feminino','born'=>'1970-09-20');
 			echo '<pre>';
-			print_r($this->Elasticsearch->status());
+            print_r($this->Elasticsearch->add('family',$id,$data));
+            echo '<hr>';
+            print_r($this->Elasticsearch->get('family',$id));
+            echo '<hr>';
+            print_r($this->Elasticsearch->query_all("Gabriel"));
+			
 			
 			//$result = $client->index($params);			
 		}

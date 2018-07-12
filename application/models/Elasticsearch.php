@@ -7,13 +7,20 @@
  */
 class ElasticSearch extends CI_model
 {
-    var $index = '';
-	var $server = 'http://143.54.114.150:9200';
+    var $index = 'names';
+	//var $server = 'http://143.54.114.150:9200';
+    var $server = 'http://127.0.0.1:9200';
 
     /**
      * constructor setting the config variables for server ip and index.
      */
 
+     /* http://127.0.0.1:9200/names/family/_mapping?pretty=true
+      * 
+      * 
+      * 
+      * */
+     
     public function __construct()
     {
         $ci = &get_instance();
@@ -35,13 +42,12 @@ class ElasticSearch extends CI_model
     private function call($path, $method = 'GET', $data = null)
     {
     	echo $this-> index;    	
-        if (strlen($this -> index)) {
+        if (strlen($this -> index) == 0) {
             echo ('index needs a value');
 			return(array());
         }
 
         $url = $this -> server . '/' . $this -> index . '/' . $path;
-
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
 		echo '<tt>['.$url.']</tt>';
         $ch = curl_init();
