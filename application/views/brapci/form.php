@@ -32,7 +32,11 @@ input[type=text]:focus {
 					<div>
 						<div>
 							<?php echo msg('search_term'); ?>
-							<input type="text" class="form_input" name="q" id="q" placeholder="<?php msg('search_here'); ?>" value="<?php echo get("q"); ?>">
+							<?php
+								$q = htmlspecialchars(get("q"));
+							?>
+							<input type="text" class="form_input" name="q" id="q" placeholder="<?php msg('search_here'); ?>" 
+								value="<?php echo $q; ?>">
 							<button type="submit" >
 								<?php echo msg('Search'); ?>
 							</button>

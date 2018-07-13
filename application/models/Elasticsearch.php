@@ -5,11 +5,11 @@
  * @package OpenLibs
  * 
  */
-class ElasticSearch extends CI_model
+class elasticsearch extends CI_model
 {
-    var $index = 'names';
-	//var $server = 'http://143.54.114.150:9200';
-    var $server = 'http://127.0.0.1:9200';
+    var $index = 'brp';
+	var $server = '';
+
 
     /**
      * constructor setting the config variables for server ip and index.
@@ -24,8 +24,8 @@ class ElasticSearch extends CI_model
     public function __construct()
     {
         $ci = &get_instance();
-        $ci -> config -> load("elasticsearch");
-        $this -> server = $this->server;
+        //$ci -> config -> load("elasticsearch");
+        $this -> server = ELASTIC;
         $this -> index = $this->index;
     }
     /**
@@ -41,7 +41,6 @@ class ElasticSearch extends CI_model
 
     private function call($path, $method = 'GET', $data = null)
     {
-    	echo $this-> index;    	
         if (strlen($this -> index) == 0) {
             echo ('index needs a value');
 			return(array());
@@ -49,7 +48,7 @@ class ElasticSearch extends CI_model
 
         $url = $this -> server . '/' . $this -> index . '/' . $path;
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
-		echo '<tt>['.$url.']</tt>';
+		//echo '<tt>['.$url.']</tt>';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
