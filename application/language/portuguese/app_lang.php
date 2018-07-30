@@ -77,6 +77,7 @@ $lang['collections'] = 'Coleções Indexadas';
 $lang['help'] = 'Ajuda sobre a Brapci';
 
 $lang['edit_source'] = 'Editar';
+$lang['return_to_up'] = 'retorna ao topo';
 
 
 $lang['admin_journals'] = 'Fontes indexadas';
