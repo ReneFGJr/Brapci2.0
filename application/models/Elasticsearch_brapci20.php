@@ -1,6 +1,10 @@
 <?php
 class Elasticsearch_brapci20 extends CI_model
 	{
+	    function article_index($d)
+            {
+                return($d);
+            }
 		function query($q='')
 			{
 				$rlt = $this-> Elasticsearch -> query_all($q);

@@ -96,7 +96,8 @@ class oai_pmh extends CI_model {
 		$dt['article_id'] = $article_id;
 		$this->indexer->indexing($dt);
         $this -> export -> export_Article_Single($article_id);
-		$this->Elasticsearch->add('article',$dt['idc'],$dt);
+		//$this->Elasticsearch->add('article',$dt['idc'],$dt);
+        $this->Elasticsearch->add('article',$article_id,$dt);
 		
         return ("<h1>Index Article: " . $link . $article_id . '</a></h1>');
     }

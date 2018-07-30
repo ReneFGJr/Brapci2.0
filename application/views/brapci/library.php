@@ -17,6 +17,21 @@
 		background-size: cover;
 	}
 </style>
+<div class="container-fluid" style="border: 1px solid #b0b0b0; padding: 5px 10px;">
+    <div class="row">
+        <div class="col-md-2" >
+             <img src="<?php echo HTTP;?>img/logo/logo-bibliotecas-brasileiras.png" width="100%">
+        </div>
+        <div class="col-md-8 text-center" >
+             <h2>CATÁLOGO DE BIBLIOTECAS BRASILEIRAS</h2>
+        </div>
+        
+        <div class="col-md-2" >
+             <img src="<?php echo HTTP;?>img/logo/logo-bibliotecas-brasileiras-cadastre-se.png" width="100%">
+        </div>
+    </div>
+</div>    
+<br/>&nbsp;
 
 <div class="container-fluid parallax parallax_lib_1">
 	<div class="row" style="padding: 10px;">

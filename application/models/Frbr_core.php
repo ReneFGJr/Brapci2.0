@@ -329,6 +329,7 @@ class frbr_core extends CI_model {
 
     function vv($id) {
         $data = $this -> le($id);
+        $tela = '';
         if (count($data) == 0) {
             $this -> load -> view('error', $data);
         } else {
