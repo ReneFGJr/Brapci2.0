@@ -80,12 +80,12 @@ class sources extends CI_Model {
         $rlt = $rlt -> result_array();
         /**************************** MOUNT HTML ***********/
         $sx = '<div class="col-12">'.CR;
-        $sx .= '<ul class="journals">';
+        $sx .= '<ol class="journals">';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $sx .= '<li>' . $this -> jnl_name($line) . '</li>';
         }
-        $sx .= '</ul>';
+        $sx .= '</ol>';
 		$sx .= '</div>'.CR;
         return ($sx);
     }
