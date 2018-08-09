@@ -85,4 +85,15 @@ $lang['admin_export'] = 'Exportar dados';
 $lang['export_article'] = 'Exportar Artigos';
 $lang['export_subject'] = 'Exportar Palavras';
 $lang['export_subject_reverse'] = 'Exportar Índice Invertido';
+
+$lang['tools_harvesting'] = 'Ferramenta de coleta';
+$lang['admin_tools'] = 'Utilitários de coleta';
+$lang['tools_pdf_import'] = 'Importar PDF dos artigos';
+$lang['perfil'] = 'Perfil';
+$lang['logout'] = 'Sair';
+$lang['SignIn'] = 'Entrar no Sistema';
+$lang['password'] = 'senha';
+$lang['return'] = 'voltar';
+$lang['Not found'] = 'Não localizado';
+$lang[''] = '';
 ?>

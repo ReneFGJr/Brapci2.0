@@ -68,6 +68,7 @@
 					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('tools'); ?>&nbsp;</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'journals'); ?>"><?php echo msg('admin_journals'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'tools'); ?>"><?php echo msg('admin_tools'); ?></a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('admin_export'); ?></a>
 					</div>

@@ -1740,7 +1740,7 @@ abstract class CI_DB_driver {
 	 */
 	public function display_error($error = '', $swap = '', $native = FALSE)
 	{
-		$LANG =& load_class('Lang', 'core');
+		$LANG = load_class('Lang', 'core');
 		$LANG->load('db');
 
 		$heading = $LANG->line('db_error_heading');
@@ -1778,7 +1778,7 @@ abstract class CI_DB_driver {
 			}
 		}
 
-		$error =& load_class('Exceptions', 'core');
+		$error = load_class('Exceptions', 'core');
 		echo $error->show_error($heading, $message, 'error_db');
 		exit(8); // EXIT_DATABASE
 	}

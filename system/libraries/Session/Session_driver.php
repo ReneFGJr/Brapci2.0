@@ -96,7 +96,7 @@ abstract class CI_Session_driver implements SessionHandlerInterface {
 	 */
 	public function __construct(&$params)
 	{
-		$this->_config =& $params;
+		$this->_config = $params;
 
 		if (is_php('7'))
 		{

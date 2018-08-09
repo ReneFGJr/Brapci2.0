@@ -126,7 +126,7 @@ class CI_Form_validation {
 	 */
 	public function __construct($rules = array())
 	{
-		$this->CI =& get_instance();
+		$this->CI = get_instance();
 
 		// applies delimiters set in config file.
 		if (isset($rules['error_prefix']))
@@ -589,18 +589,18 @@ class CI_Form_validation {
 				else
 				{
 					// start with a reference
-					$post_ref =& $_POST;
+					$post_ref = $_POST;
 
 					// before we assign values, make a reference to the right POST key
 					if (count($row['keys']) === 1)
 					{
-						$post_ref =& $post_ref[current($row['keys'])];
+						$post_ref = $post_ref[current($row['keys'])];
 					}
 					else
 					{
 						foreach ($row['keys'] as $val)
 						{
-							$post_ref =& $post_ref[$val];
+							$post_ref = $post_ref[$val];
 						}
 					}
 

@@ -86,7 +86,7 @@ abstract class CI_DB_utility {
 	 */
 	public function __construct(&$db)
 	{
-		$this->db =& $db;
+		$this->db = $db;
 		log_message('info', 'Database Utility Class Initialized');
 	}
 
@@ -404,7 +404,7 @@ abstract class CI_DB_utility {
 			}
 
 			// Load the Zip class and output it
-			$CI =& get_instance();
+			$CI = get_instance();
 			$CI->load->library('zip');
 			$CI->zip->add_data($prefs['filename'], $this->_backup($prefs));
 			return $CI->zip->get_zip();

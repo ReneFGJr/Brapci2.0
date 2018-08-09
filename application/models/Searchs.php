@@ -113,7 +113,7 @@ class searchs extends CI_Model {
             //$img = 'img/cover/cover_issue_3477_pt_BR.jpg';
             $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
             if (!is_file($img)) {
-                echo '==>' . $img . '<br>';
+                //echo '==>' . $img . '<br>';
                 $img = 'img/cover/cover_issue_0.jpg';
                 //$sx .= '['.$jnl.']';
             }

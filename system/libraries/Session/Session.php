@@ -429,7 +429,7 @@ class CI_Session {
 			}
 		}
 
-		$this->userdata =& $_SESSION;
+		$this->userdata = $_SESSION;
 	}
 
 	// ------------------------------------------------------------------------

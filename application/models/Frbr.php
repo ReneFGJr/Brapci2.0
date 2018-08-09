@@ -25,7 +25,6 @@ class frbr extends CI_model {
         $tela = '';
         $data = $this -> frbr_core -> le_data($id);
         $article = $dados['article'] = $data;
-        
 
         $tela .= $this -> load -> view('brapci/view/article', $dados, true);
             

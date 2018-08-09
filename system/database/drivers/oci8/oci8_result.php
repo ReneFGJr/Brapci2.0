@@ -91,7 +91,7 @@ class CI_DB_oci8_result extends CI_DB_result {
 		$this->stmt_id = $driver_object->stmt_id;
 		$this->curs_id = $driver_object->curs_id;
 		$this->limit_used = $driver_object->limit_used;
-		$this->commit_mode =& $driver_object->commit_mode;
+		$this->commit_mode = $driver_object->commit_mode;
 		$driver_object->stmt_id = FALSE;
 	}
 

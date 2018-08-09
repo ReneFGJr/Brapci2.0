@@ -297,7 +297,7 @@ if ( ! function_exists('config_item'))
 		if (empty($_config))
 		{
 			// references cannot be directly assigned to static variables, so we use an array
-			$_config[0] =& get_config();
+			$_config[0] = get_config();
 		}
 
 		return isset($_config[0][$item]) ? $_config[0][$item] : NULL;
@@ -413,7 +413,7 @@ if ( ! function_exists('show_error'))
 			$exit_status = 1; // EXIT_ERROR
 		}
 
-		$_error =& load_class('Exceptions', 'core');
+		$_error = load_class('Exceptions', 'core');
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
 		exit($exit_status);
 	}
@@ -436,7 +436,7 @@ if ( ! function_exists('show_404'))
 	 */
 	function show_404($page = '', $log_error = TRUE)
 	{
-		$_error =& load_class('Exceptions', 'core');
+		$_error = load_class('Exceptions', 'core');
 		$_error->show_404($page, $log_error);
 		exit(4); // EXIT_UNKNOWN_FILE
 	}
@@ -463,7 +463,7 @@ if ( ! function_exists('log_message'))
 		if ($_log === NULL)
 		{
 			// references cannot be directly assigned to static variables, so we use an array
-			$_log[0] =& load_class('Log', 'core');
+			$_log[0] = load_class('Log', 'core');
 		}
 
 		$_log[0]->write_log($level, $message);
@@ -614,7 +614,7 @@ if ( ! function_exists('_error_handler'))
 			return;
 		}
 
-		$_error =& load_class('Exceptions', 'core');
+		$_error = load_class('Exceptions', 'core');
 		$_error->log_exception($severity, $message, $filepath, $line);
 
 		// Should we display the error?
@@ -649,7 +649,7 @@ if ( ! function_exists('_exception_handler'))
 	 */
 	function _exception_handler($exception)
 	{
-		$_error =& load_class('Exceptions', 'core');
+		$_error = load_class('Exceptions', 'core');
 		$_error->log_exception('error', 'Exception: '.$exception->getMessage(), $exception->getFile(), $exception->getLine());
 
 		is_cli() OR set_status_header(500);

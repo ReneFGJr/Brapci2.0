@@ -723,7 +723,7 @@ class CI_Email {
 		}
 		else
 		{
-			$file_content =& $file; // buffered file
+			$file_content = $file; // buffered file
 		}
 
 		$this->_attachments[] = array(
@@ -2391,7 +2391,7 @@ class CI_Email {
 	 */
 	protected function _set_error_message($msg, $val = '')
 	{
-		$CI =& get_instance();
+		$CI = get_instance();
 		$CI->lang->load('email');
 
 		if (sscanf($msg, 'lang:%s', $line) !== 1 OR FALSE === ($line = $CI->lang->line($line)))
@@ -2416,7 +2416,7 @@ class CI_Email {
 	{
 		$ext = strtolower($ext);
 
-		$mimes =& get_mimes();
+		$mimes = get_mimes();
 
 		if (isset($mimes[$ext]))
 		{

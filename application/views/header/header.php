@@ -35,6 +35,7 @@ $HTTP = 'http://www.brapci.inf.br/';
     <script src="<?php echo base_url('js/jquery-3.3.1.min.js?v3.3.1'); ?>"></script>
     <script src="<?php echo base_url('js/bootstrap.min.js?v4.0'); ?>"></script>
     <script src="<?php echo base_url('js/jquery-ui.js?v1.12.1'); ?>"></script>
+    <script src="<?php echo base_url('js/sisdoc_form.js?v1.1.1'); ?>"></script>
 <!---    
 <script>
 	(function(i, s, o, g, r, a, m) {

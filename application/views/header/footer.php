@@ -12,6 +12,7 @@
 </style>
 <div style="height: 150px;"></div>
 
+<?php if (!isset($simple)) { ?>
 <!------- Facebook -------->
 <div id="fb-root"></div>
 <script>
@@ -25,7 +26,7 @@
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk')); 
 </script>
-
+<?php } ?>
 <div class="container-fluid footer" style="min-height: 250px;">
 	<div class="row" style="padding: 10px;">
 		<div clas="col-md-1"></div>

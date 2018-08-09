@@ -27,7 +27,8 @@ $config['base_url'] = '';
 DEFINE("PATH","index.php/res/");
 DEFINE("HTTP","http://143.54.114.150/Brapci2.0/");
 DEFINE("ELASTIC",'http://143.54.114.150:9200');
-DEFINE("ELASTIC_PREFIX","");
+DEFINE("ELASTIC_PREFIX","brp2");
+DEFINE("ELASTICPREFIX","brp2");
 DEFINE("CR",chr(13).chr(10));
 
 /*

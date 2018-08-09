@@ -123,8 +123,8 @@ class CI_Router {
 	 */
 	public function __construct($routing = NULL)
 	{
-		$this->config =& load_class('Config', 'core');
-		$this->uri =& load_class('URI', 'core');
+		$this->config = load_class('Config', 'core');
+		$this->uri = load_class('URI', 'core');
 
 		$this->enable_query_strings = ( ! is_cli() && $this->config->item('enable_query_strings') === TRUE);
 

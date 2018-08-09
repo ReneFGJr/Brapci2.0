@@ -97,7 +97,7 @@ class CI_Profiler {
 	 */
 	public function __construct($config = array())
 	{
-		$this->CI =& get_instance();
+		$this->CI = get_instance();
 		$this->CI->load->language('profiler');
 
 		// default all sections to display

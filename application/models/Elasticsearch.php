@@ -45,7 +45,7 @@ class elasticsearch extends CI_model {
 
         $url = $this -> server . '/' . $this -> index . '/' . $path;
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
-        echo '<tt>['.$url.']</tt>';
+        //echo '<tt>['.$url.']</tt>';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

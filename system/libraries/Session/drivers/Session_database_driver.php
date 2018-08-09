@@ -81,7 +81,7 @@ class CI_Session_database_driver extends CI_Session_driver implements SessionHan
 	{
 		parent::__construct($params);
 
-		$CI =& get_instance();
+		$CI = get_instance();
 		isset($CI->db) OR $CI->load->database();
 		$this->_db = $CI->db;
 

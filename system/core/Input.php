@@ -142,12 +142,12 @@ class CI_Input {
 		$this->_enable_csrf		= (config_item('csrf_protection') === TRUE);
 		$this->_standardize_newlines	= (bool) config_item('standardize_newlines');
 
-		$this->security =& load_class('Security', 'core');
+		$this->security = load_class('Security', 'core');
 
 		// Do we need the UTF-8 class?
 		if (UTF8_ENABLED === TRUE)
 		{
-			$this->uni =& load_class('Utf8', 'core');
+			$this->uni = load_class('Utf8', 'core');
 		}
 
 		// Sanitize global arrays
