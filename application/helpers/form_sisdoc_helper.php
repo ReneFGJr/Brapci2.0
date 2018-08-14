@@ -773,6 +773,9 @@ function nbr_autor($xa, $tp) {
 		$xa = troca($xa, 'Dos ', 'dos ');
 		$xa = troca($xa, ' E ', ' e ');
 	}
+	if ($tp == 9) {
+		echo '===>'.$xa;
+	}	
 	return $xa;
 }
 

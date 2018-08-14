@@ -127,7 +127,7 @@ class searchs extends CI_Model {
         }
         $sx .= '</div>';
         
-        $sx = '<div class="container"><div class="row">';
+        $sx .= '<div class="container"><div class="row">';
         $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
         $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
         $sx .= '</div></div>';        
