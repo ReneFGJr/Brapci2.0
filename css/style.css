@@ -157,3 +157,15 @@
     padding: 0;
 }
 
+.icone_nets
+    {
+        padding-top: 4px;
+        padding-bottom: 0px;
+        cursor: pointer;
+        padding-right: 4px;
+    }
+.icone_nets:hover
+    {
+        padding-top: 0px;
+        padding-bottom: 4px;
+    }

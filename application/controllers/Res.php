@@ -103,7 +103,7 @@ class res extends CI_Controller {
 		$this -> load -> model('libraries');
 		$this -> load -> model('sources');
 		$this -> load -> model('frbr');
-		$this -> cab();
+    	$this -> cab();
 
 		$this -> load -> view('brapci/form');
 
@@ -146,7 +146,8 @@ class res extends CI_Controller {
 	}
 
 	public function v($id) {
-		$this -> load -> model('frbr');
+		$this -> load -> model('nets');
+        $this -> load -> model('frbr');
 		$this -> cab();
 
 		$tela = $this -> frbr -> vv($id);

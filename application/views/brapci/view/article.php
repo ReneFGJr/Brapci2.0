@@ -13,6 +13,11 @@ $pdf = '<img src="' . base_url('img/icone/icone_pdf_off.png') . '" class="img-fl
 $linkpdf = '<a href="#">';
 $linkpdfa = '</a>';
 $epdf = 0;
+$doi = '';
+if (!isset($social))
+    {
+        $social = '';
+    }
 
 for ($r = 0; $r < count($article); $r++) {
 	$l = $article[$r];
@@ -82,6 +87,9 @@ for ($r = 0; $r < count($article); $r++) {
 }
 ?>
 </div>
+<header>
+    <title><?php echo $title;?></title>
+</header>
 <div class="row">
 	<div class="col-8">
 		[<?php echo $source; ?>]
@@ -128,6 +136,8 @@ for ($r = 0; $r < count($article); $r++) {
 			echo '<br>' . cr();
 			echo '<br>' . cr();
 		}
+		
+		echo $social;
 		?>
 	</div>
 	<div class="col-2 text-justify">

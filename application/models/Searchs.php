@@ -110,7 +110,6 @@ class searchs extends CI_Model {
         for ($r = 0; $r < count($rst); $r++) {
             $key = $rst[$r]['_source']['article_id'];
             $jnl = $rst[$r]['_source']['id_jnl'];
-            //$img = 'img/cover/cover_issue_3477_pt_BR.jpg';
             $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
             if (!is_file($img)) {
                 //echo '==>' . $img . '<br>';
@@ -127,6 +126,11 @@ class searchs extends CI_Model {
             $sx .= '</div>';
         }
         $sx .= '</div>';
+        
+        $sx = '<div class="container"><div class="row">';
+        $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
+        $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
+        $sx .= '</div></div>';        
 
         return ($sx);
         /*********************************************************************************/

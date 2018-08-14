@@ -25,6 +25,11 @@ class frbr extends CI_model {
         $tela = '';
         $data = $this -> frbr_core -> le_data($id);
         $article = $dados['article'] = $data;
+        $dados['social'] = $this->nets->twitter($data);
+        $dados['social'] .= $this->nets->facebook($data);
+        $dados['social'] .= $this->nets->google($data);
+        $dados['social'] .= $this->nets->linked($data);
+        $dados['social'] .= $this->nets->pinterest($data); 
 
         $tela .= $this -> load -> view('brapci/view/article', $dados, true);
             
