@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.18.08.08
+ * @version     v0.18.08.14
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -774,7 +774,11 @@ function nbr_autor($xa, $tp) {
 		$xa = troca($xa, ' E ', ' e ');
 	}
 	if ($tp == 9) {
-		echo '===>'.$xa;
+        if (strpos($xp2,' '))
+            {
+                $xa = ucwords(LowerCase(substr($xp2,0,strpos($xp2,' '))));
+                $xa .= ' '.ucwords(LowerCase($xp1));
+            }
 	}	
 	return $xa;
 }
