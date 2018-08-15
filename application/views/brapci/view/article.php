@@ -18,6 +18,10 @@ if (!isset($social))
     {
         $social = '';
     }
+if (!isset($cited))
+    {
+        $cited = '';
+    }	
 
 for ($r = 0; $r < count($article); $r++) {
 	$l = $article[$r];
@@ -136,8 +140,9 @@ for ($r = 0; $r < count($article); $r++) {
 			echo '<br>' . cr();
 			echo '<br>' . cr();
 		}
-		
-		echo $social;
+		echo '<div>'.msg('how_cite').'<br>'.$cited.'</div>';
+		echo '<br>';
+		echo '<div>'.msg('how_sharing').'<br>'.$social.'</div>';
 		?>
 	</div>
 	<div class="col-2 text-justify">

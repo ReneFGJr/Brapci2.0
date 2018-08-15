@@ -1,13 +1,26 @@
 <?php
 class nets extends CI_model {
+	
+	function howcited($data)
+		{
+		$d = $this -> dados($data);
+		$mn = $d['autor_full'];
+		$mn .= ' '.$d['title'].'. ';
+		$mn .= $d['source'];
+		if (strlen($d['doi']) > 0)
+			{
+				$mn .= '. DOI: '.'<a href="'.$d['doi'].'" target="_new">'.troca($d['doi'],'http://dx.doi.org/','').'</a>';
+			}
+		return($mn);	
+		}
+	
     function pinterest($data) {
-        return('');
         $d = $this -> dados($data);
         $nm = $d['title'] . '. ' . $d['autor_resumido'] . ' ' . $d['http'];
         $nm = urlencode($nm);
-        $url = 'https://www.facebook.com/dialog/share?app_id=140586622674265&display=popup&href=' . $nm . '&picture=&title=Aspectos%20%C3%A9ticos%20da%20coautoria%20em%20publica%C3%A7%C3%B5es%20cient%C3%ADficas&description=&redirect_uri=http%3A%2F%2Fs7.addthis.com%2Fstatic%2Fthankyou.html';
+		$url = base_url(PATH);
         $link = '<span onclick="newwin2(\'' . $url . '\',800,400);" class="btn-primary" id="tw' . date("Ymdhis") . '" style="cursor: pointer; padding: 5px 10px; border-radius: 4px;">';
-        $link = '<img src="' . base_url('img/nets/icone_pinterest.png') . '" class="icone_nets">';
+        $link = '<img src="' . base_url('img/icone/icone_select_on.png') . '" class="icone_nets" height="42">';
         $link .= '</span>' . cr();
         return ($link);
     }
@@ -52,7 +65,7 @@ class nets extends CI_model {
         $nm = $d['title'] . '. ' . $d['autor_resumido'] . ' ' . $url;
         $nm = urlencode($nm);
         //https://www.facebook.com/dialog/share?app_id=140586622674265&display=popup&href=http%3A%2F%2Fseer.ufrgs.br%2Findex.php%2FEmQuestao%2Farticle%2Fview%2F56837%23.W3NwkU7trRU.facebook&picture=&title=Empoderamento%20das%20mulheres%20quilombolas%3A%20contribui%C3%A7%C3%B5es%20das%20pr%C3%A1ticas%20mediacionais%20desenvolvidas%20na%20Ci%C3%AAncia%20da%20Informa%C3%A7%C3%A3o&description=&redirect_uri=http%3A%2F%2Fs7.addthis.com%2Fstatic%2Fthankyou.html
-        $url = 'https://www.facebook.com/dialog/share?app_id=140586622674265&display=popup&href=' . $nm . '&picture=&title=Aspectos%20%C3%A9ticos%20da%20coautoria%20em%20publica%C3%A7%C3%B5es%20cient%C3%ADficas&description=&redirect_uri=http%3A%2F%2Fs7.addthis.com%2Fstatic%2Fthankyou.html';
+        $url = 'https://www.facebook.com/dialog/share?app_id=140586622674265&display=popup&href=' . $url . '&picture=&title=Divulgação Científica: '.$nm;
         $link = '<span onclick="newwin2(\'' . $url . '\',800,400);" id="tw' . date("Ymdhis") . '" style="cursor: pointer;">';
         $link .= '<img src="' . base_url('img/nets/icone_facebook.png') . '" class="icone_nets">';
         $link .= '</span>' . cr();
@@ -82,10 +95,12 @@ class nets extends CI_model {
         $title = '';
         $autor = '';
         $autor_resumido = '';
+		$autor_full = '';
         $doi = '';
         $source = '';
         $doi = '';
         $subject = '';
+		$vol = '';
 
         for ($r = 0; $r < count($data); $r++) {
             $line = $data[$r];
@@ -94,6 +109,22 @@ class nets extends CI_model {
             $name = trim($line['n_name']);
             //echo $class.'-'.$name.'<hr>';
             switch($class) {
+				case 'hasIssueOf':
+					//echo '===>'.$name;
+					//print_r($line);
+					//echo '<hr>';
+					$issue = $this->frbr_core->le_data($line['d_r1']);
+					for ($i = 0;$i < count($issue); $i++)
+						{
+							$ln = $issue[$i];
+				            $nid = $ln['d_r1'];
+				            $nclass = trim($ln['c_class']);
+				            $nname = trim($ln['n_name']);
+							if ($nclass == 'hasIssue') { $source = $nname; }
+							if ($nclass == 'dateOfPublication') { $year = $nname; }
+							if ($nclass == 'hasVolumeNumber') { $vol .= ', '.$nname; }							
+						}
+					break;
                 case 'hasRegisterId' :
                     if (substr($name, 0, 3) == '10.') {
                         $doi = troca($name, 'DOI:', '');
@@ -106,37 +137,39 @@ class nets extends CI_model {
                         $name = ucwords($name);
                         $subject .= '#' . troca(ucFirst($name), ' ', '') . ' ';
                         $subject = troca($subject, '&', '');
-                        $subject = troca($subject, '-', '');
+                        $subject = troca($subject, '-', '');				
                     }
                     break;
 
                 case 'hasSource' :
                     if (strlen($source) == 0) {
-                        $src = $name;
-                        $src1 = substr($src, 0, strpos($src, ';'));
-                        $src1 = troca($src1, ' ', '') . ' ';
-                        $src2 = substr($src, strpos($src, ';') + 1, strlen($src));
-                        $source = '#' . $src1 . $src2;
-                        $source = troca($source, '&', '');
+                        //$source = $name;
                     }
 
                     break;
                 case 'hasTitle' :
                     if (strlen($title) == 0) {
                         $title = $name;
+						$title = lowercase($title);
+						$title = ucfirst($title);
                     }
                     break;
                 case 'hasAuthor' :
                     $au = nbr_autor($name, 7);
                     $aun = nbr_autor($name, 9);
+					$auf = nbr_autor($name, 5);
 
                     if (strlen($au) > 0) {
-                        if (strlen($autor) > 0) { $autor .= '; ';
+                        if (strlen($autor) > 0) {
+                        	$autor .= '; ';
                             $autor_resumido .= '; ';
+							$autor_full .= '; ';
                         }
                         $au = troca($au, ' ', '');
                         $autor .= trim($au);
                         $autor_resumido .= trim($aun);
+						
+						$autor_full .= $auf; 
                     }
 
                     break;
@@ -145,7 +178,9 @@ class nets extends CI_model {
         $d = array();
         $d['title'] = $title;
         $d['autor'] = $autor;
+		$d['source'] = '<b>'.$source . '</b>'. $vol. ', '.$year;
         $d['autor_resumido'] = $autor_resumido;
+		$d['autor_full'] = $autor_full;
         $d['http'] = base_url(PATH . 'v/' . $id);
         $d['doi'] = $doi;
         $d['subject'] = $subject;

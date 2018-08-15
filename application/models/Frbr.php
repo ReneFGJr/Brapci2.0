@@ -29,7 +29,9 @@ class frbr extends CI_model {
         $dados['social'] .= $this->nets->facebook($data);
         $dados['social'] .= $this->nets->google($data);
         $dados['social'] .= $this->nets->linked($data);
-        $dados['social'] .= $this->nets->pinterest($data); 
+        $dados['social'] .= $this->nets->pinterest($data);
+		
+		$dados['cited'] = $this->nets->howcited($data);  
 
         $tela .= $this -> load -> view('brapci/view/article', $dados, true);
             
