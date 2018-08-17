@@ -152,6 +152,10 @@ for ($r = 0; $r < count($article); $r++) {
 		if (perfil("#ADM") and ($epdf == 0))
 			{
 				echo '<br><br><div id="download" class="text-center" style="width:100%;">';
+				echo '<a href="#" onclick="newxy2(\''.base_url(PATH.'pdf_upload/'.$d_r1).'\',800,400);">';
+				echo 'UPLOAD';
+				echo '</a>';
+				echo ' - ';
 				echo '<a href="#" onclick="newxy2(\''.base_url(PATH.'pdf_download/'.$d_r1).'\',800,400);">';
 				echo 'LOAD...';
 				echo '</a>';

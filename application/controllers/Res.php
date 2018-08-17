@@ -24,16 +24,17 @@ class res extends CI_Controller {
 	private function cab($data = array()) {
 		$data['title'] = 'Brapci';
 		$this -> load -> view('header/header.php', $data);
-		$this -> load -> view('header/menu_top.php', $data);
+		if (!isset($data['nocab'])) {
+			$this -> load -> view('header/menu_top.php', $data);
+		}
 		$this -> load -> model("socials");
 	}
 
 	private function footer($data = array()) {
-		if ($data == 0)
-			{
-				$data = array('simple'=>true);
-			}
-		$this -> load -> view('header/footer.php',$data);
+		if ($data == 0) {
+			$data = array('simple' => true);
+		}
+		$this -> load -> view('header/footer.php', $data);
 	}
 
 	function ea($pth = '', $q = '') {
@@ -99,11 +100,11 @@ class res extends CI_Controller {
 
 	public function index() {
 		$this -> load -> model('elasticsearch');
-
 		$this -> load -> model('libraries');
 		$this -> load -> model('sources');
 		$this -> load -> model('frbr');
-    	$this -> cab();
+		$this -> load -> model('bs');
+		$this -> cab();
 
 		$this -> load -> view('brapci/form');
 
@@ -147,7 +148,7 @@ class res extends CI_Controller {
 
 	public function v($id) {
 		$this -> load -> model('nets');
-        $this -> load -> model('frbr');
+		$this -> load -> model('frbr');
 		$this -> cab();
 
 		$tela = $this -> frbr -> vv($id);
@@ -451,6 +452,13 @@ class res extends CI_Controller {
 		$this -> footer();
 	}
 
+	function mark($key = '', $vlr = '') {
+		$vlr = get("dd2");
+		$this -> load -> model('bs');
+		$vlr2 = $this -> bs -> mark($key, $vlr);
+		echo $vlr2;
+	}
+
 	function ajax($id = '', $id2 = '') {
 		$this -> load -> model('searchs');
 		$q = get("q");
@@ -520,7 +528,16 @@ class res extends CI_Controller {
 		$pdf -> addPDF('d:/lixo/pdf/one.pdf', '1, 3, 4') -> addPDF('d:/lixo/pdf/two.pdf', '1-2') -> addPDF('d:/lixo/pdf/three.pdf', 'all');
 		$pdf -> merge('file', 'd:/lixo/pdf/TEST3.pdf');
 		echo "FIM";
+	}
 
+	function pdf_upload($d1 = '', $d2 = '') {
+		$this -> load -> model('frbr');
+		$this -> load -> model('frbr_core');
+		$this -> load -> model('pdfs');
+		$data['nocab'] = true;
+		$this -> cab($data);
+		$data['content'] = $this -> pdfs -> upload($d1);
+		$this -> load -> view('show', $data);
 	}
 
 	/* LOGIN */
@@ -603,16 +620,16 @@ class res extends CI_Controller {
 				$data['content'] = $txt;
 				$this -> load -> view('show', $data);
 				break;
-			case 'pdf_import':
-				$this->load->model("pdfs");
-				$this->load->model("frbr");
-				$this->load->model("frbr_core");
-				
+			case 'pdf_import' :
+				$this -> load -> model("pdfs");
+				$this -> load -> model("frbr");
+				$this -> load -> model("frbr_core");
+
 				$data['title'] = msg('Tools');
 				$txt = '<div class="col-md-12">';
 				$txt .= '<h1>' . msg('tools_harvesting') . '</h1>';
 				$txt .= '</div>';
-				$txt .= $this->pdfs->harvestinf_next($id);
+				$txt .= $this -> pdfs -> harvestinf_next($id);
 				$data['content'] = $txt;
 				$this -> load -> view('show', $data);
 				break;

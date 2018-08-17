@@ -82,6 +82,7 @@ class searchs extends CI_Model {
     }
 
     function s($n, $t = '') {
+    	print_r($_SESSION);
         $type = 'article';
         $q = $this -> elasticsearch -> query($type, $n);
         //$q = $this->ElasticSearch->query_all($n);
@@ -118,7 +119,7 @@ class searchs extends CI_Model {
             }
             $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
             $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
-            $sx .= '<input type="checkbox"> ';
+			$sx .= $this->bs->checkbox($key);
             $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
             $sx .= $this -> frbr -> show_v($key);
             $sx .= '</a>';

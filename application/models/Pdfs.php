@@ -1,45 +1,97 @@
 <?php
 class pdfs extends CI_model {
 	function harvesting_pdf($id) {
-		$this->harvesting_pdf_curl($id);
+		$this -> harvesting_pdf_curl($id);
 		echo '<script> 	window.opener.location.reload(); close();  </script>';
 	}
-	
-	function harvestinf_next($p=0)
-		{
-			$prop1 = $this->frbr_core->find_class('hasUrl');
-			$prop2 = $this->frbr_core->find_class('hasFileStorage');
-			$sql = "
+
+	function upload($id = '') {
+		$data = $this -> frbr_core -> le_data($id);
+		for ($r = 0; $r < count($data); $r++) {
+			$attr = trim($data[$r]['c_class']);
+			$vlr = trim($data[$r]['n_name']);
+
+			if ($attr == 'prefLabel') {
+				$file = trim($vlr);
+				$file = troca($file, '/', '_');
+				$file = troca($file, '.', '_');
+				$file = troca($file, ':', '_');
+			}
+		}		
+		
+		$sx = '
+			<h1>' . msg('upload_file') . '</h1>
+			<form method="post" enctype="multipart/form-data">
+			    Select image to upload:
+			    <input type="file" name="fileToUpload" id="fileToUpload">
+			    <input type="submit" value="Upload Image" name="submit">
+			</form>
+			';
+
+		// Check if image file is a actual image or fake image
+		if (isset($_POST["submit"])) {
+			$target_dir = "uploads/";
+			$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+			$uploadOk = 1;
+			$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+			$check = (lowercase(substr($imageFileType, strlen($imageFileType) - 3, 3)) == 'pdf');
+			if ($check !== false) {								
+				$namef = $_FILES["fileToUpload"]["tmp_name"];
+				$txt = '';
+				
+				$myfile = fopen($namef, "r") or die("Unable to open file!");
+				$txt .= fread($myfile,filesize($namef));
+				fclose($myfile);				
+				
+				//echo '===>'.$file;
+				//echo '<br>===>'.$id;
+				//exit;
+								
+				$this -> file_pdf($file, $txt, $id);	
+				$uploadOk = 1;
+				$sx .= '<script> wclose(); </script>';
+			} else {
+				echo "File is not an image.";
+				$uploadOk = 0;
+			}
+		}
+
+		return ($sx);
+	}
+
+	function harvestinf_next($p = 0) {
+		$prop1 = $this -> frbr_core -> find_class('hasUrl');
+		$prop2 = $this -> frbr_core -> find_class('hasFileStorage');
+		$sql = "
 				select count(*) as total from rdf_data AS R1
 					left JOIN rdf_data AS R2 ON R1.d_r1 = R2.d_r1 and R2.d_p = $prop2
 				  where R1.d_p = $prop1 and R2.d_p is null
 			";
-			$rlt = $this->db->query($sql);
-			$rlt = $rlt->result_array();
-			$total = $rlt[0]['total'];
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$total = $rlt[0]['total'];
 
-			$sql = "
+		$sql = "
 				select R1.d_r1 as d_r1 from rdf_data AS R1
 					left JOIN rdf_data AS R2 ON R1.d_r1 = R2.d_r1 and R2.d_p = $prop2
 				  where R1.d_p = $prop1 and R2.d_p is null
 				limit 1 offset $p			
 			";
-			$rlt = $this->db->query($sql);
-			$rlt = $rlt->result_array();
-			if (count($rlt) > 0)
-				{
-					$line = $rlt[0];
-					$id = $line['d_r1'];
-					$sx = msg('Article').' '.$id;
-					$sx .= ', '.msg('left').' '.$total.' files';					
-					echo '<meta http-equiv="refresh" content="1;'.base_url(PATH.'tools/pdf_import/'.(round($p)+1)).'">';
-					$sx .= ' '.$this->harvesting_pdf_curl($id);
-					return($sx);
-				} else {
-					return("Fim da coleta");
-				}
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) > 0) {
+			$line = $rlt[0];
+			$id = $line['d_r1'];
+			$sx = msg('Article') . ' ' . $id;
+			$sx .= ', ' . msg('left') . ' ' . $total . ' files';
+			echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/' . (round($p) + 1)) . '">';
+			$sx .= ' ' . $this -> harvesting_pdf_curl($id);
+			return ($sx);
+		} else {
+			return ("Fim da coleta");
 		}
-	
+	}
+
 	function harvesting_pdf_curl($id) {
 		$links = array();
 		$data = $this -> frbr_core -> le_data($id);
@@ -82,12 +134,12 @@ class pdfs extends CI_model {
 				} catch (Exception $e) {
 					echo 'Caught exception: ', $e -> getMessage(), "\n";
 				}
-				return(msg("Harvesting"));
+				return (msg("Harvesting"));
 				break;
 			default :
-				return("ERRO");
+				return ("ERRO");
 				break;
-		}		
+		}
 	}
 
 	function download($d1) {
