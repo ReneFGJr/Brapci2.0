@@ -40,7 +40,7 @@ $lang['home'] = 'home';
 $lang['tools'] = 'ferramentas';
 $lang['signin'] = 'login';
 $lang['search_term'] = 'informe o(s) termo(s) de busca';
-$lang['search_1'] = 'assuntos';
+$lang['search_1'] = 'todos';
 $lang['search_2'] = 'autores';
 $lang['search_3'] = 'título';
 $lang['search_4'] = 'palavras-chave';
@@ -95,5 +95,17 @@ $lang['SignIn'] = 'Entrar no Sistema';
 $lang['password'] = 'senha';
 $lang['return'] = 'voltar';
 $lang['Not found'] = 'Não localizado';
+$lang['how_cite'] = 'Como citar';
+$lang['how_sharing'] = 'Compartilhe';
+$lang['clean_selected'] = 'Limpar seleção';
+$lang['xls_selected'] = 'Exportar CSV';
+$lang['select_all'] = 'Selecionar Tudo';
+$lang['not_match_to'] = 'Nada localizado para';
 $lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+
 ?>

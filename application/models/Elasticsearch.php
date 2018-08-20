@@ -71,7 +71,7 @@ class elasticsearch extends CI_model {
 
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
+        
         return json_decode($response, true);
     }
 
@@ -149,24 +149,24 @@ class elasticsearch extends CI_model {
         $title = '';
         if (isset($data['title'])) {
             for ($r = 0; $r < count($data['title']); $r++) {
-                    $title .= $data['title'][$r]['title'] . ' ('.$data['title'][$r]['lang'].'); ';
+                $title .= $data['title'][$r]['title'] . ' (' . $data['title'][$r]['lang'] . '); ';
             }
         }
         /****************************************************************************/
         $abstract = '';
         if (isset($data['abstract'])) {
             for ($r = 0; $r < count($data['abstract']); $r++) {
-                    $abstract .= $data['abstract'][$r]['descript'] . ' ('.$data['abstract'][$r]['lang'].'); ';
+                $abstract .= $data['abstract'][$r]['descript'] . ' (' . $data['abstract'][$r]['lang'] . '); ';
             }
         }
         /****************************************************************************/
         $subject = '';
         if (isset($data['subject'])) {
             for ($r = 0; $r < count($data['subject']); $r++) {
-                    $term = substr($data['subject'][$r],0,strpos($data['subject'][$r],'@'));
-                    $subject .= $term.'; ';
+                $term = substr($data['subject'][$r], 0, strpos($data['subject'][$r], '@'));
+                $subject .= $term . '; ';
             }
-        }        
+        }
         $dt['article_id'] = $id;
         $dt['authors'] = $auth;
         $dt['title'] = $title;
@@ -201,19 +201,109 @@ class elasticsearch extends CI_model {
      * @return type
      */
 
-    public function query($type, $q) {
-        $sz = $this->searchs->sz;
+    public function query($type, $q, $t) {
+        // https://www.youtube.com/watch?v=Q0oy9-lXJ18
+        // https://www.youtube.com/watch?v=5lO4cAQlaEw&t=26s
+        // https://www.youtube.com/watch?v=MXFp4OPdV4I
+        /******************* PAGINACAO *******/
+        $sz = $this -> searchs -> sz;
         $p = round(get("p"));
-        $fr = ($p-1);
-        if ($fr < 0) { $fr = 0; }
-        $data = array('q' => $q, 'size' => $sz);
-        if ($fr > 0)
-            {
-                $fr = $fr * $sz;
-                $data['from'] = $fr;
-            }
-      
-        return $this -> call($type . '/_search?' . http_build_query($data));
+        $fr = ($p - 1);
+        if ($fr < 0) { $fr = 0;
+        }
+        $DATA = '';
+        $method = 'POST';
+        $qs = '';
+        switch($t) {
+            case '2':
+                $fld = 'authors';
+                $data = '
+                        {
+                          "from": "'.$fr.'",
+                          "query": {
+                            "query_string": {
+                              "fields": [
+                                "'.$fld.'"
+                              ],                                
+                              "query": "'.$q.'"
+                            }
+                          }
+                        }                
+                ';               
+                break;
+            case '3':
+                $fld = 'title';
+                $data = '
+                        {
+                          "from": "'.$fr.'",
+                          "query": {
+                            "query_string": {
+                              "fields": [
+                                "'.$fld.'"
+                              ],                                
+                              "query": "'.$q.'"
+                            }
+                          }
+                        }                
+                ';               
+                break;
+            case '4':
+                $fld = 'subject';
+                $data = '
+                        {
+                          "from": "'.$fr.'",
+                          "query": {
+                            "query_string": {
+                              "fields": [
+                                "'.$fld.'"
+                              ],                                
+                              "query": "'.$q.'"
+                            }
+                          }
+                        }                
+                ';               
+                break;
+            case '5':
+            $fld = 'abstract';
+                $data = '
+                        {
+                          "from": "'.$fr.'",
+                          "query": {
+                            "query_string": {
+                              "fields": [
+                                "'.$fld.'"
+                              ],                                
+                              "query": "'.$q.'"
+                            }
+                          }
+                        }                
+                ';                              
+
+                break;
+            default :
+                /**** NOVO ***/
+                $data = '
+                        {
+                          "from": "'.$fr.'",
+                          "query": {
+                            "query_string": {
+                              "fields": [
+                                "authors",
+                                "title^10",
+                                "subject^5",
+                                "abstract",
+                                "journal",
+                                "year"
+                              ],                                 
+                              "query": "'.$q.'"
+                            }
+                          }
+                        }                
+                ';                              
+                break;
+        }
+        
+        return $this -> call($type . '/_search?'.$qs,$method,$data);
     }
 
     /**

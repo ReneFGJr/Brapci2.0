@@ -47,6 +47,9 @@
 
   <div class="collapse navbar-collapse fsz" id="navbarSupportedContent">
     <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link fsz " href="<?php echo base_url(PATH . 'basket'); ?>">&nbsp;<span id="basket"><?php echo $this->bs->selected(); ?>&nbsp;</span></a>
+                </li>        
       <li class="nav-item active">
         <a class="nav-link" href="<?php echo base_url(PATH); ?>">&nbsp;<?php echo msg('home'); ?>&nbsp;<span class="sr-only">(current)</span></a>
       </li>
@@ -62,10 +65,7 @@
 
 				<li class="nav-item">
 					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'indice'); ?>">&nbsp;<?php echo msg('indexs'); ?>&nbsp;</a>
-				</li>   
-				<li class="nav-item">
-					<a class="nav-link fsz " href="<?php echo base_url(PATH . 'basket'); ?>">&nbsp;<span id="basket"><?php echo msg('0'); ?>&nbsp;</span></a>
-				</li>				   
+				</li> 				   
 			    <?php if (perfil("#ADM#GER")) { ?>
 				<li class="nav-item dropdown">
 					<a class="nav-link fsz dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp;<?php echo msg('tools'); ?>&nbsp;</a>

@@ -13,6 +13,16 @@ class nets extends CI_model {
 			}
 		return($mn);	
 		}
+        
+    function selected($data)
+        {
+        $d = $this -> dados($data);
+        $nm = $d['title'] . '. ' . $d['autor_resumido'] . ' ' . $d['http'];
+
+        $link = $this->bs->change($d['id']);
+        return ($link);
+            
+        }
 	
     function pinterest($data) {
         $d = $this -> dados($data);
@@ -101,7 +111,6 @@ class nets extends CI_model {
         $doi = '';
         $subject = '';
 		$vol = '';
-
         for ($r = 0; $r < count($data); $r++) {
             $line = $data[$r];
             $id = $line['d_r1'];
@@ -184,6 +193,7 @@ class nets extends CI_model {
         $d['http'] = base_url(PATH . 'v/' . $id);
         $d['doi'] = $doi;
         $d['subject'] = $subject;
+        $d['id'] = $id;
         //$nm = urlencode($nm);
         return ($d);
     }

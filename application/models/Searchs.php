@@ -82,9 +82,8 @@ class searchs extends CI_Model {
     }
 
     function s($n, $t = '') {
-    	print_r($_SESSION);
         $type = 'article';
-        $q = $this -> elasticsearch -> query($type, $n);
+        $q = $this -> elasticsearch -> query($type, $n, $t);
         //$q = $this->ElasticSearch->query_all($n);
 
         if (!isset($q['hits'])) {
@@ -92,8 +91,17 @@ class searchs extends CI_Model {
         }
 
         $total = $q['hits']['total'];
-        
+        $rst = $q['hits']['hits'];
+
+        $st = '';        
+        for ($r=0;$r < count($rst);$r++)
+            {
+                $line = $rst[$r];
+                $st .= $line['_id'].';';
+            }
+                
         $sx = '<div class="container"><div class="row">';
+        $sx .= $this->bs->script_all($st);        
         $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
         $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
         $sx .= '</div></div>';
@@ -102,8 +110,7 @@ class searchs extends CI_Model {
         if ($p == 0) { $p = 1;}
 
         /**************************************************** Busca Parte II *****************/
-        $sx .= '<div class="row result">';
-        $rst = $q['hits']['hits'];
+        $sx .= '<div class="row result">';        
         
         $sz = $this->sz;
         $ppi = (($p-1)*$sz);
@@ -111,6 +118,7 @@ class searchs extends CI_Model {
         for ($r = 0; $r < count($rst); $r++) {
             $key = $rst[$r]['_source']['article_id'];
             $jnl = $rst[$r]['_source']['id_jnl'];
+            $year = $rst[$r]['_source']['year'];
             $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
             if (!is_file($img)) {
                 //echo '==>' . $img . '<br>';
@@ -118,20 +126,31 @@ class searchs extends CI_Model {
                 //$sx .= '['.$jnl.']';
             }
             $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
-            $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
+            $sx .= '<div class="col-10 " style="margin-bottom: 15px;">';
 			$sx .= $this->bs->checkbox($key);
             $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
             $sx .= $this -> frbr -> show_v($key);
             $sx .= '</a>';
             $sx .= ' <sup>' . number_format($rst[$r]['_score'], 4) . '</sup>';
             $sx .= '</div>';
+            $sx .= '<div class="col-1 ">'.$year.'</div>';            
         }
         $sx .= '</div>';
-        
-        $sx .= '<div class="container"><div class="row">';
-        $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
-        $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
-        $sx .= '</div></div>';        
+        if ($total > 5)
+            {
+                $sx .= '<div class="container"><div class="row">';
+                $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
+                $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
+                $sx .= '</div></div>';
+            } 
+        if ($total == 0)
+            {
+                $sx = '<div class="container"><div class="row">';
+                $sx .= '<div class="col-12">';
+                $sx .= bs_alert("warning",msg("not_match_to") .' "<b>'.$n.'</b>"');
+                $sx .= '</div>';
+                $sx .= '</div></div>';
+            }                   
 
         return ($sx);
         /*********************************************************************************/

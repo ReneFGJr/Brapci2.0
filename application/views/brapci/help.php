@@ -22,6 +22,7 @@
                     </p>
                     <code>
                         ex: Bibliomet*
+                        <br>ex: *metria
                     </code>
                     <br/>
                     <br/>
@@ -36,6 +37,14 @@
 						ex: Bibliometria Citação
 						<br>Forma de busca do sistema: Bibliometria AND Citação
 					</code>
+					
+                    <p>
+                        Na busca composta o sistema insere automaticamento o elemento boleano OR entre os termos, recuperando apenas os registros que tenham a ocorrencias.
+                    </p>
+                    <code>
+                        ex: Bibliometria Citação
+                        <br>Forma de busca do sistema: Bibliometria OR Citação
+                    </code>					
 				</li>
 
 			</ul>
