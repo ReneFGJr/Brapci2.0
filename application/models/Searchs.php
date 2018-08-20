@@ -82,6 +82,10 @@ class searchs extends CI_Model {
     }
 
     function s($n, $t = '') {
+        
+        $p = round(get("p"));
+        if ($p == 0) { $p = 1;}
+		    	
         $type = 'article';
         $q = $this -> elasticsearch -> query($type, $n, $t);
         //$q = $this->ElasticSearch->query_all($n);
@@ -105,9 +109,7 @@ class searchs extends CI_Model {
         $sx .= '<div class="col-8">'.$this -> pages($n, $total).'</div>'.cr();
         $sx .= '<div class="col-4">Total ' . $total.'</div>'.cr();                
         $sx .= '</div></div>';
-        
-        $p = round(get("p"));
-        if ($p == 0) { $p = 1;}
+
 
         /**************************************************** Busca Parte II *****************/
         $sx .= '<div class="row result">';        

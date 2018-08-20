@@ -211,6 +211,7 @@ class elasticsearch extends CI_model {
         $fr = ($p - 1);
         if ($fr < 0) { $fr = 0;
         }
+		$fr = $fr * $sz;
         $DATA = '';
         $method = 'POST';
         $qs = '';
@@ -220,6 +221,7 @@ class elasticsearch extends CI_model {
                 $data = '
                         {
                           "from": "'.$fr.'",
+                          "size": "'.$sz.'",
                           "query": {
                             "query_string": {
                               "fields": [
@@ -236,6 +238,7 @@ class elasticsearch extends CI_model {
                 $data = '
                         {
                           "from": "'.$fr.'",
+                          "size": "'.$sz.'",
                           "query": {
                             "query_string": {
                               "fields": [
@@ -252,6 +255,7 @@ class elasticsearch extends CI_model {
                 $data = '
                         {
                           "from": "'.$fr.'",
+                          "size": "'.$sz.'",
                           "query": {
                             "query_string": {
                               "fields": [
@@ -268,6 +272,7 @@ class elasticsearch extends CI_model {
                 $data = '
                         {
                           "from": "'.$fr.'",
+                          "size": "'.$sz.'",
                           "query": {
                             "query_string": {
                               "fields": [
@@ -285,6 +290,7 @@ class elasticsearch extends CI_model {
                 $data = '
                         {
                           "from": "'.$fr.'",
+                          "size": "'.$sz.'",
                           "query": {
                             "query_string": {
                               "fields": [
@@ -299,7 +305,7 @@ class elasticsearch extends CI_model {
                             }
                           }
                         }                
-                ';                              
+                ';                            
                 break;
         }
         
