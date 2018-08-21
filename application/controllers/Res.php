@@ -10,7 +10,7 @@ class res extends CI_Controller {
         $this -> load -> database();
         $this -> load -> helper('url');
         $this -> load -> library('session');
-        
+
         //$this -> load -> library('tcpdf');
 
         $this -> load -> helper('form');
@@ -199,17 +199,36 @@ class res extends CI_Controller {
         }
     }
 
-    public function journals() {
+    public function journals($act = '', $p = '') {
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('sources');
         $this -> cab();
-
+        $html = '';
         $data = array();
-        $data['content'] = $this -> sources -> list_sources();
-        if (perfil("#ADM")) {
-            $data['content'] .= $this -> sources -> button_new_sources();
+        $data['content'] = '';
+        
+        if (strlen($act) == 0) {
+            
+            $data['content'] = $this -> sources -> list_sources();
+            if (perfil("#ADM")) {
+                $data['content'] .= $this -> sources -> button_new_sources();
+                $data['content'] .= $this -> sources -> button_harvesting_all();
+            }
+            $data['title'] = msg('journals');
+        } else {
+            $id = $this -> sources -> next_harvesting($p);
+            if ($id > 0) {
+                $this -> oai_pmh -> ListIdentifiers($id);
+                $html = $this -> sources -> info($id);
+                $html .= '<meta http-equiv="Refresh" content="5;' . base_url(PATH . 'journals/harvesting/' . ($id)) . '">';
+            } else {
+                $html .= '<div class="col-md-12">'.bs_alert('success', msg('harvesting_finished')).'</div>';
+                $html .= '<div class="col-md-12">'.$this->oai_pmh->cache_resume().'</div>';
+            }
         }
-        $data['title'] = msg('journals');
+        $data['content'] .= $html;
         $this -> load -> view('show', $data);
         $this -> footer();
     }
@@ -455,37 +474,35 @@ class res extends CI_Controller {
     }
 
     function mark($key = '', $vlr = '') {
-        $this->bs->ajax_mark($key,$vlr);
+        $this -> bs -> ajax_mark($key, $vlr);
     }
 
-    function basket($fcn='',$arg='') {
+    function basket($fcn = '', $arg = '') {
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
-        
-        switch($fcn)
-            {
-            case 'export':
-                switch($arg)
-                    {
-                    case 'csv':
-                        $this->bs->mark_export_csv();
+
+        switch($fcn) {
+            case 'export' :
+                switch($arg) {
+                    case 'csv' :
+                        $this -> bs -> mark_export_csv();
                         break;
-                    default:
-                        redirect(base_url(PATH.'basket'));
-                        break;        
-                    }
+                    default :
+                        redirect(base_url(PATH . 'basket'));
+                        break;
+                }
                 break;
-            case 'clean':
-                $this->bs->mark_clear();
-                redirect(base_url(PATH.'basket'));
-            default:
+            case 'clean' :
+                $this -> bs -> mark_clear();
+                redirect(base_url(PATH . 'basket'));
+            default :
                 $this -> cab();
-                $data['content'] = $this->bs->tools();
+                $data['content'] = $this -> bs -> tools();
                 $data['content'] .= $this -> bs -> basket();
                 $this -> load -> view('show', $data);
-                $this -> footer();                
+                $this -> footer();
                 break;
-            }
+        }
     }
 
     function ajax($id = '', $id2 = '') {

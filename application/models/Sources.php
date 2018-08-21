@@ -1,6 +1,34 @@
 <?php
 class sources extends CI_Model {
     var $table = 'source_source';
+    
+    function next_harvesting($p='')
+        {
+            if (strlen($p) == 0)
+                { $p = 0; }
+            $p = round($p);
+            
+            $sql = "SELECT * FROM `source_source` WHERE jnl_url_oai <> '' and id_jnl > $p order by id_jnl limit 1 ";
+            $rlt = $this->db->query($sql);            
+            $rlt = $rlt->result_array();
+            
+            if (count($rlt) > 0)
+                {
+                    $id = $rlt[0]['id_jnl'];
+                } else {
+                    $id = (-1);
+                }        
+            
+            return($id);
+        }
+    
+    function button_harvesting_all()
+        {
+            $sx = '&nbsp;<a href="'.base_url(PATH.'journals/harvesting').'" class="btn btn-outline-secondary">';
+            $sx .= msg('harvesting_all');
+            $sx .= '</a>';
+            return($sx);
+        }
 
 	function cp($id='')
 		{

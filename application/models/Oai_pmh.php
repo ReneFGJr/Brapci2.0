@@ -574,26 +574,57 @@ class oai_pmh extends CI_model {
         return ($sx);
     }
 
-    public function cache_resume($id) {
+    public function cache_resume($id='') {
         /* Alter status - Deleted registers */
         $sql = "update source_listidentifier set li_s = 9 where li_status = 'deleted' and li_s <> 9";
         $rlt = $this -> db -> query($sql);
-
-        /* Counter Registers */
-        $sql = "select count(*) as total, li_s, li_jnl 
-                        FROM source_listidentifier
-                        WHERE li_jnl = $id 
-                        GROUP BY li_s, li_jnl
-                        ORDER BY li_s ";
-        $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        $sx = '<h5>' . msg("cache_status") . '</h5>';
-        $sx .= '<ul>';
-        for ($r = 0; $r < count($rlt); $r++) {
-            $line = $rlt[$r];
-            $sx .= '<li>' . $this -> cache_link($line) . ': <span>' . $line['total'] . '</span>' . '</li>' . CR;
-        }
-        $sx .= '</ul>';
+        if (strlen($id) > 0)
+            {
+                $wh = "WHERE li_jnl = $id".cr();
+                $wh .= ' GROUP BY li_s, li_jnl '.cr();
+                
+                /* Counter Registers */
+                $sql = "select count(*) as total, li_s, li_jnl 
+                                FROM source_listidentifier
+                                $wh 
+                                ORDER BY li_s ";
+                $rlt = $this -> db -> query($sql);
+                $rlt = $rlt -> result_array();
+                $sx = '<h5>' . msg("cache_status") . '</h5>';
+                $sx .= '<ul>';
+                for ($r = 0; $r < count($rlt); $r++) {
+                    $line = $rlt[$r];
+                    $sx .= '<li>' . $this -> cache_link($line) . ': <span>' . $line['total'] . '</span>' . '</li>' . CR;
+                }
+                $sx .= '</ul>';
+            } else {
+                $wh = '';
+                $wh .= ' GROUP BY li_s, li_jnl, jnl_name '.cr();
+        
+               
+                /* Counter Registers */
+                $sql = "select count(*) as total, li_s, li_jnl, jnl_name 
+                                FROM source_listidentifier
+                                INNER JOIN source_source ON li_jnl = id_jnl
+                                $wh 
+                                ORDER BY jnl_name, li_s ";
+                $rlt = $this -> db -> query($sql);
+                $rlt = $rlt -> result_array();
+                $sx = '<h5>' . msg("cache_status") . '</h5>';
+                $sx .= '<ul>';
+                $xjnl = '';
+                for ($r = 0; $r < count($rlt); $r++) {
+                    $line = $rlt[$r];
+                    $jnl = $line['li_jnl'];
+                    if ($xjnl != $jnl)
+                        {
+                            $xjnl = $jnl;
+                            $sx .= '<h3>'.$line['jnl_name'].'</h3>'.cr();
+                        }
+                    $sx .= '<li>' . $this -> cache_link($line) . ': <span>' . $line['total'] . '</span>' . '</li>' . CR;
+                }
+                $sx .= '</ul>';                
+            }
         return ($sx);
     }
 
