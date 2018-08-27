@@ -37,7 +37,7 @@
 	    $idt = jQuery("#idt").val();
 		$.ajax({
 			type : "POST",
-			url : "<?php echo base_url('index.php/main/ajax_action/setPrefTerm/');?>" + $id,
+			url : "<?php echo base_url(PATH.'ajax_action/setPrefTerm/');?>" + $id,
 			data : "q=" + $id+"&t=" + $idt,
 			success : function(data) {
 				$("#dd52b").html(data);

@@ -508,7 +508,7 @@ class socials extends CI_Model {
                 $pass = get("user_password");
                 $ok = $this -> security_login($user, $pass);
                 if ($ok != 1) {
-                    redirect(base_url('index.php/main/social/form'));
+                    redirect(base_url(PATH.'social/form'));
                 } else {
                     redirect(base_url('index.php/main'));
                 }

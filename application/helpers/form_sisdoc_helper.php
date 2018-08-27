@@ -2673,6 +2673,7 @@ function read_link($url) {
 	} else {
 		$read = 'CURL';
 	}
+	$read = 'file';
 	switch ($read) {
 		case 'file' :
 			$contents = file_get_contents($url);

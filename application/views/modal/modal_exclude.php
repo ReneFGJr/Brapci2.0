@@ -35,8 +35,8 @@
 	    $id = jQuery("#ide").val(); 
 		$.ajax({
 			type : "POST",
-			url : "<?php echo base_url('index.php/main/ajax_action/exclude/');?>" + $id,
-			data : "q=" + $id,
+			url : "<?php echo base_url(PATH.'ajax/exclude/');?>" + $id,
+			data : "dd1=" + $id,
 			success : function(data) {
 				$("#dd51b").html(data);
 			}

@@ -75,7 +75,7 @@ $img = troca($img,'class="img-fluid"','class="img-fluid img-person"');
         <div class="col-md-1 text-right" style="border-right: 4px solid #8080FF;">
             <tt style="font-size: 100%;"><?php echo msg('Person');?></tt>            
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
             <font style="font-size: 200%"><?php echo $nome;?><?php echo $dates;?></font>
             <?php
             if (strlen($cc_origin) > 0)
@@ -102,7 +102,7 @@ $img = troca($img,'class="img-fluid"','class="img-fluid img-person"');
                 }                
             ?>
         </div>
-        <div class="col-md-1 text-center">
+        <div class="col-md-2 text-center">
               <?php echo $img;?>
         </div>        
         <?php

@@ -63,7 +63,10 @@ class genero extends CI_model
                 {
                     $prop = 'hasGender';
                     $r1 = $this->frbr_core->find($g,'Gender',1);
-                    $this->frbr_core->set_propriety($id, $prop, $r1, 0);
+					if ($r1 > 0)
+						{
+                    		$this->frbr_core->set_propriety($id, $prop, $r1, 0);
+						}
                 }
                 
         }

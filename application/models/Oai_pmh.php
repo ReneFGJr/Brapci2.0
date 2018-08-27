@@ -673,7 +673,7 @@ class oai_pmh extends CI_model {
         if (count($rlt) > 0) {
             $line = $rlt[0];
             $sqlu = "li_status = '" . $data['status'] . "'";
-            $sqlu .= ", li_datestamp = '" . $data['datestamp'] . "'";
+            $sqlu .= ", li_datestamp = '" . substr($data['datestamp'],0,10) . "'";
             $sqlu .= ", li_setSpec = '" . $data['setSpec'] . "'";
             $up = 0;
             if (($data['status'] != $line['li_status']) or ($data['setSpec'] != $line['li_setSpec'])) {

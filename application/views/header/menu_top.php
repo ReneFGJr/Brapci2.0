@@ -72,6 +72,8 @@
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'journals'); ?>"><?php echo msg('admin_journals'); ?></a>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'tools'); ?>"><?php echo msg('admin_tools'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'vocabulary'); ?>"><?php echo msg('admin_vocabulary'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'config'); ?>"><?php echo msg('admin_config'); ?></a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('admin_export'); ?></a>
 					</div>
