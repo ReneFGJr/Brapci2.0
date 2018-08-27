@@ -151,6 +151,7 @@ class res extends CI_Controller {
     public function v($id) {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
+        $this -> load -> model('genero');
         $this -> cab();
 
         $tela = $this -> frbr -> vv($id);
@@ -509,6 +510,8 @@ class res extends CI_Controller {
         $this -> load -> model('searchs');
         $q = get("q");
         switch($id) {
+            case '':
+                   
             case 'thesa' :
                 $this -> load -> model('thesa_api');
                 $this -> load -> model('frbr_core');
@@ -517,6 +520,9 @@ class res extends CI_Controller {
             default :
                 if (strlen($q) > 0) {
                     echo $this -> searchs -> ajax_q($q);
+                } else {
+                    $this -> load -> model('frbr_core');
+                    echo $this->frbr_core->model();
                 }
                 break;
         }
@@ -682,5 +688,57 @@ class res extends CI_Controller {
         }
         $this -> footer(0);
     }
+    function a($id = '') {
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        
+        $data = $this -> frbr_core -> le($id);
 
+        $this -> cab();
+
+        //$tela = $this -> frbr -> show($id);
+        $tela = '';
+        $linkc = '<a href="' . base_url(PATH.'v/' . $id) . '" class="middle">';
+        $linkca = '</a>';
+
+        if (strlen($data['n_name']) > 0) {
+            $tela .= '<h2>' . $linkc . $data['n_name'] . $linkca . '</h2>';
+        }
+        $linkc = '<a href="' . base_url(PATH.'v/' . $id) . '" class="btn btn-secondary">';
+        $linkca = '</a>';
+
+        $tela .= '
+                    <div class="row">
+                    <div class="col-md-11">
+                    <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
+                    </div>
+                    <div class="col-md-1 text-right">
+                    ' . $linkc . msg('return') . $linkca . '
+                    </div>
+                    </div>';
+                    
+                    
+        //$tela .= $this -> frbr -> form($id, $data);
+        $tela .= $this -> frbr_core -> form($id, $data);
+
+        switch($data['c_class']) {
+            case 'Person' :
+                $tela .= $this -> frbr_core -> show($id);
+                break;
+            case 'Family' :
+                $tela .= $this -> frfrbr_corebr -> show($id);
+                break;
+            case 'Corporate Body' :
+                $tela .= $this -> frbr_core -> show($id);
+                break;
+            default :
+                break;
+        }
+
+        $data['title'] = '';
+        $data['content'] = $tela;
+
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
 }

@@ -1,60 +1,56 @@
 <?php
 class frbr_core extends CI_model {
     var $limit = 20;
-	
-	function transfRemissive($id, $idp)
-		{
-			$prop = $this->find_class("altLabel");
-			$sql = "update rdf_data set d_r1 = $idp where d_r1 = $id and d_p = $prop";
-			$this->db->query($sql);
-			
-			return(1);
-		}
-    
-    function equivalentClass($id, $idp)
-        {
-            $prop = 'equivalentClass';
-            $this->frbr_core->set_propriety($id, $prop, $idp, 0);
-            
-            /* Atualiza remissiva */
-            $sql = "update rdf_concept set cc_use = $idp where id_cc = $id";
-            $rlt = $this->db->query($sql);
-            
-            /* Transfere todas as remissivas e relações para o termo principal */
-            $sql = "update ????";
-            return(1);
-        }
-    
+
+    function transfRemissive($id, $idp) {
+        $prop = $this -> find_class("altLabel");
+        $sql = "update rdf_data set d_r1 = $idp where d_r1 = $id and d_p = $prop";
+        $this -> db -> query($sql);
+
+        return (1);
+    }
+
+    function equivalentClass($id, $idp) {
+        $prop = 'equivalentClass';
+        $this -> frbr_core -> set_propriety($id, $prop, $idp, 0);
+
+        /* Atualiza remissiva */
+        $sql = "update rdf_concept set cc_use = $idp where id_cc = $id";
+        $rlt = $this -> db -> query($sql);
+
+        /* Transfere todas as remissivas e relações para o termo principal */
+        $sql = "update ????";
+        return (1);
+    }
+
     function prefTerm_chage($c = '', $t1 = '') {
         $sql = "select * from rdf_concept
                     INNER JOIN rdf_name on id_n = cc_pref_term  
                     where id_cc = $c ";
-        $rlt = $this->db->query($sql);
-        $rlt = $rlt->result_array();
-        if (count($rlt) == 1)
-            {
-                $line = $rlt[0];
-                if ($line['cc_pref_term'] != $t1)
-                    {
-                        $prop = $this->frbr_core->find_class("prefLabel");
-                        $lit = $line['cc_pref_term'];
-                        /****************** UPDATE *******************/
-                        $sql = "update rdf_data set d_literal = $t1 where d_p = $prop AND d_r1 = ".$c;
-                        $rrr = $this->db->query($sql);
-                        
-                        $sql = "update rdf_concept set cc_pref_term = $t1 where id_cc = ".$c;
-                        $rrr = $this->db->query($sql);
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        if (count($rlt) == 1) {
+            $line = $rlt[0];
+            if ($line['cc_pref_term'] != $t1) {
+                $prop = $this -> frbr_core -> find_class("prefLabel");
+                $lit = $line['cc_pref_term'];
+                /****************** UPDATE *******************/
+                $sql = "update rdf_data set d_literal = $t1 where d_p = $prop AND d_r1 = " . $c;
+                $rrr = $this -> db -> query($sql);
 
-                        /****************** SET HIDDEN ***************/
-                        $prop = 'altLabel';
-                        $this->frbr_core->set_propriety($c, $prop, 0, $lit); 
-                        return(1);
-                    } else {
-                        return(0);
-                    }
+                $sql = "update rdf_concept set cc_pref_term = $t1 where id_cc = " . $c;
+                $rrr = $this -> db -> query($sql);
+
+                /****************** SET HIDDEN ***************/
+                $prop = 'altLabel';
+                $this -> frbr_core -> set_propriety($c, $prop, 0, $lit);
+                return (1);
+            } else {
+                return (0);
             }
+        }
         return (0);
-    }    
+    }
 
     function link($line, $tp = 1) {
         $id = $line['d_r2'];
@@ -64,39 +60,34 @@ class frbr_core extends CI_model {
         $link = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="' . $line['c_class'] . '">';
         return ($link);
     }
-    
-    function prefTerm($data)
-        {
-            for ($r=0;$r < count($data);$r++)
-                {
-                    $line = $data[$r];
-                    $prop = $line['c_class'];
-                    if ($prop == 'prefLabel')
-                        {
-                            $name = trim($line['n_name']).'@'.trim($line['n_lang']);
-                            return($name);
-                        }
-                }
-            return("");
+
+    function prefTerm($data) {
+        for ($r = 0; $r < count($data); $r++) {
+            $line = $data[$r];
+            $prop = $line['c_class'];
+            if ($prop == 'prefLabel') {
+                $name = trim($line['n_name']) . '@' . trim($line['n_lang']);
+                return ($name);
+            }
         }
-    
-    function find($n, $prop = '',$equal=0) {
+        return ("");
+    }
+
+    function find($n, $prop = '', $equal = 0) {
         /* EQUAL */
         $wh = "(n_name like '%" . $n . "%')";
-        if ($equal == 1)
-            {
-                $wh = "(n_name = '" . $n . "')";        
-            }
+        if ($equal == 1) {
+            $wh = "(n_name = '" . $n . "')";
+        }
         /* PROPRIETY */
-        if (strlen($prop) > 0)
-            {
-                $class = $this->find_class($prop);
-                $wh .= "and ((d_p = $class) or (cc_class = $class))";
-            } else {
-                $wh .= '';
-            }
+        if (strlen($prop) > 0) {
+            $class = $this -> find_class($prop);
+            $wh .= "and ((d_p = $class) or (cc_class = $class))";
+        } else {
+            $wh .= '';
+        }
 
-                    $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
+        $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
                         INNER JOIN rdf_data on d_literal = id_n 
                         INNER JOIN rdf_class ON d_p = id_c
                         INNER JOIN rdf_concept ON id_cc = d_r1
@@ -115,13 +106,13 @@ class frbr_core extends CI_model {
         switch($lang) {
             case 'por' :
                 $lang = 'pt-BR';
-                break;            
+                break;
             case 'pt_BR' :
                 $lang = 'pt-BR';
                 break;
             case 'eng' :
                 $lang = 'en';
-                break;            
+                break;
             case 'en-US' :
                 $lang = 'en';
                 break;
@@ -163,14 +154,13 @@ class frbr_core extends CI_model {
             $name_use = '';
             $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
             $linka = '</a>';
-            if ($line['id_cc_use'] > 0)
-                {
-                    $link = '';
-                    $linka = '';
-                    $x2 = ucase($line['n_name_use']);
-                    $link_use = '<a href="' . base_url(PATH . 'v/' . $line['id_cc_use']) . '">';
-                    $name_use = ' <i>use</i> '.$link_use . $x2 .'</a>';
-                }
+            if ($line['id_cc_use'] > 0) {
+                $link = '';
+                $linka = '';
+                $x2 = ucase($line['n_name_use']);
+                $link_use = '<a href="' . base_url(PATH . 'v/' . $line['id_cc_use']) . '">';
+                $name_use = ' <i>use</i> ' . $link_use . $x2 . '</a>';
+            }
             $name = $link . $line['n_name'] . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
             $name .= $name_use;
             $sx .= '<li>' . $name . '</li>' . cr();
@@ -196,9 +186,9 @@ class frbr_core extends CI_model {
 
     /******************************************************************* RDF NAME ***/
     function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
-    	$this->load->model('indexer');
+        $this -> load -> model('indexer');
         $n = trim($n);
-		$n = $this->utf8_detect($n);
+        $n = $this -> utf8_detect($n);
         $lang = trim($lang);
         $lang = troca($lang, '@', '');
         if (strlen($lang) > 5) { $lang = substr($lang, 0, 5);
@@ -211,7 +201,7 @@ class frbr_core extends CI_model {
         /***************************************************************** LANGUAGE */
         $lang = $this -> language($lang);
         $md5 = md5(trim($n));
-		$dt['title'] = $n;
+        $dt['title'] = $n;
 
         /************ BUSCA NOMES **************************************/
         $sql = "select * from rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
@@ -296,7 +286,7 @@ class frbr_core extends CI_model {
             }
             $sx .= $this -> mostra_dados($line['n_name'], $link, $line);
             $sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
-            $sx .= ' <sup>'.$line['rule'].'</sup>';
+            $sx .= ' <sup>' . $line['rule'] . '</sup>';
             $sx .= '</td>';
             $sx .= '</tr>';
         }
@@ -361,21 +351,22 @@ class frbr_core extends CI_model {
 
             switch ($class) {
                 case 'Article' :
-                    $tela = $this-> frbr->show_article($id);
+                    $tela = $this -> frbr -> show_article($id);
                     $tela .= $this -> view_data($id);
-                    break;                
+                    break;
                 case 'Issue' :
                     $tela .= $this -> view_data($id);
                     break;
                 case 'Subject' :
-                    $tela .= $this-> frbr->show_Subject($id);
-                    break;                    
+                    $tela .= $this -> frbr -> show_Subject($id);
+                    break;
                 case 'Corporate Body' :
                     $tela .= $this -> view_data($id);
                     break;
                 case 'Person' :
                     $tela = $this -> person_show($id);
                     $tela .= $this -> view_data($id);
+                    $tela .= $this -> genero -> update($id);
                     break;
                 case 'Journal' :
                     $tela = $this -> person_show($id);
@@ -491,45 +482,43 @@ class frbr_core extends CI_model {
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r2 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r1 = $id and d_r2 > 0".cr().cr();
-        $sql .= ' union '.cr().cr();
+                        WHERE d_r1 = $id and d_r2 > 0" . cr() . cr();
+        $sql .= ' union ' . cr() . cr();
         /* TRABALHOS */
         $sql .= "select $cp_reverse,2 as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r1 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r2 = $id and d_r1 > 0".cr().cr();
-        $sql .= ' union '.cr().cr();
+                        WHERE d_r2 = $id and d_r1 > 0" . cr() . cr();
+        $sql .= ' union ' . cr() . cr();
         $sql .= "select $cp,3 as rule from rdf_data as rdata
                         LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
                         LEFT JOIN rdf_concept ON d_r2 = id_cc 
                         LEFT JOIN rdf_name on d_literal = id_n
-                        WHERE d_r1 = $id and d_r2 = 0".cr().cr();
-        
+                        WHERE d_r1 = $id and d_r2 = 0" . cr() . cr();
+
         /* USE */
-        $prop = $this->frbr_core->find_class("equivalentClass");
+        $prop = $this -> frbr_core -> find_class("equivalentClass");
         $sqll = "SELECT * FROM rdf_data where (d_r2 = $id or d_r1 = $id) and d_p = $prop";
-        
+
         //$sqll = "select * from rdf_concept where (cc_use = $id) and (id_cc <> cc_use)";
-        $rrr = $this->db->query($sqll);
-        $rrr = $rrr->result_array();
-        for ($r=0;$r < count($rrr);$r++)
-            {
-                $line = $rrr[$r];
-                $iduse = $line['d_r1'];
-                if ($iduse == $id)
-                    {
-                     $iduse = $line['d_r2'];   
-                    }                   
-                $sql .= ' union '.cr().cr();
-                $sql .= "select $cp_reverse, ".(10+$r)." as rule from rdf_data as rdata
+        $rrr = $this -> db -> query($sqll);
+        $rrr = $rrr -> result_array();
+        for ($r = 0; $r < count($rrr); $r++) {
+            $line = $rrr[$r];
+            $iduse = $line['d_r1'];
+            if ($iduse == $id) {
+                $iduse = $line['d_r2'];
+            }
+            $sql .= ' union ' . cr() . cr();
+            $sql .= "select $cp_reverse, " . (10 + $r) . " as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r1 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop".cr().cr();                    
-            }
+                        WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop" . cr() . cr();
+        }
         $sql .= " order by c_order, c_class, rule, n_lang desc, id_d";
-          
+
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         return ($rlt);
@@ -720,34 +709,216 @@ class frbr_core extends CI_model {
         return ($sx);
     }
 
-	function utf8_detect($n)
-		{
-			$type = mb_detect_encoding($n, "auto");
-			if ($type != 'UTF-8')
-				{
-					return($n);
-				}
-			/************* UTF8 **************/				
-			$utf = 0;
-			$conv = 0;
-			for ($r=0;$r < strlen($n);$r++)
-				{
-					$c = substr($n,$r,1);
-					$co = ord($c);
-					if (($co > 195) and ($utf == 0))
-						{
-							$conv = 1;
-						}
-					if ($co == 195) { $utf = 1; }
-					//echo '<br>'.$c.'=>'.$co;
-				}
-			if ($conv == 1)
-				{
-					$n = utf8_encode($n);
-				}
-			return($n);
-		}
+    function utf8_detect($n) {
+        $type = mb_detect_encoding($n, "auto");
+        if ($type != 'UTF-8') {
+            return ($n);
+        }
+        /************* UTF8 **************/
+        $utf = 0;
+        $conv = 0;
+        for ($r = 0; $r < strlen($n); $r++) {
+            $c = substr($n, $r, 1);
+            $co = ord($c);
+            if (($co > 195) and ($utf == 0)) {
+                $conv = 1;
+            }
+            if ($co == 195) { $utf = 1;
+            }
+            //echo '<br>'.$c.'=>'.$co;
+        }
+        if ($conv == 1) {
+            $n = utf8_encode($n);
+        }
+        return ($n);
+    }
 
+    function form($id, $dt) {
+        $class = $dt['cc_class'];
+        $sx = '';
+        /* complementos */
+        switch($class) {
+            default :
+                $cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d';
+                $sqla = "select $cp from rdf_data as rdata
+                                INNER JOIN rdf_class as prop ON d_p = prop.id_c 
+                                INNER JOIN rdf_concept as cpt ON d_r2 = id_cc 
+                                INNER JOIN rdf_name on cc_pref_term = id_n
+                                WHERE d_r1 = $id and d_r2 > 0";
+                $sqla .= ' union ';
+                $sqla .= "select $cp from rdf_data as rdata
+                                LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
+                                LEFT JOIN rdf_concept as cpt ON d_r2 = id_cc 
+                                LEFT JOIN rdf_name on d_literal = id_n
+                                WHERE d_r1 = $id and d_r2 = 0";
+                /*****************/
+                $sql = "select * from rdf_form_class
+                            INNER JOIN rdf_class ON id_c = sc_propriety
+                            LEFT JOIN (" . $sqla . ") as table1 ON id_c = prop 
+                        where sc_class = $class 
+                        order by sc_ord, id_sc, c_order";
+                $rlt = $this -> db -> query($sql);
+                $rlt = $rlt -> result_array();
+                $sx .= '<table width="100%" cellpadding=5>';
+                $js = '';
+                $xcap = '';
+                for ($r = 0; $r < count($rlt); $r++) {
+                    $line = $rlt[$r];
+                    $cap = msg($line['c_class']);
+                    $link = '<a href="#" id="action_' . trim($line['c_class']) . '" data-toggle="modal" data-target=".bs-example-modal-lg">';
+                    $link = '<a href="#" id="action_' . trim($line['c_class']) . '">';
+                    $linka = '</a>';
+                    $sx .= '<tr>';
+                    $sx .= '<td width="25%" align="right">';
+                    if ($xcap != $cap) {
+                        $sx .= '<nobr><i>' . msg($line['c_class']) . '</i></nobr>';
+                        $sx .= '<td width="1%">' . $link . '[+]' . $linka . '</td>';
+                        $xcap = $cap;
+
+                    } else {
+                        $sx .= '&nbsp;';
+                        $sx .= '<td>-</td>';
+                    }
+                    $sx .= '</td>';
+                    $sx .= '<td style="border-bottom: 1px solid #808080;">';
+                    if (strlen($line['n_name']) > 0) {
+                        $linkc = '<a href="' . base_url('index.php/main/v/' . $line['idcc']) . '" class="middle">';
+                        $linkca = '</a>';
+                        $sx .= $linkc . $line['n_name'] . $linkca;
+                        $link = ' <span id="ex' . $line['id_d'] . '" onclick="exclude(' . $line['id_d'] . ');" style="cursor: pointer;">';
+                        $sx .= $link . '<font style="color: red;" title="Excluir lancamento">[X]</font>' . $linka;
+                        $sx .= '</span>';
+                    }
+                    $sx .= '</td>';
+                    $sx .= '</tr>';
+                    $js .= 'jQuery("#action_' . trim($line['c_class']) . '").click(function() 
+                      {
+                          carrega("' . trim($line['c_class']) . '");
+                          jQuery("#dialog").modal("show"); 
+                      });' . cr();
+                }
+                $sx .= '</table>';
+                break;
+        }
+        $sx .= '<script>
+                    ' . $js . '
+                    function carrega($id)
+                    {
+                        jQuery.ajax({
+                          url: "' . base_url(PATH.'ajax/') . '"+$id+"/"+' . $id . ',
+                          context: document.body
+                        })  .done(function( html ) {
+                            jQuery( "#model_texto" ).html( html );
+                        });
+                    }                    
+                </script>';
+        $sx .= '<div id="dialog" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                              <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content" id="model_texto">
+                                </div>
+                              </div>
+                            </div>';
+        $sx .= $this -> load -> view('modal/modal_exclude', null, true);
+        return ($sx);
+    }
+
+    function show($r) {
+        if (strlen($r) == 0) {
+            return ('');
+        }
+        $sx = '';
+        $sql = "select * from rdf_concept 
+                        INNER JOIN rdf_class as prop ON cc_class = id_c
+                        WHERE id_cc = " . $r;
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        /****************************************** return if empty */
+        if (count($rlt) == 0) {
+            return ('');
+        }
+        /**************************************************** show **/
+        $line = $rlt[0];
+        $sx .= '<h3>class:' . $line['c_class'] . '</h3>';
+
+        $cp = '*';
+        $sql = "select $cp from rdf_data as rdata
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
+                        INNER JOIN rdf_concept ON d_r2 = id_cc 
+                        INNER JOIN rdf_name on cc_pref_term = id_n
+                        WHERE d_r1 = $r and d_r2 > 0";
+        $sql .= ' union ';
+        $sql .= "select $cp from rdf_data as rdata
+                        LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
+                        LEFT JOIN rdf_concept ON d_r2 = id_cc 
+                        LEFT JOIN rdf_name on d_literal = id_n
+                        WHERE d_r1 = $r and d_r2 = 0";
+        $sql .= " order by c_order, c_class";
+
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        $sx .= '<table width="100%" cellpadding=5>' . cr();
+        $sx .= '<tr><th width=20%" class="text-right">propriety</th><th>value</th></tr>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $id = $line['id_cc'];
+            $link = '<a href="' . base_url('index.php/main/a/' . $line['id_cc']) . '">';
+            $linka = '</a>';
+            if (strlen($line['id_cc']) == 0) {
+                $link = '';
+                $linka = '';
+            }
+            $sx .= '<tr>';
+            $sx .= '<td class="text-right" style="font-size: 60%;">';
+            $sx .= msg($line['c_class']);
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+            $sx .= $link . $line['n_name'] . $linka;
+            $sx .= ' ';
+
+            $link = '<span id="ex' . $line['id_d'] . '" onclick="exclude(' . $line['id_d'] . ');" style="cursor: pointer;">';
+            $sx .= $link . '<font style="color: red;" title="Excluir lancamento">[X]</font>' . $linka;
+            $sx .= '</span>';
+
+            /********************* prefer */
+            if ($line['c_class'] == 'altLabel') {
+                $link = '<span id="ep' . $line['id_d'] . '" onclick="setPrefTerm(' . $line['id_d'] . ',' . $line['id_n'] . ');" style="cursor: pointer;">';
+                $sx .= $link . '<font style="color: red;" title="Definir como preferencial">[pref]</font>' . $linka;
+                $sx .= '</span>';
+            }
+
+            $sx .= '</td>';
+
+            $sx .= '</tr>' . cr();
+        }
+        $sx .= '</table>';
+        $sx .= $this -> load -> view('modal/modal_exclude', null, true);
+        $sx .= $this -> load -> view('modal/modal_set_prefterm', null, true);
+        return ($sx);
+    }
+    function Model()
+        {
+            $sx = '
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    ...
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                  </div>
+                </div>            
+            ';
+            return($sx);
+        }
 }
 
 function person_work($id) {
