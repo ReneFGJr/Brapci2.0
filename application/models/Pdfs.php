@@ -74,8 +74,8 @@ class pdfs extends CI_model {
 		$sql = "
 				select R1.d_r1 as d_r1 from rdf_data AS R1
 					left JOIN rdf_data AS R2 ON R1.d_r1 = R2.d_r1 and R2.d_p = $prop2
-				  where R1.d_p = $prop1 and R2.d_p is null
-				limit 1 offset $p			
+				  where R1.d_p = $prop1 and R2.d_p is null and R1.d_r1 > $p
+				limit 1			
 			";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -84,7 +84,7 @@ class pdfs extends CI_model {
 			$id = $line['d_r1'];
 			$sx = msg('Article') . ' ' . $id;
 			$sx .= ', ' . msg('left') . ' ' . $total . ' files';
-			echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/' . (round($p) + 1)) . '">';
+			echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/' . (round($id))) . '">';
 			$sx .= ' ' . $this -> harvesting_pdf_curl($id);
 			return ($sx);
 		} else {

@@ -22,13 +22,20 @@ class sources extends CI_Model {
             return($id);
         }
     
+    function button_harvesting_status()
+        {
+            $sx = '&nbsp;<a href="'.base_url(PATH.'journals/harvesting/999999').'" class="btn btn-outline-secondary">';
+            $sx .= msg('button_harvesting_status');
+            $sx .= '</a>';
+            return($sx);
+        }
     function button_harvesting_all()
         {
             $sx = '&nbsp;<a href="'.base_url(PATH.'journals/harvesting').'" class="btn btn-outline-secondary">';
             $sx .= msg('harvesting_all');
             $sx .= '</a>';
             return($sx);
-        }
+        }		
 
 	function cp($id='')
 		{

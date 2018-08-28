@@ -115,8 +115,15 @@ class oai_pmh extends CI_model {
     }
 
     function getRecord($id_jnl = 0) {
+    	if ($id_jnl > 0)
+			{
+				$wh = "li_jnl = '$id_jnl' and ";
+			} else {
+				$wh = '';
+			}
+		
         $sql = "select * from source_listidentifier 
-                    where li_jnl = '$id_jnl' and li_status = 'active' and li_s = 1
+                    where $wh li_status = 'active' and li_s = 1
                     order by li_s, li_u, id_li
                     limit 1";
         $rlt = $this -> db -> query($sql);

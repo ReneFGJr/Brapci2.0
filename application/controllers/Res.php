@@ -216,6 +216,7 @@ class res extends CI_Controller {
 			if (perfil("#ADM")) {
 				$data['content'] .= $this -> sources -> button_new_sources();
 				$data['content'] .= $this -> sources -> button_harvesting_all();
+				$data['content'] .= $this -> sources -> button_harvesting_status();
 			}
 			$data['title'] = msg('journals');
 		} else {
@@ -540,10 +541,10 @@ class res extends CI_Controller {
 				break;
 			case 'ajax3' :
 				echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
-		        $this -> load -> model('frbr_core');
-		        $val = get("q");
-		        $this -> frbr_core -> set_propriety($id3, $id2, $val, 0);
-		        echo '<meta http-equiv="refresh" content="0;">';	
+				$this -> load -> model('frbr_core');
+				$val = get("q");
+				$this -> frbr_core -> set_propriety($id3, $id2, $val, 0);
+				echo '<meta http-equiv="refresh" content="0;">';
 				break;
 			case 'thesa' :
 				$this -> load -> model('thesa_api');
@@ -691,6 +692,7 @@ class res extends CI_Controller {
 
 	function tools($p = '', $id = '0', $id2 = '') {
 		$this -> cab();
+
 		switch($p) {
 			case '' :
 				$data['title'] = msg('Tools');
@@ -701,10 +703,50 @@ class res extends CI_Controller {
 				$txt .= '<div class="col-md-12">';
 				$txt .= '<ul>';
 				$txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_import') . '">' . msg('tools_pdf_import') . '</a>';
+				$txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/oai_import') . '">' . msg('tools_oai_import') . '</a>';
 				$txt .= '</ul>';
 				$txt .= '</div>';
 				$data['content'] = $txt;
 				$this -> load -> view('show', $data);
+				break;
+			case 'oai_import' :
+				$data['title'] = msg('Tools');
+				$txt = '<div class="col-md-12">';
+				$txt .= '<h1>' . msg('tools_oai_harvesting') . '</h1>';
+				$txt .= '</div>';
+				//$txt .= $this -> pdfs -> harvestinf_next($id);
+
+				/* Coleta */
+				$this -> load -> model('sources');
+				$this -> load -> model('searchs');
+				$this -> load -> model('oai_pmh');
+				$this -> load -> model('export');
+				$this -> load -> model('frbr');
+				$this -> load -> model('frbr_core');
+				$this -> load -> model('Elasticsearch');
+				$this -> load -> model('Elasticsearch_brapci20');
+				$dt = array();
+				$idc = $this -> oai_pmh -> getRecord(0);
+				if ($idc > 0) {
+					$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
+					$dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
+					$dt['idc'] = $idc;
+					//$txt = $this -> sources -> info($id);
+					$txt .= $this -> oai_pmh -> process($dt);
+					$txt .= '<meta http-equiv="Refresh" content="5">';
+				} else {
+					$txt = $this -> sources -> info($id);
+					$txt .= '<h3>Fim da coleta</h3>';
+					$txt .= '<br>' . date("d/m/Y H:i:s");
+				}
+				/***************************************************/
+				$data['content'] = $txt;
+				$this -> load -> view('show', $data);
+				
+				//$html = '';
+				//http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
+				//http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
+
 				break;
 			case 'pdf_import' :
 				$this -> load -> model("pdfs");
@@ -839,107 +881,109 @@ class res extends CI_Controller {
 
 		$tela = $this -> load -> view('find/view/class', $datac, true);
 		$tela .= '<div class="container">
-					<div class="row"><div class="col-md-4" >'.$this -> vocabularies -> modal_th($id).'</div>';
-		$tela .= '<div class="col-md-8">'.$this -> vocabularies -> list_vc($id).'</div></div>
+					<div class="row"><div class="col-md-4" >' . $this -> vocabularies -> modal_th($id) . '</div>';
+		$tela .= '<div class="col-md-8">' . $this -> vocabularies -> list_vc($id) . '</div></div>
 					</div>';
 
 		$data['content'] = $tela;
 		$this -> load -> view('show', $data);
 
 	}
-    public function config($tools = '', $ac = '') {
-        $this -> load -> model("frbr");
 
-        /********************* EXPORTS ************************/
-        switch($tools) {
-            case 'class_export' :
-                /* acao */
-                $this -> load -> model("frbr_clients");
-                $this -> frbr_clients -> export_class($ac);
-                return ('');
-                exit ;
-        }
+	public function config($tools = '', $ac = '') {
+		$this -> load -> model("frbr");
 
-        $cab = 1;
-        $this -> cab();
+		/********************* EXPORTS ************************/
+		switch($tools) {
+			case 'class_export' :
+				/* acao */
+				$this -> load -> model("frbr_clients");
+				$this -> frbr_clients -> export_class($ac);
+				return ('');
+				exit ;
+		}
 
-        if (!perfil("#ADM")) {
-            redirect(base_url('index.php/main'));
-        }
+		$cab = 1;
+		$this -> cab();
 
-        $this -> load -> view('welcome');
-        $tela = '';
+		if (!perfil("#ADM")) {
+			redirect(base_url('index.php/main'));
+		}
 
-        switch($tools) {
-            case 'class_export' :
-                /* acao */
-                $this -> load -> model("frbr_clients");
-                $tela .= $this -> frbr_clients -> export_class();
-                break;
-            case 'class' :
-                /* acao */
-                $this -> load -> model("frbr_core");
-                if (strlen($ac) > 0) {
-                    //$tela .= msg('MAKE_MESSAGES');
-                } else {
-                    $tela .= $this -> frbr_core -> classes_lista();
-                }
-                break;
-            case 'msg' :
-                /* acao */
-                if (strlen($ac) > 0) {
-                    $tela .= msg('MAKE_MESSAGES');
-                } else {
-                    $tela .= msg_lista();
-                }
+		$this -> load -> view('welcome');
+		$tela = '';
 
-                break;
-            case 'forms' :
-                $tela .= '<h1>'.msg('FORMS').'</h1>';
+		switch($tools) {
+			case 'class_export' :
+				/* acao */
+				$this -> load -> model("frbr_clients");
+				$tela .= $this -> frbr_clients -> export_class();
+				break;
+			case 'class' :
+				/* acao */
+				$this -> load -> model("frbr_core");
+				if (strlen($ac) > 0) {
+					//$tela .= msg('MAKE_MESSAGES');
+				} else {
+					$tela .= $this -> frbr_core -> classes_lista();
+				}
+				break;
+			case 'msg' :
+				/* acao */
+				if (strlen($ac) > 0) {
+					$tela .= msg('MAKE_MESSAGES');
+				} else {
+					$tela .= msg_lista();
+				}
+
+				break;
+			case 'forms' :
+				$tela .= '<h1>' . msg('FORMS') . '</h1>';
 				$tela .= '<hr>';
 				$this -> load -> model("frbr_core");
-                $tela .= $this -> frbr_core -> form_class();
-                break;
-            case 'authority' :
-                if (perfil("#ADM") == 1) {
-                    if ($ac == 'update') {
-                        $tela .= $this -> frbr -> viaf_update();
-                    } else {
-                        $tela .= '<br><a href="' . base_url(PATH.'config/authority/update') . '" class="btn btn-secondary">' . msg('authority_update') . '</a>';
-                    }
-                    $tela .= '<br><br><h3>' . msg('Authority') . ' ' . msg('viaf') . '</h3>';
-                    $tela .= $this -> frbr -> authority_class();
-                }
-                break;
-			default:
-				$tela = '<h1>'.msg('config').'</h1><ul>';
-				$tela .= '<li>'.'<a href="'.base_url(PATH.'config/forms').'">'.msg('config_forms').'</a></li>';
-				$tela .= '<li>'.'<a href="'.base_url(PATH.'config/class').'">'.msg('config_class').'</a></li>';
-				
+				$tela .= $this -> frbr_core -> form_class();
+				break;
+			case 'authority' :
+				if (perfil("#ADM") == 1) {
+					if ($ac == 'update') {
+						$tela .= $this -> frbr -> viaf_update();
+					} else {
+						$tela .= '<br><a href="' . base_url(PATH . 'config/authority/update') . '" class="btn btn-secondary">' . msg('authority_update') . '</a>';
+					}
+					$tela .= '<br><br><h3>' . msg('Authority') . ' ' . msg('viaf') . '</h3>';
+					$tela .= $this -> frbr -> authority_class();
+				}
+				break;
+			default :
+				$tela = '<h1>' . msg('config') . '</h1><ul>';
+				$tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>';
+				$tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>';
+
 				$tela .= '</ul>';
 				break;
-        }
-        $data['content'] = $tela;
-        $this -> load -> view('show', $data);
-        $this -> footer();
-    }
+		}
+		$data['content'] = $tela;
+		$this -> load -> view('show', $data);
+		$this -> footer();
+	}
 
-    public function pop_config($tools = '', $id = '') {
-        $this -> load -> model("frbr_core");
+	public function pop_config($tools = '', $id = '') {
+		$this -> load -> model("frbr_core");
 		$data['nocab'] = true;
-        $this -> cab($data);
-        $tela = '';
-        $tela .= $tools;
-        switch($tools) {
-            case 'msg' :
-                $tela .= $this -> frbr_core -> form_msg_ed($id);
-                break;
-            case 'forms' :
-                $tela .= msg('FORMS');
-                $tela .= $this -> frbr_core -> form_class_ed($id);
-                break;
-        }
-        $data['content'] = $tela;
-        $this -> load -> view('show', $data);
-    }
+		$this -> cab($data);
+		$tela = '';
+		$tela .= $tools;
+		switch($tools) {
+			case 'msg' :
+				$tela .= $this -> frbr_core -> form_msg_ed($id);
+				break;
+			case 'forms' :
+				$tela .= msg('FORMS');
+				$tela .= $this -> frbr_core -> form_class_ed($id);
+				break;
+		}
+		$data['content'] = $tela;
+		$this -> load -> view('show', $data);
+	}
+
 }
