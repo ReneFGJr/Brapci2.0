@@ -57,10 +57,11 @@ $lang['hasEmail'] = 'e-mail';
 //$lang['hasIssueOf'] = 'Artigo';
 $lang['hasSubject'] = 'Tema';  
 
-$lang['cache_status_1'] = 'Para coletar';
-$lang['cache_status_2'] = 'Em processamento';
-$lang['cache_status_3'] = 'Processado';
-$lang['cache_status_9'] = 'Excluído';
+$lang['cache_status_1'] = '<span style="color: #008F00"><b>Para coletar</b></span>';
+$lang['cache_status_2'] = '<span style="color: #8080FF"><b>Em processamento</b></span>';
+$lang['cache_status_3'] = '<span style="color: #000000">Processado</span>';
+$lang['cache_status_8'] = '<span style="color: #C00000"><b>Erro no PDF</b></span>';
+$lang['cache_status_9'] = '<span style="color: #808080">Excluído</span>';
 
 
 $lang['Search'] = 'Pesquisar';
