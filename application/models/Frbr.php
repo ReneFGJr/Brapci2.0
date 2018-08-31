@@ -176,6 +176,7 @@ class frbr extends CI_model {
         $iss = $dt['issue'];
         /*******************************************/
         $issue = $iss['issue_id'];
+		
         if (isset($iss['vol'])) {
             if (strlen($iss['vol']) > 0) { $nm .= ', v.' . $iss['vol'];
             }
@@ -188,6 +189,7 @@ class frbr extends CI_model {
             if (strlen($iss['year']) > 0) { $nm .= ', ' . $iss['year'];
             }
         }
+		
         /************** ISSUE id **********************************************/
         $name = 'Issue:' . $dt['issue']['issue_id'] . ' Jnl: ' . $dt['id_jnl'];
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');

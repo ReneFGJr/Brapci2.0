@@ -447,11 +447,16 @@ class oai_pmh extends CI_model {
             $vol = '';
             $nr = '';
             $ano = '';
-            if (strpos($n,'v.'))
+            if (strpos(' '.$n,'v.') > 0)
                 {
                     $vol = substr($n,strpos($n,'v.')+2,strlen($n));
                     $vol = substr($vol,0,strpos($vol,','));
                 }
+            if (strpos(' '.$n,'Vol.') > 0)
+                {
+                    $vol = substr($n,strpos($n,'Vol.')+5,strlen($n));
+                    $vol = substr($vol,0,strpos($vol,','));
+                }				
             /********************************************************/
             if (strpos($n,'n.'))
                 {
@@ -466,6 +471,20 @@ class oai_pmh extends CI_model {
                                 }        
                         }
                 }
+            /********************************************************/
+            if (strpos($n,'Núm.'))
+                {
+                    $nr = trim(substr($n,strpos($n,'Núm.')+5,strlen($n)));
+                    if (strpos($nr,','))
+                        {
+                            $nr = Lowercase(substr($nr,0,strpos($nr,',')));        
+                        } else {
+                            if (strpos($nr,'('))
+                                {
+                                    $nr = lowercase(substr($nr,0,strpos($nr,'(')));        
+                                }        
+                        }
+                }				
             /********************************************************/
             for ($r=1900;$r <= (date("Y")+10);$r++)
                 {
@@ -1146,6 +1165,10 @@ class oai_pmh extends CI_model {
         if (strpos($s, 'n.')) { $nr = substr($s, strpos($s, 'n.'), strlen($s));
         }
         if (strpos($s, 'No ')) { $nr = substr($s, strpos($s, 'No ') + 3, strlen($s));
+        }
+        if (strpos($s, 'Núm. ')) { $nr = substr($s, strpos($s, 'Núm. ') + 4, strlen($s));
+        }
+        if (strpos($s, 'NÚM. ')) { $nr = substr($s, strpos($s, 'NÚM. ') + 4, strlen($s));
         }
         if (strpos($s, 'No. ')) { $nr = substr($s, strpos($s, 'No. ') + 4, strlen($s));
         }
