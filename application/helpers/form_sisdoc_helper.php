@@ -661,11 +661,14 @@ function post_security($s) {
 }
 
 function nbr_autor($xa, $tp) {
+    $xa = troca($xa,'(',' ');
+    $xa = troca($xa,')',' ');    
 	if (strpos($xa, ',') > 0) {
 		$xb = trim(substr($xa, strpos($xa, ',') + 1, 100));
 		$xa = trim(substr($xa, 0, strpos($xa, ',')));
 		$xa = trim(trim($xb) . ' ' . $xa);
 	}
+
 	$xa = $xa . ' ';
 	$xp = array();
 	$xx = "";

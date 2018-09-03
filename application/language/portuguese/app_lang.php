@@ -54,8 +54,26 @@ $lang['affiliatedWith'] = 'Afiliação';
 $lang['prefLabel'] = 'Descritor';
 $lang['hasAuthor'] = 'Autor';
 $lang['hasEmail'] = 'e-mail';
-//$lang['hasIssueOf'] = 'Artigo';
-$lang['hasSubject'] = 'Tema';  
+$lang['hasIssueOf'] = 'Edição';
+$lang['hasSubject'] = 'Tema';
+$lang['hasIssue'] = 'Publicação';
+$lang['hasISSN'] = 'ISSN';
+$lang['hasIdRegister'] = 'IDs';  
+$lang['hasUrl'] = 'Link de acesso';
+$lang['hasTitle'] = 'Título';
+$lang['hasRegisterId'] = 'Identificador';
+$lang['dateOfAvailability'] = 'Disponibilizado';
+$lang['hasSectionOf'] = 'Sessão';
+$lang['isPubishIn'] = 'Nome da Pulicação';
+$lang['hasSource'] = 'Source';
+$lang['altLabel'] = 'Nome alternativo';
+$lang['dateOfPublication'] = 'Data da publicação';
+$lang['hasVolumeNumber'] = 'Vol./Num.';
+$lang['s_date_hour'] = 'Data/Hora';
+$lang['s_query'] = 'Consulta';
+$lang['s_type'] = 'Tipo';
+$lang['s_result'] = 'Total';
+
 
 $lang['cache_status_1'] = '<span style="color: #008F00"><b>Para coletar</b></span>';
 $lang['cache_status_2'] = '<span style="color: #8080FF"><b>Em processamento</b></span>';
@@ -83,13 +101,18 @@ $lang['return_to_up'] = 'retorna ao topo';
 
 $lang['admin_journals'] = 'Fontes indexadas';
 $lang['admin_export'] = 'Exportar dados';
+
 $lang['export_article'] = 'Exportar Artigos';
 $lang['export_subject'] = 'Exportar Palavras';
 $lang['export_subject_reverse'] = 'Exportar Índice Invertido';
+$lang['export_issue'] = 'Exportar Nomes dos Fascículos';
 
 $lang['tools_harvesting'] = 'Ferramenta de coleta';
 $lang['admin_tools'] = 'Utilitários de coleta';
 $lang['tools_pdf_import'] = 'Importar PDF dos artigos';
+$lang['tools_oai_import'] = 'Importar Arquivos OAI';
+$lang['tools_pdf_check'] = 'Checagem dos arquivos';
+
 $lang['perfil'] = 'Perfil';
 $lang['logout'] = 'Sair';
 $lang['SignIn'] = 'Entrar no Sistema';

@@ -709,6 +709,25 @@ class socials extends CI_Model {
         $this -> load -> view('social/login/login_signup', $data);
     }
 
+    function forgot() {
+        $data = array();
+        $email = get("email");
+
+        if (strlen($email)) {
+            $dt = array();
+
+            if ($rs == 1) {
+                $code = 'FORGOT';
+                $this -> user_email_send($email, $name, $code);
+                $this -> load -> view('social/login/login_signup_sucess', $dt);
+                return ("");
+            }
+        }
+
+        $this -> load -> view('social/login/login_forgot', $data);
+    }
+
+
     function le_email($e) {
         $sql = "select * from users where us_email = '$e'";
         $rlt = $this -> db -> query($sql);

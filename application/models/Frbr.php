@@ -222,6 +222,7 @@ class frbr extends CI_model {
             $term = $this -> frbr_core -> frbr_name('n. ' . $iss['nr']);
             $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
+        $this->export->export_Issue_Single($idf);
         return ($idf);
     }
 

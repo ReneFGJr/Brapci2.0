@@ -146,12 +146,15 @@ class frbr_core extends CI_model {
 		$l = '';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
-			$xl = substr(UpperCaseSql($line['n_name']), 0, 1);
-			if ($xl != $l) {
-				$sx .= '<h4>' . $xl . '</h4>';
-				$l = $xl;
-			}
-			$name_use = '';
+            $idx = $line['id_cc'];
+			$name_use = trim($line['n_name']);
+			
+            $filex = 'c/'.$idx.'/name.nm';
+            if (file_exists($filex))
+                {
+                    $name_use = load_file_local($filex);
+                }			
+			
 			$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
 			$linka = '</a>';
 			if ($line['id_cc_use'] > 0) {
@@ -161,8 +164,14 @@ class frbr_core extends CI_model {
 				$link_use = '<a href="' . base_url(PATH . 'v/' . $line['id_cc_use']) . '">';
 				$name_use = ' <i>use</i> ' . $link_use . $x2 . '</a>';
 			}
-			$name = $link . $line['n_name'] . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
-			$name .= $name_use;
+
+            $xl = substr(UpperCaseSql(strip_tags($name_use)), 0, 1);
+            if ($xl != $l) {
+                $sx .= '<h4>' . $xl . '</h4>';
+                $l = $xl;
+            }			
+            
+            $name = $link . $name_use . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';			
 			$sx .= '<li>' . $name . '</li>' . cr();
 		}
 		$sx .= '<ul>';
@@ -266,6 +275,7 @@ class frbr_core extends CI_model {
 		$sx .= '</tr>';
 		for ($r = 0; $r < count($data); $r++) {
 			$line = $data[$r];
+			$line['id'] = $id;
 			$link = '';
 			if ($line['d_r2'] > 0) {
 				$link = '<a href="' . base_url(PATH . 'v/' . $line['d_r2']) . '">';
@@ -283,7 +293,9 @@ class frbr_core extends CI_model {
 				$idv = $line['d_r2'];
 				$line['d_r2'] = $line['d_r1'];
 				$line['d_r1'] = $idv;
-			}
+			}          
+            
+            
 			$sx .= $this -> mostra_dados($line['n_name'], $link, $line);
 			$sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
 			$sx .= ' <sup>' . $line['rule'] . '</sup>';
@@ -296,6 +308,18 @@ class frbr_core extends CI_model {
 
 	function mostra_dados($n, $l = '', $line) {
 		$la = '';
+        $idx = $line['d_r2'];
+        if ($idx == $line['id'])
+            {
+                $idx = $line['d_r1'];
+            }
+        $filex = 'c/'.$idx.'/name.nm';
+        if (file_exists($filex) and ($idx > 0))
+             {
+                 //print_r($line);
+                 //echo '<hr>';
+                 $n = load_file_local($filex);
+             }           
 		/****************** HTTP *********/
 		if ((lowercase(substr($n, 0, 4)) == 'http') and (strlen($l) == 0)) {
 			$l = '<a href="' . $n . '" target="new_' . date("mis") . '" title="' . msg('Link:') . $n . '">';

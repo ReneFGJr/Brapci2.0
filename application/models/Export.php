@@ -5,6 +5,7 @@ class export extends CI_Model {
         $dt = $this -> frbr_core -> le_data($idx);
         $file = 'c/' . $idx . '/name.nm';
         $file2 = 'c/' . $idx . '/name.oai';
+        $file3 = 'c/' . $idx . '/name.ABNT';
 
         /************** zera dados ****/
         $sx = '';
@@ -22,15 +23,28 @@ class export extends CI_Model {
         $link_sc = '';
         $linka = '</a>';
         $txt = '';
+        $rwork = 'TY - JOUR'.cr();
+        $rwork = 'DB - BRAPCI'.cr();
+        $rwork = 'UR - '.base_url(PATH.'v/'.$idx).cr();
+        
 
         /************* recurepa dados ****/
         for ($q = 0; $q < count($dt); $q++) {
             $l = $dt[$q];
             $type = trim($l['c_class']);
+            //echo $type.'=>'.$l['n_name'].'<hr>';
+            //print_r($l);
             switch($type) {
+                case 'hasAbstract':
+                    $rwork .= 'AB - '.troca($l['n_name'],chr(13),'').cr();
+                    break;                
+                case 'hasSubject':
+                    $rwork .= 'KW - '.$l['n_name'].cr();
+                    break;
                 case 'hasSectionOf' :
                     $link_sc = $this -> frbr_core -> link($dt[$q]);
                     $sc = $dt[$q]['n_name'] . '</a>';
+                    $rwork .= 'M3 - '.$dt[$q]['n_name'].cr();
                     break;
                 case 'hasIssueOf' :
                     $issue = $l['d_r1'];
@@ -48,11 +62,17 @@ class export extends CI_Model {
                             $ano = $di[$y]['n_name'];
                         }
                     }
+                    $filex = 'c/'.$issue.'/name.rfe';
+                    if (file_exists($filex))
+                        {
+                            $rwork .= load_file_local($filex);
+                        }
                     break;
                 case 'isPubishIn' :
                     if (strlen($sor) == 0) {
                         $link = $this -> frbr_core -> link($l);
                         $sor = $link . trim($l['n_name']) . '</a>';
+                        $rwork .= 'T2 - '.$l['n_name'].cr();
                     }
                     break;
                 case 'hasAuthor' :
@@ -63,11 +83,13 @@ class export extends CI_Model {
                     $link = $this -> frbr_core -> link($l);
                     $aut .= $l['n_name'];
                     $aut2 .= $link . $l['n_name'] . '</a>';
+                    $rwork .= 'AU - '.$l['n_name'].cr();
                     break;
                 case 'hasTitle' :
                     if (strlen($tit) == 0) {
                         $link = $this -> frbr_core -> link($l);
                         $tit = $link . $l['n_name'].'</a>';
+                        $rwork .= 'TI - '.$l['n_name'].cr();
                     }
                     break;
             }
@@ -82,6 +104,9 @@ class export extends CI_Model {
             fclose($f);
         }
 
+        //echo '<pre>'.$rwork.'</pre>';
+        //exit;
+
         $txt2 = $link_work . '<b>' . $tit . '</b></a><br>';
         $txt2 .= '<i>' . trim($aut2) . '</i><br>';
         $txt2 .= '' . $link_source . $sor . $linka . ', ';
@@ -95,7 +120,134 @@ class export extends CI_Model {
             fclose($f);
         }
 
+        if (strlen($rwork) > 0) {
+            /******************************/
+            $f = fopen($file3, 'w+');
+            fwrite($f, $rwork);
+            fclose($f);
+        }
         return ($sx);
+    }
+
+    function export_Issue_Single($idx) {
+        $dt = $this -> frbr_core -> le_data($idx);
+        $file = 'c/' . $idx . '/name.nm';
+        $file2 = 'c/' . $idx . '/name.oai';
+        $file3 = 'c/' . $idx . '/name.rfe';
+
+        /************** zera dados ****/
+        $sx = '';
+        $aut = '';
+        $aut2 = '';
+        $tit = '';
+        $sor = '';
+        $num = '';
+        $vol = '';
+        $ano = '';
+        $sc = '';
+        $link = '';
+        $link_issue = '';
+        $link_source = '';
+        $link_work = '';
+        $link_sc = '';
+        $linka = '</a>';
+        $txt = '';
+        $rwork = '';
+        
+
+        /************* recurepa dados ****/
+        for ($q = 0; $q < count($dt); $q++) {
+            $l = $dt[$q];
+            $type = trim($l['c_class']);
+            //echo $type.'=>'.$l['n_name'].'<hr>';
+            switch($type) {
+                case 'hasIssue':
+                    //$rwork .= 'SO - '.troca($l['n_name'],chr(13),'').cr();
+                    $sor = $l['n_name'];
+                    break; 
+                case 'dateOfPublication':
+                    if (strlen($ano) == 0)
+                        {
+                            $ano = $l['n_name'];
+                            $rwork .= 'PY - '.troca($l['n_name'],chr(13),'').cr();
+                        }
+                    break;                                   
+                case 'hasVolumeNumber':
+                    if (substr($l['n_name'],0,1) == 'v')
+                        {
+                            $rwork .= 'VL - '.troca($l['n_name'],'v. ','').cr();    
+                            $vol = $l['n_name'];    
+                        } else {
+                            $rwork .= 'IS - '.troca($l['n_name'],'n. ','').cr();
+                            if (strlen($num) == 0)
+                                {
+                                    $num = $l['n_name'];
+                                }
+                        }
+                    
+                    break;                                   
+            }
+        }
+        $txt = '<b>'.$sor.'</b>, ';
+        if (strlen($num) > 0)
+            {
+                $txt .= $num.', ';
+            }
+        if (strlen($vol) > 0)
+            {
+                $txt .= $vol.', ';
+            }
+        if (strlen($ano) > 0)
+            {
+                $txt .= $ano;
+            }                    
+        $txt .= '.';
+        $txt = troca($txt,', .','.');
+                        
+        dircheck('c/' . $idx);
+        if (strlen($txt) > 0) {
+            /******************************/
+            $f = fopen($file, 'w+');
+            fwrite($f, $txt);
+            fclose($f);
+        }
+        if (strlen($rwork) > 0) {
+            /******************************/
+            $f = fopen($file3, 'w+');
+            fwrite($f, $rwork);
+            fclose($f);
+        }        
+        return ($txt);
+    }
+
+    function export_Issue($pg = 0) {
+        $class = 'Issue';
+        $sz = 50;
+        $f = $this -> frbr_core -> find_class($class);
+        $sql = "select id_cc, cc_use
+                        FROM rdf_concept 
+                        where cc_class = " . $f . " 
+                        ORDER BY id_cc
+                        LIMIT $sz OFFSET " . ($pg * $sz) . "    ";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        dircheck('c');
+        $sx = '<ul>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $idx = $line['id_cc'];
+            /*************************** EXPORTAR ****************/
+            $sx .= '<li>' . $this -> export_Issue_Single($idx) . '</li>' . cr();
+            /*****************************************************/
+        }
+        $sx .= '</ul>' . cr();
+
+        if (count($rlt) > 0) {
+            $sx .= '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'export/issue/' . ($pg + 1)) . '">';
+        }
+        $sx = '<ul>' . $sx . '</ul>';
+        return ($sx);
+
     }
 
     function export_Article($pg = 0) {

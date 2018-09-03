@@ -1,6 +1,20 @@
 <?php
 class searchs extends CI_Model {
     var $sz = 20;
+    var $s = '';    
+    function __construct()
+        {
+        
+        if (!isset($_SESSION['s']))
+            {
+                if (!isset($_SESSION['s']))
+                    {
+                        $_SESSION['s'] = $_SESSION['__ci_last_regenerate'];
+                    }
+            }
+           $this->s = $_SESSION['s'];
+        }
+        
     function recover_reg($art, $t) {
         $t = substr($t, strpos($t, ']') + 1, strlen($t));
         $te = splitx(';', $t);
@@ -81,6 +95,72 @@ class searchs extends CI_Model {
         return ($sx);
     }
 
+    function historic($limit = 10)
+        {
+            $session = $this->s;
+            $sql = "select * from _search 
+                        where s_session = $session 
+                        order by s_date desc, s_hour desc 
+                        limit $limit ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '<h4>'.msg('historic_search').'</h4>';
+            $sx .= '<table class="table" width="100%">';
+            $sx .= '<tr>
+                        <th width="15%">'.msg("s_date_hour").'</th>
+                        <th width="70%">'.msg("s_query").'</th>
+                        <th width="10%">'.msg("s_type").'</th>
+                        <th width="5%">'.msg("s_result").'</th>
+                    </tr>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $link = '<a href="'.base_url(PATH.'?q='.$line['s_query'].'&h=1&type='.$line['s_type']).'">';
+                    $sx .= '<tr>';
+                    $sx .= '<td align="center"><tt>'.$line['s_date'].' '.$line['s_hour'].'</tt></td>';
+                    $sx .= '<td><tt>'.$link.$line['s_query'].'</a>'.'</tt></td>';
+                    $sx .= '<td><tt>'.msg('search_'.$line['s_type']).'</tt></td>';
+                    $sx .= '<td align="center"><tt>'.$line['s_total'].'</tt></td>';
+                    $sx .= '</tr>';
+                }
+            $sx .= '</table>';
+            if (count($rlt) == 0)
+                {
+                    $sx = '';
+                }
+            return($sx);
+        }
+
+
+    function save_history($data)
+        {
+            if (get("h") == '1')
+                {
+                    return("");
+                }
+                
+            $user = 0;
+            $date = date("Y-m-d");
+            $hour = date("H:i:s");
+            $session = $this->s;
+            if (isset($_SESSION['id_us']))
+                {
+                    $user = $_SESSION['id_us'];
+                }
+            $q = UpperCase($data['q']);
+            $t = round($data['type']);
+            $total = round($data['total']);
+            $page = round(GET("p"));
+            if (strlen($q) > 0)
+                {
+                    $sql = "insert into _search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session) ";
+                    $sql .= " values ";
+                    $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session)";
+                    $this->db->query($sql);                    
+                }
+            return('');
+        }
+
     function s($n, $t = '') {
         
         $p = round(get("p"));
@@ -90,11 +170,26 @@ class searchs extends CI_Model {
         $q = $this -> elasticsearch -> query($type, $n, $t);
         //$q = $this->ElasticSearch->query_all($n);
 
+        /*************** history ***************/
+        $data['q'] = $n;
+        $data['type'] = $t;
+        
         if (!isset($q['hits'])) {
+            $total = 0;
+            $data['total'] = $total;
+            $this->save_history($data);
             return ('Not found');
-        }
-
-        $total = $q['hits']['total'];
+        } else {
+            $total = $q['hits']['total'];
+            
+            /* History */
+            $data['total'] = $total;
+            $this->save_history($data);    
+        }        
+        
+        
+        
+        
         $rst = $q['hits']['hits'];
 
         $st = '';        
