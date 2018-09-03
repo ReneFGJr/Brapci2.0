@@ -67,6 +67,10 @@ class sources extends CI_Model {
 		}
 
     function jnl_name($line) {
+    	if (count($line) == 0)
+			{
+				return("");
+			}
         $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
         $sx = $link . $line['jnl_name'] . '</a>';
 
@@ -133,7 +137,10 @@ class sources extends CI_Model {
             } else {
                 $line = $this->le($id);        
             }
-        
+        if (count($line) == 0)
+			{
+				return("");
+			}
         $sx = '';
         $sx .= '<div class="col-md-6">';
         $sx .= '<span class="h3">' . $this -> jnl_name($line) . '</span>' . CR;

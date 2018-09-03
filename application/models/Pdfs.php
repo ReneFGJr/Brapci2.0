@@ -142,6 +142,9 @@ class pdfs extends CI_model {
                                 $this -> file_save($file, $txt, $id, 'ZIP');
                                 //echo ' - ' . msg('save_pdf');
                                 break;                                
+                            case 'application/word' :
+                                $this -> file_save($file, $txt, $id, 'WRD');
+                                break;                                
                             case 'text/html' :
                                 $this -> file_txt($file, $txt, $id);
                                 //echo ' - ' . msg('save_html');
@@ -412,7 +415,7 @@ EOD;
         $class = 'FileStorage   ';
         $f = $this -> frbr_core -> find_class($class);
         $this -> frbr_core -> check_language();
-        $limit = 50;
+        $limit = 200;
         $offset = round(get('p'));
 
         $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,

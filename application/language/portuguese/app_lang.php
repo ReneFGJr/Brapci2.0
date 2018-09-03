@@ -112,6 +112,7 @@ $lang['admin_tools'] = 'Utilitários de coleta';
 $lang['tools_pdf_import'] = 'Importar PDF dos artigos';
 $lang['tools_oai_import'] = 'Importar Arquivos OAI';
 $lang['tools_pdf_check'] = 'Checagem dos arquivos';
+$lang['tools_oai_harvesting'] = 'Coletar de Metadados OAI';
 
 $lang['perfil'] = 'Perfil';
 $lang['logout'] = 'Sair';
