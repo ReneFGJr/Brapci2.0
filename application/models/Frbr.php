@@ -208,7 +208,7 @@ class frbr extends CI_model {
         $name = 'ISSUE:' . UpperCaseSql($dt['issue']['issue_id']);
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
-        $name = ucase($nm);
+        $name = ($nm);
         $nm = convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
@@ -219,6 +219,13 @@ class frbr extends CI_model {
         $jnl = $this -> frbr_core -> find($jnl);
         $prop = 'hasIssue';
         $this -> frbr_core -> set_propriety($idf, $prop, $jnl, 0);
+        
+        /*************** source **********************/
+        if (isset($iss['sourcer'])) {
+            $prop = 'altLabel';
+            $term = $this -> frbr_core -> frbr_name($iss['sourcer']);
+            $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);            
+        }
         
         /*************** Year ************************/
         if (isset($iss['year'])) {
