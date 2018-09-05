@@ -128,6 +128,20 @@ class frbr extends CI_model {
                 $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
             }
         }
+        
+        /**************************************************************** PAGINATION */
+        $prop = 'hasPageStart';
+        if ((isset($dt['issue']['start_page'])) and (round($dt['issue']['start_page']) > 0)) {
+            $name = $dt['issue']['start_page'];
+            $id_date = $this -> frbr_core -> rdf_concept_create('Number', $name, '');
+            $this -> frbr_core -> set_propriety($idf, $prop, $id_date, 0);
+        }
+        $prop = 'hasPageEnd';
+        if ((isset($dt['issue']['end_page'])) and (round($dt['issue']['start_page']) > 0)) {
+            $name = $dt['issue']['end_page'];
+            $id_date = $this -> frbr_core -> rdf_concept_create('Number', $name, '');
+            $this -> frbr_core -> set_propriety($idf, $prop, $id_date, 0);
+        }
         /*********************************************************************** DATE */
         $prop = 'dateOfAvailability';
         if (isset($dt['date'])) {
@@ -191,7 +205,7 @@ class frbr extends CI_model {
         }
 		
         /************** ISSUE id **********************************************/
-        $name = 'Issue:' . $dt['issue']['issue_id'] . ' Jnl: ' . $dt['id_jnl'];
+        $name = 'ISSUE:' . UpperCaseSql($dt['issue']['issue_id']);
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
         /* Label */
         $name = ucase($nm);
@@ -205,7 +219,7 @@ class frbr extends CI_model {
         $jnl = $this -> frbr_core -> find($jnl);
         $prop = 'hasIssue';
         $this -> frbr_core -> set_propriety($idf, $prop, $jnl, 0);
-
+        
         /*************** Year ************************/
         if (isset($iss['year'])) {
             $prop = 'dateOfPublication';
@@ -213,14 +227,19 @@ class frbr extends CI_model {
             $this -> frbr_core -> set_propriety($idf, $prop, $ano, 0);
         }
         if (isset($iss['vol']) and (strlen(trim($iss['vol'])) > 0)) {
-            $prop = 'hasVolumeNumber';
-            $term = $this -> frbr_core -> frbr_name('v. ' . $iss['vol']);
-            $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
+            $prop = 'hasPublicationVolume';
+            $tem = $this -> frbr_core -> rdf_concept_create('PublicationVolume', 'v. ' . $iss['vol'], '');
+            $this -> frbr_core -> set_propriety($idf, $prop, $tem, 0);
+            //$term = $this -> frbr_core -> frbr_name('v. ' . $iss['vol']);
+            //$this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
         if (isset($iss['nr']) and (strlen(trim($iss['nr'])) > 0)) {
-            $prop = 'hasVolumeNumber';
-            $term = $this -> frbr_core -> frbr_name('n. ' . $iss['nr']);
-            $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
+            $prop = 'hasPublicationVolume';
+            $tem = $this -> frbr_core -> rdf_concept_create('PublicationNumber', 'n. ' . $iss['nr'], '');
+            $this -> frbr_core -> set_propriety($idf, $prop, $tem, 0);
+            //$prop = 'hasPublicationNumber';
+            //$term = $this -> frbr_core -> frbr_name('n. ' . $iss['nr']);
+            //$this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
         $this->export->export_Issue_Single($idf);
         return ($idf);

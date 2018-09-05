@@ -13,7 +13,8 @@ class export extends CI_Model {
         $aut2 = '';
         $tit = '';
         $sor = '';
-        $vnr = '';
+        $nr = '';
+        $vr = '';
         $ano = '';
         $sc = '';
         $link = '';
@@ -23,6 +24,8 @@ class export extends CI_Model {
         $link_sc = '';
         $linka = '</a>';
         $txt = '';
+        $pagi = '';
+        $pagf = '';
         $rwork = 'TY - JOUR'.cr();
         $rwork = 'DB - BRAPCI'.cr();
         $rwork = 'UR - '.base_url(PATH.'v/'.$idx).cr();
@@ -35,6 +38,12 @@ class export extends CI_Model {
             //echo $type.'=>'.$l['n_name'].'<hr>';
             //print_r($l);
             switch($type) {
+                case 'hasPageStart':
+                    $pagi = trim($l['n_name']);
+                    break;
+                case 'hasPageEnd':
+                    $pagf = trim($l['n_name']);
+                    break;                    
                 case 'hasAbstract':
                     $rwork .= 'AB - '.troca($l['n_name'],chr(13),'').cr();
                     break;                
@@ -52,11 +61,17 @@ class export extends CI_Model {
                     $di = $this -> frbr_core -> le_data($issue);
                     for ($y = 0; $y < count($di); $y++) {
                         $tq = trim($di[$y]['c_class']);
-                        if ($tq == 'hasVolumeNumber') {
-                            if (strlen($vnr) > 0) {
-                                $vnr .= ', ';
+                        if ($tq == 'hasPublicationNumber') {
+                            if (strlen($nr) > 0) {
+                                $nr .= ', ';
                             }
-                            $vnr .= trim($di[$y]['n_name']);
+                            $nr .= trim($di[$y]['n_name']);
+                        }
+                        if ($tq == 'hasPublicationVolume') {
+                            if (strlen($vr) > 0) {
+                                $vr .= ', ';
+                            }
+                            $vr .= trim($di[$y]['n_name']);
                         }
                         if ($tq == 'dateOfPublication') {
                             $ano = $di[$y]['n_name'];
@@ -94,7 +109,17 @@ class export extends CI_Model {
                     break;
             }
         }
-        $txt = trim(trim($aut) . '. ' . $tit . '. <b>' . $sor . '</b>, ' . $vnr . ', ' . $ano . '.');
+        $pages = '';
+        if (strlen($pagi.$pagf) > 0)
+            {
+                if (strlen($pagf) > 0)
+                    {
+                        $pages = ', p. '.$pagi.'-'.$pagf;
+                    } else {
+                        $pages = ', p. '.$pagi;
+                    }
+            }
+        $txt = trim(trim($aut) . '. ' . $tit . '. <b>' . $sor . '</b>, ' . $nr . $vr . $pages .', ' . $ano . '.');
         $sx .= $txt;
         dircheck('c/' . $idx);
         if (strlen($txt) > 0) {
@@ -110,7 +135,7 @@ class export extends CI_Model {
         $txt2 = $link_work . '<b>' . $tit . '</b></a><br>';
         $txt2 .= '<i>' . trim($aut2) . '</i><br>';
         $txt2 .= '' . $link_source . $sor . $linka . ', ';
-        $txt2 .= $link_issue . $vnr . ', ' . $ano . $linka . '. (' . $sc . ')';
+        $txt2 .= $link_issue . $nr . $vr . $pages .', ' . $ano . $linka . '. (' . $sc . ')';
 
         dircheck('c/' . $idx);
         if (strlen($txt) > 0) {
@@ -172,19 +197,16 @@ class export extends CI_Model {
                             $rwork .= 'PY - '.troca($l['n_name'],chr(13),'').cr();
                         }
                     break;                                   
-                case 'hasVolumeNumber':
-                    if (substr($l['n_name'],0,1) == 'v')
-                        {
-                            $rwork .= 'VL - '.troca($l['n_name'],'v. ','').cr();    
-                            $vol = $l['n_name'];    
-                        } else {
-                            $rwork .= 'IS - '.troca($l['n_name'],'n. ','').cr();
-                            if (strlen($num) == 0)
-                                {
-                                    $num = $l['n_name'];
-                                }
-                        }
-                    
+                case 'hasPublicationVolume':
+                       $rwork .= 'VL - '.troca($l['n_name'],'v. ','').cr();    
+                       $vol = $l['n_name'];
+                       break;    
+                case 'hasPublicationNumber':
+                        $rwork .= 'IS - '.troca($l['n_name'],'n. ','').cr();
+                        if (strlen($num) == 0)
+                            {
+                                $num = $l['n_name'];
+                            }
                     break;                                   
             }
         }

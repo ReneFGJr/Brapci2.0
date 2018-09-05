@@ -7,6 +7,7 @@ class nets extends CI_model {
 		$mn = $d['autor_full'];
 		$mn .= ' '.$d['title'].'. ';
 		$mn .= $d['source'];
+        
 		if (strlen($d['doi']) > 0)
 			{
 				$mn .= '. DOI: '.'<a href="'.$d['doi'].'" target="_new">'.troca($d['doi'],'http://dx.doi.org/','').'</a>';
@@ -111,6 +112,10 @@ class nets extends CI_model {
         $doi = '';
         $subject = '';
 		$vol = '';
+        $nr = '';
+        $year = '';
+        $pagi = '';
+        $pagf = '';
         for ($r = 0; $r < count($data); $r++) {
             $line = $data[$r];
             $id = $line['d_r1'];
@@ -119,8 +124,6 @@ class nets extends CI_model {
             //echo $class.'-'.$name.'<hr>';
             switch($class) {
 				case 'hasIssueOf':
-					//echo '===>'.$name;
-					//print_r($line);
 					//echo '<hr>';
 					$issue = $this->frbr_core->le_data($line['d_r1']);
 					for ($i = 0;$i < count($issue); $i++)
@@ -131,7 +134,8 @@ class nets extends CI_model {
 				            $nname = trim($ln['n_name']);
 							if ($nclass == 'hasIssue') { $source = $nname; }
 							if ($nclass == 'dateOfPublication') { $year = $nname; }
-							if ($nclass == 'hasVolumeNumber') { $vol .= ', '.$nname; }							
+							if ($nclass == 'hasPublicationVolume') { $vol .= ', '.$nname; }
+                            if ($nclass == 'hasPublicationNumber') { $nr .= ', '.$nname; }							
 						}
 					break;
                 case 'hasRegisterId' :
@@ -154,7 +158,12 @@ class nets extends CI_model {
                     if (strlen($source) == 0) {
                         //$source = $name;
                     }
-
+                    break;
+                case 'hasPageStart' :
+                    $pagi = $name;
+                    break;
+                case 'hasPageEnd' :
+                    $pagf = $name;
                     break;
                 case 'hasTitle' :
                     if (strlen($title) == 0) {
@@ -184,14 +193,28 @@ class nets extends CI_model {
                     break;
             }
         }
+        /*********************************** paginacao ********************/
+        $pages = '';
+        if (strlen($pagi.$pagf) > 0)
+            {
+                if (strlen($pagf) > 0)
+                    {
+                        $pages = ', p. '.$pagi.'-'.$pagf;
+                    } else {
+                        $pages = ', p. '.$pagi;
+                    }
+            }        
+
+
         $d = array();
         $d['title'] = $title;
         $d['autor'] = $autor;
-		$d['source'] = '<b>'.$source . '</b>'. $vol. ', '.$year;
+		$d['source'] = '<b>'.$source . '</b>'. $vol.$nr.$pages.', '.$year.'.';
         $d['autor_resumido'] = $autor_resumido;
 		$d['autor_full'] = $autor_full;
         $d['http'] = base_url(PATH . 'v/' . $id);
         $d['doi'] = $doi;
+        $d['page'] = $pages;
         $d['subject'] = $subject;
         $d['id'] = $id;
         //$nm = urlencode($nm);

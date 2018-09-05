@@ -92,9 +92,15 @@ class pdfs extends CI_model {
     function harvesting_pdf_curl($id) {
         $links = array();
         $data = $this -> frbr_core -> le_data($id);
+        
         for ($r = 0; $r < count($data); $r++) {
             $attr = trim($data[$r]['c_class']);
             $vlr = trim($data[$r]['n_name']);
+            
+            if ($attr === 'isPubishIn')
+                {
+                    $jnl = $data[$r]['d_r2'];
+                }
 
             if ($attr == 'prefLabel') {
                 $file = trim($vlr);
@@ -108,7 +114,7 @@ class pdfs extends CI_model {
                 }
             }
         }
-
+        
         /************************ IDENTIFICAÇÃO DOS MÉTODOS *************/
         $method = 0;
         $link = '';
@@ -135,18 +141,18 @@ class pdfs extends CI_model {
                         //echo '<br>===>[' . $type.']';
                         switch($type) {
                             case 'application/pdf' :
-                                $this -> file_pdf($file, $txt, $id);
+                                $this -> file_pdf($file, $txt, $id, $jnl);
                                 //echo ' - ' . msg('save_pdf');
                                 break;
                             case 'application/zip' :
-                                $this -> file_save($file, $txt, $id, 'ZIP');
+                                $this -> file_save($file, $txt, $id, 'ZIP', $jnl);
                                 //echo ' - ' . msg('save_pdf');
                                 break;                                
                             case 'application/word' :
-                                $this -> file_save($file, $txt, $id, 'WRD');
+                                $this -> file_save($file, $txt, $id, 'WRD', $jnl);
                                 break;                                
                             case 'text/html' :
-                                $this -> file_txt($file, $txt, $id);
+                                $this -> file_save($file, $txt, $id, 'HTM', $jnl);
                                 //echo ' - ' . msg('save_html');
                                 break;
                             default :
@@ -205,14 +211,23 @@ class pdfs extends CI_model {
         }
     }
 
-    function file_pdf($file, $content, $id) {
-        /* Prepara o nome do arquivo */
-        $filename = '_repository';
-        check_dir($filename);
-        $filename .= '/' . date("Y");
-        check_dir($filename);
-        $filename .= '/' . date("m");
-        check_dir($filename);
+    function directories($journal=0)
+        {
+            /* Prepara o nome do arquivo */
+            $filename = '_repository';
+            check_dir($filename);
+            $filename .= '/'.$journal;
+            check_dir($filename);
+            $filename .= '/' . date("Y");
+            check_dir($filename);
+            $filename .= '/' . date("m");
+            check_dir($filename);
+            return($filename);            
+        }
+
+    function file_pdf($file, $content, $id, $journal) {
+        
+        $filename = $this->directories($journal);
         $filename .= '/' . $file . '.pdf';
 
         $fld = fopen($filename, 'w+');
@@ -245,56 +260,9 @@ class pdfs extends CI_model {
         return (1);
     }
 
-    function file_txt($file, $content, $id) {
-        /* Prepara o nome do arquivo */
-        $filename = '_repository';
-        check_dir($filename);
-        $filename .= '/' . date("Y");
-        check_dir($filename);
-        $filename .= '/' . date("m");
-        check_dir($filename);
-        $filename .= '/' . $file . '.txt';
-
-        $fld = fopen($filename, 'w+');
-        fwrite($fld, $content);
-        fclose($fld);
-
-        $size = filesize($filename);
-        if ($size > 0) {
-            /********** cria objeto do arquivo ****************************************/
-            $r2 = $this -> frbr_core -> rdf_concept_create('FullText', $filename, 'en', '');
-
-            /* TIPO DO ARQUIVO */
-            $r3 = $this -> frbr_core -> rdf_concept_create('FileType', 'TXT', 'pt-BR', '');
-            $prop = 'hasFileType';
-            $this -> frbr_core -> set_propriety($r2, $prop, $r3, 0);
-
-            /* Tamanho do Arquivo */
-            $prop = 'hasFileSize';
-            $id_size = $this -> frbr_core -> frbr_name($size, 'pt-BR');
-            $this -> frbr_core -> set_propriety($r2, $prop, 0, $id_size);
-
-            /* DATA DA COLETA DO ARQUIVO */
-            $prop = 'hasDateTime';
-            $idd = $this -> frbr_core -> rdf_concept_create('Date', DATE("Y-m-d"));
-            $this -> frbr_core -> set_propriety($r2, $prop, $idd, 0);
-
-            $prop = 'hasFileStorage';
-            $this -> frbr_core -> set_propriety($id, $prop, $r2, 0);
-        }
-        return (1);
-    }
-
     function file_save($file, $content, $id, $type) {
         $type = UpperCase($type);
-        
-        /* Prepara o nome do arquivo */
-        $filename = '_repository';
-        check_dir($filename);
-        $filename .= '/' . date("Y");
-        check_dir($filename);
-        $filename .= '/' . date("m");
-        check_dir($filename);
+        $filename = $this->directories($journal);
         $filename .= '/' . $file . '.txt';
 
         $fld = fopen($filename, 'w+');

@@ -139,7 +139,7 @@ class oai_pmh extends CI_model {
         return ($id);
     }
 
-    function getRecordNlM($id = 0, $dt) {
+    function getRecordNlM($id = 0, $dt,$z,$a) {
         $this -> load -> model("sources");
         
         $sql = "select * from source_listidentifier where id_li = $id";
@@ -288,7 +288,7 @@ class oai_pmh extends CI_model {
             $jnl = $line['li_jnl'];
 
             $data = $this -> sources -> le($jnl);
-            $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];          
+            $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];         
             
             $cnt = $this -> readfile($url);
             $cnt = troca($cnt, 'oai_dc:', 'oai_');
@@ -374,9 +374,13 @@ class oai_pmh extends CI_model {
             if (!isset($iss['issue'])) {
                 /*************************************************** date **************************/
                 $data = $this -> xml_value($rcn -> date);
-                $year = substr($data, 0, 4);
-                $month = substr($data, 4, 2);
-                $day = substr($data, 7, 2);
+                $year = '';
+                $month = '';
+                $day = '';
+                
+                //$year = substr($data, 0, 4);
+                //$month = substr($data, 4, 2);
+                //$day = substr($data, 7, 2);
 
                 /******************************************************* setSpec *******************/
                 $rcc = $xml -> GetRecord -> record -> header -> setSpec;
@@ -386,14 +390,16 @@ class oai_pmh extends CI_model {
                     {
                         $issues = (string)$xml->GetRecord->record->metadata->oai_dc->source[0];                        
                         $isz = $this->issue_mount($issues,$xml);
-                        $issue_id = 'jnl:'.$line['li_jnl'].'-'.$isz['vol'].'-'.$isz['nr'];
+                        $issue_id = 'jnl:'.strzero($line['li_jnl'],5).'-'.$isz['year'].'-'.$isz['vol'].'-'.$isz['nr'];
                     } else {
                         echo "ERRO DE ISSUE";
                     }
 
-                $iss['year'] = $year;
+                $iss['year'] = $isz['year'];
                 $iss['month'] = $month;
                 $iss['day'] = $day;
+                $iss['start_page'] = $isz['pag_start'];
+                $iss['end_page'] = $isz['pag_end'];
                 $iss['section'] = $section;
                 $iss['issue_id'] = $issue_id;
                 $iss['vol'] = $isz['vol'];
@@ -442,50 +448,36 @@ class oai_pmh extends CI_model {
         return ($dt);
     }
 
+    function pagination($n)
+        {
+            $dt=array();
+            while(strpos(' '.$n,';'))
+                {
+                    $n = substr($n,strpos($n,';')+1,strlen($n));
+                }
+            $pagi = '';
+            $pagf = '';
+            if (strlen($n) > 0)
+                {
+                    if (strpos($n,'-') > 0)
+                        {
+                            $pagi = round(substr($n,0,strpos($n,'-')));
+                            $pagf = round(substr($n,strpos($n,'-')+1,strlen($n)));
+                        } else {
+                            $pagi = $n;
+                        }                    
+                }
+            $dt['pag_start'] = $pagi;
+            $dt['pag_end'] = $pagf;
+            return($dt);
+        }
     public function issue_mount($n,$dt=array())
         {
+            $dz = $this->pagination($n,$dt);
             $vol = '';
             $nr = '';
-            $ano = '';
-            if (strpos(' '.$n,'v.') > 0)
-                {
-                    $vol = substr($n,strpos($n,'v.')+2,strlen($n));
-                    $vol = substr($vol,0,strpos($vol,','));
-                }
-            if (strpos(' '.$n,'Vol.') > 0)
-                {
-                    $vol = substr($n,strpos($n,'Vol.')+5,strlen($n));
-                    $vol = substr($vol,0,strpos($vol,','));
-                }				
-            /********************************************************/
-            if (strpos($n,'n.'))
-                {
-                    $nr = substr($n,strpos($n,'n.')+2,strlen($n));
-                    if (strpos($nr,','))
-                        {
-                            $nr = substr($nr,0,strpos($nr,','));        
-                        } else {
-                            if (strpos($nr,'('))
-                                {
-                                    $nr = substr($nr,0,strpos($nr,'('));        
-                                }        
-                        }
-                }
-            /********************************************************/
-            if (strpos($n,'Núm.'))
-                {
-                    $nr = trim(substr($n,strpos($n,'Núm.')+5,strlen($n)));
-                    if (strpos($nr,','))
-                        {
-                            $nr = Lowercase(substr($nr,0,strpos($nr,',')));        
-                        } else {
-                            if (strpos($nr,'('))
-                                {
-                                    $nr = lowercase(substr($nr,0,strpos($nr,'(')));        
-                                }        
-                        }
-                }				
-            /********************************************************/
+            $ano = 'xxxx';
+            /************************************************ ano *******************/
             for ($r=1900;$r <= (date("Y")+10);$r++)
                 {
                     if (strpos($n,(string)$r) > 0)
@@ -493,6 +485,61 @@ class oai_pmh extends CI_model {
                             $ano = $r;
                         }
                 }
+            
+            /************************************************ volume *****************/
+            $n = troca($n,'V.','v.');
+            $n = troca($n,'Vol.','v.');
+            $n = troca($n,'VOL.','v.');
+            
+            if (strpos(' '.$n,'v.') > 0)
+                {
+                    $vol = trim(substr($n,strpos($n,'v.')+2,strlen($n)));
+                    if (strpos($vol,','))
+                        {
+                            $vol = substr($vol,0,strpos($vol,','));
+                        }
+                    if (strpos($vol,'('))
+                        {
+                            $vol = substr($vol,0,strpos($vol,'('));
+                        }
+                    if (strpos($vol,';'))
+                        {
+                            $vol = substr($vol,0,strpos($vol,';'));
+                        }
+                }
+		
+            /************************************************ numero *****************/
+            $n = troca($n,'N.','n.');
+            $n = troca($n,'Núm.','n.');
+            $n = troca($n,'Num.','n.');
+            $n = troca($n,'NUM.','n.');            
+            if (strpos($n,'n.'))
+                {
+                    $nr = substr($n,strpos($n,'n.')+2,strlen($n));
+                    if (strpos($nr,','))
+                        {
+                            $nr = substr($nr,0,strpos($nr,','));        
+                        }
+                    if (strpos($nr,'('))
+                        {
+                            $nr = substr($nr,0,strpos($nr,'('));        
+                        }
+                    if (strpos($nr,';'))
+                        {
+                            $nr = substr($nr,0,strpos($nr,';'));        
+                        }
+                }
+            if ((strlen($nr) == 0) and ((strpos($n,'(') > 0)))
+                {
+                    $nz = $n;
+                    $nz = substr($nz,strpos($nz,'(')+1,strlen($nz));
+                    $nz = substr($nz,0,strpos($nz,')'));
+                    if ($nz != $ano)
+                        {
+                            $nr = $nz;
+                        }
+                }
+
                 
             $nr = trim($nr);
             $vol = trim($vol);
@@ -504,13 +551,16 @@ class oai_pmh extends CI_model {
                     $ano = substr($ano,0,4);
                 }
             
-            if (strlen($vol.$nr) == 0)
+            if ((strlen($vol.$nr) == 0) or ($ano == 'xxxx'))
                 {
-                    $vol = $ano;
+                    echo $n.'<br>';
+                    echo "FALHA v.$vol, n. $nr, $ano";
+                    exit;
                 }
             $d['year'] = $ano;
             $d['vol'] = $vol;
             $d['nr'] = $nr;
+            $d = array_merge($d,$dz);
             return($d);                
         }
 
@@ -1014,7 +1064,7 @@ class oai_pmh extends CI_model {
                 /* Recupera Issue */
                 $article['issue_id'] = strzero($this -> recupera_issue($article, $jid), 7);
                 $article['issue_ver'] = $this -> issue;
-
+                
                 /* Recupera ano */
                 $source = $article['sources'][0]['source'];
                 $article['ano'] = $this -> recupera_ano($source);
@@ -1196,15 +1246,19 @@ class oai_pmh extends CI_model {
     function recupera_vol($s) {
         $vl = '';
         $s = troca($s, 'V.', 'v.');
+        $s = troca($s, 'Vol ', 'v.');
+        $s = troca($s, 'Vol.', 'v.');
+        
+        /***********************************************************************/
         if (strpos($s, 'v.')) { $vl = substr($s, strpos($s, 'v.'), strlen($s));
-        }
-        if (strpos($s, 'Vol ')) { $vl = substr($s, strpos($s, 'Vol ') + 4, strlen($s));
-        }
-        if (strpos($s, 'Vol. ')) { $vl = substr($s, strpos($s, 'Vol. ') + 5, strlen($s));
         }
 
         if (strlen($vl) > 0) {
-            if (strpos($vl, ',') > 0) { $vl = substr($vl, 0, strpos($vl, ','));
+            if (strpos($vl, '(') > 0) {
+                $vl = substr($vl, 0, strpos($vl, '('));
+            }            
+            if (strpos($vl, ',') > 0) {
+                $vl = substr($vl, 0, strpos($vl, ','));
             }
             $vl = troca($vl, 'v. ', '');
             if (strpos($vl, ' ') > 0) { $vl = substr($vl, 0, strpos($vl, ' '));
@@ -1232,13 +1286,27 @@ class oai_pmh extends CI_model {
         $issue = $rcn['sources'];
         for ($r = 0; $r < count($issue); $r++) {
             $si = $issue[$r]['source'];
-            $ano = $this -> recupera_ano($si);
+            $ano = round($this -> recupera_ano($si));
             $nr = $this -> recupera_nr($si);
-            $vol = $this -> recupera_vol($si);
+            $vol = $this -> recupera_vol($si);          
+            
+            if ($ano < 1970)
+                {
+                    echo "ANO INVÁLIDO";
+                    echo '<hr>';
+                    print_r($issue);
+                    exit;        
+                }
+                            
+            for ($r=0;$r < 50;$r++)
+                {
+                    echo '<br>==>'.$ano.' '.$nr.' '.$vol;        
+                }
+                                            
             /* Trata issue */
             $jid = strzero($jid, 7);
 
-            $sql = "select * from brapci_edition where 
+            $sql = "selectx * from brapci_edition where 
 									ed_vol = '$vol'
 									and ed_nr = '$nr'
 									and ed_ano = '$ano' 

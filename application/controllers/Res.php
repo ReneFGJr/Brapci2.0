@@ -362,7 +362,7 @@ class res extends CI_Controller {
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
                 if ($idc > 0) {
-                    $dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
+                    //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
                     $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
                     $dt['idc'] = $idc;
                     $html = $this -> sources -> info($id);
@@ -755,7 +755,7 @@ class res extends CI_Controller {
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord(0);
                 if ($idc > 0) {
-                    $dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
+                    //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
                     $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
                     $dt['idc'] = $idc;
                     //$txt = $this -> sources -> info($id);
