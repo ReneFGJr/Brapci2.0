@@ -897,11 +897,20 @@ class res extends CI_Controller {
         $t2 = '<h3>Classe Thesa: ' . msg($id) . '</h3>' . $t2;
 
         $tela = '
+                <div class="container">
                 <div class="row">
                     <div class="col-md-6">' . $t1 . '</div>
                     <div class="col-md-6">' . $t2 . '</div>
                 </div>';
-
+        if (perfil("#ADM"))
+            {
+                $tela .= '<div class="row">';
+                $tela .= '<div class="col-md-12">';
+                $tela .= '<a href="'.base_url(PATH.'vocabulary_ed/0').'" class="btn btn-secondary">'.msg('new').'</a>';
+                $tela .= '</div>';
+                $tela .= '</div>';
+            }
+        $tela .= '</div>';
         $data['content'] = $tela;
         $this -> load -> view('show', $data);
 

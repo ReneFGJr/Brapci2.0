@@ -95,6 +95,8 @@ $lang['Words'] = 'Termos indexados';
 $lang['about_brapci'] = 'Sobra a Brapci';
 $lang['collections'] = 'Coleções Indexadas';
 $lang['help'] = 'Ajuda sobre a Brapci';
+$lang['our_colletions'] = 'Nossa coleção';
+$lang['journal_timeline'] = 'Criação das Publicações - Timeline';
 
 $lang['edit_source'] = 'Editar';
 $lang['return_to_up'] = 'retorna ao topo';

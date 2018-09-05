@@ -10,7 +10,7 @@ class nets extends CI_model {
         
 		if (strlen($d['doi']) > 0)
 			{
-				$mn .= '. DOI: '.'<a href="'.$d['doi'].'" target="_new">'.troca($d['doi'],'http://dx.doi.org/','').'</a>';
+				$mn .= ' DOI: '.'<a href="'.$d['doi'].'" target="_new">'.troca($d['doi'],'http://dx.doi.org/','').'</a>';
 			}
 		return($mn);	
 		}
