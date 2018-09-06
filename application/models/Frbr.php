@@ -241,7 +241,7 @@ class frbr extends CI_model {
             //$this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
         if (isset($iss['nr']) and (strlen(trim($iss['nr'])) > 0)) {
-            $prop = 'hasPublicationVolume';
+            $prop = 'hasPublicationNumber';
             $tem = $this -> frbr_core -> rdf_concept_create('PublicationNumber', 'n. ' . $iss['nr'], '');
             $this -> frbr_core -> set_propriety($idf, $prop, $tem, 0);
             //$prop = 'hasPublicationNumber';

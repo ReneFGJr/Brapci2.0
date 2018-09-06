@@ -260,7 +260,7 @@ class pdfs extends CI_model {
         return (1);
     }
 
-    function file_save($file, $content, $id, $type) {
+    function file_save($file, $content, $id, $type, $journal) {
         $type = UpperCase($type);
         $filename = $this->directories($journal);
         $filename .= '/' . $file . '.txt';

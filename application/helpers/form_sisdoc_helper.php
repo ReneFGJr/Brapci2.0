@@ -661,6 +661,7 @@ function post_security($s) {
 }
 
 function nbr_autor($xa, $tp) {
+	$xa = utf8_decode($xa);
     $xa = troca($xa,'(',' ');
     $xa = troca($xa,')',' ');    
 	if (strpos($xa, ',') > 0) {
@@ -730,6 +731,8 @@ function nbr_autor($xa, $tp) {
 		$xp2a = str_word_count(LowerCase($xp2), 1);
 		$xp2 = '';
 		for ($k = 0; $k < count($xp2a); $k++) {
+			if ($xp2a[$k] == 'del') { $xp2a[$k] = '';
+			}
 			if ($xp2a[$k] == 'do') { $xp2a[$k] = '';
 			}
 			if ($xp2a[$k] == 'dos') { $xp2a[$k] = '';
@@ -782,7 +785,8 @@ function nbr_autor($xa, $tp) {
                 $xa = ucwords(LowerCase(substr($xp2,0,strpos($xp2,' '))));
                 $xa .= ' '.ucwords(LowerCase($xp1));
             }
-	}	
+	}
+	$xa = utf8_encode($xa);	
 	return $xa;
 }
 

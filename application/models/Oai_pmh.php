@@ -491,7 +491,9 @@ class oai_pmh extends CI_model {
             /************************************************ volume *****************/
             $n = troca($n,'V.','v.');
             $n = troca($n,'Vol.','v.');
+			$n = troca($n,'vol.','v.');
             $n = troca($n,'VOL.','v.');
+			$n = troca($n,'volume','v.');
             
             if (strpos(' '.$n,'v.') > 0)
                 {
@@ -509,12 +511,14 @@ class oai_pmh extends CI_model {
                             $vol = substr($vol,0,strpos($vol,';'));
                         }
                 }
-		
             /************************************************ numero *****************/
             $n = troca($n,'N.','n.');
             $n = troca($n,'Núm.','n.');
             $n = troca($n,'Num.','n.');
-            $n = troca($n,'NUM.','n.');            
+            $n = troca($n,'NUM.','n.');
+			$n = troca($n,'núm.','n.');
+			$n = troca($n,'núms.','n.');
+			$n = troca($n,'Núms.','n.');            
             if (strpos($n,'n.'))
                 {
                     $nr = trim(substr($n,strpos($n,'n.')+2,strlen($n)));
@@ -531,6 +535,11 @@ class oai_pmh extends CI_model {
                     if (strpos($nr,';'))
                         {
                             $nr = substr($nr,0,strpos($nr,';'));
+                            $nr = trim($nr);        
+                        }
+                    if (strpos($nr,':'))
+                        {
+                            $nr = substr($nr,0,strpos($nr,':'));
                             $nr = trim($nr);        
                         }
                                             
@@ -564,11 +573,23 @@ class oai_pmh extends CI_model {
             
             if ((strlen($vol.$nr) == 0) or (($ano == 'xxxx') and (strlen($nr) == 0)))
                 {
-                    echo $n.'<br>';
-                    echo "FALHA v.$vol, n. $nr, $ano";
-                    ECHO '<pre>';
-                    print_r($dt);
-                    exit;
+                	$v = array('diciembre','junio');
+					$vr = array('dez.','jun.');
+					for ($r=0;$r < count($v);$r++)
+						{
+							if (strpos($n,$v[$r]) > 0)
+								{
+									$nr = $vr[$r];
+								}
+						}
+                	if (strlen($nr)==0)
+						{
+                    		echo $n.'<br>';
+                    		echo "FALHA v.$vol, n. $nr, $ano";
+                    		ECHO '<pre>';
+                    		print_r($dt);
+                    		exit;
+						}
                 }
             $d['year'] = $ano;
             $d['vol'] = $vol;
