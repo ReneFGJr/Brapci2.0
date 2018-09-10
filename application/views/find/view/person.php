@@ -10,6 +10,12 @@ $link = '<a href="'.base_url(PATH.'a/'.$w).'">';
 //echo $link.'[ed]</a>';
 $img = '<img src="' . base_url('img/no_image.png') . '" class="img-fluid">';
 $cutter = ''; 
+
+for ($r=0;$r < count($use);$r++)
+    {
+        $alt .= '<li>'.$use[$r]['n_name'].'</li>'.cr();
+    }
+
 for ($r=0;$r < count($person);$r++)
     {
         $line = $person[$r];

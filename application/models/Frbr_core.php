@@ -125,9 +125,14 @@ class frbr_core extends CI_model {
 		$rlt = $this -> db -> query($sql);
 	}
 
-	function index_list($lt = '', $class = 'Person') {
+	function index_list($lt = '', $class = 'Person',$nouse=0) {
 		$f = $this -> find_class($class);
 		$this -> check_language();
+		$wh = '';
+		if ($nouse == 1)
+		  {
+		      $wh .= " and C1.cc_use = 0 ";
+		  }
 
 		$sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
                        N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
@@ -135,7 +140,7 @@ class frbr_core extends CI_model {
                         INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                         LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                        where C1.cc_class = " . $f . " 
+                        where C1.cc_class = " . $f . " $wh 
                         ORDER BY N1.n_name";
 
 		$rlt = $this -> db -> query($sql);
@@ -260,6 +265,7 @@ class frbr_core extends CI_model {
 
 		$data = $this -> le($id);
 		$data['person'] = $this -> le_data($id);
+        $data['use'] = $this->le_remissiva($id);
 		$data['id'] = $id;
 
 		$sx = $this -> load -> view('find/view/person', $data, true);
@@ -293,9 +299,7 @@ class frbr_core extends CI_model {
 				$idv = $line['d_r2'];
 				$line['d_r2'] = $line['d_r1'];
 				$line['d_r1'] = $idv;
-			}          
-            
-            
+			}   
 			$sx .= $this -> mostra_dados($line['n_name'], $link, $line);
 			$sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
 			$sx .= ' <sup>' . $line['rule'] . '</sup>';
@@ -319,7 +323,8 @@ class frbr_core extends CI_model {
                  //print_r($line);
                  //echo '<hr>';
                  $n = load_file_local($filex);
-             }           
+             }    
+                    
 		/****************** HTTP *********/
 		if ((lowercase(substr($n, 0, 4)) == 'http') and (strlen($l) == 0)) {
 			$l = '<a href="' . $n . '" target="new_' . date("mis") . '" title="' . msg('Link:') . $n . '">';
@@ -330,7 +335,7 @@ class frbr_core extends CI_model {
 			$n = 'DOI: ' . $n;
 		}
 		/****************** OAI *********/
-		if ((lowercase(substr($n, 0, 4)) == 'oai:')) {
+		if (((lowercase(substr($n, 0, 4)) == 'oai:')) and ($line['c_class'] != 'hasID')) {
 			$n = $this -> frbr -> show_v($line['d_r1']);
 			$l = '<a href="' . base_url(PATH . 'v/' . $line['d_r1']) . '" target="new_' . date("mis") . '" title="View Article" class="result">';
 		}
@@ -338,6 +343,7 @@ class frbr_core extends CI_model {
 		if (strlen($l) > 0) {
 			$la = '</a>';
 		}
+
 		return ($l . $n . $la);
 	}
 
@@ -499,6 +505,15 @@ class frbr_core extends CI_model {
 		}
 	}
 
+    function le_remissiva($id)
+        {
+            $sql = "SELECT * FROM rdf_concept as R1
+                        INNER JOIN rdf_name ON cc_pref_term = id_n
+                        where R1.cc_use = $id";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            return($rlt);
+        }
 	function le_data($id) {
 		$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
 		$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';

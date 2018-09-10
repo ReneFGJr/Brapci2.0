@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.18.08.14
+ * @version     v0.18.09.07
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -2948,4 +2948,66 @@ function check_dir($dir) {
 		fclose($rlt);
 	}
 }
+function redirect2($url,$time=0)
+    {
+
+        if ($time <= 0)
+            {
+                redirect($url);
+            } else {
+                $sx = '
+                      <a href="'.$url.'"><span id="countdown" class="btn btn-secondary">'.msg('return_in').' '.($time+1).'s</span></a>
+                      <script>
+                      var count = '.$time.'
+                      var countdown = setInterval(function(){
+                        html = "'.msg('return_in').'";
+                        $("#countdown").html(html + " " + count + "s");
+                        if (count == 1) {
+                          clearInterval(countdown);
+                          window.open(\''.$url.'\', "_self");                    
+                        }
+                        count--;
+                      }, 1000);
+                      </script>     
+                ';
+                return($sx);
+            }
+    }
+function romano($n)
+    {
+        $r = '';
+        $u = array('','I','II','III','IV','V','VI','VII','VII','IX');
+        $d = array('','X','XX','XXX','XL','L','LX','LXX','LXXX','XC');
+        $c = array('','C','CC','CCC','CD','D,','DC','DCC','DCCC','CM');
+        $m = array('','M','MM','MMM');
+        
+        if ($n < 3000)
+            {
+                $v1 = round(substr($n,strlen($n)-1,1));
+                $r .= $u[$v1];
+                $n = substr($n,0,strlen($n)-1);
+                if (strlen($n) > 0)
+                    {
+                        $v1 = round(substr($n,strlen($n)-1,1));
+                        $r = $d[$v1].$r;
+                        $n = substr($n,0,strlen($n)-1);                        
+                    }
+                if (strlen($n) > 0)
+                    {
+                        $v1 = round(substr($n,strlen($n)-1,1));
+                        $r = $c[$v1].$r;
+                        $n = substr($n,0,strlen($n)-1);                        
+                    }                
+                if (strlen($n) > 0)
+                    {
+                        $v1 = round(substr($n,strlen($n)-1,1));
+                        $r = $m[$v1].$r;
+                        $n = substr($n,0,strlen($n)-1);                        
+                    }
+            } else {
+                $r = 'ERRO '.$n;
+            }
+        return($r);               
+    }
+
 ?>

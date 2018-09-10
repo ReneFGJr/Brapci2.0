@@ -1,76 +1,70 @@
 <?php
 class sources extends CI_Model {
     var $table = 'source_source';
-    
-    function next_harvesting($p='')
-        {
-            if (strlen($p) == 0)
-                { $p = 0; }
-            $p = round($p);
-            
-            $sql = "SELECT * FROM `source_source` WHERE jnl_url_oai <> '' and id_jnl > $p order by id_jnl limit 1 ";
-            $rlt = $this->db->query($sql);            
-            $rlt = $rlt->result_array();
-            
-            if (count($rlt) > 0)
-                {
-                    $id = $rlt[0]['id_jnl'];
-                } else {
-                    $id = (-1);
-                }        
-            
-            return($id);
-        }
-    
-    function button_harvesting_status()
-        {
-            $sx = '&nbsp;<a href="'.base_url(PATH.'journals/harvesting/999999').'" class="btn btn-outline-secondary">';
-            $sx .= msg('button_harvesting_status');
-            $sx .= '</a>';
-            return($sx);
-        }
-    function button_harvesting_all()
-        {
-            $sx = '&nbsp;<a href="'.base_url(PATH.'journals/harvesting').'" class="btn btn-outline-secondary">';
-            $sx .= msg('harvesting_all');
-            $sx .= '</a>';
-            return($sx);
-        }		
 
-	function cp($id='')
-		{
-			$cp = array();
-			array_push($cp,array('$H8','id_jnl','',False,True));
-			array_push($cp,array('$S100','jnl_name',msg('jnl_name'),False,True));
-			array_push($cp,array('$S30','jnl_name_abrev',msg('jnl_name_abrev'),False,True));
-			
-			array_push($cp,array('$S100','jnl_url',msg('jnl_url'),False,True));
-			array_push($cp,array('$S100','jnl_url_oai',msg('jnl_url_oai'),False,True));
-			
-			array_push($cp,array('$S30','jnl_issn',msg('jnl_issn'),False,True));
-			array_push($cp,array('$S30','jnl_eissn',msg('jnl_eissn'),False,True));
-			array_push($cp,array('$[1950-'.date("Y").']','jnl_ano_inicio',msg('jnl_ano_inicio'),False,True));
-			array_push($cp,array('$[1950-'.date("Y").']','jnl_ano_final',msg('jnl_ano_final'),False,True));
-			
-			
-			array_push($cp,array('$HV','jnl_oai_last_harvesting',date("Y-m-d"),True,True));
-			array_push($cp,array('$HV','jnl_cidade','0',False,True));
-			array_push($cp,array('$HV','jnl_scielo','0',False,True));
-			array_push($cp,array('$HV','jnl_collection','',False,True));
-			$op = '1:'.msg('yes, with OAI');
-			$op .= '&2:'.msg('yes, without OAI');
-			$op .= '&3:'.msg('No, finished');
-			$op .= '&0:'.msg('canceled');
-			array_push($cp,array('$O 1:Yes','jnl_active',msg('active'),True,True));
-			
-			return($cp);
-		}
+    function next_harvesting($p = '') {
+        if (strlen($p) == 0) { $p = 0;
+        }
+        $p = round($p);
+
+        $sql = "SELECT * FROM `source_source` WHERE jnl_url_oai <> '' and id_jnl > $p order by id_jnl limit 1 ";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        if (count($rlt) > 0) {
+            $id = $rlt[0]['id_jnl'];
+        } else {
+            $id = (-1);
+        }
+
+        return ($id);
+    }
+
+    function button_harvesting_status() {
+        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting/999999') . '" class="btn btn-outline-secondary">';
+        $sx .= msg('button_harvesting_status');
+        $sx .= '</a>';
+        return ($sx);
+    }
+
+    function button_harvesting_all() {
+        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting') . '" class="btn btn-outline-secondary">';
+        $sx .= msg('harvesting_all');
+        $sx .= '</a>';
+        return ($sx);
+    }
+
+    function cp($id = '') {
+        $cp = array();
+        array_push($cp, array('$H8', 'id_jnl', '', False, True));
+        array_push($cp, array('$S100', 'jnl_name', msg('jnl_name'), False, True));
+        array_push($cp, array('$S30', 'jnl_name_abrev', msg('jnl_name_abrev'), False, True));
+
+        array_push($cp, array('$S100', 'jnl_url', msg('jnl_url'), False, True));
+        array_push($cp, array('$S100', 'jnl_url_oai', msg('jnl_url_oai'), False, True));
+
+        array_push($cp, array('$S30', 'jnl_issn', msg('jnl_issn'), False, True));
+        array_push($cp, array('$S30', 'jnl_eissn', msg('jnl_eissn'), False, True));
+        array_push($cp, array('$[1950-' . date("Y") . ']', 'jnl_ano_inicio', msg('jnl_ano_inicio'), False, True));
+        array_push($cp, array('$[1950-' . date("Y") . ']', 'jnl_ano_final', msg('jnl_ano_final'), False, True));
+
+        array_push($cp, array('$HV', 'jnl_oai_last_harvesting', date("Y-m-d"), True, True));
+        array_push($cp, array('$HV', 'jnl_cidade', '0', False, True));
+        array_push($cp, array('$HV', 'jnl_scielo', '0', False, True));
+        array_push($cp, array('$HV', 'jnl_collection', '', False, True));
+        $op = '1:' . msg('yes, with OAI');
+        $op .= '&2:' . msg('yes, without OAI');
+        $op .= '&3:' . msg('No, finished');
+        $op .= '&0:' . msg('canceled');
+        array_push($cp, array('$O 1:Yes', 'jnl_active', msg('active'), True, True));
+
+        return ($cp);
+    }
 
     function jnl_name($line) {
-    	if (count($line) == 0)
-			{
-				return("");
-			}
+        if (count($line) == 0) {
+            return ("");
+        }
         $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
         $sx = $link . $line['jnl_name'] . '</a>';
 
@@ -92,23 +86,21 @@ class sources extends CI_Model {
             return ( array());
         }
     }
-	
-	function button_new_sources($id='')
-		{
-			$sx = '';
-			$sx .= '<div class="row">';
-			$sx .= '<div class="col-1">';
-			if (strlen($id) == 0)
-				{
-					$sx .= '<a href="'.base_url(PATH.'jnl_edit').'" class="btn btn-secondary">'.msg("new_source").'</a>';		
-				} else {
-					$sx .= '<a href="'.base_url(PATH.'jnl_edit/'.$id).'" class="btn btn-secondary">'.msg("edit_source").'</a>';
-				}
-			
-			$sx .= '</div>';
-			$sx .= '</div>'.CR;
-			return($sx);
-		}
+
+    function button_new_sources($id = '') {
+        $sx = '';
+        $sx .= '<div class="row">';
+        $sx .= '<div class="col-1">';
+        if (strlen($id) == 0) {
+            $sx .= '<a href="' . base_url(PATH . 'jnl_edit') . '" class="btn btn-secondary">' . msg("new_source") . '</a>';
+        } else {
+            $sx .= '<a href="' . base_url(PATH . 'jnl_edit/' . $id) . '" class="btn btn-secondary">' . msg("edit_source") . '</a>';
+        }
+
+        $sx .= '</div>';
+        $sx .= '</div>' . CR;
+        return ($sx);
+    }
 
     function list_sources() {
         $sql = "select * from " . $this -> table . " 
@@ -118,29 +110,27 @@ class sources extends CI_Model {
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         /**************************** MOUNT HTML ***********/
-        $sx = '<div class="col-12">'.CR;
+        $sx = '<div class="col-12">' . CR;
         $sx .= '<ol class="journals">';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $sx .= '<li>' . $this -> jnl_name($line) . '</li>';
         }
         $sx .= '</ol>';
-		$sx .= '</div>'.CR;
+        $sx .= '</div>' . CR;
         return ($sx);
     }
 
     /********************************************************************** INFO **********/
-    function info($id=0) {
-        if (is_array($id))
-            {
-                $line = $id;
-            } else {
-                $line = $this->le($id);        
-            }
-        if (count($line) == 0)
-			{
-				return("");
-			}
+    function info($id = 0) {
+        if (is_array($id)) {
+            $line = $id;
+        } else {
+            $line = $this -> le($id);
+        }
+        if (count($line) == 0) {
+            return ("");
+        }
         $sx = '';
         $sx .= '<div class="col-md-6">';
         $sx .= '<span class="h3">' . $this -> jnl_name($line) . '</span>' . CR;
@@ -171,15 +161,14 @@ class sources extends CI_Model {
                 $sx .= msg('Validity') . ': ' . '-' . $this -> year($fim);
             }
         }
-        
-        if (strlen($line['jnl_url_oai']) > 0)
-            {
-                $sx .= '<br>';
-                $sx .= $this->oai_pmh->menu($line['id_jnl']);
-            }
-        
-        $sx .= $this->oai_pmh->cache_resume($line['id_jnl']);
-        
+
+        if (strlen($line['jnl_url_oai']) > 0) {
+            $sx .= '<br>';
+            $sx .= $this -> oai_pmh -> menu($line['id_jnl']);
+        }
+
+        $sx .= $this -> oai_pmh -> cache_resume($line['id_jnl']);
+
         $sx .= '</div>';
 
         return ($sx);
@@ -204,20 +193,20 @@ class sources extends CI_Model {
         $rlt = $rlt -> result_array();
         $xano = date("Y");
         $sx = '<div class="row">';
-		$sx .= '<div class="col-md-12">';
-        $sx .= '<h2>'.msg('journal_timeline').'</h2>';
+        $sx .= '<div class="col-md-12">';
+        $sx .= '<h2>' . msg('journal_timeline') . '</h2>';
         $sx .= '<tt>';
-		$i = 0;
+        $i = 0;
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             /*****************************/
             $ano = $line['jnl_ano_inicio'];
             while ($xano >= $ano) {
-            	if ($i > 0)
-					{ $sx .= '<br>'; }
+                if ($i > 0) { $sx .= '<br>';
+                }
                 $sx .= $this -> year($xano) . ' +';
                 $xano--;
-				$i++;
+                $i++;
             }
             $sx .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this -> jnl_name($line);
         }
@@ -232,11 +221,78 @@ class sources extends CI_Model {
     }
 
     function agents_list() {
-            $prop = 'Person';
-            $prop_id = $this->frbr->find_class($prop);
-            
-            $sql = "select * from ";
-            echo '===>'.$prop.'=='.$prop_id;
+        $prop = 'Person';
+        $prop_id = $this -> frbr -> find_class($prop);
+
+        $sql = "select * from ";
+        echo '===>' . $prop . '==' . $prop_id;
+    }
+
+    function show_issues($idx = 0) {
+        $id = $this -> oai_pmh -> check_oai_index($idx);
+
+        $sx = '<h3>' . msg('ISSUE') . '</h3>';
+        //$id = 164;
+        $dt = $this -> frbr_core -> le_data($id);
+        $ar = array();
+
+        for ($r = 0; $r < count($dt); $r++) {
+            $line = $dt[$r];
+            if ($line['c_class'] == 'hasIssue') {
+                $n = $line['n_name'] . '#' . $line['d_r1'];
+                array_push($ar, $n);
+            }
+        }
+        asort($ar);
+
+        $sx = '';
+        $ed = 0;
+        $xano = '';
+        $sx = '<table>';        
+        foreach ($ar as $key => $value) {
+            $n = $value;
+            $name_use = substr($n, 0, strpos($n, '#'));
+            $idx = substr($n, strpos($n, '#') + 1, strlen($n));
+
+            $filex = 'c/' . $idx . '/name.sm';
+            if (file_exists($filex)) {
+                $name_use = load_file_local($filex);
+            }
+
+            if (strpos($name_use, '#')) {
+                $ano = substr($name_use, strpos($name_use, '#') + 1, strlen($name_use));
+                $name_use = substr($name_use, 0, strpos($name_use, '#'));
+            } else {
+                $ano = '';
+            }
+            if ($xano != $ano) {
+                $xano = $ano;
+                
+                if ($ed > 0)
+                    {
+                        $sx .= '</tr>';
+                    }
+                
+                $sx .= '<tr><td>' . cr();
+                $sx .= '' . $ano . '' . cr();
+                $sx .= '</td></tr>' . cr();
+                
+                $sx .= '<tr>';
+                $sx .= '<td style="background-color: #00ff00;">';
+                $ed++;
+            }
+            $sx .= '<div style="width: 80px; text-align: center; height: 120px; border: 1px solid #808080; margin: 10px 10px; float: left;">';
+            $sx .= '<a href="' . base_url(PATH . 'v/' . $idx) . '">';
+            $sx .= $name_use;
+            $sx .= '</a>';
+            $sx .= '</div>';
+
+        }
+        $sx .= '</td>';
+        $sx .= '</tr>';
+        $sx .= '</table>';
+
+        return ($sx);
     }
 
 }

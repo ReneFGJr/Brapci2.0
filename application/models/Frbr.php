@@ -4,8 +4,121 @@ class frbr extends CI_model {
         {
             
         }
-    
-    
+        
+    function author_check_method_1($p=0)
+        {
+            $f = $this->frbr_core->find_class('Person');
+            $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                           N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                            FROM rdf_concept as C1
+                            INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+                            LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                            LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                            where C1.cc_class = " . $f . " and c1.cc_use = 0
+                            ORDER BY N1.n_name";            
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $n2 = '';
+            $n0 = '';
+            $i2 = 0;
+            $sx = '';
+            $m = 0;
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $n0 = trim($line['n_name']);
+                    $n1 = trim($line['n_name']);
+                    $n1 = troca($n1,' de ',' ');
+                    $n1 = troca($n1,' da ',' ');
+                    $n1 = troca($n1,' do ',' ');
+                    $n1 = troca($n1,' dos ',' ');
+                    $nf = substr($n1,strlen($n1)-3,3);
+                    if (($nf == ' de') or ($nf == ' da') or ($nf == ' do') or ($nf == ' dos'))
+                        {
+                            $n1 = trim(substr($n1,0,strlen($n1)-3));
+                        }
+                    $n1 = trim($n1);
+                    $i1 = $line['id_cc'];
+
+                    if ($n1 == $n2)
+                        {
+                            $m++;
+                            $sx .= '<br>'.$n1.'('.$i1.')';
+                            $sx .=  '--'.$n2.'('.$i2.')';
+                            $sx .=  ' --> <b><font color="green">Igual</font></b>'; 
+                            $sql = "update rdf_concept set cc_use = $i2 where id_cc = $i1";
+                            $rrr = $this->db->query($sql);                                      
+                        }                    
+                    $n2 = $n1;
+                    $i2 = $i1;
+                }
+
+                if ($m==0)
+                    {
+                        $sx = msg('No_changes');
+                    }
+                return($sx);
+        }        
+    function author_check_method_2($p=0)
+        {
+            $sql = "SELECT * FROM rdf_concept as R1
+                        INNER JOIN rdf_name ON cc_pref_term = id_n
+                        INNER JOIN rdf_class ON cc_class = id_c
+                        INNER JOIN rdf_data ON R1.id_cc = d_r2
+                        where R1.cc_use > 0 and c_class = 'Person' ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '';
+            $m=0;
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $ida = $line['id_cc'];
+                    $idt = $line['cc_use'];
+                    $sx .= '<br>'.$line['n_name'];
+                    
+                    $sql = "update rdf_data set 
+                                d_o = ".$line['id_d'].",
+                                d_r2 = $idt
+                                where id_d = ".$line['id_d'];
+                    $rlt2 = $this->db->query($sql);
+                    $m++;
+                }
+                if ($m==0)
+                    {
+                        $sx = msg('No_changes');
+                    }                
+            return($sx);            
+        }    
+    function author_check_remissive($p=0,$p2=0)
+        {
+            $p2 = round($p2);
+            switch($p2)
+                {
+                case '0':
+                    $sx = '<h1>Phase '.romano(1).'</h1>';
+                    $sx .= $this->author_check_method_1($p);
+                    $sx .= '<meta http-equiv="refresh" content="10;'.base_url(PATH.'tools/remissive/1').'">';
+                    $sx .= '<br><br>wait phase '.romano(2);
+                    break;
+                case '1':
+                    $sx = '<h1>Phase '.romano(2).'</h1>';
+                    $sx .= $this->author_check_method_2($p);
+                    $sx .= '<meta http-equiv="refresh" content="5;'.base_url(PATH.'tools/remissive/2').'">';
+                    break;                
+                default:
+                    $sx = '<h1>FIM</h1>';
+                    $sx .= date("Y-m-d H:i:s");
+                    break;
+                }
+            $sx = '<div class="row"><div class="col-md-12">'.$sx.'</div></div>';
+            return($sx);
+                        
+            $sql = "";
+
+                            
+        }
+        
     function vv($id) {
         $this -> load -> model("frbr_core");
         return ($this -> frbr_core -> vv($id));
@@ -51,7 +164,7 @@ class frbr extends CI_model {
     
 
     function article_create($dt) {
-        $name = $dt['li_identifier'];
+        $name = $dt['li_identifier'].'#'.strzero($dt['id_jnl'],5);
         $idf = $this -> frbr_core -> rdf_concept_create('Article', $name, '');
         /******************************************************************************/
         $prop = 'hasIssueOf';
@@ -71,6 +184,13 @@ class frbr extends CI_model {
             /* ASSOCIA ARTIGO A SESSÃO */
             $prop = 'hasSectionOf';
             $this -> frbr_core -> set_propriety($idf, $prop, $id_section, 0);
+        }
+        /***************************************************** IDENTIFIER ****************/
+        $prop = 'hasId';
+        if (isset($dt['li_identifier'])) {
+            $name = $dt['li_identifier'];
+            $term = $this -> frbr_core -> frbr_name($name, '');
+            $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
 
         /***************************************************** JOURNAL ****************/

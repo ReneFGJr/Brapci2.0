@@ -116,6 +116,9 @@ $lang['tools_pdf_import'] = 'Importar PDF dos artigos';
 $lang['tools_oai_import'] = 'Importar Arquivos OAI';
 $lang['tools_pdf_check'] = 'Checagem dos arquivos';
 $lang['tools_oai_harvesting'] = 'Coletar de Metadados OAI';
+$lang['harvesting_all'] = 'Coletar todas as publicações';
+$lang['button_harvesting_status'] = 'Situação das publicações';
+$lang['new_source'] = 'Incluir nova publicação';
 
 $lang['perfil'] = 'Perfil';
 $lang['logout'] = 'Sair';
@@ -134,8 +137,8 @@ $lang['admin_config'] = 'Configurações';
 $lang['config_forms'] = 'Campos do formulário';
 $lang['config_class'] = 'Classes e Propriedades';
 $lang['config'] = 'Configurações';
-$lang[''] = '';
-$lang[''] = '';
+$lang['alternativeNames'] = 'Nomes alternativos';
+$lang['No_changes'] = 'Sem alterações';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
@@ -147,4 +150,5 @@ $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 
+//$lang = array();
 ?>

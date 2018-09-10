@@ -22,16 +22,71 @@ class oai_pmh extends CI_model {
 
     var $erro = 0;
     var $erro_msg = '';
+    
+    var $status = 0;
+    var $reg = 0;
+    var $new = 0;
+    var $del = 0;
+    var $ref = 'null';
+    
+    function log_oai($id_jnl,$cmd,$data=array())
+        {
+            $c = substr($cmd,0,1);
+            $cmd = substr($cmd,1,3);
+            switch($c)
+                {
+                    case 'U':
+                        $ref = $this->ref;
+                        $status = $data['status'];
+                        $total = $this->reg;
+                        $news = $this->new;
+                        $delete = $this->del;
+                        
+                        $sql = "update source_oai_log set 
+                                        log_status = $status,
+                                        log_new = $news,
+                                        log_del = $delete,
+                                        log_cmd = '$cmd',
+                                        log_total = $total                                        
+                                        where log_r = '$ref' ";
+                        $this->db->query($sql);
+                        break;
+                    case 'I':
+                        $ref = date("YmdHis").'LI';
+                        $sql = "insert into source_oai_log
+                                (log_id_jnl, log_r, log_cmd)
+                                values
+                                ($id_jnl,'$ref','$cmd')";
+                        $this->db->query($sql);
+                        $this->ref = $ref;
+                        return($ref);
+                }
+        }
 
+    function check_oai_index($id_jnl)
+        {
+        $n = 'jnl:'.$id_jnl;
+        $prop = 'hasIdRegister';
+        $idj = $this->frbr_core->find($n, $prop, 1);
+        return($idj);    
+        }
     function menu($id_jnl = 0) {
+        $n = 'jnl:'.$id_jnl;
+        $idj = $this->check_oai_index($id_jnl);
+        
         $sx = '';
-        $sx .= '<a href="' . base_url(PATH . 'oai/info/' . $id_jnl) . '">OAI-PMH</a>';
+        $sx .= '<a href="' . base_url(PATH . 'oai/info/' . $id_jnl) . '">'.msg('status').'</a>';
         $sx .= ' | ';
-        $sx .= '<a href="' . base_url(PATH . 'oai/Identify/' . $id_jnl) . '">Identify</a>';
-        $sx .= ' | ';
-        $sx .= '<a href="' . base_url(PATH . 'oai/ListIdentifiers/' . $id_jnl) . '">ListIdentifiers</a>';
-        $sx .= ' | ';
-        $sx .= '<a href="' . base_url(PATH . 'oai/GetRecord/' . $id_jnl) . '">GetRecord</a>';
+        
+        if ($idj > 0)
+            {
+                $sx .= '';
+                $sx .= '<a href="' . base_url(PATH . 'oai/ListIdentifiers/' . $id_jnl) . '">ListIdentifiers</a>';
+                $sx .= ' | ';
+                $sx .= '<a href="' . base_url(PATH . 'oai/GetRecord/' . $id_jnl) . '">GetRecord</a>';
+            } else {
+                $sx .= '<a href="' . base_url(PATH . 'oai/Identify/' . $id_jnl) . '">Identify</a>';                
+            }
 
         return ($sx);
     }
@@ -491,6 +546,8 @@ class oai_pmh extends CI_model {
             /************************************************ volume *****************/
             $n = troca($n,'V.','v.');
             $n = troca($n,'Vol.','v.');
+            $n = troca($n,'Vol ','v.');
+            $n = troca($n,'vol ','v.');
 			$n = troca($n,'vol.','v.');
             $n = troca($n,'VOL.','v.');
 			$n = troca($n,'volume','v.');
@@ -514,6 +571,10 @@ class oai_pmh extends CI_model {
             /************************************************ numero *****************/
             $n = troca($n,'N.','n.');
             $n = troca($n,'Núm.','n.');
+            $n = troca($n,'No ','n.');
+            $n = troca($n,'No. ','n.');
+            $n = troca($n,'Nº ','n.');
+            $n = troca($n,'Nº. ','n.');
             $n = troca($n,'Num.','n.');
             $n = troca($n,'NUM.','n.');
 			$n = troca($n,'núm.','n.');
@@ -730,7 +791,8 @@ class oai_pmh extends CI_model {
                     if ($xjnl != $jnl)
                         {
                             $xjnl = $jnl;
-                            $sx .= '<h3>'.$line['jnl_name'].'</h3>'.cr();
+                            $link = '<a href="'.base_url(PATH.'jnl/'.$jnl).'" style="color: #000000;">';
+                            $sx .= '<h3>'.$link.$line['jnl_name'].'</a>'.'</h3>'.cr();
                         }
                     $sx .= '<li>' . $this -> cache_link($line) . ': <span>' . $line['total'] . '</span>' . '</li>' . CR;
                 }
@@ -740,7 +802,27 @@ class oai_pmh extends CI_model {
     }
 
     public function ListIdentifiers($id) {
+        $data = array();               
+        if ($this->check_oai_index($id) == 0)
+            {
+                $this->log_oai($id,'IIDY',$data);
+                $this->identify($id);
+                $data['status'] = 2;                
+                $this->log_oai($id,'UIDY',$data); 
+                $this->ref = '';
+            }
+
+        $ref = $this->log_oai($id,'ILIS');
+        $sx = $this->ListIdentifiers_harvesting($id);
+        $data = array();
+        $data['status'] = 2;
+        $this->log_oai($id,'ULIS',$data);
+        return($sx);
+        }        
+
+    public function ListIdentifiers_harvesting($id) {
         $this -> getListSets($id);
+        
         
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListIdentifiers');
@@ -762,7 +844,7 @@ class oai_pmh extends CI_model {
         }
         $sx .= '</ul>';
         if (strlen($token) > 0) {
-            $sx .= $this -> ListIdentifiers($id);
+            $sx .= $this -> ListIdentifiers_harvesting($id);
         }
         return ($sx);
 
@@ -795,6 +877,7 @@ class oai_pmh extends CI_model {
             if ($up == 1) { $this -> db -> query($sql);
             }
             $sx .= $identifier . ' ' . '<span class="alert-warning">harvested</span>';
+            $this->reg++;
         } else {
             $fld1 = 'li_jnl';
             $fld2 = $id_jnl;
@@ -812,6 +895,7 @@ class oai_pmh extends CI_model {
                                 ($fld2)";
             $this -> db -> query($sql);
             $sx .= $identifier . ' ' . '<span class="alert-success">inserted</span>';
+            $this->new++;
         }
         return ($sx);
     }
@@ -990,7 +1074,7 @@ class oai_pmh extends CI_model {
         }
     }
 
-    function ListIdentifiers_Method_1($url) {
+    function _deletar___ListIdentifiers_Method_1($url) {
         $rs = load_page($url);
 
         $xml_rs = $rs['content'];
@@ -1002,6 +1086,9 @@ class oai_pmh extends CI_model {
         $xml = $xml -> ListIdentifiers -> header;
         $sx = '<ul>';
         $status = 'ok';
+        $del = 0;
+        $reg = 0;
+        $new = 0;
         for ($r = 0; $r < count($xml); $r++) {
             foreach ($xml[$r]->attributes() as $a => $b) {
                 if ($a == 'status') {
@@ -1015,11 +1102,20 @@ class oai_pmh extends CI_model {
             if ($status == 'deleted') {
                 $rt = '<span class="label label-important">deleted</span>';
                 $sx .= '<li>' . $ida . ' - ' . $status . '</li>';
-
+                $del++;
             } else {
                 $rt = $this -> oai_listset($ida, $setSpec, $date);
                 $sx .= '<li>' . $ida . ' - ' . $rt . '</li>';
+                if (strpos($rt,'harvested'))
+                    {
+                        $reg++;
+                    } else {
+                        $new++;
+                    }
             }
+            $this->new = $new;
+            $this->del = $del;
+            $this->reg = $reg;
         }
         $sx .= '</ul>';
 
@@ -1521,7 +1617,7 @@ class oai_pmh extends CI_model {
         return ( array());
     }
 
-    function coleta_oai_cache_next($id) {
+    function _deletar_coleta_oai_cache_next($id) {
         $jid = strzero($id, 7);
         $sql = "select * from oai_cache
 					inner join brapci_journal on jnl_codigo = cache_journal

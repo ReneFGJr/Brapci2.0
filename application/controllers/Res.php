@@ -68,6 +68,10 @@ class res extends CI_Controller {
     }
 
     public function zera($pg = '') {
+        if (!perfil("#ADM"))
+            {
+                redirect(PATH);
+            }
         $this -> cab();
         $this -> load -> model('elasticsearch');
         if ($pg == '') {
@@ -78,26 +82,23 @@ class res extends CI_Controller {
             $sql = "TRUNCATE rdf_data;";
             $this -> db -> query($sql);
             $sql = "TRUNCATE rdf_name;";
-            $this -> db -> query($sql);
-            echo '<meta http-equiv="refresh" content="1;' . base_url('index.php/res/zera/0') . '">';
-        } else {
-            $sz = 250;
-            $pg = round($pg);
-            $ok = 0;
-            for ($r = (($pg * $sz) + 1); $r <= ($pg * $sz + $sz); $r++) {
-                $path = ELASTIC_PREFIX;
-                $rst = $this -> elasticsearch -> delete('article', $r);
-                echo ' - ' . $rst['result'] . '<br>';
-                if ($rst['result'] == 'deleted') { $ok = 1;
-                }
-            }
-            $pg = $pg + 1;
-            if ($ok == 1) {
-                echo '<meta http-equiv="refresh" content="1;' . base_url('index.php/res/zera/' . ($pg)) . '">';
-            } else {
-                echo 'FIM';
-            }
-
+            $this -> db -> query($sql);  
+            $sql = "TRUNCATE source_oai_log;";
+            $this -> db -> query($sql);  
+                      
+            $rst = $this -> elasticsearch -> delete_all('article');
+            $sx = '<div class="container">';
+            $sx .= '<div class="row">';
+            $sx .= '<div class="col-md-12">';
+            $sx .= '<h1>'.msg('DELETING DATABASE').'</h1>';
+            $sx .= '</div>';
+            $sx .= '</div>';
+            
+            $sx .= bs_alert("success",msg('all_data_deleted'));
+            $sx .= '</div>';
+            $data['content'] = $sx;
+            $this -> load -> view('show', $data);
+            $this->footer();
         }
     }
 
@@ -163,6 +164,7 @@ class res extends CI_Controller {
     }
 
     public function jnl($id = '') {
+        $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('sources');
         $this -> cab();
@@ -173,6 +175,9 @@ class res extends CI_Controller {
         if (perfil("#ADM")) {
             $html .= $this -> sources -> button_new_sources($id);
         }
+
+        $html .= '<br><br>';
+        $html .= $this->sources->show_issues($id);
 
         $data['content'] = $html;
         $this -> load -> view('show', $data);
@@ -303,7 +308,7 @@ class res extends CI_Controller {
                 break;
             case 'author' :
                 $title = msg('index') . ': ' . msg('index_authority');
-                $sx = $this -> frbr_core -> index_list($lt, 'Person');
+                $sx = $this -> frbr_core -> index_list($lt, 'Person',1);
                 break;
             case 'corporate' :
                 $title = msg('index') . ': ' . msg('index_serie');
@@ -404,6 +409,7 @@ class res extends CI_Controller {
             case 'Identify' :
                 $html = $this -> sources -> info($id);
                 $html .= $this -> oai_pmh -> Identify($id);
+                redirect(base_url(PATH.'oai/info/'.$id));
                 break;
             default :
                 $html = $this -> oai_pmh -> repository_list($id);
@@ -726,12 +732,19 @@ class res extends CI_Controller {
                 $txt .= '<ul>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_import') . '">' . msg('tools_pdf_import') . '</a>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/oai_import') . '">' . msg('tools_oai_import') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'journals/harvesting') . '">' . msg('harvesting_all') . '</a>';
                 $txt .= '</ul>';
 
                 $txt .= '<h4>' . msg('tools_title_check') . '</h4>';
                 $txt .= '<ul>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check') . '">' . msg('tools_pdf_check') . '</a>';
                 $txt .= '</ul>';
+
+                $txt .= '<h4>' . msg('tools_remissive') . '</h4>';
+                $txt .= '<ul>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/remissive') . '">' . msg('tools_remissive_check') . '</a>';
+                $txt .= '</ul>';
+
                 $txt .= '</div>';
                 $data['content'] = $txt;
                 $this -> load -> view('show', $data);
@@ -774,6 +787,13 @@ class res extends CI_Controller {
                 //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
 
+                break;
+            case 'remissive';
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $sx = $this->frbr->author_check_remissive($p,$id); 
+                $data['content'] = $sx;
+                $this -> load -> view('show', $data);               
                 break;
             case 'pdf_check' :
                 $this -> load -> model("pdfs");

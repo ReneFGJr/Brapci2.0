@@ -191,6 +191,10 @@ class elasticsearch extends CI_model {
     public function delete($type, $id) {
         return $this -> call($type . '/' . $id, 'DELETE');
     }
+    
+    public function delete_all($type) {
+        return $this -> call($type . '/' , 'DELETE');
+    }    
 
     /**
      * make a simple search query

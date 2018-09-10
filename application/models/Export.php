@@ -68,7 +68,7 @@ class export extends CI_Model {
                             $nr .= trim($di[$y]['n_name']);
                         }
                         if ($tq == 'hasPublicationVolume') {
-                            if (strlen($vr) > 0) {
+                            if (strlen($nr) > 0) {
                                 $vr .= ', ';
                             }
                             $vr .= trim($di[$y]['n_name']);
@@ -157,6 +157,7 @@ class export extends CI_Model {
     function export_Issue_Single($idx) {
         $dt = $this -> frbr_core -> le_data($idx);
         $file = 'c/' . $idx . '/name.nm';
+        $file_sm = 'c/' . $idx . '/name.sm';
         $file2 = 'c/' . $idx . '/name.oai';
         $file3 = 'c/' . $idx . '/name.rfe';
 
@@ -178,7 +179,7 @@ class export extends CI_Model {
         $linka = '</a>';
         $txt = '';
         $rwork = '';
-        
+        $txt_sm = '';
 
         /************* recurepa dados ****/
         for ($q = 0; $q < count($dt); $q++) {
@@ -214,14 +215,17 @@ class export extends CI_Model {
         if (strlen($num) > 0)
             {
                 $txt .= $num.', ';
+                $txt_sm .= $num.', ';
             }
         if (strlen($vol) > 0)
             {
                 $txt .= $vol.', ';
+                $txt_sm .= $vol.'';
             }
         if (strlen($ano) > 0)
             {
                 $txt .= $ano;
+                $txt_sm .= '<br>'.$ano;
             }                    
         $txt .= '.';
         $txt = troca($txt,', .','.');
@@ -233,6 +237,12 @@ class export extends CI_Model {
             fwrite($f, $txt);
             fclose($f);
         }
+        if (strlen($txt) > 0) {
+            /******************************/
+            $f = fopen($file_sm, 'w+');
+            fwrite($f, $txt_sm.'#'.$ano);
+            fclose($f);
+        }        
         if (strlen($rwork) > 0) {
             /******************************/
             $f = fopen($file3, 'w+');
