@@ -14,7 +14,7 @@ class frbr extends CI_model {
                             INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                             LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                             LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                            where C1.cc_class = " . $f . " and c1.cc_use = 0
+                            where C1.cc_class = " . $f . " and C1.cc_use = 0
                             ORDER BY N1.n_name";            
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
