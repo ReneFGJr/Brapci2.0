@@ -2,23 +2,23 @@
 <?php
 if (!isset($title)) { $title = 'no title';
 }
-$HTTP = 'http://www.brapci.inf.br/';
+$HTTP = 'http://http://143.54.114.150/pGDP/';
 ?>
 <head>
     <head lang="pt-br">
     <meta charset="utf-8">
     <title><?php echo $title; ?></title>    
     
-    <META NAME="title" CONTENT="Brapci - Base de Dados em Ciência da Informação">
-    <META NAME="url" CONTENT="http://www.brapci.inf.br/">
-    <META NAME="description" CONTENT="Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.">
+    <META NAME="title" CONTENT="PGDP - Plano de Gestão de Dados de Pesquisa">
+    <META NAME="url" CONTENT="http://pgdp.rdp.br">
+    <META NAME="description" CONTENT="Desenvolvimento de plano de gestão de dados de pesquisa">
     <META NAME="keywords" CONTENT="artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia">
-    <META NAME="copyright" CONTENT="Brapci">
-    <LINK REV=made href="brapcici@gmail.com">
+    <META NAME="copyright" CONTENT="@ReneFGJ">
+    <LINK REV=made href="renefgj@gmail.com">
     <META NAME="language" CONTENT="Portugues">
     <META NAME="Robots" content="All">
-    <META NAME="City" content="Curitiba/Porto Alegre">
-    <META NAME="State" content="PR - Paraná / RS - Rio Grande do Sul">
+    <META NAME="City" content="Porto Alegre (RS)">
+    <META NAME="State" content="RS - Rio Grande do Sul">
     <META NAME="revisit-after" CONTENT="7 days">
     <META HTTP-EQUIV="Content-Language" CONTENT="pt_BR">
     <meta name="google-site-verification" content="VZpzNVBfl5kOEtr9Upjmed96smfsO9p4N79DZT38toA" />
