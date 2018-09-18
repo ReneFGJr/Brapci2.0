@@ -122,8 +122,7 @@ class oai_pmh extends CI_model {
             echo '==>' . $issue;
             echo '<pre>';
             print_r($dt);
-            echo "ERRO DE ISSUE";
-            exit ;
+            return('ERRO DE ISSUE');
         }
         $dt['issue_uri'] = $ida;
         /*********************************** ARTICLE **************************************/
