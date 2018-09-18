@@ -92,15 +92,14 @@ class pdfs extends CI_model {
     function harvesting_pdf_curl($id) {
         $links = array();
         $data = $this -> frbr_core -> le_data($id);
-        
+
         for ($r = 0; $r < count($data); $r++) {
             $attr = trim($data[$r]['c_class']);
             $vlr = trim($data[$r]['n_name']);
-            
-            if ($attr === 'isPubishIn')
-                {
-                    $jnl = $data[$r]['d_r2'];
-                }
+
+            if ($attr === 'isPubishIn') {
+                $jnl = $data[$r]['d_r2'];
+            }
 
             if ($attr == 'prefLabel') {
                 $file = trim($vlr);
@@ -114,7 +113,7 @@ class pdfs extends CI_model {
                 }
             }
         }
-        
+
         /************************ IDENTIFICAÇÃO DOS MÉTODOS *************/
         $method = 0;
         $link = '';
@@ -147,12 +146,15 @@ class pdfs extends CI_model {
                             case 'application/zip' :
                                 $this -> file_save($file, $txt, $id, 'ZIP', $jnl);
                                 //echo ' - ' . msg('save_pdf');
-                                break;                                
+                                break;
                             case 'application/word' :
                                 $this -> file_save($file, $txt, $id, 'WRD', $jnl);
-                                break;                                
-                            case 'text/html' :
-                                $this -> file_save($file, $txt, $id, 'HTM', $jnl);
+                                break;
+                            case 'application/word' :
+                                $this -> file_save($file, $txt, $id, 'WRD', $jnl);
+                                break;
+                            case 'text/save' :
+                                $this -> file_save($file, $txt, $id, 'SAV', $jnl);
                                 //echo ' - ' . msg('save_html');
                                 break;
                             default :
@@ -194,40 +196,38 @@ class pdfs extends CI_model {
                     break;
             }
         }
-       
+
         if ($type == 'PDF') {
             header('Content-type: application/pdf');
             readfile($file);
         }
         if ($type == 'TXT') {
             header('Content-type: text/html');
-            if (file_exists($file))
-                {
-                    readfile($file);        
-                } else {
-                    echo 'File not found - '.$file;
-                }
-            
+            if (file_exists($file)) {
+                readfile($file);
+            } else {
+                echo 'File not found - ' . $file;
+            }
+
         }
     }
 
-    function directories($journal=0)
-        {
-            /* Prepara o nome do arquivo */
-            $filename = '_repository';
-            check_dir($filename);
-            $filename .= '/'.$journal;
-            check_dir($filename);
-            $filename .= '/' . date("Y");
-            check_dir($filename);
-            $filename .= '/' . date("m");
-            check_dir($filename);
-            return($filename);            
-        }
+    function directories($journal = 0) {
+        /* Prepara o nome do arquivo */
+        $filename = '_repository';
+        check_dir($filename);
+        $filename .= '/' . $journal;
+        check_dir($filename);
+        $filename .= '/' . date("Y");
+        check_dir($filename);
+        $filename .= '/' . date("m");
+        check_dir($filename);
+        return ($filename);
+    }
 
     function file_pdf($file, $content, $id, $journal) {
-        
-        $filename = $this->directories($journal);
+
+        $filename = $this -> directories($journal);
         $filename .= '/' . $file . '.pdf';
 
         $fld = fopen($filename, 'w+');
@@ -262,7 +262,7 @@ class pdfs extends CI_model {
 
     function file_save($file, $content, $id, $type, $journal) {
         $type = UpperCase($type);
-        $filename = $this->directories($journal);
+        $filename = $this -> directories($journal);
         $filename .= '/' . $file . '.txt';
 
         $fld = fopen($filename, 'w+');
@@ -378,8 +378,8 @@ EOD;
         // This method has several options, check the source code documentation for more information.
         $pdf -> Output('example_001.pdf', 'I');
     }
-    function check_pdf()
-        {
+
+    function check_pdf() {
         $class = 'FileStorage   ';
         $f = $this -> frbr_core -> find_class($class);
         $this -> frbr_core -> check_language();
@@ -395,60 +395,57 @@ EOD;
                         where C1.cc_class = " . $f . "                        
                         ORDER BY N1.n_name
                         limit $limit offset $offset
-                        ";                
-        $rlt = $this->db->query($sql);
-        $rlt = $rlt->result_array();
+                        ";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
         $sx = '<div class="container">';
         $sx .= '<div class="row">';
         $sx .= '<div class="col-md-12">';
         $sx .= '<ul>';
         $tot = 0;
-        for ($r=0;$r < count($rlt);$r++)
-            {
-                $tot++;
-                $line = $rlt[$r];
-                $file = trim($line['n_name']);
-                $id = $line['id_cc'];
-                $link = '<a href="'.base_url(PATH.'v/'.$id).'">';
-                $sx .= '<li>'.$link.$file.'</a>';
-                if (file_exists($file))
-                    {
-                        $sz = filesize($file);
-                        if ($sz > 10)
-                            {
-                                $sx .= ' - <font color="green"><b>OK</b></font>';
-                            } else {
-                                $sx .= ' - <font color="orange"><b>Alert</b></font>';
-                                $this->remove_pdf($id);        
-                            }
-                    } else {
-                        $sx .= ' - <font color="red"><b>ERROR</b> - '.$id.'</font>';
-                        $this->remove_pdf($id);
-                    }
-                $sx .= '</li>';
-                //print_r($line);
-                //echo '<hr>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $tot++;
+            $line = $rlt[$r];
+            $file = trim($line['n_name']);
+            $id = $line['id_cc'];
+            $link = '<a href="' . base_url(PATH . 'v/' . $id) . '">';
+            $sx .= '<li>' . $link . $file . '</a>';
+            if (file_exists($file)) {
+                $sz = filesize($file);
+                if ($sz > 10) {
+                    $sx .= ' - <font color="green"><b>OK</b></font>';
+                } else {
+                    $sx .= ' - <font color="orange"><b>Alert</b></font>';
+                    $this -> remove_pdf($id);
+                }
+            } else {
+                $sx .= ' - <font color="red"><b>ERROR</b> - ' . $id . '</font>';
+                $this -> remove_pdf($id);
             }
+            $sx .= '</li>';
+            //print_r($line);
+            //echo '<hr>';
+        }
         $sx .= '</ul>';
         $sx .= '</div>';
         $sx .= '</div>';
-        if ($tot >= $limit)
-            {
-                $sx .= '<meta http-equiv="refresh" content="5;'.base_url(PATH.'tools/pdf_check?p='.($offset + $limit)).'">';
-            } else {
-                $sx .= '<div class="row">';
-                $sx .= '<div class="col-md-12">';
-                $sx .= bs_alert('success','Fim da coleta!');
-                $sx .= '</div>';
-                $sx .= '</div>';
-            }
-        $sx .= '</div>';            
-        return($sx);
+        if ($tot >= $limit) {
+            $sx .= '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/pdf_check?p=' . ($offset + $limit)) . '">';
+        } else {
+            $sx .= '<div class="row">';
+            $sx .= '<div class="col-md-12">';
+            $sx .= bs_alert('success', 'Fim da coleta!');
+            $sx .= '</div>';
+            $sx .= '</div>';
         }
-    function remove_pdf($id)
-        {
-            $sql = "delete from rdf_data where d_r2 = $id ";
-            $rlt = $this->db->query($sql);
-        }
+        $sx .= '</div>';
+        return ($sx);
+    }
+
+    function remove_pdf($id) {
+        $sql = "delete from rdf_data where d_r2 = $id ";
+        $rlt = $this -> db -> query($sql);
+    }
+
 }
 ?>

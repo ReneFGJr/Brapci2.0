@@ -2727,6 +2727,10 @@ function nbr_author($xa, $tp) {
 		$xa = trim(substr($xa, 0, strpos($xa, ',')));
 		$xa = trim(trim($xb) . ' ' . $xa);
 	}
+    for ($r=0;$r < 32;$r++)
+        {
+            $xa = troca($xa,chr($y),'');
+        }
 	$xa = $xa . ' ';
 	$xp = array();
 	$xx = "";
