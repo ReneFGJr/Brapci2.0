@@ -4,7 +4,11 @@ class searchs extends CI_Model {
     var $s = '';    
     function __construct()
         {
-        
+		global $MODO;
+		if (isset($MODO))
+			{
+				return("modoROBOT");
+			}
         if (!isset($_SESSION['s']))
             {
                 if (!isset($_SESSION['s']))

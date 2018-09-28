@@ -118,7 +118,7 @@ class oai_pmh extends CI_model {
         } else {
             $issue = sonumero($dt['source'][0]['name']);
             $ida = $this -> frbr -> issue($dt, 'Issue');
-            print_r($issue);
+            //print_r($issue);
             echo '==>' . $issue;
             echo '<pre>';
             print_r($dt);
@@ -167,6 +167,18 @@ class oai_pmh extends CI_model {
         $rlt = $this -> db -> query($sql);
         return (1);
     }
+	
+	function leftHarvesting()
+		{
+	    $sql = "select count(*) as total from source_listidentifier 
+                where li_status = 'active' and li_s = 1
+                order by li_s, li_u, id_li
+                limit 1";
+        		$rlt = $this -> db -> query($sql);
+        		$rlt = $rlt -> result_array();
+        		$line = $rlt[0]['total'];
+				return($line);
+		}
 
     function getRecord($id_jnl = 0) {
     	if ($id_jnl > 0)
@@ -536,7 +548,7 @@ class oai_pmh extends CI_model {
             /************************************************ ano *******************/
             for ($r=1900;$r <= (date("Y")+10);$r++)
                 {
-                    if (strpos($n,(string)$r) > 0)
+                    if ((strpos($n,(string)$r) > 0) and ($ano == '[????]'))
                         {
                             $ano = $r;
                         }
@@ -550,6 +562,7 @@ class oai_pmh extends CI_model {
 			$n = troca($n,'vol.','v.');
             $n = troca($n,'VOL.','v.');
 			$n = troca($n,'volume','v.');
+			$n = troca($n,'Volume','v.');			
             
             if (strpos(' '.$n,'v.') > 0)
                 {
@@ -578,7 +591,9 @@ class oai_pmh extends CI_model {
             $n = troca($n,'NUM.','n.');
 			$n = troca($n,'núm.','n.');
 			$n = troca($n,'núms.','n.');
-			$n = troca($n,'Núms.','n.');            
+			$n = troca($n,'Núms.','n.');   
+			$n = troca($n,'número','n.');
+			$n = troca($n,'Número','n.');         
             if (strpos($n,'n.'))
                 {
                     $nr = trim(substr($n,strpos($n,'n.')+2,strlen($n)));
@@ -642,10 +657,60 @@ class oai_pmh extends CI_model {
 									$nr = $vr[$r];
 								}
 						}
+						
+					if (strlen($nr) == 0)
+						{
+							if (strpos($nm,'Especial'))
+								{
+									$nr = 'esp.';
+								}
+							if ((strpos($nm,'Primeiro') > 0) or (strpos($nm,'primeiro') > 0))
+								{
+									$nr .= ' 1. sem.';
+								}
+							if ((strpos($nm,'Segundo') > 0) or (strpos($nm,'segundo') > 0))
+								{
+									$nr .= ' 2. sem.';
+								}
+						}
+						
+					if (strlen($nr) == 0)
+						{
+							$nx = array('janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro');
+							for ($r=0;$r < count($nx);$r++)
+								{
+									if ((strpos($nm,$nx[$r]) > 0) and (strlen($nr) == 0))
+										{
+											if ($r < 6)
+												{
+													$nr = 'esp. 1. sem.';
+												}  else {
+													$nr = 'esp. 2. sem.';
+												}
+										}
+								}
+							
+						}
+					if (strlen($nr)==0)
+						{
+							$sql = "select * from source_issue_convert where sc_text like '%$nm%'";
+							$rlt = $this->db->query($sql);
+							$rlt = $rlt->result_array();
+							if (count($rlt) == 1)
+								{
+									$line = $rlt[0];
+									$vol = $line['sc_vol'];
+									$nr = $line['sc_nr'];
+									$ano = $line['sc_year'];
+								}
+						}
                 	if (strlen($nr)==0)
 						{
+							
                     		echo $n.'<br>';
-                    		echo "FALHA v.$vol, n. $nr, $ano";
+							echo '<meta http-equiv="refresh" content="30">';
+                    		echo "FALHA v. $vol, n. $nr, $ano";
+							echo $sql;
                     		ECHO '<pre>';
                     		print_r($dt);
                     		exit;
@@ -1016,9 +1081,12 @@ class oai_pmh extends CI_model {
 						AND jnl_url_oai <> ''	
 						order by jnl_name
 						";
-        $rlt = db_query($sql);
+        $rlt = $this->db->query($sql);
+		$rlt = $rlt->result_array();
         $sx = '';
-        while ($line = db_read($rlt)) {
+        for ($r=0;$r < count($rlt);$r++)
+        	{
+        	$line = $rlt[$r];
             $last = $line['update_at'];
             $url = $line['jnl_url'];
             $link = '<A HREF="' . trim($line['jnl_url']) . '" target="_new">';

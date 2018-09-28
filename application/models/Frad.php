@@ -7,6 +7,11 @@ class frad extends CI_model {
     }
 
     function find_remissiva_form($id, $name) {
+    	$ini = 0;
+		if (strlen(get("ini") > 0))
+			{
+				$ini = get("ini");
+			}
         $d1 = get("dd1");
         $ac = get("action");
         if (strlen($d1) > 0) {
@@ -26,7 +31,7 @@ class frad extends CI_model {
         $fx = splitx(';', troca($name, ' ', ';') . ';');
 
         //for ($r = 0; $r < count($fx); $r++) {
-        for ($r = 0; $r < 1; $r++) {
+        for ($r = $ini; $r < ($ini+1); $r++) {
             if (strlen($wh) > 0) {
                 $wh .= ' OR ';
             }
@@ -70,6 +75,11 @@ class frad extends CI_model {
             $sx .= '</div>';
             $sx .= '</div>';            
         }
+        for ($r=0;$r < count($fx);$r++)
+			{
+				$sx .= '<a href="'.base_url(PATH.'frad/'.$id).'?ini='.$r.'">Mth '.(1+$r).'</a> | ';		
+			}
+        
         return ($sx);
     }
 

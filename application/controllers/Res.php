@@ -153,6 +153,7 @@ class res extends CI_Controller {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
         $this -> load -> model('genero');
+		$this -> load -> model('frad');
         $this -> cab();
 
         $tela = $this -> frbr -> vv($id);
@@ -1050,5 +1051,38 @@ class res extends CI_Controller {
         $data['content'] = $tela;
         $this -> load -> view('show', $data);
     }
-
+    function frad($id='')
+        {
+            $this -> load -> model("frad");
+            $this -> load -> model("frbr_core");
+            $data['nocab'] = true;
+            
+            $this->cab($data);
+            $data = $this->frbr_core->le($id);
+            $id = $data['id_cc'];
+            $nm = $data['n_name'];
+            $tela = '<div class="container">'.cr();
+            $tela .= '<div class="row"><div class="col-md-12">';
+            $tela .= '<h1>'.$data['n_name']. ' ('.$id.')'.'</h1>';
+            $tela .= '</div></div></div>'.cr();
+            
+            $tela .= $this->frad->find_remissiva_form($id,$nm);
+            
+            $data['content'] = $tela;
+            $this->load->view('show',$data);
+            
+        }
+	function summary()
+		{
+            $this -> load -> model("frad");
+            $this -> load -> model("frbr_core");
+			$this -> load -> model("sources");
+			            
+            $this->cab();
+			$tela = $this-> sources-> summary();
+			$data['content'] = $tela;
+			
+			$this->load->view('show',$data);
+			$this->footer();	
+		}		
 }
