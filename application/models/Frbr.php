@@ -79,7 +79,8 @@ class frbr extends CI_model {
                     
                     $sql = "update rdf_data set 
                                 d_o = ".$line['id_d'].",
-                                d_r2 = $idt
+                                d_r2 = $idt,
+                                d_update = 1
                                 where id_d = ".$line['id_d'];
                     $rlt2 = $this->db->query($sql);
                     $m++;

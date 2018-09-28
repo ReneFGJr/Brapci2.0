@@ -105,7 +105,10 @@ $img = troca($img,'class="img-fluid"','class="img-fluid img-person"');
 					echo '<td>'.$cutter.'</td>'.cr();
 					echo '</tr>'.cr();
                     echo '</table>';
-                }                
+                } 
+                
+                /**********************************/
+                echo $this->frad->find_remissiva($w);               
             ?>
         </div>
         <div class="col-md-2 text-center">

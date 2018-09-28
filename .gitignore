@@ -30,3 +30,4 @@ config.php
 config.php
 config.php
 *.pdf
+application/config/config.php
