@@ -2,10 +2,12 @@
 class export extends CI_Model {
 
     function export_Article_Single($idx) {
-        $dt = $this -> frbr_core -> le_data($idx);
+        $dt = $this -> frbr_core -> le_data($idx);        
+        
         $file = 'c/' . $idx . '/name.nm';
         $file2 = 'c/' . $idx . '/name.oai';
         $file3 = 'c/' . $idx . '/name.ABNT';
+        $file_dc = 'c/' . $idx . '/name.dc';
 
         /************** zera dados ****/
         $sx = '';
@@ -30,6 +32,9 @@ class export extends CI_Model {
         $rwork = 'DB - BRAPCI'.cr();
         $rwork = 'UR - '.base_url(PATH.'v/'.$idx).cr();
         
+        /* Doblin Core */
+        $dc = '';
+        
 
         /************* recurepa dados ****/
         for ($q = 0; $q < count($dt); $q++) {
@@ -46,9 +51,12 @@ class export extends CI_Model {
                     break;                    
                 case 'hasAbstract':
                     $rwork .= 'AB - '.troca($l['n_name'],chr(13),'').cr();
+                    $dc .= '<meta name="DC.Description"  xml:lang="'.troca($l['n_lang'],chr(13),'').'" content="'.troca($l['n_name'],chr(13),'').'"/>'.cr();
                     break;                
                 case 'hasSubject':
                     $rwork .= 'KW - '.$l['n_name'].cr();
+                    $dc .= '<meta name="DC.Subject" xml:lang="'.$l['n_lang'].'" content="'.$l['n_name'].'"/>'.cr();
+                    $dc .= '<meta name="citation_keywords" xml:lang="'.$l['n_lang'].'" content="'.$l['n_name'].'"/>'.cr();
                     break;
                 case 'hasSectionOf' :
                     $link_sc = $this -> frbr_core -> link($dt[$q]);
@@ -99,6 +107,7 @@ class export extends CI_Model {
                     $aut .= $l['n_name'];
                     $aut2 .= $link . $l['n_name'] . '</a>';
                     $rwork .= 'AU - '.$l['n_name'].cr();
+                    $dc .= '<meta name="DC.Creator.PersonalName" content="'.$l['n_name'].'"/>'.cr();
                     break;
                 case 'hasTitle' :
                     if (strlen($tit) == 0) {
@@ -128,6 +137,9 @@ class export extends CI_Model {
             fwrite($f, $txt);
             fclose($f);
         }
+        
+        /************************************************************************************/
+        /* DOBLIN CORE **********************************************************************/
 
         //echo '<pre>'.$rwork.'</pre>';
         //exit;
@@ -151,6 +163,13 @@ class export extends CI_Model {
             fwrite($f, $rwork);
             fclose($f);
         }
+        
+        if (strlen($dc) > 0) {
+            /******************************/
+            $f = fopen($file_dc, 'w+');
+            fwrite($f, $dc);
+            fclose($f);
+        }        
         return ($sx);
     }
 
@@ -300,6 +319,7 @@ class export extends CI_Model {
             $idx = $line['id_cc'];
             /*************************** EXPORTAR ****************/
             $sx .= '<li>' . $this -> export_Article_Single($idx) . '</li>' . cr();
+            $this->elasticsearch->update($idx);            
             /*****************************************************/
         }
         $sx .= '</ul>' . cr();

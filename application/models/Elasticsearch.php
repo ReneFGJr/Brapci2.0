@@ -71,7 +71,7 @@ class elasticsearch extends CI_model {
 
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
+
         return json_decode($response, true);
     }
 
@@ -134,6 +134,78 @@ class elasticsearch extends CI_model {
      * @return type
      */
 
+    public function update($id) {
+        $auth = '';
+        $title = '';
+        $abstract = '';
+        $subject = '';
+        $journal = '';
+        $year = '';
+        $id_jnl = 0;
+        $source = '';
+        $type = 'article';
+
+        $dt = array();
+        /****************************************************************************/
+        $data = $this -> frbr_core -> le_data($id);
+
+        for ($r = 0; $r < count($data); $r++) {
+            $line = $data[$r];
+            $prop = trim($line['c_class']);
+            
+            switch($prop) {
+                case 'hasSource':
+                    //$source .= LowerCaseSql($line['n_name']).'; ';
+                    break;
+                case 'hasIssueOf':
+                    $id_jnl = $line['n_name'];
+                    $id_jnl = round(sonumero(substr($id_jnl,0,strpos($id_jnl,'-'))));
+                    $id_jnl = (string)$id_jnl;
+                    $source .= LowerCaseSql($line['n_name']).'; ';
+                    break;
+                case 'hasTitle' :
+                    $title .= LowerCaseSql($line['n_name']) . ' (' . $line['n_lang'] . '); ';
+                    break;
+                case 'hasAuthor':
+                    $auth .= LowerCaseSql($line['n_name']) . '; ';
+                    break;
+                case 'hasAbstract':
+                    $abstract .= LowerCaseSql($line['n_name']) . '; ';
+                    break;
+                case 'hasSubject':
+                    $subject .= LowerCaseSql($line['n_name']) . '; ';
+                    break;
+                case 'isPubishIn':
+                    $journal = LowerCaseSql($line['n_name']);
+                    break;
+                case 'dateOfAvailability':
+                    $year = substr(LowerCaseSql($line['n_name']),0,4);
+                    break;
+            }
+        }
+        
+        /*
+        echo '====>'.$id_jnl;
+        echo '<pre>';
+        print_r($data);
+        exit ;
+         */
+        
+
+        $dt['article_id'] = $id;
+        $dt['authors'] = $auth;
+        $dt['title'] = $title;
+        $dt['abstract'] = $abstract;
+        $dt['subject'] = $subject;
+        $dt['journal'] = $journal;
+        $dt['id_jnl'] = $id_jnl;
+        $dt['year'] = $year;
+        $dt['issue'] = $source;
+        $rst = $this -> call($type . '/' . $id, 'PUT', $dt);
+        return($rst);
+        
+    }
+
     public function add($type, $id, $data) {
         $dt = array();
         /****************************************************************************/
@@ -191,10 +263,10 @@ class elasticsearch extends CI_model {
     public function delete($type, $id) {
         return $this -> call($type . '/' . $id, 'DELETE');
     }
-    
+
     public function delete_all($type) {
-        return $this -> call($type . '/' , 'DELETE');
-    }    
+        return $this -> call($type . '/', 'DELETE');
+    }
 
     /**
      * make a simple search query
@@ -206,6 +278,8 @@ class elasticsearch extends CI_model {
      */
 
     public function query($type, $q, $t) {
+        $q = lowercasesql($q);
+        $qr = $q;
         // https://www.youtube.com/watch?v=Q0oy9-lXJ18
         // https://www.youtube.com/watch?v=5lO4cAQlaEw&t=26s
         // https://www.youtube.com/watch?v=MXFp4OPdV4I
@@ -215,105 +289,113 @@ class elasticsearch extends CI_model {
         $fr = ($p - 1);
         if ($fr < 0) { $fr = 0;
         }
-		$fr = $fr * $sz;
+        $fr = $fr * $sz;
         $DATA = '';
         $method = 'POST';
         $qs = '';
+        
+        /* ordem */
+        $ord = '"sort": [{"year":"desc"}], ';
+        
         switch($t) {
-            case '2':
+            case '2' :
                 $fld = 'authors';
                 $data = '
                         {
-                          "from": "'.$fr.'",
-                          "size": "'.$sz.'",
+                          "from": "' . $fr . '",
+                          "size": "' . $sz . '",
+                          '.$ord.'
                           "query": {
                             "query_string": {
                               "fields": [
-                                "'.$fld.'"
+                                "' . $fld . '"
                               ],                                
-                              "query": "'.$q.'"
+                              "query": "' . $q . '"
                             }
                           }
                         }                
-                ';               
+                ';
                 break;
-            case '3':
+            case '3' :
                 $fld = 'title';
                 $data = '
                         {
-                          "from": "'.$fr.'",
-                          "size": "'.$sz.'",
+                          "from": "' . $fr . '",
+                          "size": "' . $sz . '",
+                          '.$ord.'
                           "query": {
                             "query_string": {
                               "fields": [
-                                "'.$fld.'"
+                                "' . $fld . '"
                               ],                                
-                              "query": "'.$q.'"
+                              "query": "' . $q . '"
                             }
                           }
                         }                
-                ';               
+                ';
                 break;
-            case '4':
-                $fld = 'subject';
+            case '4' :
+                $fld = 'subject", "subject';
                 $data = '
                         {
-                          "from": "'.$fr.'",
-                          "size": "'.$sz.'",
+                          "from": "' . $fr . '",
+                          "size": "' . $sz . '",
+                          '.$ord.'
                           "query": {
                             "query_string": {
                               "fields": [
-                                "'.$fld.'"
+                                "' . $fld . '"
                               ],                                
-                              "query": "'.$q.'"
+                              "query": "' . $q . '"
                             }
                           }
                         }                
-                ';               
+                ';
                 break;
-            case '5':
-            $fld = 'abstract';
+            case '5' :
+                $fld = 'abstract';
                 $data = '
                         {
-                          "from": "'.$fr.'",
-                          "size": "'.$sz.'",
+                          "from": "' . $fr . '",
+                          "size": "' . $sz . '",
+                          '.$ord.'
                           "query": {
                             "query_string": {
                               "fields": [
-                                "'.$fld.'"
+                                "' . $fld . '"
                               ],                                
-                              "query": "'.$q.'"
+                              "query": "' . $q . '"
                             }
                           }
                         }                
-                ';                              
+                ';
 
                 break;
             default :
                 /**** NOVO ***/
                 $data = '
                         {
-                          "from": "'.$fr.'",
-                          "size": "'.$sz.'",
+                          "from": "' . $fr . '",
+                          "size": "' . $sz . '",
+                          '.$ord.'
                           "query": {
                             "query_string": {
                               "fields": [
                                 "authors",
-                                "title^10",
-                                "subject^5",
+                                "title^5",
+                                "subject^10",
                                 "abstract",
-                                "journal",
-                                "year"
+                                "journal"
                               ],                                 
-                              "query": "'.$q.'"
+                              "query": "' . $q . '"                              
                             }
                           }
                         }                
-                ';                            
-                break;
+                ';
+                break;                
         }
-        
-        return $this -> call($type . '/_search?'.$qs,$method,$data);
+        echo $data;
+        return $this -> call($type . '/_search?' . $qs, $method, $data);
     }
 
     /**

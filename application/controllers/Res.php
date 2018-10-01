@@ -585,8 +585,10 @@ class res extends CI_Controller {
     }
 
     function export($tp = '', $pg = 0) {
-        $this -> load -> model('export');
+        $this -> load -> model('export');        
         $this -> load -> model('frbr_core');
+        $this -> load -> model('elasticsearch');
+        
         $this -> cab();
 
         switch($tp) {

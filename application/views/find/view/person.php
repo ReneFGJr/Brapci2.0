@@ -108,7 +108,10 @@ $img = troca($img,'class="img-fluid"','class="img-fluid img-person"');
                 } 
                 
                 /**********************************/
-                echo $this->frad->find_remissiva($w);               
+                if (perfil("#ADM#CAT"))
+                    {
+                        echo $this->frad->find_remissiva($w);
+                    }               
             ?>
         </div>
         <div class="col-md-2 text-center">
