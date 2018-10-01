@@ -19,6 +19,12 @@
 			<li>
 				<a href="#team">Equipe da Brapci</a>
 			</li>
+			<li>
+				<a href="#howcite">Como citar a Brapci</a>
+			</li>
+			<li>
+				<a href="#logotype">Logotipo da Brapci</a>
+			</li>						
 		</ul>
 		<br>
 		<br>
@@ -35,8 +41,7 @@
         <p>
             Estão indexados na Brapci artigos publicados nas revistas científicas e profissionais das áreas desde 1972 até o momento atual.
         </p>
-        <br>
-        <br>
+
     </div>
 
 
@@ -45,14 +50,47 @@
 		<h2>Coordenação da Brapci</h2>
 		<a href="#top" class="small"><?php echo msg("return_to_up");?></a>
 		<p>
-			<b>Leilah Santiago Bufrem</b> (UFPR; UFPE) &lt;santiagobufrem@gmail.com&gt;
-		</p>
-		<p>
 			<b>Rene Faustino Gabriel junior</b> (UFRGS) &lt;renefgj@gmail.com&gt;
 		</p>
-		<br>
-		<br>
+		<p>
+			<b>Leilah Santiago Bufrem</b> (UFPR; UFPE) &lt;santiagobufrem@gmail.com&gt;
+		</p>		
 	</div>
+	
+	<div class="col-12">
+		<a name="howcite"></a>
+		<br>
+		<h4>Como citar a Brapci</h4>
+				<a href="#top" class="small"><?php echo msg("return_to_up");?></a>
+		<p>
+			BUFREM, L. S.; COSTA, F. D. O.; , GABRIEL JUNIOR, R. F.; PINTO, J. S. P. Modelizando práticas para a socialização de informações: a construção de saberes no ensino superior. <b>Perspectivas em Ciência da Informação</b>, v. 15, n. 2, 2010.
+		</p>
+		<br>
+		<br>		
+	</div>	
+	
+	<div class="col-12">
+		<a name="logotype"></a>
+		<br>
+		<h4>Logotipo da Brapci</h4>
+		<a href="#top" class="small"><?php echo msg("return_to_up");?></a>
+		<br>
+		<img src="<?php echo base_url("img/logo/logo-brapci.png");?>" width="400"><br>
+		http://www.brapci.inf.br
+		<br><br>		
+	</div>
+	
+	
+	<div class="col-12">
+		<a name="logotype"></a>
+		<br>
+		<h4>Mecanismo de Busca</h4>
+		<a href="#top" class="small"><?php echo msg("return_to_up");?></a>
+		<br>
+		<p>A Brapci passou a utilizar o ElasticSearch como mecanismo de busca. Baseado no Lucene, ele fornece um mecanismo de pesquisa de texto completo distribuído, com capacidade para vários usuários, com uma interface da Web HTTP e documentos JSON sem esquema. Elasticsearch é desenvolvido em Java e é lançado sob os termos do Apache.</p>
+		<a href="https://www.elastic.co/"><img src="<?php echo base_url("img/instituition/elasticsearch.png");?>" width="400"></a><br>		
+		<br><br>		
+	</div>	
 
 	<div class="col-12">
 		<a name="historic"></a>

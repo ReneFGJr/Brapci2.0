@@ -514,27 +514,33 @@ class frbr_core extends CI_model {
             $rlt = $rlt->result_array();
             return($rlt);
         }
-	function le_data($id) {
+	function le_data($id,$prop='') {
+		if (strlen($prop) > 0)
+			{
+				$wh = " AND (c_class = '$prop')"; 
+			} else {
+				$wh = '';
+			}
 		$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
 		$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';
 		$sql = "select $cp,1 as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r2 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r1 = $id and d_r2 > 0" . cr() . cr();
+                        WHERE d_r1 = $id and d_r2 > 0 ".$wh . cr() . cr();
 		$sql .= ' union ' . cr() . cr();
 		/* TRABALHOS */
 		$sql .= "select $cp_reverse,2 as rule from rdf_data as rdata
                         INNER JOIN rdf_class as prop ON d_p = prop.id_c 
                         INNER JOIN rdf_concept ON d_r1 = id_cc 
                         INNER JOIN rdf_name on cc_pref_term = id_n
-                        WHERE d_r2 = $id and d_r1 > 0" . cr() . cr();
+                        WHERE d_r2 = $id and d_r1 > 0 ".$wh . cr() . cr();
 		$sql .= ' union ' . cr() . cr();
 		$sql .= "select $cp,3 as rule from rdf_data as rdata
                         LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
                         LEFT JOIN rdf_concept ON d_r2 = id_cc 
                         LEFT JOIN rdf_name on d_literal = id_n
-                        WHERE d_r1 = $id and d_r2 = 0" . cr() . cr();
+                        WHERE d_r1 = $id and d_r2 = 0 ".$wh . cr() . cr();
 
 		/* USE */
 		$prop = $this -> frbr_core -> find_class("equivalentClass");

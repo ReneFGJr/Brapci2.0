@@ -319,7 +319,8 @@ class export extends CI_Model {
             $idx = $line['id_cc'];
             /*************************** EXPORTAR ****************/
             $sx .= '<li>' . $this -> export_Article_Single($idx) . '</li>' . cr();
-            $this->elasticsearch->update($idx);            
+            $sx .= $this->elasticsearch->update($idx);
+           
             /*****************************************************/
         }
         $sx .= '</ul>' . cr();
