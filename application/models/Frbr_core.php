@@ -267,6 +267,8 @@ class frbr_core extends CI_model {
 		$data['person'] = $this -> le_data($id);
         $data['use'] = $this->le_remissiva($id);
 		$data['id'] = $id;
+		
+		
 
 		$sx = $this -> load -> view('find/view/person', $data, true);
 		return ($sx);
@@ -395,7 +397,15 @@ class frbr_core extends CI_model {
 					break;
 				case 'Person' :
 					$tela = $this -> person_show($id);
+					$data = $this->frad->production($id);
+					$tela .= '<div class="row">';
+					$tela .= '<div class="col-md-8">';
 					$tela .= $this -> view_data($id);
+					$tela .= '</div>';
+					$tela .= '<div class="col-md-4">';
+					$tela .= $data['authors'];
+					$tela .= '</div>';
+					$tela .= '</div>';					
 					$tela .= $this -> genero -> update($id);
 					break;
 				case 'Journal' :
