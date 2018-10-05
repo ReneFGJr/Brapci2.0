@@ -56,8 +56,13 @@ class frad extends CI_model {
 						$name = $value;
 					}
 			}
+	
+			
+		
+			
 			$data = array();
 			$data['authors'] = $sxa;
+			$data['subject'] = $sub;
 			return($data);		
 	}
 
