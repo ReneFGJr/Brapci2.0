@@ -309,7 +309,8 @@ class res extends CI_Controller {
                 break;
             case 'author' :
                 $title = msg('index') . ': ' . msg('index_authority');
-                $sx = $this -> frbr_core -> index_list($lt, 'Person',1);
+                $sx = bs_pages(65,90,PATH.'indice/author');
+                $sx .= $this -> frbr_core -> index_list_2($lt, 'Person',1);
                 break;
             case 'corporate' :
                 $title = msg('index') . ': ' . msg('index_serie');
@@ -343,7 +344,8 @@ class res extends CI_Controller {
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/words') . '">' . msg('Words') . '</a></li>';
                 $sx .= '</ul>';
         }
-        $data['content'] = '<h1>' . $title . '</h1>' . $sx;
+        $data['content'] = '<div class="row"><div class="col-md-12"><h1>' . $title . '</h1></div></div>' . $sx;
+        $data['content'] = $sx;
         $this -> load -> view('show', $data);
 
         $this -> footer();
@@ -604,6 +606,13 @@ class res extends CI_Controller {
             case 'subject_reverse' :
                 $tela = $this -> export -> export_subject_reverse($pg);
                 break;
+            case 'index_authors' :
+                if ($pg == 0)
+                    {
+                        $pg = 65;
+                    }
+                $tela = $this -> export -> export_author_index_list($pg);
+                break;                
             default :
                 $tela = '<h1>' . msg('export') . '</h1>';
                 $tela .= '<ul>' . cr();
@@ -611,6 +620,7 @@ class res extends CI_Controller {
                 $tela .= '<li><a href="' . base_url(PATH . 'export/article') . '">' . msg('export_article') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject') . '">' . msg('export_subject') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
                 break;
         }

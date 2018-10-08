@@ -57,5 +57,3 @@ $HTTP = 'http://http://143.54.114.150/pGDP/';
 --->   
 </head>
 <body>
-    
-</body>
