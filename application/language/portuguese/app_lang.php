@@ -120,6 +120,20 @@ $lang['harvesting_all'] = 'Coletar todas as publicações';
 $lang['button_harvesting_status'] = 'Situação das publicações';
 $lang['new_source'] = 'Incluir nova publicação';
 
+$lang['signup_user_already_exist'] = 'Usuário já existe';
+$lang['Institution'] = 'Instituição';
+$lang['fullName'] = 'Nome completo';
+$lang['SignUp'] = 'Inscrever-se';
+$lang['Sign Up Send'] = 'Enviar inscrição';
+$lang['Forgot Password?'] = 'Esqueceu a senha?';
+$lang['Don’t have an account?'] = 'Não tem uma conta?';
+$lang['login'] = 'acessar';
+$lang['Forgot'] = 'Esqueceu a senha?';
+$lang['login_recover_password'] = 'recuperar a senha';
+
+$lang['signup_success'] = 'Mensagem enviada';
+$lang['signup_success_msg'] = 'verifique sua caixa de entrada de seu e-mail';
+
 $lang['perfil'] = 'Perfil';
 $lang['logout'] = 'Sair';
 $lang['SignIn'] = 'Entrar no Sistema';

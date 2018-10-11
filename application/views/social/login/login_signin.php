@@ -38,17 +38,17 @@
 				<br/>
 				<div class="">
 					<div class="">
-						<input type="submit" class="btn btn-primary" style="width: 100%;" value="login">
+						<input type="submit" class="btn btn-primary" style="width: 100%;" value="<?php echo msg('login');?>">
 					</div>
 				</div>
 
                 <br>
                 <div class="text-center p-t-115">
-                    <a class="txt2" href="<?php echo base_url(PATH.'social/forgot');?>"> Forgot Password? </a>
+                    <a class="txt2" href="<?php echo base_url(PATH.'social/forgot');?>"> <?php echo msg('Forgot Password?');?> </a>
                 </div>
                 <br>
 				<div class="text-center p-t-115">
-					<span class="txt1"> Don’t have an account? </span>
+					<span class="txt1"><?php echo msg('Don’t have an account?');?></span>
 
 					<a class="txt2" href="<?php echo base_url(PATH.'social/signup');?>"> <?php echo msg('SignUp');?> </a>
 				</div>

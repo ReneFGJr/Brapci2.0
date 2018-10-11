@@ -649,6 +649,16 @@ class socials extends CI_Model {
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
                 $de = 1;
                 break;
+			case 'FORGOT':
+				$data = $this->le_email($para);
+                $link = base_url('index.php/social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
+                $assunto = msg('Cadastro de novo senha') . ' - social';
+                $texto .= '<p>' . msg('Dear') . ' ' . $data['us_nome'] . '</p>';
+                $texto .= '<p>' . msg('change_new_password') . '</p>';
+                $texto .= '<br><br>';
+                $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
+                $de = 1;
+                break;
             default :
                 $assunto = 'Enviado de e-mail';
                 $texto .= ' Vinculo não informado ' . $code;
@@ -657,7 +667,8 @@ class socials extends CI_Model {
         }
         $texto .= $this -> email_foot();
         if ($de > 0) {
-            enviaremail($para, $assunto, $texto, $de);
+        	enviaremail_ufrgs($para, $assunto, $texto, $de);
+            //enviaremail($para, $assunto, $texto, $de);
         } else {
             echo 'e-mail não enviado - ' . $code;
         }
@@ -711,16 +722,23 @@ class socials extends CI_Model {
 
     function forgot() {
         $data = array();
-        $email = get("email");
+        $email = get("user_login");
 
-        if (strlen($email)) {
+        if (strlen($email) > 0) {
             $dt = array();
-
+			$rs = 1;
             if ($rs == 1) {
+            	$dt = $this->le_email($email);
                 $code = 'FORGOT';
-                $this -> user_email_send($email, $name, $code);
-                $this -> load -> view('social/login/login_signup_sucess', $dt);
-                return ("");
+				if (count($dt) > 0)
+					{
+		                $this -> user_email_send($email, '', $code);
+                		$this -> load -> view('social/login/login_signup_sucess', $dt);
+                		return ("");						
+					} else {
+						$sx = 'Email nao localizado';
+						return("");
+					}
             }
         }
 
