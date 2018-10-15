@@ -168,16 +168,16 @@ class frbr_core extends CI_model {
                 $name_use = ' <i>use</i> ' . $link_use . $x2 . '</a>';
             }
 
-            $xl = substr(UpperCaseSql(strip_tags($name_use)), 0, 1);
-            if ($xl != $l) {
-                $sx .= '<h4>' . $xl . '</h4>';
-                $l = $xl;
+            if ($line['id_cc_use'] == 0) {
+                $xl = substr(UpperCaseSql(strip_tags($name_use)), 0, 1);
+                if ($xl != $l) {
+                    $sx .= '<h4>' . $xl . '</h4>';
+                    $l = $xl;
+                }                
+                $name = $link . $name_use . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
+                $sx .= '<li>' . $name . '</li>' . cr();
             }
-
-            $name = $link . $name_use . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
-            $sx .= '<li>' . $name . '</li>' . cr();
         }
-        $sx .= '<ul>';
         $sx .= '</div></div>';
         return ($sx);
     }
@@ -344,6 +344,19 @@ class frbr_core extends CI_model {
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
     }
+    
+    function corporate_show($id) {
+        $data = array();
+        $sx = '';
+
+        $data = $this -> le($id);
+        $data['person'] = $this -> le_data($id);
+        $data['use'] = $this -> le_remissiva($id);
+        $data['id'] = $id;
+
+        $sx = $this -> load -> view('find/view/corporate', $data, true);
+        return ($sx);
+    }    
 
     function view_data($id) {
         $data = $this -> le_data($id);
@@ -461,7 +474,8 @@ class frbr_core extends CI_model {
                 case 'Subject' :
                     $tela .= $this -> frbr -> show_Subject($id);
                     break;
-                case 'Corporate Body' :
+                case 'CorporateBody' :
+                    $tela = $this -> corporate_show($id);
                     $tela .= $this -> view_data($id);
                     break;
                 case 'Person' :

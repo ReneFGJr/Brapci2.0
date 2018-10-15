@@ -2,9 +2,31 @@
 class sources extends CI_Model {
 	var $table = 'source_source';
 
-	function summary() {
+	function summary($cmd='') {
+   
+        /******************** limpa logs ************************/
+	    if ($cmd='clear')
+            {
+                $dir = $_SERVER['SCRIPT_FILENAME'];
+                $dir = troca($dir,'index.php','');        
+                $filename = $dir.'script/cron.oai.html';                                
+                if (file_exists($filename))
+                    {
+                        unlink($filename);
+                    }
+                $filename = $dir.'script/cron.pdf.html';                                
+                if (file_exists($filename))
+                    {
+                        unlink($filename);
+                    }
+            }
+            
+        /******************** summary_index ************************/
 		$wh = '';
-		$sx = '<ul>';
+        $sx = '';
+        $sx .= '<div class="col-md-8">';
+		$sx .= '<h1>'.msg('summary_index').'</h1>';
+		$sx .= '<ul>';
 		$cl = array('Journal','Article','Person');
 		$sa = '';
 		for ($r = 0; $r < count($cl); $r++) {
@@ -12,15 +34,30 @@ class sources extends CI_Model {
 			$f = $this -> frbr_core -> find_class($cl[$r]);
 			$sql = "select C1.id_cc as id_cc        
                         FROM rdf_concept as C1
-                        where C1.cc_class = " . $f . " $wh";
+                        where C1.cc_class = " . $f . " $wh  and cc_use = 0";
 
 			$rlt = $this -> db -> query($sql);
 
 			$rlt = $rlt -> result_array();
 			$sx .= '<li class="big">' . number_format(count($rlt),0,',','.') . ' ' . msg($cl[$r]) . '</li>';
 		}
-		
-		/****/
+        $sx .= '</ul>';
+        $sx .= '<h1>'.msg('summary_remissive').'</h1>';
+        $sx .= '<ul>';
+        for ($r = 0; $r < count($cl); $r++) {
+            $sa .= '<li>'.date("d-m-Y H:i:s") .' - '.$cl[$r].'</li>';
+            $f = $this -> frbr_core -> find_class($cl[$r]);
+            $sql = "select C1.id_cc as id_cc        
+                        FROM rdf_concept as C1
+                        where C1.cc_class = " . $f . " $wh  and cc_use <> 0";
+
+            $rlt = $this -> db -> query($sql);
+
+            $rlt = $rlt -> result_array();
+            $sx .= '<li class="big">' . number_format(count($rlt),0,',','.') . ' ' . msg($cl[$r]) . '</li>';
+        }		
+		/******************** summary_index ************************/
+        		
 		$prop1 = $this -> frbr_core -> find_class('hasUrl');
 		$prop2 = $this -> frbr_core -> find_class('hasFileStorage');
 		$sa .= '<li>'.date("d-m-Y H:i:s") .' - PDFs'.'</li>';
@@ -34,6 +71,11 @@ class sources extends CI_Model {
 		$total = $rlt[0]['total'];
 		$sx .= '<li>'.$total.' '.msg('pdf_to_harveting').'</li>';
 		
+        $sx .= '</ul>';
+        $sx .= '<h1>'.msg('summary_oai').'</h1>';
+        $sx .= '<ul>';
+				
+		
 		$sql = "SELECT count(*) as total, li_s FROM `source_listidentifier` group by li_s order by li_s";
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -45,9 +87,21 @@ class sources extends CI_Model {
 				$st = $rlt[$r]['li_s'];
 				$sx .= '<li>'.number_format($total,0,',','.').' '.msg('cache_status_'.$st).'</li>';		
 			}		
-		$sx .= '</ul>';				
-		
-		$sx .= '<li><h6>Logs</h6></li>';
+		$sx .= '</ul>';	
+        
+        /******************* LOG DE TEMPO ***************/      
+        $sx .= '</div>';
+        
+        $sx .= '<div class="col-md-4">';
+        $sx .= '<ul>'.$sa.'</ul>';  
+        $sx .= '</div>';    
+        
+        $sx .= '<div class="col-md-12">';
+                
+
+		$sx .= '<h1>Logs</h1>';
+        $sx .= '<a href="'.base_url(PATH.'summary/clear').'" class="btn btn-outline-primary">'.msg('clear_logs').'</a>';
+
 		$sx .= '<ul>';
 		
 		$dir = $_SERVER['SCRIPT_FILENAME'];
@@ -74,10 +128,11 @@ class sources extends CI_Model {
 				$sx .= '<pre style="color: red;">PDF Status not found</pre>';
 			}
 		$sx .= '</li>';			
-		$sx .= '</ul>';			
-		$sx .= '</ul>';	
-		
-		$sx .= '<ul>'.$sa.'</ul>';			
+		$sx .= '</ul>';
+        $sx .= '</div>';
+        $sx .= '</div>';
+        $sx .= '</div>';			
+        //$sx .= '<style> div { border:1px solid #000000;"}<style>';
 		return ($sx);
 	}
 

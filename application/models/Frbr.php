@@ -59,13 +59,13 @@ class frbr extends CI_model {
                     }
                 return($sx);
         }        
-    function author_check_method_2($p=0)
+    function author_check_method_2($p=0,$class="Person")
         {
             $sql = "SELECT * FROM rdf_concept as R1
                         INNER JOIN rdf_name ON cc_pref_term = id_n
                         INNER JOIN rdf_class ON cc_class = id_c
                         INNER JOIN rdf_data ON R1.id_cc = d_r2
-                        where R1.cc_use > 0 and c_class = 'Person' ";
+                        where R1.cc_use > 0 and c_class = '$class' ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             $sx = '';
@@ -91,6 +91,8 @@ class frbr extends CI_model {
                     }                
             return($sx);            
         }    
+       
+        
     function author_check_remissive($p=0,$p2=0)
         {
             $p2 = round($p2);
@@ -106,7 +108,12 @@ class frbr extends CI_model {
                     $sx = '<h1>Phase '.romano(2).'</h1>';
                     $sx .= $this->author_check_method_2($p);
                     $sx .= '<meta http-equiv="refresh" content="5;'.base_url(PATH.'tools/remissive/2').'">';
-                    break;                
+                    break; 
+                case '2':
+                    $sx = '<h1>Phase '.romano(3).'</h1>';
+                    $sx .= $this->author_check_method_2($p,'CorporateBody');
+                    $sx .= '<meta http-equiv="refresh" content="5;'.base_url(PATH.'tools/remissive/3').'">';
+                    break;                                   
                 default:
                     $sx = '<h1>FIM</h1>';
                     $sx .= date("Y-m-d H:i:s");
@@ -417,7 +424,7 @@ class frbr extends CI_model {
                 }
 
                 if (strlen($aff) > 0) {
-                    $id_aff = $this -> frbr_core -> rdf_concept_create('Corporate Body', $aff, '');
+                    $id_aff = $this -> frbr_core -> rdf_concept_create('CorporateBody', $aff, '');
                     $this -> frbr_core -> set_propriety($idf, 'affiliatedWith', $id_aff, 0);
                 }
 

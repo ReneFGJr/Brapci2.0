@@ -314,7 +314,7 @@ class res extends CI_Controller {
                 break;
             case 'corporate' :
                 $title = msg('index') . ': ' . msg('index_serie');
-                $sx = $this -> frbr_core -> index_list($lt, 'Corporate Body');
+                $sx = $this -> frbr_core -> index_list($lt, 'CorporateBody');
 
                 break;
             case 'journal' :
@@ -337,7 +337,7 @@ class res extends CI_Controller {
                 $title = 'Índices';
                 $sx = '<ul>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/author') . '">' . msg('Authors') . '</a></li>';
-                $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('Corporate Body') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('CorporateBody') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/subject') . '">' . msg('Subject') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/journal') . '">' . msg('Journal') . '</a></li>';
@@ -505,12 +505,17 @@ class res extends CI_Controller {
     function basket($fcn = '', $arg = '') {
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
-
         switch($fcn) {
             case 'export' :
                 switch($arg) {
                     case 'csv' :
                         $this -> bs -> mark_export_csv();
+                        break;
+                    case 'doc' :
+                        $this -> bs -> mark_export_doc();
+                        break;                        
+                    case 'ris' :
+                        $this -> bs -> mark_export_ris();
                         break;
                     default :
                         redirect(base_url(PATH . 'basket'));
@@ -523,6 +528,7 @@ class res extends CI_Controller {
             default :
                 $this -> cab();
                 $data['content'] = $this -> bs -> tools();
+                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
                 $data['content'] .= $this -> bs -> basket();
                 $this -> load -> view('show', $data);
                 $this -> footer();
@@ -873,7 +879,7 @@ class res extends CI_Controller {
             case 'Family' :
                 $tela .= $this -> frfrbr_corebr -> show($id);
                 break;
-            case 'Corporate Body' :
+            case 'CorporateBody' :
                 $tela .= $this -> frbr_core -> show($id);
                 break;
             default :
@@ -992,6 +998,9 @@ class res extends CI_Controller {
         $tela = '';
 
         switch($tools) {
+            case 'email':
+                $tela .= '<h1>e-mail</h1>';
+                break;
             case 'class_export' :
                 /* acao */
                 $this -> load -> model("frbr_clients");
@@ -1033,11 +1042,14 @@ class res extends CI_Controller {
                 }
                 break;
             default :
-                $tela = '<h1>' . msg('config') . '</h1><ul>';
-                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>';
-                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>';
-
-                $tela .= '</ul>';
+                $tela = '<div class="col-md-12">'.cr();
+                $tela .= '<h1>' . msg('config') . '</h1>'.cr();
+                $tela .= '<ul>'.cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>'.cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>'.cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/email') . '">' . msg('config_email') . '</a></li>'.cr();
+                $tela .= '</ul>'.cr();
+                $tela .= '</div>'.cr();
                 break;
         }
         $data['content'] = $tela;
@@ -1081,17 +1093,38 @@ class res extends CI_Controller {
             $tela .= $this->frad->find_remissiva_form($id,$nm);
             
             $data['content'] = $tela;
+            $this->load->view('show',$data);            
+        }
+        
+    function frad_corporate($id='')
+        {
+            $this -> load -> model("frad");
+            $this -> load -> model("frbr_core");
+            $data['nocab'] = true;
+            
+            $this->cab($data);
+            $data = $this->frbr_core->le($id);
+            $id = $data['id_cc'];
+            $nm = $data['n_name'];
+            $tela = '<div class="container">'.cr();
+            $tela .= '<div class="row"><div class="col-md-12">';
+            $tela .= '<h1>'.$data['n_name']. ' ('.$id.')'.'</h1>';
+            $tela .= '</div></div></div>'.cr();
+            
+            $tela .= $this->frad->find_remissiva_form($id,$nm,'CorporateBody');
+            
+            $data['content'] = $tela;
             $this->load->view('show',$data);
             
-        }
-	function summary()
+        }        
+	function summary($cmd='')
 		{
             $this -> load -> model("frad");
             $this -> load -> model("frbr_core");
 			$this -> load -> model("sources");
 			            
             $this->cab();
-			$tela = $this-> sources-> summary();
+			$tela = $this-> sources-> summary($cmd);
 			$data['content'] = $tela;
 			
 			$this->load->view('show',$data);

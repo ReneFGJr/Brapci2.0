@@ -3,7 +3,8 @@ class Bs extends CI_model {
     function tools() {
         $sx = '<div class="col-md-12">';
         $sx .= '<a href="' . base_url(PATH . 'basket/clean') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('clean_selected') . '</a>';
-        $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
+        //$sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
         $sx .= '<hr>';
@@ -16,10 +17,9 @@ class Bs extends CI_model {
         if (isset($_SESSION)) {
             $a = $_SESSION;
             foreach ($a as $key => $value) {
-                if (substr($key,0,1) == 'm')
-                    {
-                        unset($_SESSION[$key]);
-                    }
+                if (substr($key, 0, 1) == 'm') {
+                    unset($_SESSION[$key]);
+                }
             }
         }
     }
@@ -55,40 +55,69 @@ class Bs extends CI_model {
         return ('');
     }
 
-    function basket() {
+    function basket($type = '1') {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        foreach ($s as $key => $value) {
-            if (substr($key, 0, 1) == 'm') {
-                $key = substr($key, 1, strlen($key));
-                $tot++;
-                $jnl = 0;
-                $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
-                if (!is_file($img)) {
-                    //echo '==>' . $img . '<br>';
-                    $img = 'img/cover/cover_issue_0.jpg';
-                    //$sx .= '['.$jnl.']';
-                }
-                $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
-                $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
-                $sx .= $this -> bs -> checkbox($key);
-                $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
-                $sx .= $this -> frbr -> show_v($key);
-                $sx .= '</a>';
-                $sx .= '</div>';
+        switch($type) {
+            case '1' :
+                $a = array();
+                foreach ($s as $key => $value) {
+                    if (substr($key, 0, 1) == 'm') {
+                        $tot++;
+                        $key = substr($key, 1, strlen($key));
+                        $file = 'c/' . $key . '/name.nm';
+                        if (file_exists($file)) {
+                            $fr = file_get_contents($file);
+                            $fr = troca($fr, '<b>', '_b_');
+                            $fr = troca($fr, '</b>', '_bb_');
+                            $fr = strip_tags($fr);
+                            $fr = troca($fr, '_b_', '<b>');
+                            $fr = troca($fr, '_bb_', '</b>');
 
-            }
+                            $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
+                            $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
+                            $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+                            array_push($a, $fr);
+                        }
+                    }
+                }
+                asort($a);
+                foreach ($a as $key => $value) {
+                    $sx .= '<p style="margin-bottom: 10px;">' . $value . '</p>' . cr();
+                }
+                break;
+            default :
+                foreach ($s as $key => $value) {
+                    if (substr($key, 0, 1) == 'm') {
+                        $key = substr($key, 1, strlen($key));
+                        $tot++;
+                        $jnl = 0;
+                        $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
+                        if (!is_file($img)) {
+                            //echo '==>' . $img . '<br>';
+                            $img = 'img/cover/cover_issue_0.jpg';
+                            //$sx .= '['.$jnl.']';
+                        }
+                        $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
+                        $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
+                        $sx .= $this -> bs -> checkbox($key);
+                        $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
+                        $sx .= $this -> frbr -> show_v($key);
+                        $sx .= '</a>';
+                        $sx .= '</div>';
+                    }
+                    break;
+                }
         }
-        
-        if ($tot > 0)
-            {
-                
-            } else {
-                $sx .= '<div class="col-md-12">';
-                $sx .= bs_alert('warning',msg('basket_empty'));
-                $sx .= '</div>';
-            }
+
+        if ($tot > 0) {
+
+        } else {
+            $sx .= '<div class="col-md-12">';
+            $sx .= bs_alert('warning', msg('basket_empty'));
+            $sx .= '</div>';
+        }
         return ($sx);
     }
 
@@ -123,7 +152,7 @@ class Bs extends CI_model {
         } else {
             $vlr = 0;
             unset($_SESSION['m' . $key]);
-        }        
+        }
         $vlr = $this -> selected();
         return ($vlr);
     }
@@ -233,15 +262,88 @@ class Bs extends CI_model {
         }
         return ($sx);
     }
-    function mark_export_csv()
-        {
-            $file = 'brapci_'.date("YmdHi").'.csv';
-            header('Content-Encoding: UTF-8');
-            header('Content-type: text/csv; charset=UTF-8');
-            header('Content-Disposition: attachment; filename='.$file);
-            
-            
-            
+
+    function mark_export_csv() {
+        $file = 'brapci_' . date("YmdHi") . '.csv';
+        header('Content-Encoding: UTF-8');
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename=' . $file);
+    }
+    
+    function mark_export_ris() {
+        $file = 'brapci_' . date("YmdHi") . '.csv';
+        header('Content-Encoding: UTF-8');
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename=' . $file);
+    }    
+    
+    function mark_export_bibex() {
+        $file = 'brapci_' . date("YmdHi") . '.bex';
+        header('Content-Encoding: UTF-8');
+        header('Content-type: text/text; charset=UTF-8');
+        header('Content-Disposition: attachment; filename=' . $file);
+        $sx = 'Brapci'.cr();
+        $sx .= 'EXPORT DATE: '.date("d M y").cr();
+        $sx = '
+@ARTICLE{Aslanidi2018354,
+author={Aslanidi, M. and Papadakis, I. and Stefanidakis, M.},
+title={Name and title authorities in the music domain: Alignment of UNIMARC authorities format with RDA},
+journal={Cataloging and Classification Quarterly},
+year={2018},
+volume={56},
+number={4},
+pages={354-373},
+doi={10.1080/01639374.2018.1423596},
+note={cited By 0},
+url={https://www.scopus.com/inward/record.uri?eid=2-s2.0-85042223030&doi=10.1080%2f01639374.2018.1423596&partnerID=40&md5=5886dcb97642e90560c3f0e9d5d02c5f},
+document_type={Article},
+source={Scopus},
+}        
+        ';
+    }    
+
+    function mark_export_doc() {
+        $file = 'brapci_' . date("YmdHi") . '.doc';
+        header('Content-Encoding: UTF-8');
+        //header('Content-type: application/vnd.ms-word; charset=UTF-8');
+        header('Content-type: application/vnd.ms-word; charset=ISO-8859-1');
+        header('Content-Disposition: attachment; filename=' . $file);
+        $sx = '';
+        $s = $_SESSION;
+        $tot = 0;
+        
+        $a = array();
+        foreach ($s as $key => $value) {
+            if (substr($key, 0, 1) == 'm') {
+                $tot++;
+                $key = substr($key, 1, strlen($key));
+                $file = 'c/' . $key . '/name.nm';
+                if (file_exists($file)) {
+                    $fr = file_get_contents($file);
+                    $fr = troca($fr, '<b>', '_b_');
+                    $fr = troca($fr, '</b>', '_bb_');
+                    $fr = strip_tags($fr);
+                    $fr = troca($fr, '_b_', '<b>');
+                    $fr = troca($fr, '_bb_', '</b>');
+
+                    $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
+                    $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
+                    $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+                    array_push($a, $fr);
+                }
+            }
         }
+        asort($a);
+        foreach ($a as $key => $value) {
+            $sx .= '<p style="margin-bottom: 10px;">' . $value . '</p>' . cr();
+        }
+        echo '<html>';
+        echo '<body>';
+        echo '<h1>'.utf8_decode(msg('References')).'</h1>'.cr();
+        echo utf8_decode($sx);
+        echo '</body>';
+        echo '</html>';
+    }
+
 }
 ?>

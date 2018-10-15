@@ -87,7 +87,7 @@ $lang['Search'] = 'Pesquisar';
 $lang['Subject'] = 'Índices das Palavras-chave';
 $lang['index_sections'] = 'Seções';
 $lang['Sections'] = 'Seções indexadas';
-$lang['Corporate Body'] = 'Afiliação institucional';
+$lang['CorporateBody'] = 'Afiliação institucional';
 $lang['Authors'] = 'Autores indexados';
 $lang['Journal'] = 'Publicações indexadas';
 $lang['Words'] = 'Termos indexados';
@@ -144,6 +144,7 @@ $lang['how_cite'] = 'Como citar';
 $lang['how_sharing'] = 'Compartilhe';
 $lang['clean_selected'] = 'Limpar seleção';
 $lang['xls_selected'] = 'Exportar CSV';
+$lang['doc_selected'] = 'Exportar DOC';
 $lang['select_all'] = 'Selecionar Tudo';
 $lang['not_match_to'] = 'Nada localizado para';
 $lang['admin_vocabulary'] = 'Vocabulário controlado';
@@ -154,15 +155,30 @@ $lang['config'] = 'Configurações';
 $lang['alternativeNames'] = 'Nomes alternativos';
 $lang['No_changes'] = 'Sem alterações';
 $lang['hasSectionIndex'] = 'Sessão indexada';
+$lang['basket_empty'] = 'Seleção vazia';
+$lang['config_email'] = 'Configurações de e-mail';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
-$lang[''] = '';
-$lang[''] = '';
-$lang[''] = '';
+$lang['References'] = 'Referências';
+
+/* MESES */
+$lang['mes_01'] = 'jan.';
+$lang['mes_02'] = 'fev.';
+$lang['mes_03'] = 'mar.';
+$lang['mes_04'] = 'abr.';
+$lang['mes_05'] = 'maio';
+$lang['mes_06'] = 'jun.';
+$lang['mes_07'] = 'jul.';
+$lang['mes_08'] = 'ago.';
+$lang['mes_09'] = 'set.';
+$lang['mes_10'] = 'out.';
+$lang['mes_11'] = 'nov.';
+$lang['mes_12'] = 'dez.';
+
 
 //$lang = array();
 ?>

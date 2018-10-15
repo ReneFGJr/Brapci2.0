@@ -82,14 +82,31 @@ class frad extends CI_model {
         return ($data);
     }
 
-    function find_remissiva($id) {
-        $url = base_url(PATH . 'frad/' . $id);
-        $sx = '<br><span class="btn btn-outline-primary" onclick="newxy(\'' . $url . '\',800,600);">Remissive</span>';
+    function find_remissiva($id,$type='Person') {        
+        switch($type)
+            {
+            case 'CorporateBody':
+                $url = base_url(PATH . 'frad_corporate/' . $id);
+                $sx = '<br><span class="btn btn-outline-primary" onclick="newxy(\'' . $url . '\',800,600);">Remissive</span>';
+                break;
+            default:
+                $url = base_url(PATH . 'frad/' . $id);
+                $sx = '<br><span class="btn btn-outline-primary" onclick="newxy(\'' . $url . '\',800,600);">Remissive</span>';
+                break;                
+            }
+        
         return ($sx);
     }
 
-    function find_remissiva_form($id, $name) {
+    function find_remissiva_form($id, $name, $class="Person") {
         $ini = 0;
+        $meth = 'frad';
+        
+        if ($class == 'CorporateBody')
+            {
+                $meth = 'frad_corporate';
+            }
+        
         if (strlen(get("ini") > 0)) {
             $ini = get("ini");
         }
@@ -101,7 +118,6 @@ class frad extends CI_model {
         }
 
         $nouse = 1;
-        $class = 'Person';
         $f = $this -> frbr_core -> find_class($class);
 
         $wh = '';
@@ -157,7 +173,7 @@ class frad extends CI_model {
             $sx .= '</div>';
         }
         for ($r = 0; $r < count($fx); $r++) {
-            $sx .= '<a href="' . base_url(PATH . 'frad/' . $id) . '?ini=' . $r . '">Mth ' . (1 + $r) . '</a> | ';
+            $sx .= '<a href="' . base_url(PATH .$meth.'/' . $id) . '?ini=' . $r . '">Mth ' . (1 + $r) . '</a> | ';
         }
 
         return ($sx);
