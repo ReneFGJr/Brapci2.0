@@ -19,13 +19,29 @@ class res extends CI_Controller {
         #$this -> load -> helper('xml_dom');
         $this -> load -> model("socials");
         $this -> load -> model('bs');
-        $this -> load -> helper('email');
+        //$this -> load -> helper('email');
         $this -> load -> helper('bootstrap');
         date_default_timezone_set('America/Sao_Paulo');
     }
 
     private function cab($data = array()) {
-        $data['title'] = 'Brapci';
+        $data['title'] = 'Brapci 2.0';
+		if (isset($data['meta']))
+			{
+				for($r=0;$r < count($data['meta']);$r++)
+					{
+						$line = $data['meta'][$r];
+						$class = trim($line['c_class']);
+						if (trim($line['c_class']) == 'prefLabel')
+							{
+								$data['title'] = trim($line['n_name']).' :: Brapci 2.0';	
+							}
+						if (trim($line['c_class']) == 'hasTitle')
+							{
+								$data['title'] = trim($line['n_name']).' :: Brapci 2.0';	
+							}							
+					}
+			}
         $this -> load -> view('header/header.php', $data);
         if (!isset($data['nocab'])) {
             $this -> load -> view('header/menu_top.php', $data);
@@ -152,9 +168,14 @@ class res extends CI_Controller {
     public function v($id) {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
+		$this -> load -> model('frbr_core');
         $this -> load -> model('genero');
 		$this -> load -> model('frad');
-        $this -> cab();
+		
+		$vv = $this->frbr_core->le_data($id);
+		$data['meta'] = $vv;
+		$data['id'] = $id;
+        $this -> cab($data);
 
         $tela = $this -> frbr -> vv($id);
 
@@ -1000,6 +1021,10 @@ class res extends CI_Controller {
         switch($tools) {
             case 'email':
                 $tela .= '<h1>e-mail</h1>';
+                $this->load->helper('email');
+                enviaremail('renefgj@gmail.com','teste','teste');
+                
+                echo '===>'.$this->email->send();                
                 break;
             case 'class_export' :
                 /* acao */

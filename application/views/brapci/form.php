@@ -15,6 +15,8 @@ for ($r = 1; $r <= 6; $r++) {
 	$op .= '<span style="margin-right: 10px; font-size: 75%;">' . msg('search_' . $r) . '</span>';
 
 }
+$opx = '<span style="margin-right: 10px; font-size: 75%;">Operador booleano "OR" para refinar a busca veja <a href="'.base_url(PATH.'help').'">'.'Busca Avançada</a>';
+$opx .= '</span>';
 ?>
 <style>
 input[type=text] {
@@ -66,6 +68,9 @@ input[type=text]:focus {
                                 </div>
                                 <div class="card-body row no-gutters align-items-center"  style="padding-top: 0px;">
                                 	<?php echo $op; ?>
+                               	</div>
+                                <div class="card-body  no-gutters align-items-center"  style="padding-top: 0px;">
+                                	<?php echo $opx; ?>
                                	</div>
                                 <br>
 						<?php ?>

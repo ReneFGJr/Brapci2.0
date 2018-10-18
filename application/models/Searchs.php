@@ -147,6 +147,8 @@ class searchs extends CI_Model {
             $date = date("Y-m-d");
             $hour = date("H:i:s");
             $session = $this->s;
+			$ip = $_SERVER['REMOTE_ADDR'];
+
             if (isset($_SESSION['id_us']))
                 {
                     $user = $_SESSION['id_us'];
@@ -157,9 +159,9 @@ class searchs extends CI_Model {
             $page = round(GET("p"));
             if (strlen($q) > 0)
                 {
-                    $sql = "insert into _search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session) ";
+                    $sql = "insert into _search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session, s_ip) ";
                     $sql .= " values ";
-                    $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session)";
+                    $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip')";
                     $this->db->query($sql);                    
                 }
             return('');

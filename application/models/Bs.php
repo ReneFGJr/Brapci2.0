@@ -3,7 +3,7 @@ class Bs extends CI_model {
     function tools() {
         $sx = '<div class="col-md-12">';
         $sx .= '<a href="' . base_url(PATH . 'basket/clean') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('clean_selected') . '</a>';
-        //$sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
@@ -269,38 +269,6 @@ class Bs extends CI_model {
         header('Content-type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename=' . $file);
     }
-    
-    function mark_export_ris() {
-        $file = 'brapci_' . date("YmdHi") . '.csv';
-        header('Content-Encoding: UTF-8');
-        header('Content-type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename=' . $file);
-    }    
-    
-    function mark_export_bibex() {
-        $file = 'brapci_' . date("YmdHi") . '.bex';
-        header('Content-Encoding: UTF-8');
-        header('Content-type: text/text; charset=UTF-8');
-        header('Content-Disposition: attachment; filename=' . $file);
-        $sx = 'Brapci'.cr();
-        $sx .= 'EXPORT DATE: '.date("d M y").cr();
-        $sx = '
-@ARTICLE{Aslanidi2018354,
-author={Aslanidi, M. and Papadakis, I. and Stefanidakis, M.},
-title={Name and title authorities in the music domain: Alignment of UNIMARC authorities format with RDA},
-journal={Cataloging and Classification Quarterly},
-year={2018},
-volume={56},
-number={4},
-pages={354-373},
-doi={10.1080/01639374.2018.1423596},
-note={cited By 0},
-url={https://www.scopus.com/inward/record.uri?eid=2-s2.0-85042223030&doi=10.1080%2f01639374.2018.1423596&partnerID=40&md5=5886dcb97642e90560c3f0e9d5d02c5f},
-document_type={Article},
-source={Scopus},
-}        
-        ';
-    }    
 
     function mark_export_doc() {
         $file = 'brapci_' . date("YmdHi") . '.doc';

@@ -2,24 +2,66 @@
 <?php
 if (!isset($title)) { $title = 'no title';
 }
-$HTTP = 'http://143.54.114.150/Brapci2.0/';
+$HTTP = 'http://www.brapci.inf.br/';
+
+$title = 'Brapci - Base de Dados em Ciência da Informação';
+$descr = 'Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.';
+$url = 'http://www.brapci.inf.br/';
+$sufix = ' #Brapci2.0';
+$author = '';
+$keys = 'artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia';
+if (isset($meta))
+	{
+		$url = HTTP.PATH.'v/'.$id;
+		$keys = '';
+		for ($r=0;$r < count($meta);$r++)
+			{
+				$line = $meta[$r];
+				$class = trim($line['c_class']);
+				$value = trim($line['n_name']);
+				//echo '<br>'.$class.'==>'.$value;
+				switch($class)
+					{
+					case 'prefLabel':
+						$title = $value.' '.$sufix;
+						break;						
+					case 'hasTitle':
+						$title = $value.' '.$sufix;
+						break;
+					case 'hasAuthor':
+						$author = '    <META NAME="author" CONTENT="'.$value.'">'.cr();
+						break;
+					case 'hasAbstract':
+						$descr = $value;
+						break;
+					case 'hasSubject':
+						if (strlen($keys) > 0)
+							{
+								$keys .= ', ';
+							}
+						$keys .= $value;
+					}
+			}
+	}
+
 ?>
 <head>
     <head lang="pt-br">
     <meta charset="utf-8">
     <title><?php echo $title; ?></title>    
-    <META NAME="title" CONTENT="Brapci - Base de Dados em Ciência da Informação">
-    <META NAME="url" CONTENT="http://www.brapci.inf.br/">
-    <META NAME="description" CONTENT="Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.">
+    <META NAME="title" CONTENT="<?php echo $title;?>">
+    <META NAME="url" CONTENT="<?php echo $url;?>">
+    <META NAME="description" CONTENT="<?php echo $descr;?>">
+<?php echo $author;?>
     
-    <META NAME="keywords" CONTENT="artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia">
+    <META NAME="keywords" CONTENT="<?php echo $keys;?>">
     <META NAME="copyright" CONTENT="Brapci">
     <LINK REV=made href="brapcici@gmail.com">
     <META NAME="language" CONTENT="Portugues">
     <META NAME="Robots" content="All">
     <META NAME="City" content="Curitiba/Porto Alegre">
     <META NAME="State" content="PR - Paraná / RS - Rio Grande do Sul">
-    <META NAME="revisit-after" CONTENT="7 days">
+    <META NAME="revisit-after" CONTENT="365 days">
     <META HTTP-EQUIV="Content-Language" CONTENT="pt_BR">
     <meta name="google-site-verification" content="VZpzNVBfl5kOEtr9Upjmed96smfsO9p4N79DZT38toA" />
     

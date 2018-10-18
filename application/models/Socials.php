@@ -603,7 +603,7 @@ class socials extends CI_Model {
                 if (($p1 == $p2) or ($new == 1)) {
                     $sql = "update " . $this -> table . " set us_password = '" . md5($p1) . "', us_autenticador = 'MD5' where id_us = " . $id;
                     $this -> db -> query($sql);
-                    redirect(base_url('index.php/social/social/login'));
+                    redirect(base_url(PATH.'social/login'));
                 } else {
                     $tela .= '<div class="alert">Senhas não conferem</div>';
                 }
@@ -631,30 +631,31 @@ class socials extends CI_Model {
         $de = 0;
         switch($code) {
             case 'SIGNUP' :
-                $link = base_url('index.php/social/social/npass/?dd0=' . $para . '&chk=' . checkpost_link($para . $para));
-                $assunto = 'Cadastro de novo usuários - social';
+                $link = base_url(PATH.'social/npass/?dd0=' . $para . '&chk=' . checkpost_link($para . $para));
+                $assunto = utf8_decode('Cadastro de novo usuários - Brapci');
                 $texto .= '<p>' . msg('Dear') . ' <b>' . $nome . ',</b></p>';
                 $texto .= '<p>Para ativar seu cadastro é necessário clicar no link abaixo:';
                 $texto .= '<br><br>';
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a></p>';
+                $texto = utf8_decode($text);
                 $de = 1;
                 break;
             case 'PASSWORD' :
                 $this -> le_user_id($para);
-                $link = base_url('index.php/social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
-                $assunto = msg('Cadastro de novo senha') . ' - social';
+                $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
+                $assunto = msg('Cadastro de nova senha') . ' - Brapci';
                 $texto .= '<p>' . msg('Dear') . ' ' . $this -> line['us_nome'] . '</p>';
-                $texto .= '<p>' . msg('change_new_password') . '</p>';
+                $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
                 $texto .= '<br><br>';
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
                 $de = 1;
                 break;
 			case 'FORGOT':
 				$data = $this->le_email($para);
-                $link = base_url('index.php/social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
-                $assunto = msg('Cadastro de novo senha') . ' - social';
+                $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
+                $assunto = msg('Cadastro de nova senha') . ' - Brapci';
                 $texto .= '<p>' . msg('Dear') . ' ' . $data['us_nome'] . '</p>';
-                $texto .= '<p>' . msg('change_new_password') . '</p>';
+                $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
                 $texto .= '<br><br>';
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
                 $de = 1;
@@ -667,8 +668,8 @@ class socials extends CI_Model {
         }
         $texto .= $this -> email_foot();
         if ($de > 0) {
-        	enviaremail_ufrgs($para, $assunto, $texto, $de);
-            //enviaremail($para, $assunto, $texto, $de);
+            $this->load->helper('email');
+        	enviaremail($para, $assunto, $texto, $de);
         } else {
             echo 'e-mail não enviado - ' . $code;
         }
@@ -678,9 +679,9 @@ class socials extends CI_Model {
     function email_cab() {
         $sx = '<table width="600" align="center"><tr><td>';
         $sx .= '<font style="font-family: Tahoma, Verdana, Arial; font-size: 14px;">' . cr();
-        $sx .= '<font color="blue" style="font-size: 24px;">social</font>' . cr();
+        $sx .= '<font style="font-size: 24px; color: #1D0E9B; font-family: Tahoma, Arial">BRAPCI</font>' . cr();
         $sx .= '<br>';
-        $sx .= '<font color="blue" style="font-size: 12px;"><i>Semantic socialurus</i></font>' . cr();
+        $sx .= utf8_decode('<font style="color: #1D0E9B; font-size: 12px;">Base de dados em Ciência da Informação</font>') . cr();
         $sx .= '<hr>';
         return ($sx);
     }
@@ -712,7 +713,9 @@ class socials extends CI_Model {
             if ($rs == 1) {
                 $code = 'SIGNUP';
                 $this -> user_email_send($email, $name, $code);
-                $this -> load -> view('social/login/login_signup_sucess', $dt);
+                $txt = bs_alert('success','Success!');
+                $data['content'] = $tela;
+                $this->load->view('show',$data);
                 return ("");
             }
         }
