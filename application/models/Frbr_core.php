@@ -173,7 +173,7 @@ class frbr_core extends CI_model {
                 if ($xl != $l) {
                     $sx .= '<h4>' . $xl . '</h4>';
                     $l = $xl;
-                }                
+                }
                 $name = $link . $name_use . $linka . ' <sup style="font-size: 70%;">(' . $line['n_lang'] . ')</sup>';
                 $sx .= '<li>' . $name . '</li>' . cr();
             }
@@ -188,13 +188,24 @@ class frbr_core extends CI_model {
         if (strlen($lt) == 0) {
             $lt = 'A';
         }
-        $file = $dir . '/authors_' . $lt . '.php';
-        $file2 = 'brapci/index/authors_' . $lt;
-        if (file_exists($file)) {
-            $sx .= $this -> load -> view($file2, null, True);
-        } else {
-            $sx .= bs_alert('danger', "Index not found " . $file);
+        if ($class == "Person") {
+            $file = $dir . '/authors_' . $lt . '.php';
+            $file2 = 'brapci/index/authors_' . $lt;
+            if (file_exists($file)) {
+                $sx .= $this -> load -> view($file2, null, True);
+            } else {
+                $sx .= bs_alert('danger', "Index not found " . $file);
+            }
         }
+        if ($class == "Subject") {
+            $file = $dir . '/subject_' . $lt . '.php';
+            $file2 = 'brapci/index/subject_' . $lt;
+            if (file_exists($file)) {
+                $sx .= $this -> load -> view($file2, null, True);
+            } else {
+                $sx .= bs_alert('danger', "Index not found " . $file);
+            }
+        }        
         return ($sx);
     }
 
@@ -344,7 +355,7 @@ class frbr_core extends CI_model {
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
     }
-    
+
     function corporate_show($id) {
         $data = array();
         $sx = '';
@@ -356,7 +367,7 @@ class frbr_core extends CI_model {
 
         $sx = $this -> load -> view('find/view/corporate', $data, true);
         return ($sx);
-    }    
+    }
 
     function view_data($id) {
         $data = $this -> le_data($id);
@@ -481,21 +492,21 @@ class frbr_core extends CI_model {
                 case 'Person' :
                     $tela = $this -> person_show($id);
                     $data = $this -> frad -> production($id);
-                    
-                    //$tela .= $this->load->view("brapci/cloud_tags_2",$data,true);                    
+
+                    //$tela .= $this->load->view("brapci/cloud_tags_2",$data,true);
                     //$tela .= $this -> load -> view("brapci/cloud_tags", $data, true);
-                    
-                    $tela .= $this->load->view("brapci/cloud_tags_3",$data,true);
-                    
+
+                    $tela .= $this -> load -> view("brapci/cloud_tags_3", $data, true);
+
                     $tela .= '<div class="col-md-8">';
                     $tela .= $this -> view_data($id);
                     $tela .= '</div>';
-                    
+
                     $tela .= '<div class="col-md-4">';
                     $tela .= $data['authors'];
-                    $tela .= '</div>'.cr();
+                    $tela .= '</div>' . cr();
 
-                    $tela .= '</div>'.cr();
+                    $tela .= '</div>' . cr();
                     $tela .= $this -> genero -> update($id);
                     break;
                 case 'Journal' :

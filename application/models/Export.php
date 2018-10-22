@@ -356,6 +356,29 @@ class export extends CI_Model {
         return($sx);
     }    
 
+function export_subject_index_list($lt = 0, $class = 'Person') {
+        $nouse=0;
+        $dir = 'application/views';
+        dircheck($dir);
+        $dir = 'application/views/brapci';
+        dircheck($dir);
+        $dir = 'application/views/brapci/index';
+        dircheck($dir);
+        $sx = '';
+        if (($lt >= 65) and ($lt <= 90))
+            {
+                $ltx = chr(round($lt));
+                $txt = $this->frbr_core->index_list_style_2($ltx,'Subject',0);
+                $file = $dir.'/subject_'.$ltx.'.php';
+                $hdl = fopen($file,'w+');
+                fwrite($hdl,$txt);
+                fclose($hdl);
+                $sx .= bs_alert('success',msg('Export_subject').' #'.$ltx.' - '.$file.'<br>');
+                $sx .= '<meta http-equiv="refresh" content="3;' . base_url(PATH . 'export/subject/' . ($lt + 1)) . '">';
+            }                    
+        return($sx);
+    }    
+
     function export_subject_reverse($pg = 0) {
         $this -> load -> model('searchs');
         $class = 'Subject';

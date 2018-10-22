@@ -348,8 +348,13 @@ class res extends CI_Controller {
                 break;
             case 'subject' :
                 $title = msg('index') . ': ' . msg('index_sections');
-                $sx = $this -> frbr_core -> index_list($lt, 'Subject');
-                break;
+                $sx = bs_pages(65,90,PATH.'indice/subject');
+                $sx .= $this -> frbr_core -> index_list_2($lt, 'Subject',1);
+                break;                
+                
+                //$title = msg('index') . ': ' . msg('index_sections');
+                //$sx = $this -> frbr_core -> index_list($lt, 'Subject');
+                //break;
             case 'words' :
                 $title = msg('index') . ': ' . msg('index_words');
                 $sx = $this -> frbr_core -> index_list($lt, 'Word');
@@ -628,7 +633,11 @@ class res extends CI_Controller {
                 $tela = $this -> export -> export_Article($pg);
                 break;
             case 'subject' :
-                $tela = $this -> export -> export_subject($pg);
+                if ($pg == 0)
+                    {
+                        $pg = 65;
+                    }
+                $tela = $this -> export -> export_subject_index_list($pg);                
                 break;
             case 'subject_reverse' :
                 $tela = $this -> export -> export_subject_reverse($pg);
@@ -693,6 +702,7 @@ class res extends CI_Controller {
 
     /* LOGIN */
     function social($act = '') {
+    	if ($act == 'user_password_new') { $act = 'npass'; }
         switch($act) {
             case 'perfil' :
                 $this -> cab();
@@ -717,8 +727,9 @@ class res extends CI_Controller {
                 $email = get("dd0");
                 $chk = get("chk");
                 $chk2 = checkpost_link($email . $email);
+				$chk3 = checkpost_link($email . date("Ymd"));
 
-                if (($chk != $chk2) AND (!isset($_POST['dd1']))) {
+                if ((($chk != $chk2) AND ($chk != $chk3)) AND (!isset($_POST['dd1']))) {
                     $data['content'] = 'Erro de Check';
                     $this -> load -> view('show', $data);
                 } else {

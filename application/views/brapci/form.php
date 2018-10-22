@@ -15,7 +15,7 @@ for ($r = 1; $r <= 6; $r++) {
 	$op .= '<span style="margin-right: 10px; font-size: 75%;">' . msg('search_' . $r) . '</span>';
 
 }
-$opx = '<span style="margin-right: 10px; font-size: 75%;">Operador booleano "OR" para refinar a busca veja <a href="'.base_url(PATH.'help').'">'.'Busca Avançada</a>';
+$opx = '<span style="margin-right: 10px; font-size: 75%;">Para refinar a busca veja <a href="'.base_url(PATH.'help').'">'.'Busca Avançada</a>';
 $opx .= '</span>';
 ?>
 <style>
@@ -48,9 +48,9 @@ input[type=text]:focus {
 	<div class="container" style="border: 0px solid #ff0000;">
 		<div class="row">
                         <div class="col-12 col-md-12 col-lg-12">
-                            <form class="card card-sm search-wrapper ucase" style="border: 0px solid #ffffff;">
+                            <form class="card card-sm search-wrapper " style="border: 0px solid #ffffff;">
                             	<?php echo msg('search_term'); ?>
-                                <div class="card-body row no-gutters align-items-center" style="padding-bottom: 0px;">
+                                <div class="card-body row ucase no-gutters align-items-center" style="padding-bottom: 0px;">
                                     <div class="col-auto">
                                         <i class="fas fa-search h4 text-body"></i>
                                     </div>
@@ -73,6 +73,34 @@ input[type=text]:focus {
                                 	<?php echo $opx; ?>
                                	</div>
                                 <br>
+                                
+                                <!---------- LIMITS --------------->
+                                <h4><?php echo msg('limits');?></h4>
+                                <nobr>
+                                <?php echo msg('search_delimitation');?>: 
+                                <?php echo $this->searchs->rage("year_s","1972",(date("Y")+1));?>
+                                <?php echo $this->searchs->rage("year_e",(date("Y")+1),"1972");?>
+                                </nobr>
+                                <!----
+                                <nobr>
+                                    <?php
+                                        $chks = array('','','','','');
+                                        if (!isset($_SESSION['order']))
+                                            {
+                                                $_SESSION['order'] = 0;
+                                            }
+                                        $chk = $_SESSION['order'];
+                                        if (strlen($chk) > 0)
+                                            {
+                                                $chks[$chk] = 'checked';
+                                            }
+                                    ?>
+                                    Ordernar: 
+                                    <input name="order" value="0" type="radio" <?php echo $chks[0];?>> Relevância
+                                    <input name="order" value="1" type="radio" <?php echo $chks[1];?>> Ano
+                                </nobr>
+                                ---->
+                                
 						<?php ?>
 						</div>                                
                             </form>

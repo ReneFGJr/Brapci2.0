@@ -16,6 +16,18 @@
 				</li>
 				
                 <li>
+                    <h4>Busca por Termo Composto</h4>
+                    <p>
+                        Termo exato: <b>"Nome do termo"</b> (entre aspas)
+                    </p>
+                    <code>
+                        ex: "Mineração de texto"
+                    </code>
+                    <br/>
+                    <br/>
+                </li>				
+				
+                <li>
                     <h4>Busca pela variações de termos</h4>
                     <p>
                         Termo e sua variação: <b>Nome do termo com asterisco "*"</b>

@@ -637,7 +637,7 @@ class socials extends CI_Model {
                 $texto .= '<p>Para ativar seu cadastro é necessário clicar no link abaixo:';
                 $texto .= '<br><br>';
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a></p>';
-                $texto = utf8_decode($text);
+                $texto = utf8_decode($texto);
                 $de = 1;
                 break;
             case 'PASSWORD' :
@@ -712,10 +712,8 @@ class socials extends CI_Model {
 
             if ($rs == 1) {
                 $code = 'SIGNUP';
-                $this -> user_email_send($email, $name, $code);
-                $txt = bs_alert('success','Success!');
-                $data['content'] = $tela;
-                $this->load->view('show',$data);
+                $this -> user_email_send($email, $name, $code);                
+                $this -> load -> view('social/login/login_signup_sucess', $dt);                
                 return ("");
             }
         }
