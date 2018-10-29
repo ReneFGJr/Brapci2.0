@@ -4,18 +4,18 @@ $q = htmlspecialchars(get("q"));
 $pos = get("type");
 $op = '';
 if (strlen($pos) == 0) {
-	$pos = 1;
+    $pos = 1;
 }
 for ($r = 1; $r <= 6; $r++) {
-	$check = '';
-	if ($r == $pos) {
-		$check = 'checked';
-	}
-	$op .= '<input type="radio" name="type" value="' . $r . '" ' . $check . '>' . cr();
-	$op .= '<span style="margin-right: 10px; font-size: 75%;">' . msg('search_' . $r) . '</span>';
+    $check = '';
+    if ($r == $pos) {
+        $check = 'checked';
+    }
+    $op .= '<input type="radio" name="type" value="' . $r . '" ' . $check . '>' . cr();
+    $op .= '<span style="margin-right: 10px; font-size: 75%;">' . msg('search_' . $r) . '</span>';
 
 }
-$opx = '<span style="margin-right: 10px; font-size: 75%;">Para refinar a busca veja <a href="'.base_url(PATH.'help').'">'.'Busca Avançada</a>';
+$opx = '<span style="margin-right: 10px; font-size: 75%;">Para refinar a busca veja <a href="' . base_url(PATH . 'help') . '">' . 'Busca Avançada</a>';
 $opx .= '</span>';
 ?>
 <style>
@@ -37,11 +37,11 @@ input[type=text] {
 input[type=text]:focus {
     width: 100%;
     background-image: url('<?php echo HTTP; ?>
-		img/icone/searchicon.png');
-		background-color: white;
-		background-position: 10px 10px;
-		background-repeat: no-repeat;
-		}
+        img/icone/searchicon.png');
+        background-color: white;
+        background-position: 10px 10px;
+        background-repeat: no-repeat;
+        }
 </style>
 </head>
 <body>
@@ -73,13 +73,15 @@ input[type=text]:focus {
                                 	<?php echo $opx; ?>
                                	</div>
                                 <br>
+                        </div>
+                        <div class="col-6 col-md-6 col-lg-6">
                                 
                                 <!---------- LIMITS --------------->
-                                <h4><?php echo msg('limits');?></h4>
+                                <h4><?php echo msg('limits'); ?></h4>
                                 <nobr>
-                                <?php echo msg('search_delimitation');?>: 
-                                <?php echo $this->searchs->rage("year_s","1972",(date("Y")+1));?>
-                                <?php echo $this->searchs->rage("year_e",(date("Y")+1),"1972");?>
+                                <?php echo msg('search_delimitation'); ?>: 
+                                <?php echo $this -> searchs -> rage("year_s", "1972", (date("Y") + 1)); ?>
+                                <?php echo $this -> searchs -> rage("year_e", (date("Y") + 1), "1972"); ?>
                                 </nobr>
                                 <!----
                                 <nobr>
@@ -102,6 +104,10 @@ input[type=text]:focus {
                                 ---->
                                 
 						<?php ?>
+                        </div>
+                        <div class="col-6 col-md-6 col-lg-6">
+                            <h4><?php echo msg('Collection'); ?></h4>
+                            <?php echo msg('collection_all');?> | <a href=<?php echo '"'.base_url(PATH.'collection').'">'.msg('select_collection');?></a>						
 						</div>                                
                             </form>
                         </div>			
@@ -112,7 +118,7 @@ input[type=text]:focus {
 	</div>
 
 	<script>
-						$(function() {
+								$(function() {
 			$("#q").autocomplete({
 				source : function(request, response) {
 					$.ajax({

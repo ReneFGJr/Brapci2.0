@@ -239,12 +239,15 @@ class res extends CI_Controller {
 
         if (strlen($act) == 0) {
 
-            $data['content'] = $this -> sources -> list_sources();
+            $data['content'] = '';
             if (perfil("#ADM")) {
+                $data['content'] .= '<div class="col-md-12">'.cr();
                 $data['content'] .= $this -> sources -> button_new_sources();
                 $data['content'] .= $this -> sources -> button_harvesting_all();
                 $data['content'] .= $this -> sources -> button_harvesting_status();
+                $data['content'] .= '</div>'.cr();
             }
+            $data['content'] .= $this -> sources -> list_sources();
             $data['title'] = msg('journals');
         } else {
             $id = $this -> sources -> next_harvesting($p);
@@ -359,15 +362,24 @@ class res extends CI_Controller {
                 $title = msg('index') . ': ' . msg('index_words');
                 $sx = $this -> frbr_core -> index_list($lt, 'Word');
                 break;
+            case 'collection' :
+                $title = msg('Collection') . ': ' . msg('index_collection');
+                $sx = $this -> frbr_core -> index_list($lt, 'Collection');
+                break;                
             default :
                 $title = 'Índices';
                 $sx = '<ul>';
+                $sx .= '<h3>'.msg('Authorities').'</h3>'.cr();
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/author') . '">' . msg('Authors') . '</a></li>';
-                $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('CorporateBody') . '</a></li>';
-                $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/subject') . '">' . msg('Subject') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('CorporateBody') . '</a></li>';
+                $sx .= '<h3>'.msg('Journals').'</h3>'.cr();
+                $sx .= '<li><a href="' . base_url(PATH . 'indice/collection') . '">' . msg('Collection') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/journal') . '">' . msg('Journal') . '</a></li>';
-                $sx .= '<li><a href="' . base_url(PATH . 'indice/words') . '">' . msg('Words') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';                
+                
+                //$sx .= '<li><a href="' . base_url(PATH . 'indice/words') . '">' . msg('Words') . '</a></li>';
+                
                 $sx .= '</ul>';
         }
         $data['content'] = '<div class="row"><div class="col-md-12"><h1>' . $title . '</h1></div></div>' . $sx;
@@ -551,6 +563,33 @@ class res extends CI_Controller {
             case 'clean' :
                 $this -> bs -> mark_clear();
                 redirect(base_url(PATH . 'basket'));
+            case 'inport' :
+                $this -> cab();
+                $data = array();
+                $data['content'] = '';
+                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= $this -> bs -> mark_form_inport();
+                $this -> load -> view('show', $data);
+                $this -> footer();
+                
+            case 'save' :
+                $this -> cab();
+                $data = array();
+                $data['content'] = '';
+                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= $this -> bs -> mark_save();
+                $this -> load -> view('show', $data);
+                $this -> footer();
+                break;
+            case 'saved' :
+                $this -> cab();
+                $data = array();
+                $data['content'] = '';
+                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= $this -> bs -> mark_saved();
+                $this -> load -> view('show', $data);
+                $this -> footer();                                 
+                break;
             default :
                 $this -> cab();
                 $data['content'] = $this -> bs -> tools();
@@ -628,6 +667,10 @@ class res extends CI_Controller {
         switch($tp) {
             case 'issue' :
                 $tela = $this -> export -> export_Issue($pg);
+                if (strlen($tela) <= 25)
+                    {
+                        redirect(base_url(PATH.'/export'));
+                    }
                 break;
             case 'article' :
                 $tela = $this -> export -> export_Article($pg);
@@ -648,7 +691,10 @@ class res extends CI_Controller {
                         $pg = 65;
                     }
                 $tela = $this -> export -> export_author_index_list($pg);
-                break;                
+                break; 
+            case 'collections_form':
+                $tela = $this -> export -> collections_form();
+                break;               
             default :
                 $tela = '<h1>' . msg('export') . '</h1>';
                 $tela .= '<ul>' . cr();
@@ -657,6 +703,8 @@ class res extends CI_Controller {
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject') . '">' . msg('export_subject') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
+                
                 $tela .= '</ul>' . cr();
                 break;
         }
@@ -1165,5 +1213,20 @@ class res extends CI_Controller {
 			
 			$this->load->view('show',$data);
 			$this->footer();	
-		}		
+		}
+    function collection()
+        {
+            $this->cab();
+            $tela = '<div class="row">'.cr();
+            $tela .= '<div class="col-md12">'.cr();
+            $tela .= '<h1>'.msg("Collection").'</h1>';
+            
+            $tela .= '</div>'.cr();
+            $tela .= '</div>'.cr();
+            
+            $data['content'] = $tela;            
+            $this->load->view('show',$data);
+            
+            $this->footer();
+        }		
 }

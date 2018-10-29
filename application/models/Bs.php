@@ -2,9 +2,13 @@
 class Bs extends CI_model {
     function tools() {
         $sx = '<div class="col-md-12">';
-        $sx .= '<a href="' . base_url(PATH . 'basket/clean') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('clean_selected') . '</a>';
-        $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/clean') . '" class="btn btn-outline-danger" style="margin-right: 10px;">' . msg('clean_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/csv') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
+
+        if ((isset($_SESSION['user'])) and (strlen($_SESSION['user']) > 0)) {
+            $sx .= '<a href="' . base_url(PATH . 'basket/save') . '" class="btn btn-outline-primary" style="margin-right: 10px;">' . msg('save_selected') . '</a>';
+        }
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
         $sx .= '<hr>';
@@ -264,10 +268,46 @@ class Bs extends CI_model {
     }
 
     function mark_export_csv() {
-        $file = 'brapci_' . date("YmdHi") . '.csv';
+        $file = 'brapci_' . date("YmdHi") . '.xls';
         header('Content-Encoding: UTF-8');
         header('Content-type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename=' . $file);
+        $sx = '';
+        $s = $_SESSION;
+        $tot = 0;
+
+        $a = array();
+        $sx = '<table>' . cr();
+        $sx .= '<tr><th>' . msg('author') . '</th>';
+        $sx .= '<th>' . msg('title') . '</th>';
+        $sx .= '<th>' . msg('source') . '</th>';
+        $sx .= '<th>' . msg('issue') . '</th>';
+        $sx .= '<th>' . msg('year') . '</th>';
+        $sx .= '<th>' . msg('session') . '</th>';
+        $sx .= '<th>' . msg('keywords') . '</th>';
+        $sx .= '<th>' . msg('abstract') . '</th>';
+        $sx .= '<th>' . msg('id') . '</th>';
+        $sx .= '<th>' . msg('link') . '</th>';
+        $sx .= '</tr>' . cr();
+        foreach ($s as $key => $value) {
+            if (substr($key, 0, 1) == 'm') {
+                $tot++;
+                $key = substr($key, 1, strlen($key));
+                $file = 'c/' . $key . '/name.xls';
+                if (file_exists($file)) {
+                    $fr = file_get_contents($file);
+                    $sx .= $fr . cr();
+                }
+            }
+        }
+        $sx .= '</table>';
+
+        echo '<html>';
+        echo '<body>';
+        echo utf8_decode($sx);
+        echo '</body>';
+        echo '</html>';
+
     }
 
     function mark_export_doc() {
@@ -279,7 +319,7 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
+
         $a = array();
         foreach ($s as $key => $value) {
             if (substr($key, 0, 1) == 'm') {
@@ -307,10 +347,100 @@ class Bs extends CI_model {
         }
         echo '<html>';
         echo '<body>';
-        echo '<h1>'.utf8_decode(msg('References')).'</h1>'.cr();
+        echo '<h1>' . utf8_decode(msg('References')) . '</h1>' . cr();
         echo utf8_decode($sx);
         echo '</body>';
         echo '</html>';
+    }
+
+    function mark_form_inport() {
+        $form = new form;
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, false));
+        array_push($cp, array('$T80:10', '', msg('IDs'), true, true));
+        array_push($cp, array('$M1', '', msg('IDs_info'), false, false));
+        array_push($cp, array('$B8', '', msg('inport'), false, true));
+
+        $tela = $form -> editar($cp, '');
+        $tela = '<div class="row"><div class="col-md-12 col-12">' . $tela . '</div></div>';
+
+        if ($form -> saved > 0) {
+            $n = troca(get("dd1"), chr(13), ';');
+            $n = troca($n, chr(10), '');
+            $ln = splitx(';', $n);
+            for ($r = 0; $r < count($ln); $r++) {
+                $nn = sonumero($ln[$r]);
+                $_SESSION['m' . $nn] = 1;
+            }
+            $tela .= bs_alert('success', msg('Was') . ' ' . count($ln) . ' ' . msg('inported_registers'));
+        }
+
+        return ($tela);
+    }
+
+    function mark_save($id = 0) {
+        if (!(isset($_SESSION['id'])) or (sonumero($_SESSION['id']) == 0)) {
+            return (bs_alert('danger', 'Session not initialized'));
+        }
+        $form = new form;
+        $cp = array();
+
+        $s = '';
+        $a = $_SESSION;
+        $total = 0;
+        foreach ($a as $key => $value) {
+            if (substr($key, 0, 1) == 'm') {
+                $s .= sonumero($key) . '; ';
+                $total++;
+            }
+        }
+        $_POST['dd2'] = $s;
+        array_push($cp, array('$H8', 'id_bb', '', false, false));
+        array_push($cp, array('$S100', 'bb_title', msg('ID_save_name'), true, true));
+        array_push($cp, array('$T100:5', 'bb_sel', msg('IDs'), true, true));
+        array_push($cp, array('$HV', 'bb_user', $_SESSION['id'], false, true));
+        array_push($cp, array('$HV', 'bb_update', date("Y-m-d"), false, true));
+        array_push($cp, array('$C1', 'bb_public', msg('bb_public'), false, true));
+        array_push($cp, array('$HV', 'bb_total', $total, false, true));
+        //array_push($cp,array('$HV','bb_session',$_SESSION['session'],true,true));
+
+        array_push($cp, array('$B8', '', msg('save_selection'), false, true));
+
+        $tela = $form -> editar($cp, '_bibliographic_selections');
+        $tela = '<div class="row"><div class="col-md-12 col-12">' . $tela . '</div></div>';
+
+        if ($form -> saved > 0) {
+            $tela = bs_alert('success', msg('bb_success'));
+        }
+
+        return ($tela);
+    }
+
+    function mark_saved() {
+        if (!(isset($_SESSION['id'])) or (sonumero($_SESSION['id']) == 0)) {
+            return (bs_alert('danger', 'Session not initialized'));
+        }
+        $id = $_SESSION['id'];
+        $sql = "select * from _bibliographic_selections 
+                        where bb_user = $id 
+                        order by bb_update";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<ul>';
+        for ($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $sx .= '<li>';
+                $sx .= $line['bb_title'];
+                $sx .= ' ';
+                $sx .= '('.$line['bb_total'].')';
+                $sx .= ' ';
+                $sx .= msg('saved_in').' '.stodbr($line['bb_update']);
+                $sx .= '<hr><code>'.$line['bb_sel'].'</code>';
+                $sx .= '</li>';
+            }
+        $sx .= '</ul>';
+        return($sx);
     }
 
 }

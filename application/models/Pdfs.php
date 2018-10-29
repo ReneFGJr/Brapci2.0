@@ -116,6 +116,7 @@ class pdfs extends CI_model {
 
 	function harvesting_pdf_curl($id) {
 		$links = array();
+		$links2 = array();
 		$data = $this -> frbr_core -> le_data($id);
 
 		for ($r = 0; $r < count($data); $r++) {
@@ -137,8 +138,42 @@ class pdfs extends CI_model {
 					array_push($links, $vlr);
 				}
 			}
+			if ($attr == 'hasRegisterId'){
+                if (substr($vlr, 0, 4) == 'http') {
+                    array_push($links2, $vlr);
+                }			    
+			}
+            
 		}
+        
+        if ((count($links) == 0) and (count($links2) > 0))
+            {
+                for ($r=0;$r < count($links2);$r++)
+                    {
+                        $link = $links2[$r];
+                        $rsp = load_page($link);
+                        $txt = $rsp['content'];
 
+                        if (strpos($txt,'citation_pdf_url') > 0)
+                            {
+                                /*****************************/
+                                $d = 'citation_pdf_url';
+                                $pos = strpos($txt,$d)+strlen($d);
+                                $txt = substr($txt,$pos,1000);
+                                
+                                /*****************************/
+                                $d = 'content="';
+                                $pos = strpos($txt,$d)+strlen($d);
+                                $txt = substr($txt,$pos,1000);
+                                $txt = substr($txt,0,strpos($txt,'"'));                                
+                                if (strlen($txt) > 0)
+                                    {
+                                        array_push($links, $txt);
+                                    }
+                            }                       
+                    }
+            }
+        
 		/************************ IDENTIFICAÇÃO DOS MÉTODOS *************/
 		$method = 0;
 		$link = '';
@@ -152,7 +187,7 @@ class pdfs extends CI_model {
 			switch($method) {
 				case '1' :
 					$link = $this -> method_1($link, $file, $id);
-					//echo '<br>' . ($r+1) . '. ' . $link;
+					echo '<br>' . ($r+1) . '. ' . $link;
 					try {
 						$rsp = load_page($link);
 						$txt = $rsp['content'];

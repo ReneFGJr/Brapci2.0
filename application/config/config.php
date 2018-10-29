@@ -32,8 +32,8 @@ DEFINE("PATH","index.php/res/");
 DEFINE("HTTP","http://[::1]/projeto/Brapci2.0/");
 //DEFINE("HTTP","http://143.54.114.150/Brapci2.0/");
 
-DEFINE("ELASTIC_PREFIX","brp2");
-//DEFINE("ELASTIC_PREFIX","tst2");
+//DEFINE("ELASTIC_PREFIX","brp2");
+DEFINE("ELASTIC_PREFIX","tst2");
 
 DEFINE("ELASTIC",'http://143.54.114.150:9200');
 //DEFINE("ELASTIC",'http://127.0.0.1:9200');

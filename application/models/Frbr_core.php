@@ -355,6 +355,19 @@ class frbr_core extends CI_model {
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
     }
+    
+    function journal_show($id) {
+        $data = array();
+        $sx = '';
+
+        $data = $this -> le($id);
+        $data['person'] = $this -> le_data($id);
+        $data['use'] = $this -> le_remissiva($id);
+        $data['id'] = $id;
+
+        $sx = $this -> load -> view('find/view/journal', $data, true);
+        return ($sx);
+    }    
 
     function corporate_show($id) {
         $data = array();
@@ -510,7 +523,7 @@ class frbr_core extends CI_model {
                     $tela .= $this -> genero -> update($id);
                     break;
                 case 'Journal' :
-                    $tela = $this -> person_show($id);
+                    $tela = $this -> journal_show($id);
                     $tela .= $this -> view_data($id);
                     break;
                 default :

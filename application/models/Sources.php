@@ -368,7 +368,10 @@ class sources extends CI_Model {
 
 	function show_issues($idx = 0) {
 		$id = $this -> oai_pmh -> check_oai_index($idx);
-
+        if ($id == 0)
+            {
+                return("");
+            }
 		$sx = '<h3>' . msg('ISSUE') . '</h3>';
 		//$id = 164;
 		$dt = $this -> frbr_core -> le_data($id);
