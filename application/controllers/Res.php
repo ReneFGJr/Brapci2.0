@@ -130,9 +130,14 @@ class res extends CI_Controller {
 
         if (strlen(get("q")) > 0) {
             //$this -> ElasticSearch -> getStatus();
-
-            $term = convert(get("q"));
-            $type = get("type");
+			$type = get("type");
+			if ($type != 2)
+				{
+            		$term = convert(get("q"));
+				} else {
+					$term = get("q");
+				}
+            $term = troca($term,'¢','"');
             $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
             //$data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);
