@@ -1222,10 +1222,21 @@ class res extends CI_Controller {
     function collection()
         {
             $this->cab();
+            $ps = $_POST;
+            foreach ($ps as $key => $value) {
+                if (substr($key,0,1) == 'a')
+                    {
+                        $_SESSION[$key] = 1;        
+                    }                
+            }
             $tela = '<div class="row">'.cr();
             $tela .= '<div class="col-md12">'.cr();
             $tela .= '<h1>'.msg("Collection").'</h1>';
-            
+            $file = 'application/views/brapci/filter.php';
+            if (file_exists($file))
+                {
+                    $tela .= file_get_contents($file);        
+                }            
             $tela .= '</div>'.cr();
             $tela .= '</div>'.cr();
             

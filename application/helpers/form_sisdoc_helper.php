@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.18.09.07
+ * @version     v0.18.11.03
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -1462,7 +1462,7 @@ if (!function_exists('form_edit')) {
 			}
 			if ($obj -> edit == True) {
 				$idr = trim($row[$fd[0]]);
-				$data .= '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></td>';
+				$data .= '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '">'.msg('[ed]').'</span></td>';
 			}
 			$data .= '</tr>' . chr(13) . chr(10);
 		}

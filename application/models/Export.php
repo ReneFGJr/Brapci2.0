@@ -626,6 +626,7 @@ class export extends CI_Model {
 
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
+        print_r($_POST);
 
         $sx = '<form method="post">';
         $sx .= '<ul style="list-style-type: none;">';
@@ -641,46 +642,56 @@ class export extends CI_Model {
             if ($nx != $n) {
 
                 $sx .= '<h4>';
-                $dt = 'name = "c' . $ic2 . '" id="c' . $ic2 . '" ';
-                if ((isset($_SESSION['c' . $ic2])) and ($_SESSION['c' . $ic2] == '1')) {
-                    $dt .= ' checked';
-                }
-                $sx .= '<input type="checkbox" ' . $dt . ' onchange="fcn'.$ic2.'(\'#c' . $ic2 . '\');"> ';
+                $dt = 'name = "c' . $ic1 . '" id="c' . $ic1 . '" ';
+                $sx .= '<input type="checkbox" ' . $dt . ' onclick="fcn'.$ic1.'(\'fcn'.$ic1.'\', this);"> ';
                 $sx .= $line['n_name_1'];
                 $sx .= '</h4>' . cr();
                 $n = $nx;
             }
             $sx .= '<li style="margin-left: 20px;">';
-            $dt = 'name = "a' . $ic1 . '" id="c' . $ic1 . '" ';
-            if ((isset($_SESSION['c' . $ic1])) and ($_SESSION['c' . $ic1] == '1')) {
+            $dt = 'name = "a' . $ic2 . '" id="a' . $ic1.'_'.$ic2 . '" ';
+            if ((isset($_SESSION['a' . $ic2])) and ($_SESSION['a' . $ic2] == '1')) {
                   $dt .= ' checked';
             }
-            $sx .= '<input type="checkbox" ' . $dt . '> ';
-            $sx .= $line['n_name_2'];
-            $sx .= '</li>';
 
-            if (!isset($sel[$ic2])) {
-                $sel[$ic2] = array();
+            $sx .= '<?php '.cr();
+            $sx .= '    $ch = ""; '.cr();
+            $sx .= '    if ((isset($_SESSION[\'c'.$ic1.'\'])) and ($_SESSION[\'c' . $ic1.'\'] == \'1\')) { $ch = \' checked\'; }'.cr();
+            $sx .= '?>'.cr();
+            $sx .= '<input type="checkbox" ' . $dt . ' <?php echo $ch; ?> ';
+            $sx .= $line['n_name_2'];
+            $sx .= ' ('.$line['id_cc_2'].')';
+            $sx .= '</li>'.cr();
+
+            if (!isset($sel[$ic1])) {
+                $sel[$ic1] = array();
             }
-            array_push($sel[$ic2], $ic1);
+            array_push($sel[$ic1], $ic2);
         }
         $sx .= '</ul>';
-        $sx .= '<input type="submit" value="' . msg('submit') . '" class="btn btn-outline-primary">';
+        $sx .= '<input type="submit" value="' . msg('filter') . '" class="btn btn-outline-primary">';
         $sx .= '</form>';
 
         /* JAVA */
         $sx .= cr().'<script>' . cr();
+        /***********************************************************/
         foreach ($sel as $key => $value) {
-            $sx .= 'function fcn'.$key.'($id) {'.cr();
-            for ($rx=0;$rx < count($value);$rx++)
+            $sx .= 'function fcn'.$key.'($this,ta) {'.cr();
+            $sx .= '    var $chk = ta.checked;'.cr();            
+                for ($rx=0;$rx < count($value);$rx++)
                 {
-                    $d = $value[$rx];
-                    $sx .= 'alert("==>'.$d.'");'.cr();
-                    //$sx .=  $('#').prop('checked',true);
+                    $d = $key.'_'.$value[$rx];
+                    $sx .=  '   $("#a'.$d.'").prop( "checked", $chk ); '.cr();
                 }
+                
             $sx .= '}'.cr();            
         }
         $sx .= '</script>' . cr();
+        $file = 'application/views/brapci/filter.php';
+        $rlt = fopen($file,'w+');
+        fwrite($rlt,$sx);
+        fclose($rlt);
+        
         return ($sx);
     }
 

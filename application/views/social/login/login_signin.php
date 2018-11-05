@@ -12,8 +12,8 @@
 </style>
 <div class="container" style="margin-top: 100px;">
 	<div class="row">
-		<div class="col-md-4"></div>
-		<div class="col-md-4 box100">
+		<div class="col-md-2 col-lg-3 col-sm-1 col-xs-3"></div>
+		<div class="col-md-8 col-lg-5 col-sm-10 col-xs-6 box100">
 			<form method="post" action="<?php echo base_url(PATH.'social/login_local');?>">
 				<span class="form_title"> BRAPCI <sup>2.0</sup> </span>
 				<br/>
@@ -55,7 +55,7 @@
 				<br>
 			</form>
 		</div>
-		<div class="col-md-4"></div>
+		<div class="col-md-2 col-lg-3 col-sm-1 col-xs-3"></div>
 	</div>
 </div>
 
