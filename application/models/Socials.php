@@ -633,11 +633,10 @@ class socials extends CI_Model {
             case 'SIGNUP' :
                 $link = base_url(PATH.'social/npass/?dd0=' . $para . '&chk=' . checkpost_link($para . $para));
                 $assunto = utf8_decode('Cadastro de novo usuários - Brapci');
-                $texto .= '<p>' . msg('Dear') . ' <b>' . $nome . ',</b></p>';
-                $texto .= '<p>Para ativar seu cadastro é necessário clicar no link abaixo:';
+                $texto .= utf8_decode('<p>' . msg('Dear') . ' <b>' . $nome . ',</b></p>');
+                $texto .= utf8_decode('<p>Para ativar seu cadastro é necessário clicar no link abaixo:');
                 $texto .= '<br><br>';
                 $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a></p>';
-                $texto = utf8_decode($texto);
                 $de = 1;
                 break;
             case 'PASSWORD' :
