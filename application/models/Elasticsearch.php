@@ -409,6 +409,9 @@ class elasticsearch extends CI_model {
                           ' . $qqq . '                          
                         }              
                 ';
+                //echo '<pre>';
+                //print_r($data);
+                //echo '</pre>';
         $rq = $this -> call($type . '/_search?' . $qs, $method, $data);
         return $rq;
     }
