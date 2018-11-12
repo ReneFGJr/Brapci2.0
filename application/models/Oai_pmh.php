@@ -1983,6 +1983,57 @@ class oai_pmh extends CI_model {
         }
 
     }
+    function valida_metadata($id=0)
+        {
+            $jnl = 16;
+            $sx = bs_alert('info',msg("OK"));
+            $wh = 'li_jnl = '.$jnl.' and ';
+            $sql = "select * from source_listidentifier 
+                        where $wh li_status = 'active' and li_s = 3
+                        order by li_s, li_u, id_li
+                        limit 1 offset ".$id;
+            $rlt = $this -> db -> query($sql);
+            $rlt = $rlt -> result_array();
+            
+            /* dados da publicação */
+            $data = $this -> sources -> le($jnl);
+             
+            if (count($rlt) > 0)
+                {
+                    $line = $rlt[0];                    
+                    $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];
+                    $cnt = $this -> readfile($url);
+                    $cnt = troca($cnt, 'oai_dc:', 'oai_');
+                    $cnt = troca($cnt, 'dc:', '');
+                    $cnt = troca($cnt, 'xml:', '');
+                    $xml = simplexml_load_string($cnt);
+                                                              
+                    $idi = $line['li_identifier'];
+                    $sx .= '<h2>'.$url.'<br>'.$idi.'</h2>';
+                    $dt = $xml->GetRecord->record->header;
+                    $mt = $xml->GetRecord->record->metadata->oai_dc;
 
+                    $dtst = $dt->datestamp;
+                    $setSpec = $dt->setSpec;
+                    /**********************/
+                    $date = $mt->date;
+                    $title = $this->xml_values($mt->title);
+                    $creator = $this->xml_values($mt->creator);
+                    
+                    echo '<br>=date stamp=>'.$dtst;
+                    echo '<br>=setSpec=>'.$setSpec;
+                    echo '<br>=Date=>'.$date;
+                    echo '<hr>';
+                    print_r($title);
+                    echo '<hr>';
+                    print_r($creator);
+                    echo '<hr>';
+                    
+                    echo '<pre>';
+                    print_r($xml);
+                    echo '</pre>';        
+                }         
+            return($sx);
+        }
 }
 ?>

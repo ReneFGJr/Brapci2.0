@@ -1233,5 +1233,19 @@ class res extends CI_Controller {
             $this->load->view('show',$data);
             
             $this->footer();
-        }		
+        }
+    function metadata($id=0)
+        {
+            $this->load->model("sources");
+            $this->load->model("oai_pmh");
+            $this->cab();
+            $tela = '<div class="row"><div class="col-md-12">';
+            $tela .= '<h1>'.msg('metadata').'</h1>';
+            $tela .= $this->oai_pmh->valida_metadata($id);
+            $tela .= '</div></div>';
+            $data['content'] = $tela;
+            
+            $this->load->view('show',$data);
+            $this->footer();
+        }        		
 }
