@@ -1247,5 +1247,17 @@ class res extends CI_Controller {
             
             $this->load->view('show',$data);
             $this->footer();
-        }        		
+        }
+    function patent($ac='',$pg=0)
+        {
+            $this -> load -> model("frad");
+            $this -> load -> model("frbr_core");            
+            $this->load->model('patents');
+            $this->cab();
+            $tela = $this->patents->import();
+            
+            $data['content'] = $tela;
+            $this->load->view('show',$data);            
+            $this->footer();
+        }                		
 }

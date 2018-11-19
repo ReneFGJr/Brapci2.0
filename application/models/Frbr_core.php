@@ -488,6 +488,10 @@ class frbr_core extends CI_model {
             $class = trim($data['c_class']);
 
             switch ($class) {
+                case 'Patent':
+                    $tela = $this -> frbr -> show_patent($id);
+                    $tela .= $this -> view_data($id);                    
+                    break;
                 case 'Article' :
                     $tela = $this -> frbr -> show_article($id);
                     $tela .= $this -> view_data($id);
