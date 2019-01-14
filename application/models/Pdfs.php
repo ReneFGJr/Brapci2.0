@@ -145,7 +145,7 @@ class pdfs extends CI_model {
 			}
             
 		}
-        
+
         if ((count($links) == 0) and (count($links2) > 0))
             {
                 for ($r=0;$r < count($links2);$r++)
@@ -187,7 +187,7 @@ class pdfs extends CI_model {
 			switch($method) {
 				case '1' :
 					$link = $this -> method_1($link, $file, $id);
-					echo '<br>' . ($r+1) . '. ' . $link;
+					//echo '<br>' . ($r+1) . '. ' . $link;
 					try {
 						$rsp = load_page($link);
 						$txt = $rsp['content'];
@@ -197,10 +197,10 @@ class pdfs extends CI_model {
 						if (strpos($type, ';') > 0) {
 							$type = substr($type, 0, strpos($type, ';'));
 						}
-						//echo '<br>===>[' . $type.']';
 						switch($type) {
 							case 'application/pdf' :
 								$this -> file_pdf($file, $txt, $id, $jnl);
+                                return("pdf");
 								//echo ' - ' . msg('save_pdf');
 								break;
 							case 'application/zip' :
@@ -243,6 +243,7 @@ class pdfs extends CI_model {
 					break;
 			}
 		}
+exit;
 		return (msg("Harvesting"));
 	}
 

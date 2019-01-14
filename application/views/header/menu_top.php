@@ -73,6 +73,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/saved'); ?>"><?php echo msg('basket_saved'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/inport'); ?>"><?php echo msg('basket_inport'); ?></a>
+                        <a class="dropdown-item" href="<?php echo base_url(PATH . 'bibliometric'); ?>"><?php echo msg('bibliometric_tools'); ?></a>
                     </div>
                 </li>
                 <?php } ?>

@@ -26,22 +26,18 @@ class res extends CI_Controller {
 
     private function cab($data = array()) {
         $data['title'] = 'Brapci 2.0';
-		if (isset($data['meta']))
-			{
-				for($r=0;$r < count($data['meta']);$r++)
-					{
-						$line = $data['meta'][$r];
-						$class = trim($line['c_class']);
-						if (trim($line['c_class']) == 'prefLabel')
-							{
-								$data['title'] = trim($line['n_name']).' :: Brapci 2.0';	
-							}
-						if (trim($line['c_class']) == 'hasTitle')
-							{
-								$data['title'] = trim($line['n_name']).' :: Brapci 2.0';	
-							}							
-					}
-			}
+        if (isset($data['meta'])) {
+            for ($r = 0; $r < count($data['meta']); $r++) {
+                $line = $data['meta'][$r];
+                $class = trim($line['c_class']);
+                if (trim($line['c_class']) == 'prefLabel') {
+                    $data['title'] = trim($line['n_name']) . ' :: Brapci 2.0';
+                }
+                if (trim($line['c_class']) == 'hasTitle') {
+                    $data['title'] = trim($line['n_name']) . ' :: Brapci 2.0';
+                }
+            }
+        }
         $this -> load -> view('header/header.php', $data);
         if (!isset($data['nocab'])) {
             $this -> load -> view('header/menu_top.php', $data);
@@ -84,10 +80,9 @@ class res extends CI_Controller {
     }
 
     public function zera($pg = '') {
-        if (!perfil("#ADM"))
-            {
-                redirect(PATH);
-            }
+        if (!perfil("#ADM")) {
+            redirect(PATH);
+        }
         $this -> cab();
         $this -> load -> model('elasticsearch');
         if ($pg == '') {
@@ -98,23 +93,23 @@ class res extends CI_Controller {
             $sql = "TRUNCATE rdf_data;";
             $this -> db -> query($sql);
             $sql = "TRUNCATE rdf_name;";
-            $this -> db -> query($sql);  
+            $this -> db -> query($sql);
             $sql = "TRUNCATE source_oai_log;";
-            $this -> db -> query($sql);  
-                      
+            $this -> db -> query($sql);
+
             $rst = $this -> elasticsearch -> delete_all('article');
             $sx = '<div class="container">';
             $sx .= '<div class="row">';
             $sx .= '<div class="col-md-12">';
-            $sx .= '<h1>'.msg('DELETING DATABASE').'</h1>';
+            $sx .= '<h1>' . msg('DELETING DATABASE') . '</h1>';
             $sx .= '</div>';
             $sx .= '</div>';
-            
-            $sx .= bs_alert("success",msg('all_data_deleted'));
+
+            $sx .= bs_alert("success", msg('all_data_deleted'));
             $sx .= '</div>';
             $data['content'] = $sx;
             $this -> load -> view('show', $data);
-            $this->footer();
+            $this -> footer();
         }
     }
 
@@ -130,14 +125,13 @@ class res extends CI_Controller {
 
         if (strlen(get("q")) > 0) {
             //$this -> ElasticSearch -> getStatus();
-			$type = get("type");
-			if ($type != 2)
-				{
-            		$term = convert(get("q"));
-				} else {
-					$term = get("q");
-				}
-            $term = troca($term,'¢','"');
+            $type = get("type");
+            if ($type != 2) {
+                $term = convert(get("q"));
+            } else {
+                $term = get("q");
+            }
+            $term = troca($term, '¢', '"');
             $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
             //$data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);
@@ -173,13 +167,13 @@ class res extends CI_Controller {
     public function v($id) {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
-		$this -> load -> model('frbr_core');
+        $this -> load -> model('frbr_core');
         $this -> load -> model('genero');
-		$this -> load -> model('frad');
-		
-		$vv = $this->frbr_core->le_data($id);
-		$data['meta'] = $vv;
-		$data['id'] = $id;
+        $this -> load -> model('frad');
+
+        $vv = $this -> frbr_core -> le_data($id);
+        $data['meta'] = $vv;
+        $data['id'] = $id;
         $this -> cab($data);
 
         $tela = $this -> frbr -> vv($id);
@@ -204,7 +198,7 @@ class res extends CI_Controller {
         }
 
         $html .= '<br><br>';
-        $html .= $this->sources->show_issues($id);
+        $html .= $this -> sources -> show_issues($id);
 
         $data['content'] = $html;
         $this -> load -> view('show', $data);
@@ -246,11 +240,11 @@ class res extends CI_Controller {
 
             $data['content'] = '';
             if (perfil("#ADM")) {
-                $data['content'] .= '<div class="col-md-12">'.cr();
+                $data['content'] .= '<div class="col-md-12">' . cr();
                 $data['content'] .= $this -> sources -> button_new_sources();
                 $data['content'] .= $this -> sources -> button_harvesting_all();
                 $data['content'] .= $this -> sources -> button_harvesting_status();
-                $data['content'] .= '</div>'.cr();
+                $data['content'] .= '</div>' . cr();
             }
             $data['content'] .= $this -> sources -> list_sources();
             $data['title'] = msg('journals');
@@ -338,8 +332,8 @@ class res extends CI_Controller {
                 break;
             case 'author' :
                 $title = msg('index') . ': ' . msg('index_authority');
-                $sx = bs_pages(65,90,PATH.'indice/author');
-                $sx .= $this -> frbr_core -> index_list_2($lt, 'Person',1);
+                $sx = bs_pages(65, 90, PATH . 'indice/author');
+                $sx .= $this -> frbr_core -> index_list_2($lt, 'Person', 1);
                 break;
             case 'corporate' :
                 $title = msg('index') . ': ' . msg('index_serie');
@@ -356,13 +350,13 @@ class res extends CI_Controller {
                 break;
             case 'subject' :
                 $title = msg('index') . ': ' . msg('index_sections');
-                $sx = bs_pages(65,90,PATH.'indice/subject');
-                $sx .= $this -> frbr_core -> index_list_2($lt, 'Subject',1);
-                break;                
-                
-                //$title = msg('index') . ': ' . msg('index_sections');
-                //$sx = $this -> frbr_core -> index_list($lt, 'Subject');
-                //break;
+                $sx = bs_pages(65, 90, PATH . 'indice/subject');
+                $sx .= $this -> frbr_core -> index_list_2($lt, 'Subject', 1);
+                break;
+
+            //$title = msg('index') . ': ' . msg('index_sections');
+            //$sx = $this -> frbr_core -> index_list($lt, 'Subject');
+            //break;
             case 'words' :
                 $title = msg('index') . ': ' . msg('index_words');
                 $sx = $this -> frbr_core -> index_list($lt, 'Word');
@@ -370,21 +364,21 @@ class res extends CI_Controller {
             case 'collection' :
                 $title = msg('Collection') . ': ' . msg('index_collection');
                 $sx = $this -> frbr_core -> index_list($lt, 'Collection');
-                break;                
+                break;
             default :
                 $title = 'Índices';
                 $sx = '<ul>';
-                $sx .= '<h3>'.msg('Authorities').'</h3>'.cr();
+                $sx .= '<h3>' . msg('Authorities') . '</h3>' . cr();
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/author') . '">' . msg('Authors') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/subject') . '">' . msg('Subject') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('CorporateBody') . '</a></li>';
-                $sx .= '<h3>'.msg('Journals').'</h3>'.cr();
+                $sx .= '<h3>' . msg('Journals') . '</h3>' . cr();
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/collection') . '">' . msg('Collection') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/journal') . '">' . msg('Journal') . '</a></li>';
-                $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';                
-                
+                $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';
+
                 //$sx .= '<li><a href="' . base_url(PATH . 'indice/words') . '">' . msg('Words') . '</a></li>';
-                
+
                 $sx .= '</ul>';
         }
         $data['content'] = '<div class="row"><div class="col-md-12"><h1>' . $title . '</h1></div></div>' . $sx;
@@ -455,7 +449,7 @@ class res extends CI_Controller {
             case 'Identify' :
                 $html = $this -> sources -> info($id);
                 $html .= $this -> oai_pmh -> Identify($id);
-                redirect(base_url(PATH.'oai/info/'.$id));
+                redirect(base_url(PATH . 'oai/info/' . $id));
                 break;
             default :
                 $html = $this -> oai_pmh -> repository_list($id);
@@ -556,7 +550,7 @@ class res extends CI_Controller {
                         break;
                     case 'doc' :
                         $this -> bs -> mark_export_doc();
-                        break;                        
+                        break;
                     case 'ris' :
                         $this -> bs -> mark_export_ris();
                         break;
@@ -572,16 +566,16 @@ class res extends CI_Controller {
                 $this -> cab();
                 $data = array();
                 $data['content'] = '';
-                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= '<h1>' . msg('References') . '</h1>' . cr();
                 $data['content'] .= $this -> bs -> mark_form_inport();
                 $this -> load -> view('show', $data);
                 $this -> footer();
-                
+
             case 'save' :
                 $this -> cab();
                 $data = array();
                 $data['content'] = '';
-                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= '<h1>' . msg('References') . '</h1>' . cr();
                 $data['content'] .= $this -> bs -> mark_save();
                 $this -> load -> view('show', $data);
                 $this -> footer();
@@ -590,15 +584,15 @@ class res extends CI_Controller {
                 $this -> cab();
                 $data = array();
                 $data['content'] = '';
-                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= '<h1>' . msg('References') . '</h1>' . cr();
                 $data['content'] .= $this -> bs -> mark_saved();
                 $this -> load -> view('show', $data);
-                $this -> footer();                                 
+                $this -> footer();
                 break;
             default :
                 $this -> cab();
                 $data['content'] = $this -> bs -> tools();
-                $data['content'] .= '<h1>'.msg('References').'</h1>'.cr();
+                $data['content'] .= '<h1>' . msg('References') . '</h1>' . cr();
                 $data['content'] .= $this -> bs -> basket();
                 $this -> load -> view('show', $data);
                 $this -> footer();
@@ -663,43 +657,40 @@ class res extends CI_Controller {
     }
 
     function export($tp = '', $pg = 0) {
-        $this -> load -> model('export');        
+        $this -> load -> model('export');
         $this -> load -> model('frbr_core');
         $this -> load -> model('elasticsearch');
-        
+
         $this -> cab();
 
         switch($tp) {
             case 'issue' :
                 $tela = $this -> export -> export_Issue($pg);
-                if (strlen($tela) <= 25)
-                    {
-                        redirect(base_url(PATH.'/export'));
-                    }
+                if (strlen($tela) <= 25) {
+                    redirect(base_url(PATH . '/export'));
+                }
                 break;
             case 'article' :
                 $tela = $this -> export -> export_Article($pg);
                 break;
             case 'subject' :
-                if ($pg == 0)
-                    {
-                        $pg = 65;
-                    }
-                $tela = $this -> export -> export_subject_index_list($pg);                
+                if ($pg == 0) {
+                    $pg = 65;
+                }
+                $tela = $this -> export -> export_subject_index_list($pg);
                 break;
             case 'subject_reverse' :
                 $tela = $this -> export -> export_subject_reverse($pg);
                 break;
             case 'index_authors' :
-                if ($pg == 0)
-                    {
-                        $pg = 65;
-                    }
+                if ($pg == 0) {
+                    $pg = 65;
+                }
                 $tela = $this -> export -> export_author_index_list($pg);
-                break; 
-            case 'collections_form':
+                break;
+            case 'collections_form' :
                 $tela = $this -> export -> collections_form();
-                break;               
+                break;
             default :
                 $tela = '<h1>' . msg('export') . '</h1>';
                 $tela .= '<ul>' . cr();
@@ -709,7 +700,7 @@ class res extends CI_Controller {
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
-                
+
                 $tela .= '</ul>' . cr();
                 break;
         }
@@ -755,7 +746,8 @@ class res extends CI_Controller {
 
     /* LOGIN */
     function social($act = '') {
-    	if ($act == 'user_password_new') { $act = 'npass'; }
+        if ($act == 'user_password_new') { $act = 'npass';
+        }
         switch($act) {
             case 'perfil' :
                 $this -> cab();
@@ -780,7 +772,7 @@ class res extends CI_Controller {
                 $email = get("dd0");
                 $chk = get("chk");
                 $chk2 = checkpost_link($email . $email);
-				$chk3 = checkpost_link($email . date("Ymd"));
+                $chk3 = checkpost_link($email . date("Ymd"));
 
                 if ((($chk != $chk2) AND ($chk != $chk3)) AND (!isset($_POST['dd1']))) {
                     $data['content'] = 'Erro de Check';
@@ -892,21 +884,21 @@ class res extends CI_Controller {
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
 
                 break;
-            case 'remissive';
+            case 'remissive' :
                 $this -> load -> model("frbr");
                 $this -> load -> model("frbr_core");
-                $sx = $this->frbr->author_check_remissive($p,$id); 
+                $sx = $this -> frbr -> author_check_remissive($p, $id);
                 $data['content'] = $sx;
-                $this -> load -> view('show', $data);               
+                $this -> load -> view('show', $data);
                 break;
             case 'pdf_check' :
                 $this -> load -> model("pdfs");
                 $this -> load -> model("frbr");
                 $this -> load -> model("frbr_core");
-                
-                $this->cab();
-                $data['content'] = $this->pdfs->check_pdf();
-                $this->load->view('show',$data);
+
+                $this -> cab();
+                $data['content'] = $this -> pdfs -> check_pdf();
+                $this -> load -> view('show', $data);
                 break;
             case 'pdf_import' :
                 $this -> load -> model("pdfs");
@@ -1026,14 +1018,13 @@ class res extends CI_Controller {
                     <div class="col-md-6">' . $t1 . '</div>
                     <div class="col-md-6">' . $t2 . '</div>
                 </div>';
-        if (perfil("#ADM"))
-            {
-                $tela .= '<div class="row">';
-                $tela .= '<div class="col-md-12">';
-                $tela .= '<a href="'.base_url(PATH.'vocabulary_ed/0').'" class="btn btn-secondary">'.msg('new').'</a>';
-                $tela .= '</div>';
-                $tela .= '</div>';
-            }
+        if (perfil("#ADM")) {
+            $tela .= '<div class="row">';
+            $tela .= '<div class="col-md-12">';
+            $tela .= '<a href="' . base_url(PATH . 'vocabulary_ed/0') . '" class="btn btn-secondary">' . msg('new') . '</a>';
+            $tela .= '</div>';
+            $tela .= '</div>';
+        }
         $tela .= '</div>';
         $data['content'] = $tela;
         $this -> load -> view('show', $data);
@@ -1083,12 +1074,12 @@ class res extends CI_Controller {
         $tela = '';
 
         switch($tools) {
-            case 'email':
+            case 'email' :
                 $tela .= '<h1>e-mail</h1>';
-                $this->load->helper('email');
-                enviaremail('renefgj@gmail.com','teste','teste');
-                
-                echo '===>'.$this->email->send();                
+                $this -> load -> helper('email');
+                enviaremail('renefgj@gmail.com', 'teste', 'teste');
+
+                echo '===>' . $this -> email -> send();
                 break;
             case 'class_export' :
                 /* acao */
@@ -1131,14 +1122,14 @@ class res extends CI_Controller {
                 }
                 break;
             default :
-                $tela = '<div class="col-md-12">'.cr();
-                $tela .= '<h1>' . msg('config') . '</h1>'.cr();
-                $tela .= '<ul>'.cr();
-                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>'.cr();
-                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>'.cr();
-                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/email') . '">' . msg('config_email') . '</a></li>'.cr();
-                $tela .= '</ul>'.cr();
-                $tela .= '</div>'.cr();
+                $tela = '<div class="col-md-12">' . cr();
+                $tela .= '<h1>' . msg('config') . '</h1>' . cr();
+                $tela .= '<ul>' . cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>' . cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>' . cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/email') . '">' . msg('config_email') . '</a></li>' . cr();
+                $tela .= '</ul>' . cr();
+                $tela .= '</div>' . cr();
                 break;
         }
         $data['content'] = $tela;
@@ -1164,100 +1155,149 @@ class res extends CI_Controller {
         $data['content'] = $tela;
         $this -> load -> view('show', $data);
     }
-    function frad($id='')
-        {
-            $this -> load -> model("frad");
-            $this -> load -> model("frbr_core");
-            $data['nocab'] = true;
-            
-            $this->cab($data);
-            $data = $this->frbr_core->le($id);
-            $id = $data['id_cc'];
-            $nm = $data['n_name'];
-            $tela = '<div class="container">'.cr();
-            $tela .= '<div class="row"><div class="col-md-12">';
-            $tela .= '<h1>'.$data['n_name']. ' ('.$id.')'.'</h1>';
-            $tela .= '</div></div></div>'.cr();
-            
-            $tela .= $this->frad->find_remissiva_form($id,$nm);
-            
-            $data['content'] = $tela;
-            $this->load->view('show',$data);            
+
+    function frad($id = '') {
+        $this -> load -> model("frad");
+        $this -> load -> model("frbr_core");
+        $data['nocab'] = true;
+
+        $this -> cab($data);
+        $data = $this -> frbr_core -> le($id);
+        $id = $data['id_cc'];
+        $nm = $data['n_name'];
+        $tela = '<div class="container">' . cr();
+        $tela .= '<div class="row"><div class="col-md-12">';
+        $tela .= '<h1>' . $data['n_name'] . ' (' . $id . ')' . '</h1>';
+        $tela .= '</div></div></div>' . cr();
+
+        $tela .= $this -> frad -> find_remissiva_form($id, $nm);
+
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+    }
+
+    function frad_corporate($id = '') {
+        $this -> load -> model("frad");
+        $this -> load -> model("frbr_core");
+        $data['nocab'] = true;
+
+        $this -> cab($data);
+        $data = $this -> frbr_core -> le($id);
+        $id = $data['id_cc'];
+        $nm = $data['n_name'];
+        $tela = '<div class="container">' . cr();
+        $tela .= '<div class="row"><div class="col-md-12">';
+        $tela .= '<h1>' . $data['n_name'] . ' (' . $id . ')' . '</h1>';
+        $tela .= '</div></div></div>' . cr();
+
+        $tela .= $this -> frad -> find_remissiva_form($id, $nm, 'CorporateBody');
+
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+
+    }
+
+    function summary($cmd = '') {
+        $this -> load -> model("frad");
+        $this -> load -> model("frbr_core");
+        $this -> load -> model("sources");
+
+        $this -> cab();
+        $tela = $this -> sources -> summary($cmd);
+        $data['content'] = $tela;
+
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
+    function collection() {
+        $this -> cab();
+        $tela = '<div class="row">' . cr();
+        $tela .= '<div class="col-md12">' . cr();
+        $tela .= '<h1>' . msg("Collection") . '</h1>';
+
+        $tela .= '</div>' . cr();
+        $tela .= '</div>' . cr();
+
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+
+        $this -> footer();
+    }
+
+    function metadata($id = 0) {
+        $this -> load -> model("sources");
+        $this -> load -> model("oai_pmh");
+        $this -> cab();
+        $tela = '<div class="row"><div class="col-md-12">';
+        $tela .= '<h1>' . msg('metadata') . '</h1>';
+        $tela .= $this -> oai_pmh -> valida_metadata($id);
+        $tela .= '</div></div>';
+        $data['content'] = $tela;
+
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
+    function patent($ac = '', $pg = 0) {
+        $this -> load -> model("frad");
+        $this -> load -> model("frbr_core");
+        $this -> load -> model('patents');
+        $this -> cab();
+        $tela = $this -> patents -> import();
+
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
+    function bibliometric($ac = '') {
+        $this -> load -> model("bibliometrics");        
+        $dd1 = get("dd1");
+        $tela = '';
+        $tela .= '<div class="row">';
+        $tela .= '<div class="col-md-12">';
+        switch($ac) {
+            case 'csv_to_net' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this-> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);                   
+                    $rst = $this -> bibliometrics -> csv_to_net($txt);
+                    $this->bibliometrics->download_file($rst);
+                    return('');
+                }
+                break;
+            case 'csv_to_matrix' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this-> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);                   
+                    $rst = $this -> bibliometrics -> csv_to_matrix($txt);
+                    $this->bibliometrics->download_file($rst);
+                    return('');
+                }
+                break;                
+            case 'semicolon_to_list' :
+                if (strlen($dd1) == 0) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> semicolon_to_list($dd1);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }
+                break;
+            default :
+                $tela = $this -> bibliometrics -> tools_menu();
+                break;
         }
-        
-    function frad_corporate($id='')
-        {
-            $this -> load -> model("frad");
-            $this -> load -> model("frbr_core");
-            $data['nocab'] = true;
-            
-            $this->cab($data);
-            $data = $this->frbr_core->le($id);
-            $id = $data['id_cc'];
-            $nm = $data['n_name'];
-            $tela = '<div class="container">'.cr();
-            $tela .= '<div class="row"><div class="col-md-12">';
-            $tela .= '<h1>'.$data['n_name']. ' ('.$id.')'.'</h1>';
-            $tela .= '</div></div></div>'.cr();
-            
-            $tela .= $this->frad->find_remissiva_form($id,$nm,'CorporateBody');
-            
-            $data['content'] = $tela;
-            $this->load->view('show',$data);
-            
-        }        
-	function summary($cmd='')
-		{
-            $this -> load -> model("frad");
-            $this -> load -> model("frbr_core");
-			$this -> load -> model("sources");
-			            
-            $this->cab();
-			$tela = $this-> sources-> summary($cmd);
-			$data['content'] = $tela;
-			
-			$this->load->view('show',$data);
-			$this->footer();	
-		}
-    function collection()
-        {
-            $this->cab();
-            $tela = '<div class="row">'.cr();
-            $tela .= '<div class="col-md12">'.cr();
-            $tela .= '<h1>'.msg("Collection").'</h1>';
-            
-            $tela .= '</div>'.cr();
-            $tela .= '</div>'.cr();
-            
-            $data['content'] = $tela;            
-            $this->load->view('show',$data);
-            
-            $this->footer();
-        }
-    function metadata($id=0)
-        {
-            $this->load->model("sources");
-            $this->load->model("oai_pmh");
-            $this->cab();
-            $tela = '<div class="row"><div class="col-md-12">';
-            $tela .= '<h1>'.msg('metadata').'</h1>';
-            $tela .= $this->oai_pmh->valida_metadata($id);
-            $tela .= '</div></div>';
-            $data['content'] = $tela;
-            
-            $this->load->view('show',$data);
-            $this->footer();
-        }
-    function patent($ac='',$pg=0)
-        {
-            $this -> load -> model("frad");
-            $this -> load -> model("frbr_core");            
-            $this->load->model('patents');
-            $this->cab();
-            $tela = $this->patents->import();
-            
-            $data['content'] = $tela;
-            $this->load->view('show',$data);            
-            $this->footer();
-        }                		
+        $this -> cab();
+        $tela .= '</div>';
+        $tela .= '</div>';
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
 }

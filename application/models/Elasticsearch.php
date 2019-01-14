@@ -43,14 +43,16 @@ class elasticsearch extends CI_model {
             return ( array());
         }
 
+        $url = $this -> server . '/' . $this -> index . '/' . $path;
+        
         if (perfil("#ADM"))
             {
-            //echo '<pre style="color: blue">';
-            //print_r($data);
-            //echo '</pre>';
+            echo '<pre style="color: blue">';
+            echo '<tt>'.$url.'</tt>';
+            echo '</pre>';
             }
 
-        $url = $this -> server . '/' . $this -> index . '/' . $path;
+        
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
