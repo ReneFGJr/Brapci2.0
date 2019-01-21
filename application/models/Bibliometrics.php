@@ -27,6 +27,12 @@ class bibliometrics extends CI_model {
             $sx .= '</a>';
             $sx .= '</li>';            
 
+            $sx .= '<li>';
+            $sx .= '<a href="'.base_url(PATH.'bibliometric/change_to').'">';
+            $sx .= msg('change_to');
+            $sx .= '</a>';
+            $sx .= '</li>'; 
+
             $sx .= '</ul>';
             $sx .= '</div>';
             $sx .= '</div>';
@@ -73,7 +79,14 @@ class bibliometrics extends CI_model {
         
         
     function semicolon_to_list($txt) {
-        $t = troca($txt, chr(13), ';');
+        for ($r=1;$r < 32;$r++)
+            {
+                $t = troca($txt, chr($r), ';');
+            }
+        while (strpos($t,';;'))
+            {
+                $t = troca($t,';;',';');
+            }
         for ($r = 0; $r < 31; $r++) {
             $t = troca($txt, chr($r), '');
         }
@@ -82,7 +95,8 @@ class bibliometrics extends CI_model {
         asort($te);
         foreach ($te as $key => $value) {          
             if (strlen($value) > 0) {
-                $sx .= $value . cr();
+                $id = $this->detect_language($value);
+                $sx .= $value . $id.cr();
             }
         }
         return ($sx);
@@ -313,7 +327,82 @@ class bibliometrics extends CI_model {
                 $sx  .= '';
                 return($sx);
             }
-
+        function detect_language($t)
+            {
+                $t = ' '.lowercase($t).' ';
+                $t = troca($t,'.',' ');
+                $t = troca($t,'?',' ');
+                $t = troca($t,'-',' ');
+                $t = troca($t,'(',' ');
+                $en = array(' and',' or','nals','mic','ion','ing','rds','rd',
+                            'ics','k','y','t','d','der','lt','cs','lex','nal','ian','rch',
+                            'hic','ase','ials','stem','eval','ms','ure','sm','al','an',' for','c',
+                            'ate','ile','bases','databases','ions','rian','ph','ives', 'cles',
+                            'hers','ks','ts','ds','brazil','like','class','ools','rcis','lente',
+                            'ange','ex','ors','w','ws','ship','ires','nces','role',
+                            'rvice', 'bus','line','use','ies','face','sis','ens'
+                            );
+                            
+                $pt = array('ário','afia','mana','ção','são',' de',' da',' do',
+                            'gia','lica','ico', 'logo',' para','tica',
+                            'sil','mia',' vro','rvo','sal', 'nto','rie','ria',
+                            'fía', 'ana','ura','cia','ica','eca','ada','ato', 'nual',
+                            'iva','ao','ivo','ado','ulo','ias','cas','ilos','cos',
+                            'ografía','asse','tador','tudo','vro','esso','nha','arte',
+                            'mbuco','lona','ilia','grafo','usca','doro','chas',
+                            'ense','nema','ismo','dade','mbia','ito','trole','urso',
+                            'reito','lista','ino', 'rior','ista','stão','mídia',
+                            'exto','des','ador','dores','mbio','lei','uais','meio','obra',
+                            'rara','quisa','ursos','anta','ina','ida','ída', 'cola',
+                            'ema','uro','ano','ião','iao','nio','nia','rede','todos','grafia',
+                            'asica','nomia','dulo','orma','nal','ormas','nais','egal','sito'
+                            );
+                            
+                $es = array(' le',' la',' lo',' los', 'ción','cion','del','sión','sion',
+                            'gía','ana','ura','ueva','eva','fía','blografía','ales',
+                            'ctos','datos','tos','cación','ipción','ctura','sidad','dad',
+                            'culos','bros','itas','ó','tión',' por','esos','bros','bro','guo',
+                            ' en','ínea','ajo','brar'
+                            );
+                $pen = 0;
+                $ppt = 0;
+                $pes = 0;
+                /* ingles */
+                for ($r=0;$r < count($en);$r++)
+                    {
+                        if (strpos($t,$en[$r].' ')) { $pen++; }
+                    }
+                /* PORTUGUES */
+                for ($r=0;$r < count($pt);$r++)
+                    {
+                        if (strpos($t,$pt[$r].' ')) { $ppt++; }
+                    }
+                /* ESPANHOL */                     
+                for ($r=0;$r < count($es);$r++)
+                    {
+                        if (strpos($t,$es[$r].' ')) { $pes++; }
+                    } 
+                    
+                    
+                $sx = '==>EN='.$pen.'==PT='.$ppt.'<br>';
+                if (($ppt >= $pen) and ($ppt >= $pes))
+                    {
+                        $sx = " (PT); en:$pen, pt:$ppt, es:$pes"; 
+                    }
+                if (($pen > $ppt) and ($pen > $pes))
+                    {
+                        $sx = " (EN); en:$pen, pt:$ppt, es:$pes"; 
+                    }
+                if (($pes > $ppt) and ($pes >= $pen))
+                    {
+                        $sx = " (ES); en:$pen, pt:$ppt, es:$pes"; 
+                    } 
+                if (($pen == 0) and ($ppt == 0) and ($pes == 0))
+                    {
+                        $sx = '(??);(---'.$t.'---)';
+                    }
+                return(';'.$sx);
+            }
         function trata($txt)
             {
                 $txt = troca($txt,'; ',';');
