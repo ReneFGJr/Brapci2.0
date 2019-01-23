@@ -103,10 +103,12 @@ class oai_pmh extends CI_model {
         }
         return ($line);
     }
-
+    
     function process($dt) {
         $this -> load -> model('searchs');
 		$this -> load -> model('indexer');
+        $this -> load -> model('export');
+        $this -> load -> model('elasticsearch');        
 
         /*********************************** PROCESS **************************************/
         $dt2 = $this -> le_cache($dt['idc']);
@@ -151,7 +153,9 @@ class oai_pmh extends CI_model {
 		$this->indexer->indexing($dt);
         $this -> export -> export_Article_Single($article_id);
 		//$this->Elasticsearch->add('article',$dt['idc'],$dt);
-        $this->Elasticsearch->add('article',$article_id,$dt);
+		
+        $this->export->export_Article_Single($article_id);
+        $this -> elasticsearch -> update($idx);
 		
         return ("<h1>Index Article: " . $link . $article_id . '</a></h1>');
     }
@@ -865,6 +869,23 @@ class oai_pmh extends CI_model {
         return ($sx);
     }
 
+    public function NextHarvesting()
+        {
+            $sql = "select * from source_source
+                        where jnl_url_oai <> '' and jnl_active = 1
+                        order by jnl_oai_last_harvesting 
+                        limit 1";
+            $rlt = $this -> db -> query($sql);
+            $rlt = $rlt -> result_array();
+            if (count($rlt) > 0)
+                {
+                    $line = $rlt[0];
+                    return($line);
+                } else {
+                    return(array());
+                }                           
+        }
+
     public function ListIdentifiers($id) {
         $data = array();               
         if ($this->check_oai_index($id) == 0)
@@ -878,6 +899,12 @@ class oai_pmh extends CI_model {
 
         $ref = $this->log_oai($id,'ILIS');
         $sx = $this->ListIdentifiers_harvesting($id);
+        
+        $sql = "update source_source set
+                    jnl_oai_last_harvesting = '".date("Y-m-d H:i:s")."'
+                    where id_jnl = $id";
+        $rlt = $this -> db -> query($sql);                    
+        
         $data = array();
         $data['status'] = 2;
         $this->log_oai($id,'ULIS',$data);

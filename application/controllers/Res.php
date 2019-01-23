@@ -113,6 +113,17 @@ class res extends CI_Controller {
         }
     }
 
+    public function issue($act,$id) {
+        $this -> load -> model('sources');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('export');
+        $data['nocab'] = true;
+        $this -> cab($data);
+        $data['content'] = $this -> frbr -> issue_new($id);
+        $this -> load -> view('show', $data);
+    }
+
     public function index() {
         $this -> load -> model('elasticsearch');
         $this -> load -> model('libraries');
@@ -187,6 +198,8 @@ class res extends CI_Controller {
     public function jnl($id = '') {
         $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
         $this -> load -> model('sources');
         $this -> cab();
 
@@ -195,6 +208,8 @@ class res extends CI_Controller {
 
         if (perfil("#ADM")) {
             $html .= $this -> sources -> button_new_sources($id);
+            $html .= '&nbsp;';
+            $html .= $this -> sources -> button_new_issue($id);
         }
 
         $html .= '<br><br>';
@@ -224,6 +239,55 @@ class res extends CI_Controller {
         } else {
             redirect(base_url(PATH));
         }
+    }
+
+    public function cron($act = '', $token = '', $id = '') {
+        $sx = date("Y-m-d H:i:s") . ' ';
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('oai_pmh');
+        $this -> load -> model('sources');
+        $this -> load -> model('socials');
+        $usr = $this -> socials -> token($token);
+        if (count($usr) == 0) {
+            //$sx .= msg('token_invalid') . cr();
+            $id = '';
+        }
+        if (strlen($id) == 0) {
+            $id = 'journal';
+        }
+        $sx .= date("Y-m-d H:i:s") . ' ACT:' . $id . cr();
+        switch($id) {
+            case 'journal' :
+                $data = $this -> oai_pmh -> NextHarvesting();
+                if (count($data) > 0) {
+                    $sx .= 'Harvesting OAI-PMH Journal' . cr();
+                    $sx .= $data['jnl_name'] . cr();
+                    $idx = $data['id_jnl'];
+                    $sr = $this -> oai_pmh -> ListIdentifiers($idx);
+                    $sr = troca($sr, '</li>', '</LI>' . cr());
+                    $sr = strip_tags($sr);
+                    //$sx .= $sr;
+                } else {
+                    $sx .= msg('not_journal_to_harvesting') . cr();
+                }
+                break;
+            default :
+                $sx .= msg('not_action') . cr();
+        }
+
+        /* save log */
+        $filename = '/var/www/html/Brapci2.0/script/cron.oai.html';
+        if (file_exists($filename)) {
+            $t = readfile($filename);
+        } else {
+            $t = '';
+        }
+        $t .= date('Y-m-d H:i:s') . $sx . cr();
+        $fld = fopen($filename, 'w+');
+        fwrite($fld, $sx);
+        fclose($fld);
+        echo $sx;
     }
 
     public function journals($act = '', $p = '') {
@@ -1252,7 +1316,7 @@ class res extends CI_Controller {
     }
 
     function bibliometric($ac = '') {
-        $this -> load -> model("bibliometrics");        
+        $this -> load -> model("bibliometrics");
         $dd1 = get("dd1");
         $tela = '';
         $tela .= '<div class="row">';
@@ -1262,22 +1326,22 @@ class res extends CI_Controller {
                 if (!(isset($_FILES['userfile']['tmp_name']))) {
                     $tela .= $this -> bibliometrics -> form_file(msg($ac));
                 } else {
-                    $txt = $this-> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);                   
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
                     $rst = $this -> bibliometrics -> csv_to_net($txt);
-                    $this->bibliometrics->download_file($rst);
-                    return('');
+                    $this -> bibliometrics -> download_file($rst);
+                    return ('');
                 }
                 break;
             case 'csv_to_matrix' :
                 if (!(isset($_FILES['userfile']['tmp_name']))) {
                     $tela .= $this -> bibliometrics -> form_file(msg($ac));
                 } else {
-                    $txt = $this-> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);                   
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
                     $rst = $this -> bibliometrics -> csv_to_matrix($txt);
-                    $this->bibliometrics->download_file($rst);
-                    return('');
+                    $this -> bibliometrics -> download_file($rst);
+                    return ('');
                 }
-                break;                
+                break;
             case 'semicolon_to_list' :
                 if (strlen($dd1) == 0) {
                     $tela .= $this -> bibliometrics -> form_1();

@@ -73,12 +73,17 @@ class frbr_core extends CI_model {
         return ("");
     }
 
-    function find($n, $prop = '', $equal = 0) {
+    function find($n, $prop = '', $equal = 1) {
         /* EQUAL */
         $wh = "(n_name like '%" . $n . "%')";
         if ($equal == 1) {
             $wh = "(n_name = '" . $n . "')";
+        } else {
+            if (perfil("#ADM")) {
+                echo "** ALERT - use like in " . $n . ' ********<br>';
+            }
         }
+
         /* PROPRIETY */
         if (strlen($prop) > 0) {
             $class = $this -> find_class($prop);
@@ -205,7 +210,7 @@ class frbr_core extends CI_model {
             } else {
                 $sx .= bs_alert('danger', "Index not found " . $file);
             }
-        }        
+        }
         return ($sx);
     }
 
@@ -323,13 +328,15 @@ class frbr_core extends CI_model {
         }
         /*********************** recupera propriedade ID ***/
         $pr = $this -> find_class($prop);
-        $sql = "select * from rdf_data 
-                    WHERE 
+        $sql = "select * from (
+                    select * from rdf_data 
+                        WHERE 
+                    (d_p = $pr and d_literal = $lit)
+                    ) as table1
+                where
                     ((d_r1 = $r1 AND d_r2 = $r2)
                         OR
-                     (d_r1 = $r2 AND d_r2 = $r1))
-                    AND d_p = $pr 
-                    AND d_literal = $lit ";
+                    (d_r1 = $r2 AND d_r2 = $r1))";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) == 0) {
@@ -341,6 +348,7 @@ class frbr_core extends CI_model {
         } else {
 
         }
+        return (true);
     }
 
     function person_show($id) {
@@ -355,7 +363,7 @@ class frbr_core extends CI_model {
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
     }
-    
+
     function journal_show($id) {
         $data = array();
         $sx = '';
@@ -367,7 +375,7 @@ class frbr_core extends CI_model {
 
         $sx = $this -> load -> view('find/view/journal', $data, true);
         return ($sx);
-    }    
+    }
 
     function corporate_show($id) {
         $data = array();
@@ -488,9 +496,9 @@ class frbr_core extends CI_model {
             $class = trim($data['c_class']);
 
             switch ($class) {
-                case 'Patent':
+                case 'Patent' :
                     $tela = $this -> frbr -> show_patent($id);
-                    $tela .= $this -> view_data($id);                    
+                    $tela .= $this -> view_data($id);
                     break;
                 case 'Article' :
                     $tela = $this -> frbr -> show_article($id);

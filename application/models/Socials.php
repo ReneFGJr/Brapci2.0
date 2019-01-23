@@ -757,6 +757,20 @@ class socials extends CI_Model {
             return ( array());
         }
     }
+    function token($t)
+        {
+            $t = troca($t,"'",'´');
+            $sql = "select * from users where us_password = '$t' ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) == 1)
+                {
+                    $line = $rlt[0];
+                    return($line);                    
+                } else {
+                    return(array());
+                }
+        }
 
 }
 ?>

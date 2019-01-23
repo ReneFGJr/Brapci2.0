@@ -198,6 +198,8 @@ $lang['mes_12'] = 'dez.';
 $lang['bibliometric_menu'] = 'Utilitários Bibliométricos e Tratamento de Texto';
 $lang['semicolon_to_list'] = 'Troca ponto e virgula (;) por Enter (CR)';
 $lang['csv_to_net'] = 'Converte .CSV para .NET (Pajek)';
-$lang['csv_to_matrix'] = 'Converte .CSV para Matriz de Correlação'
+$lang['csv_to_matrix'] = 'Converte .CSV para Matriz de Correlação';
+
+$lang['bibliometric_tools'] = 'Ferramentas bibliometricas';
 //$lang = array();
 ?>

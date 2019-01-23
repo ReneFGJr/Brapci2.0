@@ -350,7 +350,7 @@ class export extends CI_Model {
         $sx .= '</ul>' . cr();
 
         if (count($rlt) > 0) {
-            $sx .= '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'export/article/' . ($pg + 1)) . '">';
+            $sx .= '<meta http-equiv="refresh" content="2;' . base_url(PATH . 'export/article/' . ($pg + 1)) . '">';
         }
         $sx = '<ul>' . $sx . '</ul>';
         return ($sx);
@@ -627,57 +627,57 @@ class export extends CI_Model {
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
-        $sx = '<form method="post">';
-        $sx .= '<ul style="list-style-type: none;">';
+        $sx = '<form method="post">'.cr();
+        $sx .= '<ul style="list-style-type: none;">'.cr();
         $n = '';
         $sel = array();
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $ic1 = $line['id_cc_1'];
             $ic2 = $line['id_cc_2'];
-
             /******************** Header *************/
             $nx = $line['n_name_1'];
             if ($nx != $n) {
 
                 $sx .= '<h4>';
-                $dt = 'name = "c' . $ic2 . '" id="c' . $ic2 . '" ';
-                if ((isset($_SESSION['c' . $ic2])) and ($_SESSION['c' . $ic2] == '1')) {
+                $dt = 'name = "c' . $ic1 . '" id="c' . $ic1 . '" ';
+                if ((isset($_SESSION['c' . $ic1])) and ($_SESSION['c' . $ic1] == '1')) {
                     $dt .= ' checked';
                 }
-                $sx .= '<input type="checkbox" ' . $dt . ' onchange="fcn'.$ic2.'(\'#c' . $ic2 . '\');"> ';
+                $sx .= '<input type="checkbox" ' . $dt . ' onchange="fcn'.$ic1.'(\'#c' . $ic1 . '\');"> ';
                 $sx .= $line['n_name_1'];
                 $sx .= '</h4>' . cr();
                 $n = $nx;
             }
             $sx .= '<li style="margin-left: 20px;">';
-            $dt = 'name = "a' . $ic1 . '" id="c' . $ic1 . '" ';
-            if ((isset($_SESSION['c' . $ic1])) and ($_SESSION['c' . $ic1] == '1')) {
+            $dt = 'name = "a' . $ic2 . '" id="c' . $ic2 . '" ';
+            if ((isset($_SESSION['c' . $ic2])) and ($_SESSION['c' . $ic2] == '1')) {
                   $dt .= ' checked';
             }
-            $sx .= '<input type="checkbox" ' . $dt . '> ';
+            //$sx .= '<input type="checkbox" ' . $dt . '> ';
             $sx .= $line['n_name_2'];
-            $sx .= '</li>';
+            $sx .= '</li>'.cr();
 
-            if (!isset($sel[$ic2])) {
-                $sel[$ic2] = array();
+            if (!isset($sel[$ic1])) {
+                $sel[$ic1] = array();
             }
-            array_push($sel[$ic2], $ic1);
+            array_push($sel[$ic1], $ic2);
         }
-        $sx .= '</ul>';
-        $sx .= '<input type="submit" value="' . msg('submit') . '" class="btn btn-outline-primary">';
-        $sx .= '</form>';
+        $sx .= '</ul>'.cr();
+        $sx .= '<input type="submit" value="' . msg('submit') . '" class="btn btn-outline-primary">'.cr();
+        $sx .= '</form>'.cr();
 
         /* JAVA */
         $sx .= cr().'<script>' . cr();
         foreach ($sel as $key => $value) {
             $sx .= 'function fcn'.$key.'($id) {'.cr();
+            $v = '';
             for ($rx=0;$rx < count($value);$rx++)
                 {
                     $d = $value[$rx];
-                    $sx .= 'alert("==>'.$d.'");'.cr();
-                    //$sx .=  $('#').prop('checked',true);
+                    $v .= $d.';';
                 }
+            $sx .= 'alert("'.$v.'");';                
             $sx .= '}'.cr();            
         }
         $sx .= '</script>' . cr();

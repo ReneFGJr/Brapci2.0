@@ -134,7 +134,7 @@ class frbr extends CI_model {
         $tela = '';
         $data = $this -> frbr_core -> le_data($id);
         $article = $dados['article'] = $data;
-        
+
         $dados['social'] = $this -> nets -> twitter($data);
         $dados['social'] .= $this -> nets -> facebook($data);
         $dados['social'] .= $this -> nets -> google($data);
@@ -210,7 +210,7 @@ class frbr extends CI_model {
 
         /***************************************************** JOURNAL ****************/
         $jnl = 'jnl:' . $dt['id_jnl'];
-        $idj = $this -> frbr_core -> find($jnl);
+        $idj = $this -> frbr_core -> find($jnl, 'hasIdRegister');
         $prop = 'isPubishIn';
         $this -> frbr_core -> set_propriety($idf, $prop, $idj, 0);
 
@@ -315,6 +315,34 @@ class frbr extends CI_model {
         return ($idf);
     }
 
+    function issue_new($id) {
+        $form = new form;
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, true));
+        array_push($cp, array('$S40', '', 'Volume', false, true));
+        array_push($cp, array('$S40', '', 'Nr.', false, true));
+        array_push($cp, array('$[1950-' . (date("Y") + 1) . ']', '', 'Ano', false, true));
+        array_push($cp, array('$S100', '', 'Temática do fascículo', false, true));
+        array_push($cp, array('$O 1:' . msg('yes'), '', 'Confirma', true, true));
+        $sx = $form -> editar($cp, '');
+        if (($form -> saved > 0) and (sonumero($id) > 0)) {
+            $dt = $this -> sources -> le($id);
+            $dt['issue']['issue_id'] = 'jnl:'.$id.':'.get("dd1").':'.get("dd2").':'.get("dd3");
+            $dt['issue']['vol'] = get("dd1");
+            $dt['issue']['nr'] = get("dd2");
+            $dt['issue']['year'] = get("dd3");
+            if (strlen(get("dd4")) > 0) {
+                $dt['issue']['sourcer'] = get("dd4");
+            }
+            $id_issue = $this -> issue($dt);
+            
+            $prop = 'hasIssue';
+            
+            $sx .= '<script>wclose();</script>';
+        }
+        return ($sx);
+    }
+
     function issue($dt) {
         if (strlen(trim($dt['jnl_name_abrev'])) > 0) {
             $nm = trim($dt['jnl_name_abrev']);
@@ -339,19 +367,23 @@ class frbr extends CI_model {
             }
         }
 
+        $z = 0;
+
         /************** ISSUE id **********************************************/
         $name = 'ISSUE:' . UpperCaseSql($dt['issue']['issue_id']);
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
+
         /* Label */
         $name = ($nm);
         $nm = convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
+
         $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
 
         /******************************************************************************/
         $jnl = 'jnl:' . $dt['id_jnl'];
-        $jnl = $this -> frbr_core -> find($jnl);
+        $jnl = $this -> frbr_core -> find($jnl, 'hasIdRegister');
         $prop = 'hasIssue';
         $this -> frbr_core -> set_propriety($idf, $prop, $jnl, 0);
 
@@ -368,6 +400,7 @@ class frbr extends CI_model {
             $ano = $this -> frbr_core -> rdf_concept_create('Date', $iss['year'], '');
             $this -> frbr_core -> set_propriety($idf, $prop, $ano, 0);
         }
+
         if (isset($iss['vol']) and (strlen(trim($iss['vol'])) > 0)) {
             $prop = 'hasPublicationVolume';
             $tem = $this -> frbr_core -> rdf_concept_create('PublicationVolume', 'v. ' . $iss['vol'], '');
@@ -375,6 +408,7 @@ class frbr extends CI_model {
             //$term = $this -> frbr_core -> frbr_name('v. ' . $iss['vol']);
             //$this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
+
         if (isset($iss['nr']) and (strlen(trim($iss['nr'])) > 0)) {
             $prop = 'hasPublicationNumber';
             $tem = $this -> frbr_core -> rdf_concept_create('PublicationNumber', 'n. ' . $iss['nr'], '');
@@ -383,6 +417,7 @@ class frbr extends CI_model {
             //$term = $this -> frbr_core -> frbr_name('n. ' . $iss['nr']);
             //$this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
         }
+
         $this -> export -> export_Issue_Single($idf);
         return ($idf);
     }
@@ -420,7 +455,6 @@ class frbr extends CI_model {
                 $aff = $dt['aff'];
                 $name = $dt['name'];
                 $email = $dt['email'];
-                //echo '<h1>=>'.$aff.'</h1>';
 
                 if (strlen($name) > 0) {
                     $idf = $this -> frbr_core -> rdf_concept_create('Person', $name, '');
@@ -439,8 +473,53 @@ class frbr extends CI_model {
             return ($idf);
         }
     }
+    
+    function journal_update_id_frbr($id,$idf)
+        {
+            if ($idf > 0)
+                {
+                    $sql = "update source_source set jnl_frbr = $idf where id_jnl = $id";
+                    $rlt = $this->db->query($sql);
+                    return(1);
+                }
+            return(0);
+        }
+
+    function journal_manual($id, $idf) {
+        $jnl = 'jnl:' . $id;
+        $idj = $this -> frbr_core -> find($jnl, 'hasIdRegister');
+        $sx = '';
+        if ($idj == 0) {
+            $sx = '<a href="' . base_url(PATH . 'jnl/' . $id . '?act=register') . '">' . msg('jnl_register_journal') . '</a>';
+        }
+        if ((get("act")) and (perfil("#ADM"))) {
+            $sx .= '<h3>' . msg('registred') . '</h3>';
+            $dt = $this -> sources -> le($id);
+            if (count($dt) > 0) {
+                $name = trim($dt['jnl_name']);
+            }
+            $class = 'Journal';
+            $id_jnl = $this -> frbr_core -> rdf_concept_create($class, $name, '');
+            /* ID JNL */
+            $jnl = 'jnl:' . $dt['id_jnl'];
+            $prop = 'hasIdRegister';
+            $term = $this -> frbr_core -> frbr_name($jnl);
+            $this -> frbr_core -> set_propriety($id_jnl, $prop, 0, $term);
+
+            if (strlen(trim($dt['jnl_url'])) > 0) {
+                $prop = 'hasUrl';
+                $term = $this -> frbr_core -> frbr_name(trim($dt['jnl_url']));
+                $this -> frbr_core -> set_propriety($id_jnl, $prop, 0, $term);
+            }
+            $this->journal_update_id_frbr($id,$id_jnl);
+            $newURL =base_url(PATH.'jnl/'.$id);
+            header('Location: '.$newURL);
+            exit;
+        }
+        return ($sx);
+    }
 
 }
 
-require ("Frbr_core.php");
+//require ("Frbr_core.php");
 ?>
