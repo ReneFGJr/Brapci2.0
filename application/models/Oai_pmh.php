@@ -155,7 +155,7 @@ class oai_pmh extends CI_model {
 		//$this->Elasticsearch->add('article',$dt['idc'],$dt);
 		
         $this->export->export_Article_Single($article_id);
-        $this -> elasticsearch -> update($idx);
+        $this -> elasticsearch -> update($article_id);
 		
         return ("<h1>Index Article: " . $link . $article_id . '</a></h1>');
     }
