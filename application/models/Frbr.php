@@ -149,6 +149,69 @@ class frbr extends CI_model {
         return ($tela);
 
     }
+    
+    function form_article($id)
+        {
+            $form = new form;
+            $cp = array();
+            array_push($cp,array('$H8','','',false,true));
+            array_push($cp,array('$T80:4','',msg('hasTitle'),true,true));
+            array_push($cp,array('$T80:8','',msg('hasAuthores'),true,true));
+            array_push($cp,array('$M','',msg('hasAuthoresInfo'),false,false));
+            array_push($cp,array('$A4','',msg('Abstract'),FALSE,true));
+            array_push($cp,array('$T80:8','',msg('hasAbstract1'),FALSE,true));
+            array_push($cp,array('$S100','',msg('hasKeyword1'),FALSE,true));
+            array_push($cp,array('$A4','',msg('Abstract'),FALSE,true));
+            array_push($cp,array('$T80:8','',msg('hasAbstract2'),FALSE,true));
+            array_push($cp,array('$S100','',msg('hasKeyword2'),FALSE,true));
+            array_push($cp,array('$A4','',msg('Pages'),FALSE,true));
+            array_push($cp,array('$S20','',msg('pageStart'),FALSE,true));
+            array_push($cp,array('$S20','',msg('pageStop'),FALSE,true));
+            array_push($cp,array('$B8','',msg('submit'),false,true));
+            $tela = $form->editar($cp,'');
+            
+            if ($form->saved > 0)
+                {
+                    $ida = 0;
+                    $title = LowerCase(get("dd1"));
+                    $title = Uppercase(substr($title,0,1)).substr($title,1,strlen($title));
+                    
+                    $aut = troca(get("dd2"),chr(13),';');
+                    $aut = troca($aut,chr(10),';');
+                    $aut = troca($aut,'  ',' ');
+                    $aut = splitx(';',$aut);
+                    for ($r=0;$r < count($aut);$r++)
+                        {
+                            $aut[$r] = nbr_autor($aut[$r],1);
+                        }
+                        
+                    /* ABSTRACT */
+                    $abs1 = troca(get("dd5"),chr(10),'');
+                    $abs1 = troca($abs1,chr(13),' ');
+                    $abs1 = troca($abs1,'  ',' ');
+                    $abs2 = troca(get("dd8"),chr(10),'');
+                    $abs2 = troca($abs2,chr(13),' ');
+                    $abs2 = troca($abs2,'  ',' ');    
+                    
+                    /* KEYWORD */                
+                    echo $title;
+                    print_r($aut);
+                    echo '<hr>'.$abs1;
+                    echo '<hr>'.$abs2;
+                }
+            return($tela);
+        }
+    
+    function show_issue($id)
+        {
+        $tela = '';
+        $data = $this -> frbr_core -> le_data($id);
+        $dados['issue'] = $data;
+        $tela .= $this -> load -> view('brapci/view/issue', $dados, true);
+
+        //$tela .= $this -> frbr_core -> view_data($id);
+        return ($tela);            
+        }
 
     function show_article($id) {
         $tela = '';
@@ -334,9 +397,7 @@ class frbr extends CI_model {
             if (strlen(get("dd4")) > 0) {
                 $dt['issue']['sourcer'] = get("dd4");
             }
-            $id_issue = $this -> issue($dt);
-            
-            $prop = 'hasIssue';
+            $id_issue = $this -> issue($dt);       
             
             $sx .= '<script>wclose();</script>';
         }
@@ -370,15 +431,23 @@ class frbr extends CI_model {
         $z = 0;
 
         /************** ISSUE id **********************************************/
-        $name = 'ISSUE:' . UpperCaseSql($dt['issue']['issue_id']);
+        $name = 'ISSUE:' . UpperCaseSql($issue);
         $idf = $this -> frbr_core -> rdf_concept_create('Issue', $name, '');
+
+        /* Associa com a revista ****/        
+        $prop = 'hasIssue';
+        if ($dt['jnl_frbr'] == 0)
+            {
+                echo msg('erro_801');
+                exit;
+            }
+        
 
         /* Label */
         $name = ($nm);
         $nm = convert($nm);
         $prop = 'altLabel';
         $term = $this -> frbr_core -> frbr_name($name);
-
         $this -> frbr_core -> set_propriety($idf, $prop, 0, $term);
 
         /******************************************************************************/

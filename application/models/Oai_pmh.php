@@ -316,6 +316,8 @@ class oai_pmh extends CI_model {
     }
 
     function getListSets($id = 0) {
+        echo 'Processando $id = '.$id.'<br>';
+        if ($id==0) { return(""); }
         $this -> load -> model("sources");
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListSets');
@@ -326,7 +328,14 @@ class oai_pmh extends CI_model {
         $cnt = troca($cnt, 'xml:', '');
         $xml = simplexml_load_string($cnt);
         
-
+        echo '<hr>';
+        if (!isset($xml -> ListSets -> set))
+        {
+            return('');
+        }
+        print_r($xml -> ListSets -> set);
+        echo '<hr>';
+        
         $rcn = $xml -> ListSets -> set;
         for ($r = 0; $r < count($rcn); $r++) {
             $line = $rcn[$r];

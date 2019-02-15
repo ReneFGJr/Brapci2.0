@@ -74,6 +74,7 @@ $lang['s_date_hour'] = 'Data/Hora';
 $lang['s_query'] = 'Consulta';
 $lang['s_type'] = 'Tipo';
 $lang['s_result'] = 'Total';
+$lang['submit'] = 'Enviar/salvar';
 
 
 $lang['cache_status_1'] = '<span style="color: #008F00"><b>Para coletar</b></span>';

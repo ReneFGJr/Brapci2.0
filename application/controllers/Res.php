@@ -175,6 +175,25 @@ class res extends CI_Controller {
         $this -> footer();
     }
 
+    public function article_new($id)
+        {
+        $this -> load -> model('nets');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('genero');
+        $this -> load -> model('frad');
+
+        $vv = $this -> frbr_core -> le_data($id);
+        $data['meta'] = $vv;
+        $data['id'] = $id;
+        $this -> cab($data);
+        
+        $dt['content'] = $this->frbr->form_article($id);
+        $this->load->view('show',$dt);
+        $this->footer();
+           
+        }
+
     public function v($id) {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
