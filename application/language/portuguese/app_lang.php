@@ -202,5 +202,6 @@ $lang['csv_to_net'] = 'Converte .CSV para .NET (Pajek)';
 $lang['csv_to_matrix'] = 'Converte .CSV para Matriz de Correlação';
 
 $lang['bibliometric_tools'] = 'Ferramentas bibliometricas';
+$lang['hasAuthoresInfo'] = 'Separe um autor por linha, ou utilize o "ponto e virgula"';
 //$lang = array();
 ?>

@@ -152,18 +152,26 @@ class frbr extends CI_model {
     
     function form_article($id)
         {
+            $lg = 'pt-BR:Portugues&en:Inglês&es:Espanhol&fr:Francês';
             $form = new form;
             $cp = array();
-            array_push($cp,array('$H8','','',false,true));
-            array_push($cp,array('$T80:4','',msg('hasTitle'),true,true));
-            array_push($cp,array('$T80:8','',msg('hasAuthores'),true,true));
+            array_push($cp,array('$H8','','',false,true));    
+            array_push($cp,array('$A4','',msg('Authors'),FALSE,true));        
+            array_push($cp,array('$T80:8','',msg('hasAuthors'),true,true));
             array_push($cp,array('$M','',msg('hasAuthoresInfo'),false,false));
-            array_push($cp,array('$A4','',msg('Abstract'),FALSE,true));
+            
+            array_push($cp,array('$A4','',msg('MainTitle'),FALSE,true));
+            array_push($cp,array('$T80:4','',msg('hasTitle'),true,true));
             array_push($cp,array('$T80:8','',msg('hasAbstract1'),FALSE,true));
             array_push($cp,array('$S100','',msg('hasKeyword1'),FALSE,true));
-            array_push($cp,array('$A4','',msg('Abstract'),FALSE,true));
-            array_push($cp,array('$T80:8','',msg('hasAbstract2'),FALSE,true));
-            array_push($cp,array('$S100','',msg('hasKeyword2'),FALSE,true));
+            array_push($cp,array('$O '.$lg,'',msg('hasLanguage'),true,true));
+            
+            array_push($cp,array('$A4','',msg('SencondTitle'),FALSE,true));
+            array_push($cp,array('$T80:4','',msg('hasTitle'),true,true));            
+            array_push($cp,array('$T80:8','',msg('hasAbstract'),FALSE,true));
+            array_push($cp,array('$S100','',msg('hasKeyword'),FALSE,true));
+            array_push($cp,array('$O '.$lg,'',msg('hasLanguage'),true,true));
+            
             array_push($cp,array('$A4','',msg('Pages'),FALSE,true));
             array_push($cp,array('$S20','',msg('pageStart'),FALSE,true));
             array_push($cp,array('$S20','',msg('pageStop'),FALSE,true));
@@ -173,8 +181,10 @@ class frbr extends CI_model {
             if ($form->saved > 0)
                 {
                     $ida = 0;
-                    $title = LowerCase(get("dd1"));
+                    $title = LowerCase(get("dd5"));
                     $title = Uppercase(substr($title,0,1)).substr($title,1,strlen($title));
+                    $title2 = LowerCase(get("dd10"));
+                    $title2 = Uppercase(substr($title2,0,1)).substr($title2,1,strlen($title2));
                     
                     $aut = troca(get("dd2"),chr(13),';');
                     $aut = troca($aut,chr(10),';');
@@ -183,21 +193,151 @@ class frbr extends CI_model {
                     for ($r=0;$r < count($aut);$r++)
                         {
                             $aut[$r] = nbr_autor($aut[$r],1);
-                        }
+                        }                                      
                         
                     /* ABSTRACT */
-                    $abs1 = troca(get("dd5"),chr(10),'');
+                    $abs1 = troca(get("dd6"),chr(10),'');
                     $abs1 = troca($abs1,chr(13),' ');
                     $abs1 = troca($abs1,'  ',' ');
-                    $abs2 = troca(get("dd8"),chr(10),'');
+                    $key1 = get("dd7");
+                    $lng1 = get("dd8");
+                    
+                    $abs2 = troca(get("dd11"),chr(10),'');
                     $abs2 = troca($abs2,chr(13),' ');
-                    $abs2 = troca($abs2,'  ',' ');    
+                    $abs2 = troca($abs2,'  ',' ');
+                    $key2 = get("dd12");
+                    $lng2 = get("dd13");    
                     
                     /* KEYWORD */                
-                    echo $title;
+                    echo 'Titles:'.$title.'--'.$title2;
+                    echo '<hr>';
                     print_r($aut);
                     echo '<hr>'.$abs1;
                     echo '<hr>'.$abs2;
+                    
+                    $pagi = get("dd15");
+                    $pagf = get("dd16");
+                    
+                    $artid = 'issue:'.$id.'-'.date("Ymdhis");   
+                    //$artid = 'issue:110215-20190219091814';                 
+                    $ida = $this->frbr_core->rdf_concept_create('Article',$artid);
+                                        
+                    $prop = 'hasId';
+                    $idan = $this->frbr_core->frbr_name($artid);
+                    $this->frbr_core->set_propriety($ida,$prop,0,$idan);
+                    /********* Issue ***************************/
+                    $prop = 'hasIssueOf';
+                    $this->frbr_core->set_propriety($ida,$prop,$id,0);
+                    
+                    /* SOURCE */
+                    $prop = 'hasSource';
+                    $dt = $this->frbr_core->le_data($id);
+                    $source = 'não localizado - '.$pagi.'-'.$pagf;
+                    $source_id = 0;
+                    for ($r=0;$r < count($dt);$r++)
+                        {
+                            if ($dt[$r]['c_class']=='altLabel')
+                                {
+                                    $source = $dt[$r]['n_name'].'; '.$pagi.'-'.$pagf;                
+                                }
+                            if ($dt[$r]['c_class']=='hasIssue')
+                                {
+                                    $source_id = $dt[$r]['d_r2'];                
+                                }                                
+                        }
+                    $prop = 'hasSource';
+                    $idan = $this->frbr_core->frbr_name($source);
+                    $this->frbr_core->set_propriety($ida,$prop,0,$idan);
+                    
+                    if ($source_id > 0)
+                        {
+                            $prop = 'isPubishIn';
+                            $this->frbr_core->set_propriety($ida,$prop,$source_id,0);                
+                        }
+                      
+                    
+                    $prop = 'hasIssue';
+                    echo '<pre>';
+                    print_r($dt);
+                    exit;                  
+                    
+                    /********* Abstract 1 **********************/
+                    if (strlen($title) > 0)
+                        {
+                            $prop = 'hasTitle';
+                            $idan = $this->frbr_core->frbr_name($title,$lng1);
+                            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+                        }
+                    if (strlen($title2) > 0)
+                        {
+                            $prop = 'hasTitleAlternative';
+                            $idan = $this->frbr_core->frbr_name($title2,$lng2);
+                            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+                        }                    
+                    
+                    /********* Abstract 1 **********************/
+                    if (strlen($abs1) > 0)
+                        {
+                            $prop = 'hasAbstract';
+                            $idan = $this->frbr_core->frbr_name($abs1,$lng1);
+                            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+                        }
+                    if (strlen($abs2) > 0)
+                        {
+                            $prop = 'hasAbstract';
+                            $idan = $this->frbr_core->frbr_name($abs2,$lng2);
+                            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+                        } 
+                    /******** Pages ******************************/
+                    if (strlen($pagi) > 0)
+                        {
+                            $prop = 'hasPageStart';
+                            $idp = $this->frbr_core->rdf_concept_create('Number',$pagi);
+                            $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
+                        }
+                    if (strlen($pagf) > 0)
+                        {
+                            $prop = 'hasPageEnd';
+                            $idp = $this->frbr_core->rdf_concept_create('Number',$pagf);
+                            $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
+                        }                                                               
+                    /****** Key words *********************************/
+                        $prop = 'hasSubject';
+                        $kys = $key1;
+                        $lng = $lng1;
+                        $kys = troca($kys,'.',';');';';
+                        $kys = troca($kys,',',';');';';
+                        $kys = splitx(';',$kys);
+                        for ($r=0;$r < count($kys);$r++)
+                            {
+                                $keyw = $kys[$r];
+                                $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
+                                $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+                            }
+                        $prop = 'hasSubject';
+                        $kys = $key2;
+                        $lng = $lng2;
+                        $kys = troca($kys,'.',';');';';
+                        $kys = troca($kys,',',';');';';
+                        $kys = splitx(';',$kys);
+                        for ($r=0;$r < count($kys);$r++)
+                            {
+                                $keyw = $kys[$r];
+                                $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
+                                $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+                            }                            
+                       /****** Author *********************************/
+                        $prop = 'hasAuthor';
+                        for ($r=0;$r < count($aut);$r++)
+                            {
+                                $author = $aut[$r];
+                                $idp = $this->frbr_core->rdf_concept_create('Person',$author); 
+                                $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+                            }           
+                                     
+                    echo '<br>IDA='.$ida;
+                    redirect(base_url(PATH.'a/'.$ida));
+                    
                 }
             return($tela);
         }
@@ -439,6 +579,9 @@ class frbr extends CI_model {
         if ($dt['jnl_frbr'] == 0)
             {
                 echo msg('erro_801');
+                echo '<hr><pre>';
+                print_r($dt);
+                echo '</pre>';
                 exit;
             }
         
@@ -560,6 +703,11 @@ class frbr extends CI_model {
         $sx = '';
         if ($idj == 0) {
             $sx = '<a href="' . base_url(PATH . 'jnl/' . $id . '?act=register') . '">' . msg('jnl_register_journal') . '</a>';
+        } else {
+            if ($idf == 0)
+                {
+                   $this->journal_update_id_frbr($id,$idj);
+                }
         }
         if ((get("act")) and (perfil("#ADM"))) {
             $sx .= '<h3>' . msg('registred') . '</h3>';

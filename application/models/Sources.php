@@ -304,10 +304,16 @@ class sources extends CI_Model {
         if (strlen($line['jnl_url_oai']) > 0) {
             $sx .= '<br>';
             $sx .= $this -> oai_pmh -> menu($line['id_jnl'],$line['jnl_frbr']);
+            if ($line['jnl_frbr'] == 0)
+                {
+                    $sx .= $this -> frbr -> journal_manual($line['id_jnl'],$line['jnl_frbr']);
+                }
         } else {
             $sx .= '<br>';
             $sx .= $this -> frbr -> journal_manual($line['id_jnl'],$line['jnl_frbr']);            
         }
+
+        $sx .= '<br>WebSemantic (Brapci):'.$line['jnl_frbr'];
         
 
         $sx .= $this -> oai_pmh -> cache_resume($line['id_jnl']);

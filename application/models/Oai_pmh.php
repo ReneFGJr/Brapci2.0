@@ -108,7 +108,7 @@ class oai_pmh extends CI_model {
         $this -> load -> model('searchs');
 		$this -> load -> model('indexer');
         $this -> load -> model('export');
-        $this -> load -> model('elasticsearch');        
+        $this -> load -> model('elasticsearch');       
 
         /*********************************** PROCESS **************************************/
         $dt2 = $this -> le_cache($dt['idc']);

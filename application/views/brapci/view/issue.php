@@ -68,7 +68,7 @@ for ($r = 0; $r < count($issue); $r++) {
 	<div class="col-9">
         <?php
         for ($r = 0; $r < count($article); $r++) {
-            
+            $link = '';
             echo $link.$article[$r] .'<hr>';
             
         }
