@@ -129,12 +129,16 @@ class res extends CI_Controller {
         $this -> load -> model('libraries');
         $this -> load -> model('sources');
         $this -> load -> model('searchs');
+        $this -> load -> model('events');
         $this -> load -> model('frbr');
         $this -> cab();
 
-        $this -> load -> view('brapci/form');
-
+        $data['events'] = $this->events->events_actives();
+        $this -> load -> view('brapci/form',$data);
+        
+        
         if (strlen(get("q")) > 0) {
+            /****************************************************************************/
             //$this -> ElasticSearch -> getStatus();
             $type = get("type");
             if ($type != 2) {
@@ -144,10 +148,15 @@ class res extends CI_Controller {
             }
             $term = troca($term, '¢', '"');
             $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
+            
             //$data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);
+            
         } else {
+            /****************************************************************************/
             $data['content'] = $this -> searchs -> historic();
+            //$data['content'] .= '<div class="col-md-2">xxxxxxxxxx</div>';
+            
             $this -> load -> view('show', $data);
         }
 
@@ -738,6 +747,21 @@ class res extends CI_Controller {
                 break;
         }
     }
+
+    function event($act='')
+        {
+            $this->load->model('events');
+            $this->cab();
+            $data['content'] = '<div class="row">';
+            $data['content'] .= '<div class="col-md-12">';
+            $data['content'] .= '<h1>'.msg('event').'</h1>'.'<p>Para registrar um evento, envie um e-mail para brapcici@gmail.com com o assunto [Evento]<p>';
+            $data['content'] .= $this->events->events_actives(1);
+            $data['content'] .= '</div>';
+            $data['content'] .= '</div>';            
+            $this->load->view('show',$data);
+           
+            $this->footer();
+        }
 
     function export($tp = '', $pg = 0) {
         $this -> load -> model('export');

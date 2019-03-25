@@ -203,5 +203,9 @@ $lang['csv_to_matrix'] = 'Converte .CSV para Matriz de Correlação';
 
 $lang['bibliometric_tools'] = 'Ferramentas bibliometricas';
 $lang['hasAuthoresInfo'] = 'Separe um autor por linha, ou utilize o "ponto e virgula"';
+$lang['Next_events'] = 'Próximos eventos';
+$lang['event_all'] = 'todos os eventos';
+$lang['register_our_event'] = 'registrar seu evento';
+$lang['event'] = 'Área de eventos';
 //$lang = array();
 ?>
