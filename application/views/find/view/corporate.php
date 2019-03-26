@@ -8,7 +8,7 @@ $notas = '';
 $w = $id;
 $link = '<a href="'.base_url(PATH.'a/'.$w).'">';
 //echo $link.'[ed]</a>';
-$img = '<img src="' . base_url('img/no_image.png') . '" class="img-fluid">';
+$img = '<img src="' . base_url('img/icon/icone_author.jpg') . '" class="img-fluid">';
 $cutter = ''; 
 
 for ($r=0;$r < count($use);$r++)

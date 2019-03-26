@@ -167,9 +167,13 @@ class sources extends CI_Model {
         array_push($cp, array('$S100', 'jnl_name', msg('jnl_name'), False, True));
         array_push($cp, array('$S30', 'jnl_name_abrev', msg('jnl_name_abrev'), False, True));
 
+        array_push($cp, array('$A', '', msg('jnl_oai_title'), False, True));
         array_push($cp, array('$S100', 'jnl_url', msg('jnl_url'), False, True));
         array_push($cp, array('$S100', 'jnl_url_oai', msg('jnl_url_oai'), False, True));
+        array_push($cp, array('$S100', 'jnl_oai_set', msg('jnl_oai_set'), False, True));
+        array_push($cp, array('$O 0:Não&1:Sim', 'jnl_scielo', msg('jnl_scielo'), False, True));
 
+        array_push($cp, array('$A', '', msg('jnl_issn_title'), False, True));
         array_push($cp, array('$S30', 'jnl_issn', msg('jnl_issn'), False, True));
         array_push($cp, array('$S30', 'jnl_eissn', msg('jnl_eissn'), False, True));
         array_push($cp, array('$[1950-' . date("Y") . ']', 'jnl_ano_inicio', msg('jnl_ano_inicio'), False, True));

@@ -320,6 +320,11 @@ class oai_pmh extends CI_model {
         if ($id==0) { return(""); }
         $this -> load -> model("sources");
         $data = $this -> sources -> le($id);
+        
+        if ($data['jnl_scielo'] == '1')
+            {
+                return('');
+            }
         $url = $this -> oai_url($data, 'ListSets');
 
         $cnt = $this -> readfile($url);
@@ -328,13 +333,11 @@ class oai_pmh extends CI_model {
         $cnt = troca($cnt, 'xml:', '');
         $xml = simplexml_load_string($cnt);
         
-        echo '<hr>';
         if (!isset($xml -> ListSets -> set))
         {
             return('');
         }
-        print_r($xml -> ListSets -> set);
-        echo '<hr>';
+
         
         $rcn = $xml -> ListSets -> set;
         for ($r = 0; $r < count($rcn); $r++) {
@@ -368,8 +371,10 @@ class oai_pmh extends CI_model {
 
             $data = $this -> sources -> le($jnl);
             $url = $this -> oai_url($data, 'GetRecord') . $line['li_identifier'];         
-            
             $cnt = $this -> readfile($url);
+            $cnt = troca($cnt,'<![CDATA[ ','');
+            $cnt = troca($cnt,' ]]>','');
+
             $cnt = troca($cnt, 'oai_dc:', 'oai_');
             $cnt = troca($cnt, 'dc:', '');
             $cnt = troca($cnt, 'xml:', '');
@@ -921,8 +926,7 @@ class oai_pmh extends CI_model {
         }        
 
     public function ListIdentifiers_harvesting($id) {
-        $this -> getListSets($id);
-        
+        $this -> getListSets($id);       
         
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListIdentifiers');
@@ -1023,6 +1027,7 @@ class oai_pmh extends CI_model {
     }
 
     public function xml_values($x) {
+
         $v = array();
         foreach ($x as $key => $value) {
             array_push($v, (string)$value);
@@ -1057,33 +1062,39 @@ class oai_pmh extends CI_model {
         $url = trim($data['jnl_url_oai']);
         switch($verb) {
             case 'ListSets' :
-                $url .= '?verb=ListSets';
+                $url .= '?verb=ListSets&$set';
                 break;
             case 'GetRecord' :
-                $url .= '?verb=GetRecord&metadataPrefix=oai_dc&identifier=';
+                $url .= '?verb=GetRecord&$set&metadataPrefix=oai_dc&identifier=';
                 break;
             case 'GetRecordNlm' :
-                $url .= '?verb=GetRecord&metadataPrefix=nlm&identifier=';
+                $url .= '?verb=GetRecord&$set&metadataPrefix=nlm&identifier=';
                 break;
             case 'ListIdentifiers' :
                 if (strlen($data['jnl_oai_token']) > 5) {
-                    $url .= '?verb=ListIdentifiers&resumptionToken=' . trim($data['jnl_oai_token']);
+                    $url .= '?verb=ListIdentifiers&$set&resumptionToken=' . trim($data['jnl_oai_token']);
                 } else {
-                    $url .= '?verb=ListIdentifiers&metadataPrefix=oai_dc';
+                    $url .= '?verb=ListIdentifiers&$set&metadataPrefix=oai_dc';
                 }
 
                 break;
             case 'identify' :
-                $url .= '?verb=Identify';
+                $url .= '?verb=Identify&$set';
                 break;
         }
+        /* Incluir o SET */
+        if (strlen($data['jnl_oai_set']) > 0) { $url = troca($url,'&$set','&set=' . trim($data['jnl_oai_set']));
+        } else {
+            $url = troca($url,'&$set','');
+        }
         return ($url);
-    }
+        }
 
-    function rescan_xml($id, $art) {
+        function rescan_xml($id, $art) {
         $art = strzero($art, 10);
         $idx = strzero($id, 7);
-        $file = 'ma/oai/' . $idx . '.xml';
+        $file =
+ 'ma/oai/' . $idx . '.xml';
         $txt = load_file_local($file);
         $sx = '<dc:identifier>';
         $txt = substr($txt, strpos($txt, $sx) + strlen($sx), strlen($txt));

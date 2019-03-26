@@ -133,7 +133,11 @@ class res extends CI_Controller {
         $this -> load -> model('frbr');
         $this -> cab();
 
-        $data['events'] = $this->events->events_actives();
+        if (strlen(get("q")) == 0) {
+            $data['events'] = $this->events->events_actives();
+        } else {
+            $data['events'] = '';
+        }
         $this -> load -> view('brapci/form',$data);
         
         
@@ -771,6 +775,9 @@ class res extends CI_Controller {
         $this -> cab();
 
         switch($tp) {
+            case 'all_xls':
+                $this->export->all_xls();
+                break;
             case 'issue' :
                 $tela = $this -> export -> export_Issue($pg);
                 if (strlen($tela) <= 25) {
@@ -807,6 +814,7 @@ class res extends CI_Controller {
                 $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
 
                 $tela .= '</ul>' . cr();
                 break;

@@ -55,14 +55,14 @@ class export extends CI_Model {
                 case 'hasAbstract' :
                     $rwork .= 'AB - ' . troca($l['n_name'], chr(13), '') . cr();
                     $dc .= '<meta name="DC.Description"  xml:lang="' . troca($l['n_lang'], chr(13), '') . '" content="' . troca($l['n_name'], chr(13), '') . '"/>' . cr();
-                    $abstract .= troca($l['n_name'], chr(13), '').'@'.troca($l['n_lang'], chr(13), '').cr();
+                    $abstract .= troca($l['n_name'], chr(13), '') . '@' . troca($l['n_lang'], chr(13), '') . cr();
                     break;
                 case 'hasSubject' :
                     $rwork .= 'KW - ' . $l['n_name'] . cr();
                     $dc .= '<meta name="DC.Subject" xml:lang="' . $l['n_lang'] . '" content="' . $l['n_name'] . '"/>' . cr();
                     $dc .= '<meta name="citation_keywords" xml:lang="' . $l['n_lang'] . '" content="' . $l['n_name'] . '"/>' . cr();
-                    if (strlen($subj) > 0)
-                        { $subj .= '; '; }
+                    if (strlen($subj) > 0) { $subj .= '; ';
+                    }
                     $subj .= trim($l['n_name']);
                     break;
                 case 'hasSectionOf' :
@@ -120,8 +120,9 @@ class export extends CI_Model {
                     if (strlen($tit) == 0) {
                         $link = $this -> frbr_core -> link($l);
                         $tit = $link . $l['n_name'] . '</a>';
-                        if (strlen($title) > 0) { $title .= cr(); }
-                        $title .= $l['n_name'].'@'.$l['n_lang'];
+                        if (strlen($title) > 0) { $title .= cr();
+                        }
+                        $title .= $l['n_name'] . '@' . $l['n_lang'];
                         $rwork .= 'TI - ' . $l['n_name'] . cr();
                     }
                     break;
@@ -155,18 +156,18 @@ class export extends CI_Model {
         $txt2 .= '<i>' . trim($aut2) . '</i><br>';
         $txt2 .= '' . $link_source . $sor . $linka . ', ';
         $txt2 .= $link_issue . $nr . $vr . $pages . ', ' . $ano . $linka . '. (' . $sc . ')';
-        
+
         $txt3 = '<tr>';
-        $txt3 .= '<td>'.strip_tags($aut2).'</td>';
-        $txt3 .= '<td>'.$title.'</td>';
-        $txt3 .= '<td>'.$source.'</td>';
-        $txt3 .= '<td>'.$nr.$vr.$pages.'</td>';
-        $txt3 .= '<td>'.$ano.'</td>';
-        $txt3 .= '<td>'.$sc.'</td>';
-        $txt3 .= '<td>'.$subj.'</td>';
-        $txt3 .= '<td>'.$abstract.'</td>';
-        $txt3 .= '<td>'.$idx.'</td>';
-        $txt3 .= '<td>'.base_url(PATH.'v/'.$idx).'</td>';
+        $txt3 .= '<td>' . strip_tags($aut2) . '</td>';
+        $txt3 .= '<td>' . $title . '</td>';
+        $txt3 .= '<td>' . $source . '</td>';
+        $txt3 .= '<td>' . $nr . $vr . $pages . '</td>';
+        $txt3 .= '<td>' . $ano . '</td>';
+        $txt3 .= '<td>' . $sc . '</td>';
+        $txt3 .= '<td>' . $subj . '</td>';
+        $txt3 .= '<td>' . $abstract . '</td>';
+        $txt3 .= '<td>' . $idx . '</td>';
+        $txt3 .= '<td>' . base_url(PATH . 'v/' . $idx) . '</td>';
 
         dircheck('c/' . $idx);
         if (strlen($txt) > 0) {
@@ -290,6 +291,43 @@ class export extends CI_Model {
             fclose($f);
         }
         return ($txt);
+    }
+
+    function all_xls($pg = 0) {
+        header ("Content-type: application/x-msexcel");
+        //header("Content-type:   application/x-msexcel; charset=utf-8");
+        header("Content-Disposition: attachment; filename=Brapci".date("Y-m-d-H-m").".xsl");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        echo '<table>';
+        echo '<tr>';
+        echo '<th>author</th>';
+        echo '<th>title</th>';
+        echo '<th>source</th>';
+        echo '<th>edition</th>';
+        echo '<th>year</th>';
+        echo '<th>section</th>';
+        echo '<th>keywords</th>';
+        echo '<th>abstract</th>';
+        echo '<th>page</th>';
+        echo '<th>link</th>';
+        echo '</tr>';
+        $id = 0;
+        for ($r=0;$r < 100000;$r++)
+            {
+                $f = 'c/'.$r.'/name.xls';
+                if (file_exists($f))
+                {
+                    $id++;
+                    echo file_get_contents($f).'</tr>'.cr();
+                } else {
+                    //echo 'Bye '.$r.'-'.$f.cr();
+                }
+            }
+            echo '</table>';
+            exit;
+        return('');
     }
 
     function export_Issue($pg = 0) {
@@ -627,8 +665,8 @@ class export extends CI_Model {
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
-        $sx = '<form method="post">'.cr();
-        $sx .= '<ul style="list-style-type: none;">'.cr();
+        $sx = '<form method="post">' . cr();
+        $sx .= '<ul style="list-style-type: none;">' . cr();
         $n = '';
         $sel = array();
         for ($r = 0; $r < count($rlt); $r++) {
@@ -644,7 +682,7 @@ class export extends CI_Model {
                 if ((isset($_SESSION['c' . $ic1])) and ($_SESSION['c' . $ic1] == '1')) {
                     $dt .= ' checked';
                 }
-                $sx .= '<input type="checkbox" ' . $dt . ' onchange="fcn'.$ic1.'(\'#c' . $ic1 . '\');"> ';
+                $sx .= '<input type="checkbox" ' . $dt . ' onchange="fcn' . $ic1 . '(\'#c' . $ic1 . '\');"> ';
                 $sx .= $line['n_name_1'];
                 $sx .= '</h4>' . cr();
                 $n = $nx;
@@ -652,33 +690,32 @@ class export extends CI_Model {
             $sx .= '<li style="margin-left: 20px;">';
             $dt = 'name = "a' . $ic2 . '" id="c' . $ic2 . '" ';
             if ((isset($_SESSION['c' . $ic2])) and ($_SESSION['c' . $ic2] == '1')) {
-                  $dt .= ' checked';
+                $dt .= ' checked';
             }
             //$sx .= '<input type="checkbox" ' . $dt . '> ';
             $sx .= $line['n_name_2'];
-            $sx .= '</li>'.cr();
+            $sx .= '</li>' . cr();
 
             if (!isset($sel[$ic1])) {
                 $sel[$ic1] = array();
             }
             array_push($sel[$ic1], $ic2);
         }
-        $sx .= '</ul>'.cr();
-        $sx .= '<input type="submit" value="' . msg('submit') . '" class="btn btn-outline-primary">'.cr();
-        $sx .= '</form>'.cr();
+        $sx .= '</ul>' . cr();
+        $sx .= '<input type="submit" value="' . msg('submit') . '" class="btn btn-outline-primary">' . cr();
+        $sx .= '</form>' . cr();
 
         /* JAVA */
-        $sx .= cr().'<script>' . cr();
+        $sx .= cr() . '<script>' . cr();
         foreach ($sel as $key => $value) {
-            $sx .= 'function fcn'.$key.'($id) {'.cr();
+            $sx .= 'function fcn' . $key . '($id) {' . cr();
             $v = '';
-            for ($rx=0;$rx < count($value);$rx++)
-                {
-                    $d = $value[$rx];
-                    $v .= $d.';';
-                }
-            $sx .= 'alert("'.$v.'");';                
-            $sx .= '}'.cr();            
+            for ($rx = 0; $rx < count($value); $rx++) {
+                $d = $value[$rx];
+                $v .= $d . ';';
+            }
+            $sx .= 'alert("' . $v . '");';
+            $sx .= '}' . cr();
         }
         $sx .= '</script>' . cr();
         return ($sx);
