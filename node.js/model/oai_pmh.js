@@ -24,8 +24,20 @@ var oai = {
 		// http://www.scielo.br/oai/scielo-oai.php?verb=ListIdentifiers&metadataPrefix=oai_dc_openaire&set=0103-3786&resumptionToken=HR__S0103-37862003000200008:0103-3786:::oai_dc_openaire
 		//&resumptionToken=
 	},
+	OaiRec : function (id, jid)
+	{
+		console.log("process "+id+" "+jid);
+		var rlt = db.query('select * from source_listidentifier where li_identifier = "' + id+" and li_jnl = '+jid+', function(error, results, fields) {
+			if (error) {
+				console.log("Update Error " + error);
+			}
+			return ("");
+		});
+		
+	},	
 	ListSets : function(line) {
 		url = line.jnl_url_oai;
+		idjnl = line.id_jnl;
 		if (line.jnl_scielo == 1) {
 			var sets = line.jnl_oai_set;
 			console.log('Harvesing Scielo ' + url + ' ' + sets);
@@ -46,6 +58,7 @@ var oai = {
 					    len = rlt2.length; i < len; i++) {
 						ln = rlt2[i]['identifier'][0];
 						console.log('#' + i + ': ' + ln);
+						oai.OaiRec(ln,idjnl);
 					}
 				});
 			});
@@ -53,7 +66,6 @@ var oai = {
 		} else {
 			console.log('Harvesing ' + url);
 		}
-
 	},
 	UpdateOaiToken : function(id, token) {
 		section = 'source_source';
