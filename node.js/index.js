@@ -9,6 +9,7 @@
 * node.js>npm install yyyy-mm-dd
 * node.js>npm install xml2js
 * node.js>npm install xml2json
+* npm install --save-dev nodemon
 */
 
 /************************************************************************/
@@ -25,8 +26,10 @@ console.log('Welcome to Robot #01 - OAI Brapci - v'+version());
 console.log("Started Robot");
 
 /* Create Server ******************************************************/
-app.listen(8081, function() {
+var port = 8081;
+app.listen(port, function() {
 	console.log("Started server - version " + version());
+	console.log("Port "+port);
 	dt = Date();
 	dt = dt.toLocaleString();
 	console.log(dt);

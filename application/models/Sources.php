@@ -134,7 +134,12 @@ class sources extends CI_Model {
         }
         $p = round($p);
 
-        $sql = "SELECT * FROM `source_source` WHERE jnl_url_oai <> '' and id_jnl > $p order by id_jnl limit 1 ";
+        $sql = "SELECT * FROM source_source 
+                    WHERE jnl_url_oai <> '' 
+                    and id_jnl > $p
+                    and jnl_scielo = 0
+                    and jnl_active = 1 
+                    order by id_jnl limit 1 ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 

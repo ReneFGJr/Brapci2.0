@@ -3,8 +3,13 @@ var db = require('../config/database');
 var xml2js = require('xml2js');
 const yyyymmdd = require('yyyy-mm-dd');
 const fs = require("fs");
+var https = require('https');
 
 var oai = {
+	readUrl : function() {
+
+
+	},
 	test : function(id, line) {
 		console.log('Function OAI-PMH test ' + line.jnl_name);
 		dt = Date();
@@ -24,17 +29,28 @@ var oai = {
 		// http://www.scielo.br/oai/scielo-oai.php?verb=ListIdentifiers&metadataPrefix=oai_dc_openaire&set=0103-3786&resumptionToken=HR__S0103-37862003000200008:0103-3786:::oai_dc_openaire
 		//&resumptionToken=
 	},
-	OaiRec : function (id, jid)
-	{
-		console.log("process "+id+" "+jid);
-		var rlt = db.query('select * from source_listidentifier where li_identifier = "' + id+" and li_jnl = '+jid+', function(error, results, fields) {
+	OaiInsert : function(id, jid) {
+		var dt = yyyymmdd();
+		var sql = "insert into source_listidentifier (li_identifier, li_jnl, li_update) values ('" + id + "','" + jid + "','" + dt + "')";
+		db.query(sql);
+		console.log(dt + ' - Register ' + jid + ':' + id);
+	},
+
+	OaiRec : function(id, jid) {
+		var sql = "select * from source_listidentifier ";
+		var sql = sql + " where li_identifier = '" + id + "' and li_jnl = " + jid;
+		var rlt = db.query(sql, function(error, rows, fields) {
 			if (error) {
 				console.log("Update Error " + error);
 			}
-			return ("");
+			if (rows.length == 0) {
+				oai.OaiInsert(id, jid);
+			} else {
+
+			}
+			/* return (""); */
 		});
-		
-	},	
+	},
 	ListSets : function(line) {
 		url = line.jnl_url_oai;
 		idjnl = line.id_jnl;
@@ -51,14 +67,14 @@ var oai = {
 					rlt = result['OAI-PMH']['ListIdentifiers'];
 					rlt2 = rlt[0]['header'];
 					token = result['OAI-PMH']['ListIdentifiers'];
+					console.log('Token: ' + token);
 					tk = rlt[0]['resumptionToken'][0];
 					console.log("Token: " + tk);
 					console.log('Total de registros: ' + rlt2.length);
 					for (var i = 0,
 					    len = rlt2.length; i < len; i++) {
 						ln = rlt2[i]['identifier'][0];
-						console.log('#' + i + ': ' + ln);
-						oai.OaiRec(ln,idjnl);
+						oai.OaiRec(ln, idjnl);
 					}
 				});
 			});

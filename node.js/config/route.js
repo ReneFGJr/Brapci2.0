@@ -11,5 +11,6 @@ router.get("/", function(req, res) {
 });
 
 router.route("/source").get(source.ListAll);
+router.route("/oai").get(oai.readUrl);
 
 module.exports = router;
