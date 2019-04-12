@@ -9,14 +9,16 @@
 * node.js>npm install yyyy-mm-dd
 * node.js>npm install xml2js
 * node.js>npm install xml2json
-* npm install --save-dev nodemon
+* npm install --save-dev -g nodemon
+* node.js>npm install cheerio
+* node.js>npm install request
 */
 
 /************************************************************************/
 /* Modules **************************************************************/
 const express = require('express');
 const router = require('./config/route');
-const db = require('./config/database');
+//const db = require('./config/database');
 const app = express();
 //const source = require("./model/sources");
 

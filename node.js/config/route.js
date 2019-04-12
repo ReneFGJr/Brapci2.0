@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const source = require("../model/sources");
-const oai = require("../model/oai_pmh");
+//const oai = require("../model/oai_pmh");
+const oai = require("../model/oai_ListIdentifiers");
 
 router.get("/", function(req, res) {
 	//res.send(">>"+__dirname+"\\test.html");
@@ -11,6 +12,10 @@ router.get("/", function(req, res) {
 });
 
 router.route("/source").get(source.ListAll);
-router.route("/oai").get(oai.readUrl);
 
-module.exports = router;
+/************************************************** OAI HARVESTING ***************/
+router.get("/oai", function(req, res) {	
+	oai.readNext(req, res);
+});
+
+module.exports = router; 

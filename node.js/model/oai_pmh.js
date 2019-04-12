@@ -3,13 +3,9 @@ var db = require('../config/database');
 var xml2js = require('xml2js');
 const yyyymmdd = require('yyyy-mm-dd');
 const fs = require("fs");
-var https = require('https');
+var request = require('request');
 
 var oai = {
-	readUrl : function() {
-
-
-	},
 	test : function(id, line) {
 		console.log('Function OAI-PMH test ' + line.jnl_name);
 		dt = Date();
@@ -25,6 +21,13 @@ var oai = {
 		oai.ListSets(line);
 		return (line.jnl_name);
 	},
+	/******************************************************** Le Proxima Coleta *****************/
+	readNext : function(req, res) {
+		url = 'http://www.scielo.br/oai/scielo-oai.php?verb=ListIdentifiers&metadataPrefix=oai_dc_openaire&set=0103-3786&resumptionToken=HR__S0103-37862003000200008:0103-3786:::oai_dc_openaire';
+		var html = openUrl(url);
+		res.send(html);
+		console.log(html);
+	},
 	Url : function(line, verb) {
 		// http://www.scielo.br/oai/scielo-oai.php?verb=ListIdentifiers&metadataPrefix=oai_dc_openaire&set=0103-3786&resumptionToken=HR__S0103-37862003000200008:0103-3786:::oai_dc_openaire
 		//&resumptionToken=
@@ -35,7 +38,6 @@ var oai = {
 		db.query(sql);
 		console.log(dt + ' - Register ' + jid + ':' + id);
 	},
-
 	OaiRec : function(id, jid) {
 		var sql = "select * from source_listidentifier ";
 		var sql = sql + " where li_identifier = '" + id + "' and li_jnl = " + jid;

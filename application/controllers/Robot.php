@@ -6,41 +6,65 @@ class Robot extends CI_Controller {
     function __construct() {
 
         parent::__construct();
-		global $MODO;
-		$MODO = 'robot';
+        global $MODO;
+        $MODO = 'robot';
         $this -> lang -> load("app", "portuguese");
         $this -> load -> database();
-		$this -> load -> helper('url');
+        $this -> load -> helper('url');
         $this -> load -> helper('xml');
         $this -> load -> helper('email');
-		$this -> load -> helper('form_sisdoc');
+        $this -> load -> helper('form_sisdoc');
         date_default_timezone_set('America/Sao_Paulo');
     }
 
     private function cab($data = array()) {
-    	echo "OAI-PMH ROBOT Brapci v2.0a".cr();
+        if (count($data) == 0) {
+            echo "OAI-PMH ROBOT Brapci v2.0a" . cr();
+        } else {
+            $data['title'] = 'Brapci 2.0';
+            if (isset($data['meta'])) {
+                for ($r = 0; $r < count($data['meta']); $r++) {
+                    $line = $data['meta'][$r];
+                    $class = trim($line['c_class']);
+                    if (trim($line['c_class']) == 'prefLabel') {
+                        $data['title'] = trim($line['n_name']) . ' :: Brapci 2.0';
+                    }
+                    if (trim($line['c_class']) == 'hasTitle') {
+                        $data['title'] = trim($line['n_name']) . ' :: Brapci 2.0';
+                    }
+                }
+            }
+            $this -> load -> view('header/header.php', $data);
+        }
+
     }
 
     private function footer($data = array()) {
-    	echo cr();
+        echo cr();
+    }
+
+    public function status() {
+        $data['status'] = true;
+        $this -> cab($data);
+        $this -> load -> view('robots/status');
     }
 
     public function index() {
-    	$verb = get("verb");
-    	$id = get("id");
-		$id2 = get("id2");
-    	
+        $verb = get("verb");
+        $id = get("id");
+        $id2 = get("id2");
+
         $this -> load -> model('sources');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('export');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
-		$this -> load -> helper('form_sisdoc');
+        $this -> load -> helper('form_sisdoc');
         $this -> load -> model('Elasticsearch');
         $this -> load -> model('Elasticsearch_brapci20');
         $this -> cab();
-        $data['title'] = 'OAI';		
-		$html = '';
+        $data['title'] = 'OAI';
+        $html = '';
         switch($verb) {
             case 'GetRecord' :
                 $dt = array();
@@ -54,7 +78,7 @@ class Robot extends CI_Controller {
                     $html .= '<meta http-equiv="Refresh" content="5">';
                 } else {
                     $html = $this -> sources -> info($id);
-                    $html .= '<h3>Fim da coleta</h3>'.cr();
+                    $html .= '<h3>Fim da coleta</h3>' . cr();
                 }
                 /***************************************************/
 
@@ -87,24 +111,24 @@ class Robot extends CI_Controller {
             case 'Identify' :
                 $html = $this -> sources -> info($id);
                 $html .= $this -> oai_pmh -> Identify($id);
-                redirect(base_url(PATH.'oai/info/'.$id));
+                redirect(base_url(PATH . 'oai/info/' . $id));
                 break;
-			case 'pdf_import':
+            case 'pdf_import' :
                 $this -> load -> model("pdfs");
                 $this -> load -> model("frbr");
                 $this -> load -> model("frbr_core");
 
-                $txt = $this -> pdfs -> harvesting_next($id,0);
-				echo cr().$txt;
-				echo cr().date("d/m/Y H:i:s");
-				break;
-			case 'oai_import':
+                $txt = $this -> pdfs -> harvesting_next($id, 0);
+                echo cr() . $txt;
+                echo cr() . date("d/m/Y H:i:s");
+                break;
+            case 'oai_import' :
                 $data['title'] = msg('Tools');
-				$txt = '';
-				$txt = date("d/m/Y H:i:s").cr();
+                $txt = '';
+                $txt = date("d/m/Y H:i:s") . cr();
                 /* Coleta */
                 $this -> load -> model('sources');
-                $this -> load -> model('searchs');				
+                $this -> load -> model('searchs');
                 $this -> load -> model('oai_pmh');
                 $this -> load -> model('export');
                 $this -> load -> model('frbr');
@@ -119,15 +143,15 @@ class Robot extends CI_Controller {
                     $dt['idc'] = $idc;
                     //$txt = $this -> sources -> info($id);
                     $txt .= $this -> oai_pmh -> process($dt);
-                    $html = $txt.cr();
+                    $html = $txt . cr();
                 } else {
                     $txt = $this -> sources -> info($id);
-                    $txt .= '<h3>Fim da coleta</h3>'.cr();
-                    $txt .= '<br>' . date("d/m/Y H:i:s").cr();
-					$html .= $txt.cr();
-                }	
-				$html .= 'left >>'.$this->oai_pmh->leftHarvesting().cr();			
-				break;
+                    $txt .= '<h3>Fim da coleta</h3>' . cr();
+                    $txt .= '<br>' . date("d/m/Y H:i:s") . cr();
+                    $html .= $txt . cr();
+                }
+                $html .= 'left >>' . $this -> oai_pmh -> leftHarvesting() . cr();
+                break;
             default :
                 $html = $this -> oai_pmh -> repository_list($id);
                 break;
@@ -136,4 +160,5 @@ class Robot extends CI_Controller {
         echo strip_tags($html);
         $this -> footer();
     }
+
 }
