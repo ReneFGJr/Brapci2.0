@@ -38,6 +38,20 @@ class bibliometrics extends CI_model {
             $sx .= '</div>';
             return($sx);
         }
+    function change_text_to($d1,$d2)
+        {
+            $ln = troca($d2,chr(13),';');
+            $ln = troca($ln,chr(10),'');
+            
+            $lns = splitx(';',$ln);
+            for ($r=0;$r < count($lns);$r++)
+                {
+                    $ln = troca($lns[$r],'=>',';');
+                    $m = splitx(';',$ln);
+                    $d1 = troca($d1,$m[0],$m[1]);
+                }
+            return($d1);
+        }
     function form_1()
         {
             $form = new form;
@@ -48,6 +62,17 @@ class bibliometrics extends CI_model {
             $sx = $form->editar($cp,'');
             return($sx);
         }
+    function form_2()
+        {
+            $form = new form;
+            $cp = array();
+            array_push($cp,array('$H8','','',False,False));
+            array_push($cp,array('$T80:10','',msg('text_to_process'),True,True));
+            array_push($cp,array('$T80:10','',msg('text_to_change_to'),True,True));
+            array_push($cp,array('$B8','',msg('process'),False,True));
+            $sx = $form->editar($cp,'');
+            return($sx);
+        }        
         function form_file($title='')
             {
                 if (strlen($title) > 0)

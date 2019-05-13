@@ -207,5 +207,5 @@ $lang['Next_events'] = 'Próximos eventos';
 $lang['event_all'] = 'todos os eventos';
 $lang['register_our_event'] = 'registrar seu evento';
 $lang['event'] = 'Área de eventos';
-//$lang = array();
+$lang = array();
 ?>

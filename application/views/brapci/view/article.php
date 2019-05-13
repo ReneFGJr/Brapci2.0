@@ -105,6 +105,13 @@ for ($r = 0; $r < count($article); $r++) {
 
 <div class="row" style="margin-top: 40px;">
 	<div class="col-10">
+	    <?php
+	       if (perfil("#ADMIN") > 0)
+            {
+            echo 'ADMIN Menu | <a href="'.base_url(PATH.'concept_del/'.$id.'/'.checkpost_link($id.'Concept')).'" onClick="return confirm(\''.msg('confirm_exclud_article').'\')" class="btn btn-warning">'.msg('del_article').'</a>';
+            }
+        ?>
+	    
 		<center>
 			<?php
 			for ($r = 0; $r < count($tit); $r++) {
@@ -165,5 +172,4 @@ for ($r = 0; $r < count($article); $r++) {
 		
 		?>
 	</div>
-
 </div>

@@ -219,6 +219,11 @@ class res extends CI_Controller {
         $data['id'] = $id;
         $this -> cab($data);
 
+        if (count($vv) == 0)
+            {
+                $this->load->view("error");
+                return("");
+            }
         $tela = $this -> frbr -> vv($id);
 
         $data['content'] = $tela;
@@ -826,6 +831,18 @@ class res extends CI_Controller {
 
         $this -> footer();
     }
+    
+    function concept_del($id='',$chk='')
+        {
+            $this->load->model('frbr');
+            if (checkpost_link($id.'Concept') == $chk)
+                {
+                    $this->frbr->remove_concept($id);        
+                } else {
+                    echo "Erro de Post";
+                }
+            
+        }
 
     function download($d1 = '') {
         $d1 = round($d1);
@@ -1369,6 +1386,7 @@ class res extends CI_Controller {
     function bibliometric($ac = '') {
         $this -> load -> model("bibliometrics");
         $dd1 = get("dd1");
+        $dd2 = get("dd2");
         $tela = '';
         $tela .= '<div class="row">';
         $tela .= '<div class="col-md-12">';
@@ -1403,6 +1421,17 @@ class res extends CI_Controller {
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
                 break;
+            case 'change_to':
+                if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_2();
+                } else {
+                    $rst = $this -> bibliometrics -> change_text_to($dd1,$dd2);
+                    $tela .= $this -> bibliometrics -> form_2();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }
+                break;           
+                
             default :
                 $tela = $this -> bibliometrics -> tools_menu();
                 break;

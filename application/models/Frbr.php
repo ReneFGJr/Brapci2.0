@@ -150,6 +150,17 @@ class frbr extends CI_model {
 
     }
     
+    function remove_concept($id) {
+        $sql = "update rdf_data set
+                                d_r1 = ((-1) * d_r1) ,
+                                d_r2 = ((-1) * d_r2 ),
+                                d_p  = ((-1) * d_p) 
+                                where d_r1 = $id or d_r2 = $id";
+        $rlt = $this -> db -> query($sql);
+        redirect(base_url(PATH));
+        return ("");
+    }    
+    
     function form_article($id)
         {
             $lg = 'pt-BR:Portugues&en:Inglês&es:Espanhol&fr:Francês';
@@ -175,6 +186,9 @@ class frbr extends CI_model {
             array_push($cp,array('$A4','',msg('Pages'),FALSE,true));
             array_push($cp,array('$S20','',msg('pageStart'),FALSE,true));
             array_push($cp,array('$S20','',msg('pageStop'),FALSE,true));
+            
+            array_push($cp,array('$O jnl-artile:Artigo&jnl-editorial:Editorial','',msg('session'),true,true));
+            
             array_push($cp,array('$B8','',msg('submit'),false,true));
             $tela = $form->editar($cp,'');
             
@@ -209,26 +223,38 @@ class frbr extends CI_model {
                     $lng2 = get("dd13");    
                     
                     /* KEYWORD */                
-                    echo 'Titles:'.$title.'--'.$title2;
-                    echo '<hr>';
-                    print_r($aut);
-                    echo '<hr>'.$abs1;
-                    echo '<hr>'.$abs2;
-                    
                     $pagi = get("dd15");
                     $pagf = get("dd16");
+                    $session = get("dd17");
+                    
+                    /*********************ok **********/
                     
                     $artid = 'issue:'.$id.'-'.date("Ymdhis");   
-                    //$artid = 'issue:110215-20190219091814';                 
+                    //$artid = 'issue:'.$id.'-'.date("Ymdh"); /* remover depois do teste */
+                                                         
                     $ida = $this->frbr_core->rdf_concept_create('Article',$artid);
-                                        
+
                     $prop = 'hasId';
                     $idan = $this->frbr_core->frbr_name($artid);
-                    $this->frbr_core->set_propriety($ida,$prop,0,$idan);
+                    $this->frbr_core->set_propriety($ida,$prop,0,$idan);                
+                    
                     /********* Issue ***************************/
                     $prop = 'hasIssueOf';
                     $this->frbr_core->set_propriety($ida,$prop,$id,0);
                     
+                    /*******************************************/
+                    $prop = 'isPubishIn';
+                    
+                    /* Session **********************************/
+                    $session = get("dd17");
+                    
+                    /********** Section *************************/                           
+                    $class = 'ArticleSection'; 
+                    $ids = $this->frbr_core->rdf_concept_create($class,$session);
+                    
+                    $prop = 'hasSectionOf';                     
+                    $this->frbr_core->set_propriety($ida,$prop,$ids,0);
+                            
                     /* SOURCE */
                     $prop = 'hasSource';
                     $dt = $this->frbr_core->le_data($id);
@@ -254,12 +280,8 @@ class frbr extends CI_model {
                             $prop = 'isPubishIn';
                             $this->frbr_core->set_propriety($ida,$prop,$source_id,0);                
                         }
-                      
-                    
-                    $prop = 'hasIssue';
-                    echo '<pre>';
-                    print_r($dt);
-                    exit;                  
+                        
+    
                     
                     /********* Abstract 1 **********************/
                     if (strlen($title) > 0)
@@ -334,10 +356,7 @@ class frbr extends CI_model {
                                 $idp = $this->frbr_core->rdf_concept_create('Person',$author); 
                                 $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
                             }           
-                                     
-                    echo '<br>IDA='.$ida;
-                    redirect(base_url(PATH.'a/'.$ida));
-                    
+                       redirect(base_url(PATH.'a/'.$ida));                    
                 }
             return($tela);
         }

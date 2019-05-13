@@ -76,9 +76,10 @@ for ($r = 0; $r < count($issue); $r++) {
         
         <?php
         if (perfil("#ADM#CAT")==1)
-        {
-            echo '<hr>';
-            echo '<a href="'.base_url(PATH.'article_new/'.$id).'">'.msg('new_article').'</a>';
+        {            
+            echo '<a href="'.base_url(PATH.'article_new/'.$id).'" class="btn btn-primary">'.msg('new_article').'</a>';
+            echo '<br>';
+            echo '<br>';
         }
         ?>
 	</div>
