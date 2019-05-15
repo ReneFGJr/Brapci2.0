@@ -47,12 +47,11 @@ class elasticsearch extends CI_model {
         
         if (perfil("#ADM"))
             {
-            echo '<pre style="color: blue">';
-            echo '<tt>'.$url.'</tt>';
-            echo '</pre>';
+            //echo '<pre style="color: blue">';
+            //echo '<tt>'.$url.'</tt>';
+            //echo '</pre>';
             }
 
-        
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -79,6 +78,8 @@ class elasticsearch extends CI_model {
 
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        //print_r($response);
+        //exit;
 
         return json_decode($response, true);
     }
@@ -216,6 +217,7 @@ class elasticsearch extends CI_model {
         $dt['year'] = $year;
         $dt['issue'] = $source;
         $dt['all'] = $title . ' ' . $abstract . ' ' . $subject;
+       
         if ($status == 'N') {
             $rst = $this -> delete($type, $id);
             $rst = "<font color=red><b>Deleted " . $id . " " . $type . '</b></font>';
@@ -223,7 +225,6 @@ class elasticsearch extends CI_model {
             $rst = $this -> call($type . '/' . $id, 'PUT', $dt);
             $rst = "<font color=green><b>Update " . $id . " " . $type . '</b></font>';
         }
-
         return ($rst);
 
     }
