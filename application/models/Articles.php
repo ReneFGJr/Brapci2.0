@@ -1027,7 +1027,7 @@ class articles extends CI_model {
         $pgf = trim($ln['ar_pg_final']);
         $doi = trim($ln['ar_doi']);
         $tipo = trim($ln['jnl_tipo']);
-        $link = ' Disponível em: &lt;' . base_url('v/a/'.$ln['id_ar']) . '&gt;.';
+        $link = ' Disponível em: &lt;' . 'http://hdl.handle.net/20.500.11959/brapci/'.$ln['id_ar'] . '&gt;.';
         $acesso = ' Acesso em: ' . date("d") . ' ' . msg('mes_' . date("m") . 'a') . ' ' . date("Y") . '.';
         $pag = '';
 
@@ -1062,12 +1062,16 @@ class articles extends CI_model {
         if (strlen($ano) > 0) { $ano = ', ' . $ano;
         }
         /* DOI */
-        if (strlen($doi) > 0) { $doi .= '. DOI:<a href="#">' . $doi . '</a>';
+        if (strlen($doi) > 0) {
+            $doi .= '. DOI:<a href="#">' . $doi . '</a>';
+            $link = '';
+        } else {
+            
         }
 
         switch ($tipo) {
             case 'J' :
-                $sx = $autor . '. ' . trim($title) . '. <b>' . $journal.'</b>' . $vol . $num . $pag . $ano . $doi . '.';
+                $sx = $autor . '. ' . trim($title) . '. <b>' . $journal.'</b>' . $vol . $num . $pag . $ano . $doi . '. '.$link.$acesso;
                 $sx .= $link;
                 $sx .= $acesso;
                 break;

@@ -61,6 +61,7 @@ $lang['hasISSN'] = 'ISSN';
 $lang['hasIdRegister'] = 'IDs';  
 $lang['hasUrl'] = 'Link de acesso';
 $lang['hasTitle'] = 'Título';
+$lang['hasTitleAlternative'] = 'Título alternativo';
 $lang['hasRegisterId'] = 'Identificador';
 $lang['dateOfAvailability'] = 'Disponibilizado';
 $lang['hasSectionOf'] = 'Sessão';
@@ -207,5 +208,5 @@ $lang['Next_events'] = 'Próximos eventos';
 $lang['event_all'] = 'todos os eventos';
 $lang['register_our_event'] = 'registrar seu evento';
 $lang['event'] = 'Área de eventos';
-$lang = array();
+/* $lang = array(); */
 ?>

@@ -1443,5 +1443,16 @@ class res extends CI_Controller {
         $this -> load -> view('show', $data);
         $this -> footer();
     }
+    function handle()
+        {
+            if (perfil("#ADM") > 0)
+                {
+                    $this->cab();
+                    $this->load->model("handle");
+                    echo '<pre>'.$this->handle->create_handle(101,105).'</pre>';
+                } else {
+                    echo "OPS";
+                }
+        }
 
 }

@@ -4,6 +4,10 @@ class nets extends CI_model {
 	function howcited($data)
 		{
 		$d = $this -> dados($data);
+        
+        $link = ' Disponível em: &lt;' . 'http://hdl.handle.net/20.500.11959/brapci/'.$data[0]['d_r1'] . '&gt;.';
+        $acesso = ' Acesso em: ' . date("d") . ' ' . msg('mes_' . date("m")) . ' ' . date("Y") . '.';
+        
 		$mn = $d['autor_full'];
 		$mn .= ' '.$d['title'].'. ';
 		$mn .= $d['source'];
@@ -11,8 +15,11 @@ class nets extends CI_model {
 		if (strlen($d['doi']) > 0)
 			{
 				$mn .= ' DOI: '.'<a href="'.$d['doi'].'" target="_new">'.troca($d['doi'],'http://dx.doi.org/','').'</a>';
+                $mn .= $acesso;
+			} else {
+			    $mn .= $link.$acesso;
 			}
-		return($mn);	
+		return(''.$mn);	
 		}
         
     function selected($data)
