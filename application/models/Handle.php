@@ -17,7 +17,7 @@ class handle extends CI_model {
         }        
         
         /* Seleciona todos os não registrados e em processo de registro */
-        $sql = "select * from handle where hdl_status <= 1 limit 1000";
+        $sql = "select * from handle where hdl_status <= 1 limit 5000";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $c = $this -> cmd_header();
@@ -37,7 +37,7 @@ class handle extends CI_model {
         $output = shell_exec('sh /hs/cmd/c');
         echo "=><pre>$output</pre>";
     
-        echo '<pre>' . $c . '</pre>';
+        echo '<pre>Gerado com ' . strlen($c) . ' bytes</pre>';
         exit ;
     }
 
