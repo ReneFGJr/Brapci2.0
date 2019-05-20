@@ -113,7 +113,7 @@ class res extends CI_Controller {
         }
     }
 
-    public function issue($act,$id) {
+    public function issue($act, $id) {
         $this -> load -> model('sources');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
@@ -134,13 +134,12 @@ class res extends CI_Controller {
         $this -> cab();
 
         if (strlen(get("q")) == 0) {
-            $data['events'] = $this->events->events_actives();
+            $data['events'] = $this -> events -> events_actives();
         } else {
             $data['events'] = '';
         }
-        $this -> load -> view('brapci/form',$data);
-        
-        
+        $this -> load -> view('brapci/form', $data);
+
         if (strlen(get("q")) > 0) {
             /****************************************************************************/
             //$this -> ElasticSearch -> getStatus();
@@ -152,15 +151,15 @@ class res extends CI_Controller {
             }
             $term = troca($term, '¢', '"');
             $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
-            
+
             //$data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);
-            
+
         } else {
             /****************************************************************************/
             $data['content'] = $this -> searchs -> historic();
             //$data['content'] .= '<div class="col-md-2">xxxxxxxxxx</div>';
-            
+
             $this -> load -> view('show', $data);
         }
 
@@ -188,8 +187,7 @@ class res extends CI_Controller {
         $this -> footer();
     }
 
-    public function article_new($id)
-        {
+    public function article_new($id) {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
@@ -200,12 +198,12 @@ class res extends CI_Controller {
         $data['meta'] = $vv;
         $data['id'] = $id;
         $this -> cab($data);
-        
-        $dt['content'] = $this->frbr->form_article($id);
-        $this->load->view('show',$dt);
-        $this->footer();
-           
-        }
+
+        $dt['content'] = $this -> frbr -> form_article($id);
+        $this -> load -> view('show', $dt);
+        $this -> footer();
+
+    }
 
     public function v($id) {
         $this -> load -> model('nets');
@@ -213,17 +211,17 @@ class res extends CI_Controller {
         $this -> load -> model('frbr_core');
         $this -> load -> model('genero');
         $this -> load -> model('frad');
+        $this -> load -> model('handle');
 
         $vv = $this -> frbr_core -> le_data($id);
         $data['meta'] = $vv;
         $data['id'] = $id;
         $this -> cab($data);
 
-        if (count($vv) == 0)
-            {
-                $this->load->view("error");
-                return("");
-            }
+        if (count($vv) == 0) {
+            $this -> load -> view("error");
+            return ("");
+        }
         $tela = $this -> frbr -> vv($id);
 
         $data['content'] = $tela;
@@ -646,9 +644,12 @@ class res extends CI_Controller {
         switch($fcn) {
             case 'export' :
                 switch($arg) {
+                    case 'xls' :
+                        $this -> bs -> mark_export_xls();
+                        break;
                     case 'csv' :
                         $this -> bs -> mark_export_csv();
-                        break;
+                        break;                        
                     case 'doc' :
                         $this -> bs -> mark_export_doc();
                         break;
@@ -757,20 +758,19 @@ class res extends CI_Controller {
         }
     }
 
-    function event($act='')
-        {
-            $this->load->model('events');
-            $this->cab();
-            $data['content'] = '<div class="row">';
-            $data['content'] .= '<div class="col-md-12">';
-            $data['content'] .= '<h1>'.msg('event').'</h1>'.'<p>Para registrar um evento, envie um e-mail para brapcici@gmail.com com o assunto [Evento]<p>';
-            $data['content'] .= $this->events->events_actives(1);
-            $data['content'] .= '</div>';
-            $data['content'] .= '</div>';            
-            $this->load->view('show',$data);
-           
-            $this->footer();
-        }
+    function event($act = '') {
+        $this -> load -> model('events');
+        $this -> cab();
+        $data['content'] = '<div class="row">';
+        $data['content'] .= '<div class="col-md-12">';
+        $data['content'] .= '<h1>' . msg('event') . '</h1>' . '<p>Para registrar um evento, envie um e-mail para brapcici@gmail.com com o assunto [Evento]<p>';
+        $data['content'] .= $this -> events -> events_actives(1);
+        $data['content'] .= '</div>';
+        $data['content'] .= '</div>';
+        $this -> load -> view('show', $data);
+
+        $this -> footer();
+    }
 
     function export($tp = '', $pg = 0) {
         $this -> load -> model('export');
@@ -780,8 +780,8 @@ class res extends CI_Controller {
         $this -> cab();
 
         switch($tp) {
-            case 'all_xls':
-                $this->export->all_xls();
+            case 'all_xls' :
+                $this -> export -> all_xls();
                 break;
             case 'issue' :
                 $tela = $this -> export -> export_Issue($pg);
@@ -831,18 +831,16 @@ class res extends CI_Controller {
 
         $this -> footer();
     }
-    
-    function concept_del($id='',$chk='')
-        {
-            $this->load->model('frbr');
-            if (checkpost_link($id.'Concept') == $chk)
-                {
-                    $this->frbr->remove_concept($id);        
-                } else {
-                    echo "Erro de Post";
-                }
-            
+
+    function concept_del($id = '', $chk = '') {
+        $this -> load -> model('frbr');
+        if (checkpost_link($id . 'Concept') == $chk) {
+            $this -> frbr -> remove_concept($id);
+        } else {
+            echo "Erro de Post";
         }
+
+    }
 
     function download($d1 = '') {
         $d1 = round($d1);
@@ -1397,7 +1395,7 @@ class res extends CI_Controller {
                 } else {
                     $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
                     $rst = $this -> bibliometrics -> csv_to_net($txt);
-                    $this -> bibliometrics -> download_file($rst);
+                    $this -> bibliometrics -> download_file($rst,'.net');
                     return ('');
                 }
                 break;
@@ -1421,17 +1419,17 @@ class res extends CI_Controller {
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
                 break;
-            case 'change_to':
+            case 'change_to' :
                 if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
                     $tela .= $this -> bibliometrics -> form_2();
                 } else {
-                    $rst = $this -> bibliometrics -> change_text_to($dd1,$dd2);
+                    $rst = $this -> bibliometrics -> change_text_to($dd1, $dd2);
                     $tela .= $this -> bibliometrics -> form_2();
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
-                break;           
-                
+                break;
+
             default :
                 $tela = $this -> bibliometrics -> tools_menu();
                 break;
@@ -1443,16 +1441,17 @@ class res extends CI_Controller {
         $this -> load -> view('show', $data);
         $this -> footer();
     }
-    function handle()
-        {
-            if (perfil("#ADM") > 0)
-                {
-                    $this->cab();
-                    $this->load->model("handle");
-                    echo '<pre>'.$this->handle->create_handle(101,105).'</pre>';
-                } else {
-                    echo "OPS";
-                }
+
+    function handle($act = '', $token = '') {
+        if ((perfil("#ADM") > 0) or ($token == '0mhHuERfFBpuwULJSZXGNJc5agPVZZHe')) {
+            if ($act = 'register') {
+                $this -> cab();
+                $this -> load -> model("handle");
+                echo '<pre>' . $this -> handle -> handle_register() . '</pre>';
+            }
+        } else {
+            echo "OPS";
         }
+    }
 
 }

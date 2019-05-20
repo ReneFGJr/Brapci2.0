@@ -9,6 +9,8 @@ class export extends CI_Model {
         $file3 = 'c/' . $idx . '/name.ABNT';
         $file_dc = 'c/' . $idx . '/name.dc';
         $file_xls = 'c/' . $idx . '/name.xls';
+        $file_csv = 'c/' . $idx . '/name.csv';
+        $file_rdf = 'c/' . $idx . '/name.rdf';
 
         /************** zera dados ****/
         $sx = '';
@@ -168,6 +170,20 @@ class export extends CI_Model {
         $txt3 .= '<td>' . $abstract . '</td>';
         $txt3 .= '<td>' . $idx . '</td>';
         $txt3 .= '<td>' . base_url(PATH . 'v/' . $idx) . '</td>';
+        
+        $txt4 = '';
+        $txt4 .= '"' . strip_tags($aut2) . '"';
+        $txt4 .= ',"' . $title . '"';
+        $txt4 .= ',"' . $source . '"';
+        $txt4 .= ',"' . $nr . $vr . $pages . '"';
+        $txt4 .= ',"' . $ano . '"';
+        $txt4 .= ',"' . $sc . '"';
+        $txt4 .= ',"' . $subj . '"';
+        $txt4 .= ',"' . $abstract . '"';
+        $txt4 .= ',"' . $idx . '"';
+        $txt4 .= ',"' . base_url(PATH . 'v/' . $idx) . '"';  
+        $txt4 = troca($txt4,chr(13),' ');
+        $txt4 = troca($txt4,chr(10),'');      
 
         dircheck('c/' . $idx);
         if (strlen($txt) > 0) {
@@ -183,6 +199,13 @@ class export extends CI_Model {
             fwrite($f, $txt3);
             fclose($f);
         }
+        
+        if (strlen($txt4) > 0) {
+            /******************************/
+            $f = fopen($file_csv, 'w+');
+            fwrite($f, $txt4);
+            fclose($f);
+        }        
 
         if (strlen($rwork) > 0) {
             /******************************/

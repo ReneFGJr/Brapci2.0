@@ -45,7 +45,7 @@
 			<br>
 			Universidade Federal do Paraná | Universidade Federal do Rio Grande do Sul
 			<br>
-			Versão 4.1 beta | 2010-<?php echo date("Y");?>
+			Versão 4.2 beta | 2010-<?php echo date("Y");?>
 			<br>
 			<a href="mailto:brapcici@gmail.com"><font color="black">brapcici@gmail.com</font></a> | <a href="mailto:renefgj@gmail.com"><font color="black">renefgj@gmail.com</font></a>
 			<br>

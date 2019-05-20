@@ -3,12 +3,17 @@ class Bs extends CI_model {
     function tools() {
         $sx = '<div class="col-md-12">';
         $sx .= '<a href="' . base_url(PATH . 'basket/clean') . '" class="btn btn-outline-danger" style="margin-right: 10px;">' . msg('clean_selected') . '</a>';
-        $sx .= '<a href="' . base_url(PATH . 'basket/export/csv') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
-        $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
-
         if ((isset($_SESSION['user'])) and (strlen($_SESSION['user']) > 0)) {
             $sx .= '<a href="' . base_url(PATH . 'basket/save') . '" class="btn btn-outline-primary" style="margin-right: 10px;">' . msg('save_selected') . '</a>';
         }
+
+        $sx .= '</br>';
+        $sx .= '</br>';        
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/csv') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('csv_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
+        //$sx .= '<a href="' . base_url(PATH . 'basket/export/rdf') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('rdf_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
+
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
         $sx .= '<hr>';
@@ -268,6 +273,41 @@ class Bs extends CI_model {
     }
 
     function mark_export_csv() {
+        $file = 'brapci_csv_' . date("YmdHi") . '.txt';
+        header('Content-Encoding: UTF-8');
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename=' . $file);
+        $sx = '';
+        $s = $_SESSION;
+        $tot = 0;
+
+        $a = array();
+        $sx = '';
+        $sx .= '' . msg('author');
+        $sx .= ',' . msg('title');
+        $sx .= ',' . msg('source');
+        $sx .= ',' . msg('issue');
+        $sx .= ',' . msg('year');
+        $sx .= ',' . msg('session');
+        $sx .= ',' . msg('keywords');
+        $sx .= ',' . msg('abstract');
+        $sx .= ',' . msg('id');
+        $sx .= ',' . msg('link');
+        $sx .= ',' . cr();
+        foreach ($s as $key => $value) {
+            if (substr($key, 0, 1) == 'm') {
+                $tot++;
+                $key = substr($key, 1, strlen($key));
+                $file = 'c/' . $key . '/name.csv';
+                if (file_exists($file)) {
+                    $fr = file_get_contents($file);
+                    $sx .= $fr . cr();
+                }
+            }
+        }
+        echo utf8_decode($sx);
+    }
+    function mark_export_xls() {
         $file = 'brapci_' . date("YmdHi") . '.xls';
         header('Content-Encoding: UTF-8');
         header('Content-type: text/csv; charset=UTF-8');
@@ -309,7 +349,6 @@ class Bs extends CI_model {
         echo '</html>';
 
     }
-
     function mark_export_doc() {
         $file = 'brapci_' . date("YmdHi") . '.doc';
         header('Content-Encoding: UTF-8');

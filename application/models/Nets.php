@@ -4,8 +4,8 @@ class nets extends CI_model {
 	function howcited($data)
 		{
 		$d = $this -> dados($data);
-        
-        $link = ' Disponível em: &lt;' . 'http://hdl.handle.net/20.500.11959/brapci/'.$data[0]['d_r1'] . '&gt;.';
+        $uri = 'http://hdl.handle.net/20.500.11959/brapci/'.$data[0]['d_r1'];
+        $link = ' Disponível em: &lt;<a href="'.$uri.'" target=_"new">' . $uri . '</a>&gt;.';
         $acesso = ' Acesso em: ' . date("d") . ' ' . msg('mes_' . date("m")) . ' ' . date("Y") . '.';
         
 		$mn = $d['autor_full'];

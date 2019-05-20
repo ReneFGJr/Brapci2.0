@@ -383,6 +383,7 @@ class frbr extends CI_model {
         $dados['social'] .= $this -> nets -> selected($data);
 
         $dados['cited'] = $this -> nets -> howcited($data);
+        $this->handle->hdl_register($id,'http://www.brapci.inf.br/index.php/res/v/'.$id);
 
         $tela .= $this -> load -> view('brapci/view/article', $dados, true);
 
