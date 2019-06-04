@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.18.12.01
+ * @version     v0.19.03.29
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -689,7 +689,7 @@ function nbr_autor($xa, $tp) {
     /////////////////////////////
     $xp1 = "";
     $xp2 = "";
-    $er1 = array("JUNIOR", "JÚNIOR", "JÚNIOR", "NETTO", "NETO", "SOBRINHO", "FILHO", "JR.", "FILHA", "NETA", "NETTA", "SOBRINHA");
+    $er1 = array("JUNIOR", "JÚNIOR", "JÚNIOR", "NETTO", "NETO", "SOBRINHO", "FILHO", "JR.");
     ///////////////////////////// SEPARA NOMES
     {
         $xop = 0;
@@ -1462,7 +1462,7 @@ if (!function_exists('form_edit')) {
             }
             if ($obj -> edit == True) {
                 $idr = trim($row[$fd[0]]);
-                $data .= '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '">'.msg('[ed]').'</span></td>';
+                $data .= '<td width="1%" align="center"><A HREF="' . $obj -> row_edit . '/' . $idr . '/' . checkpost_link($idr) . '"><span class="glyphicon glyphicon-pencil" aria-hidden="true">[ed]</span></td>';
             }
             $data .= '</tr>' . chr(13) . chr(10);
         }
@@ -2584,6 +2584,37 @@ if (!function_exists('form_edit')) {
                 $tela .= form_hidden($dados);
 
                 break;
+            /* Textarea */
+            case 'W' :
+                $ntype = trim(substr($type, 2, strlen($type)));
+                $ntype = troca($ntype, ':', ';') . ';';
+                $param = splitx(';', $ntype);
+
+                /* TR da tabela */
+                $tela .= $tr;
+
+                /* label */
+                if (strlen($label) > 0) {
+                    $tela .= $tdl . $label . ' ';
+                }
+                if ($required == 1) { $tela .= ' <font color="red">*</font> ';
+                }
+
+                $tela = '
+                        <script src="js/ckeditor.js"></script>
+                        <textarea name="editor1" id="editor1" rows="10" cols="80">
+                            This is my textarea to be replaced with CKEditor.
+                        </textarea>
+                        <script>
+                            // Replace the <textarea id="editor1"> with a CKEditor
+                            // instance, using default configuration.
+                            CKEDITOR.replace( \'editor1\' );
+                        </script>';
+
+                $data = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'rows' => $param[1], 'cols' => $param[0], 'class' => 'form-control form_textarea ');
+                $tela .= $td . form_textarea($data);
+                $tela .= $tdn . $trn;
+                break;                
         }
         $ddi++;
         return ($tela);
@@ -2727,10 +2758,6 @@ function nbr_author($xa, $tp) {
         $xa = trim(substr($xa, 0, strpos($xa, ',')));
         $xa = trim(trim($xb) . ' ' . $xa);
     }
-    for ($r=0;$r < 32;$r++)
-        {
-            $xa = troca($xa,chr($y),'');
-        }
     $xa = $xa . ' ';
     $xp = array();
     $xx = "";
@@ -3012,6 +3039,5 @@ function romano($n)
                 $r = 'ERRO '.$n;
             }
         return($r);               
-    }
-
+    }    
 ?>

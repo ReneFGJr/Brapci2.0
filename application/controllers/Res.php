@@ -502,11 +502,30 @@ class res extends CI_Controller {
         $this -> cab();
         $data['title'] = 'OAI';
         switch($verb) {
+            case 'GetRecordScielo' :
+                $dt = array();
+                $idc = $this -> oai_pmh -> getRecord($id);
+                if ($idc > 0) {
+                    $dt = $this -> oai_pmh -> getRecordScielo_oai_dc($idc, $dt);
+                    $dt['idc'] = $idc;
+                    $html = $this -> sources -> infoScielo($id);
+                    $html .= $this -> oai_pmh -> processScielo($dt);
+                    $html .= '<meta http-equiv="Refresh" content="5">';
+                } else {
+                    $html = $this -> sources -> info($id);
+                    $html .= '<h3>Fim da coleta</h3>';
+                    $html .= '<br>' . date("d/m/Y H:i:s");
+                }
+                /***************************************************/
+
+                //$html = '';
+                //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
+                //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
+                break;            
             case 'GetRecord' :
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
                 if ($idc > 0) {
-                    //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
                     $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
                     $dt['idc'] = $idc;
                     $html = $this -> sources -> info($id);
