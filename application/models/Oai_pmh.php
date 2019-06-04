@@ -106,7 +106,7 @@ class oai_pmh extends CI_model {
     
     function process($dt) {
         $this -> load -> model('searchs');
-		$this -> load -> model('indexer');
+        $this -> load -> model('indexer');
         $this -> load -> model('export');
         $this -> load -> model('elasticsearch');       
 
@@ -148,15 +148,15 @@ class oai_pmh extends CI_model {
         }
         $link = '<a href="' . base_url(PATH . 'v/' . $article_id) . '" target="_new' . $article_id . '">';
         $this -> cache_alter_status($dt['idc'], 3);
-		
-		$dt['article_id'] = $article_id;
-		$this->indexer->indexing($dt);
+        
+        $dt['article_id'] = $article_id;
+        $this->indexer->indexing($dt);
         $this -> export -> export_Article_Single($article_id);
-		//$this->Elasticsearch->add('article',$dt['idc'],$dt);
-		
+        //$this->Elasticsearch->add('article',$dt['idc'],$dt);
+        
         $this->export->export_Article_Single($article_id);
         $this -> elasticsearch -> update($article_id);
-		
+        
         return ("<h1>Index Article: " . $link . $article_id . '</a></h1>');
     }
 
@@ -171,27 +171,27 @@ class oai_pmh extends CI_model {
         $rlt = $this -> db -> query($sql);
         return (1);
     }
-	
-	function leftHarvesting()
-		{
-	    $sql = "select count(*) as total from source_listidentifier 
+    
+    function leftHarvesting()
+        {
+        $sql = "select count(*) as total from source_listidentifier 
                 where li_status = 'active' and li_s = 1
                 order by li_s, li_u, id_li
                 limit 1";
-        		$rlt = $this -> db -> query($sql);
-        		$rlt = $rlt -> result_array();
-        		$line = $rlt[0]['total'];
-				return($line);
-		}
+                $rlt = $this -> db -> query($sql);
+                $rlt = $rlt -> result_array();
+                $line = $rlt[0]['total'];
+                return($line);
+        }
 
     function getRecord($id_jnl = 0) {
-    	if ($id_jnl > 0)
-			{
-				$wh = "li_jnl = '$id_jnl' and ";
-			} else {
-				$wh = '';
-			}
-		
+        if ($id_jnl > 0)
+            {
+                $wh = "li_jnl = '$id_jnl' and ";
+            } else {
+                $wh = '';
+            }
+        
         $sql = "select * from source_listidentifier 
                     where $wh li_status = 'active' and li_s = 1
                     order by li_s, li_u, id_li
@@ -533,201 +533,6 @@ class oai_pmh extends CI_model {
         return ($dt);
     }
 
-   function getRecordScielo_oai_dc($id = 0, $dt) {
-        $this -> load -> model("sources");
-        $sql = "select * from source_listidentifier where id_li = $id";
-        $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        if (count($rlt) > 0) {
-            $line = $rlt[0];
-            $jnl = $line['li_jnl'];
-
-            $data = $this -> sources -> le($jnl);
-            $url = $this -> oai_url($data, 'GetRecordScielo') . troca($line['li_identifier'],'oai:scielo:','');
-            $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
-            $cnt = $this -> readfile($url);
-            //$cnt = troca($cnt,'<![CDATA[ ','');
-            //$cnt = troca($cnt,'<![CDATA[','');
-            //$cnt = troca($cnt,' ]]>','');
-            //$cnt = troca($cnt,']]>','');
-
-            $cnt = troca($cnt, 'oai_dc:', '');
-            $cnt = troca($cnt, 'xml:', '');
-            $cnt = troca($cnt, 'xlink:', '');            
-            
-            $cnt = troca($cnt, 'article-meta', 'article_meta');
-            $cnt = troca($cnt, 'journal-meta', 'journal_meta');
-            $cnt = troca($cnt, 'journal-title', 'journal_title');            
-            $cnt = troca($cnt, 'article-id', 'article_id');
-            $cnt = troca($cnt, 'title-group', 'title_group');
-            $cnt = troca($cnt, 'article-title', 'article_title');
-            $cnt = troca($cnt, 'contrib-group', 'contrib_group');
-            $cnt = troca($cnt, 'given-names', 'given_names');
-            $cnt = troca($cnt, 'kwd-group', 'kwd_group');
-            $cnt = troca($cnt, 'pub-date', 'pub_date');
-            $cnt = troca($cnt, 'self-uri', 'self_uri');         
-            
-            $xml = simplexml_load_string($cnt);
-           
-            /*************************************************** relation **********************/
-            $rcn = $xml -> front -> article_meta;
-            $identifier = $this -> xml_values($rcn -> article_id);
-            $dt['identifier'] = $identifier;
-            
-            /******************************************************* TITLE **********************/
-            $is = $xml -> front -> article_meta -> title_group;
-            $title = array();
-            for ($r = 0; $r <= count($is); $r++) {
-                $tit = (string)$is->article_title[$r];
-                $lang = '';
-                foreach ($xml -> front -> article_meta -> title_group -> article_title[$r] -> attributes() as $atrib => $value) {
-                    if ($atrib == 'lang') { $lang = (string)$value;
-                    }
-                }
-                array_push($title, array('title' => $tit, 'lang' => $lang));
-            }
-            $dt['title'] = $title;
-
-            /******************************************************* AFILIATION *******************/
-            $aff = array();
-            $is = $xml -> front -> article_meta -> aff;
-            
-            for ($r=0;$r < count($is);$r++)
-                {
-                    $tit = (string)$is[$r]->institution;
-                    if (substr($tit,0,1) == ',') { $tit = trim(substr($tit,1,strlen($tit))); }
-                    $tit = NBR_autor($tit, 3);
-                    foreach ($is[$r] -> attributes() as $atrib => $value) {
-                        //echo '<br>'.$atrib.'=='.$value;
-                        if ($atrib == 'id') { $aff[(string)$value] = $tit; }
-                    }    
-                }        
-            /******************************************************* CREATOR *******************/         
-            $is = $xml -> front -> article_meta -> contrib_group;
-            $author = array();
-
-            for ($r = 0; $r < count($is->contrib); $r++) {
-                $tit = (string)$is -> contrib[$r]->name->given_names;
-                $tit = trim(trim($tit).' '.(string)$is -> contrib[$r]->name->surname);
-                $af = '';
-                foreach ($is -> contrib[$r]->xref -> attributes() as $atrib => $value) {
-                    if ($atrib == 'rid') { $af = trim((string)$value); }
-                }                
-                $tit = NBR_autor($tit, 1);
-                array_push($author, array('name' => $tit,'type' => 'author','aff'=> $aff[$af],'email'=>''));
-            }
-            $dt['authors'] = $author;    
-           
-
-            
-            /******************************************************* SUBJECT *******************/
-            $is = $xml -> front -> article_meta -> kwd_group;
-            $key = '';
-            for ($r = 0; $r < count($is->kwd); $r++) {
-                $tit = (string)$is -> kwd[$r];
-                $tit = lowercase($tit);
-                $tit = UpperCase(substr($tit,0,1)).substr($tit,1,strlen($tit));
-                $lang = 'pt';
-                
-                foreach ($is -> kwd[$r]-> attributes() as $atrib => $value) {
-                    if ($atrib == 'lng') { $lang = trim((string)$value); }
-                }                
-                $key .= trim($tit).'@'.$lang.'; ';
-            }
-            $subject = splitx(';', $key);
-            $dt['subject'] = $subject;
-            
-            /*************************************************** description ********************/
-            $is = $xml -> front -> article_meta -> abstract;
-            $abstract = array();
-            for ($r = 0; $r < count($is); $r++) {
-                $tit = trim((string)$is[$r]->p);
-                $lang = '';
-                foreach ($is[$r] -> attributes() as $atrib => $value) {
-                    if ($atrib == 'lang') { $lang = (string)$value;
-                    }
-                }
-                array_push($abstract, array('descript' => $tit, 'lang' => $lang));
-            }
-            $dt['abstract'] = $abstract;
-
-            
-            /*************************************************** issue ********************/            
-            $is = $xml -> front -> article_meta -> pub_date;
-                
-                $year = (string)$is->year;
-                $month = (string)$is->month;
-                $day = (string)$is->day;
-                
-                $date = strzero($year,4).'-'.strzero($month,2).'-'.strzero($day,2);
-                
-                
-                /******************************************************* Source *******************/
-                $is = $xml -> front -> journal_meta;
-                $source = (string)$is->journal_title;
-                
-                
-                /******************************************************* setSpec *******************/                
-                $is = $xml -> front -> article_meta;
-                $vol = (string)$is->volume;
-                $nr = (string)$is->numero;
-                
-                if (strlen($vol) > 0)
-                    {
-                        $source .= ', v. '.$vol;
-                    }
-                if (strlen($nr) > 0)
-                    {
-                        $source .= ', n. '.$nr;
-                    }
-                if (strlen($year) > 0)
-                    {
-                        $source .= ', '.$year.'.';
-                    }                    
-                
-                /******************************************************* setSpec *******************/
-                $section = "Artigo";
-              
-                $issue_id = 'jnl:'.strzero($line['li_jnl'],5).'-'.$year.'-'.$vol.'-'.$nr;
-
-                $iss['year'] = $year;
-                $iss['month'] = $month;
-                $iss['day'] = $day;
-                
-                $iss['start_page'] = (string)$is->fpage;
-                $iss['end_page'] = (string)$is->lpage;
-                $iss['section'] = $section;
-                $iss['issue_id'] = $issue_id;
-                $iss['vol'] = $vol;
-                $iss['nr'] = $nr;
-                $iss['sourcer'] = $source;
-                $dt['issue'] = $iss;
-            
-
-            /*************************************************** source ************************/
-            $relation = array();
-            $is = $xml -> front -> article_meta -> self_uri;
-            for ($r=0;$r < count($is);$r++)
-                {
-                    foreach ($is[$r] -> attributes() as $atrib => $value) {
-                        //echo '<br>'.$atrib.'=='.$value;
-                        if ($atrib == 'href') { array_push((string)$value);
-                        }
-                    }   
-                }
-            //http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en
-
-            $dt['subject'] = $subject;
-            $dt['identifier'] = $identifier;
-            $dt['source'] = $source;
-            $dt['relation'] = $relation;
-            $dt['date'] = $date;
-        }
-
-        return ($dt);
-    }
-
-
     function pagination($n)
         {
             $dt=array();
@@ -772,10 +577,10 @@ class oai_pmh extends CI_model {
             $n = troca($n,'Vol.','v.');
             $n = troca($n,'Vol ','v.');
             $n = troca($n,'vol ','v.');
-			$n = troca($n,'vol.','v.');
+            $n = troca($n,'vol.','v.');
             $n = troca($n,'VOL.','v.');
-			$n = troca($n,'volume','v.');
-			$n = troca($n,'Volume','v.');			
+            $n = troca($n,'volume','v.');
+            $n = troca($n,'Volume','v.');           
             
             if (strpos(' '.$n,'v.') > 0)
                 {
@@ -802,11 +607,11 @@ class oai_pmh extends CI_model {
             $n = troca($n,'Nº. ','n.');
             $n = troca($n,'Num.','n.');
             $n = troca($n,'NUM.','n.');
-			$n = troca($n,'núm.','n.');
-			$n = troca($n,'núms.','n.');
-			$n = troca($n,'Núms.','n.');   
-			$n = troca($n,'número','n.');
-			$n = troca($n,'Número','n.');         
+            $n = troca($n,'núm.','n.');
+            $n = troca($n,'núms.','n.');
+            $n = troca($n,'Núms.','n.');   
+            $n = troca($n,'número','n.');
+            $n = troca($n,'Número','n.');         
             if (strpos($n,'n.'))
                 {
                     $nr = trim(substr($n,strpos($n,'n.')+2,strlen($n)));
@@ -861,73 +666,73 @@ class oai_pmh extends CI_model {
             
             if ((strlen($vol.$nr) == 0) or (($ano == 'xxxx') and (strlen($nr) == 0)))
                 {
-                	$v = array('diciembre','junio');
-					$vr = array('dez.','jun.');
-					for ($r=0;$r < count($v);$r++)
-						{
-							if (strpos($n,$v[$r]) > 0)
-								{
-									$nr = $vr[$r];
-								}
-						}
-						
-					if (strlen($nr) == 0)
-						{
-							if (strpos($nm,'Especial'))
-								{
-									$nr = 'esp.';
-								}
-							if ((strpos($nm,'Primeiro') > 0) or (strpos($nm,'primeiro') > 0))
-								{
-									$nr .= ' 1. sem.';
-								}
-							if ((strpos($nm,'Segundo') > 0) or (strpos($nm,'segundo') > 0))
-								{
-									$nr .= ' 2. sem.';
-								}
-						}
-						
-					if (strlen($nr) == 0)
-						{
-							$nx = array('janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro');
-							for ($r=0;$r < count($nx);$r++)
-								{
-									if ((strpos($nm,$nx[$r]) > 0) and (strlen($nr) == 0))
-										{
-											if ($r < 6)
-												{
-													$nr = 'esp. 1. sem.';
-												}  else {
-													$nr = 'esp. 2. sem.';
-												}
-										}
-								}
-							
-						}
-					if (strlen($nr)==0)
-						{
-							$sql = "select * from source_issue_convert where sc_text like '%$nm%'";
-							$rlt = $this->db->query($sql);
-							$rlt = $rlt->result_array();
-							if (count($rlt) == 1)
-								{
-									$line = $rlt[0];
-									$vol = $line['sc_vol'];
-									$nr = $line['sc_nr'];
-									$ano = $line['sc_year'];
-								}
-						}
-                	if (strlen($nr)==0)
-						{
-							
-                    		echo $n.'<br>';
-							echo '<meta http-equiv="refresh" content="30">';
-                    		echo "FALHA v. $vol, n. $nr, $ano";
-							echo $sql;
-                    		ECHO '<pre>';
-                    		print_r($dt);
-                    		exit;
-						}
+                    $v = array('diciembre','junio');
+                    $vr = array('dez.','jun.');
+                    for ($r=0;$r < count($v);$r++)
+                        {
+                            if (strpos($n,$v[$r]) > 0)
+                                {
+                                    $nr = $vr[$r];
+                                }
+                        }
+                        
+                    if (strlen($nr) == 0)
+                        {
+                            if (strpos($nm,'Especial'))
+                                {
+                                    $nr = 'esp.';
+                                }
+                            if ((strpos($nm,'Primeiro') > 0) or (strpos($nm,'primeiro') > 0))
+                                {
+                                    $nr .= ' 1. sem.';
+                                }
+                            if ((strpos($nm,'Segundo') > 0) or (strpos($nm,'segundo') > 0))
+                                {
+                                    $nr .= ' 2. sem.';
+                                }
+                        }
+                        
+                    if (strlen($nr) == 0)
+                        {
+                            $nx = array('janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro');
+                            for ($r=0;$r < count($nx);$r++)
+                                {
+                                    if ((strpos($nm,$nx[$r]) > 0) and (strlen($nr) == 0))
+                                        {
+                                            if ($r < 6)
+                                                {
+                                                    $nr = 'esp. 1. sem.';
+                                                }  else {
+                                                    $nr = 'esp. 2. sem.';
+                                                }
+                                        }
+                                }
+                            
+                        }
+                    if (strlen($nr)==0)
+                        {
+                            $sql = "select * from source_issue_convert where sc_text like '%$nm%'";
+                            $rlt = $this->db->query($sql);
+                            $rlt = $rlt->result_array();
+                            if (count($rlt) == 1)
+                                {
+                                    $line = $rlt[0];
+                                    $vol = $line['sc_vol'];
+                                    $nr = $line['sc_nr'];
+                                    $ano = $line['sc_year'];
+                                }
+                        }
+                    if (strlen($nr)==0)
+                        {
+                            
+                            echo $n.'<br>';
+                            echo '<meta http-equiv="refresh" content="30">';
+                            echo "FALHA v. $vol, n. $nr, $ano";
+                            echo $sql;
+                            ECHO '<pre>';
+                            print_r($dt);
+                            exit;
+                        }
                 }
             $d['year'] = $ano;
             $d['vol'] = $vol;
@@ -1096,7 +901,8 @@ class oai_pmh extends CI_model {
         }
 
     public function ListIdentifiers($id) {
-        $data = array();               
+        $data = array();            
+   
         if ($this->check_oai_index($id) == 0)
             {
                 $this->log_oai($id,'IIDY',$data);
@@ -1105,10 +911,9 @@ class oai_pmh extends CI_model {
                 $this->log_oai($id,'UIDY',$data); 
                 $this->ref = '';
             }
-
         $ref = $this->log_oai($id,'ILIS');
         $sx = $this->ListIdentifiers_harvesting($id);
-        
+
         $sql = "update source_source set
                     jnl_oai_last_harvesting = '".date("Y-m-d H:i:s")."'
                     where id_jnl = $id";
@@ -1121,19 +926,21 @@ class oai_pmh extends CI_model {
         }        
 
     public function ListIdentifiers_harvesting($id) {
+        echo '<br>[10]'.date("Y-m-d H:i:s");        
         $this -> getListSets($id);       
-        
         $data = $this -> sources -> le($id);
         
+        
         $url = $this -> oai_url($data, 'ListIdentifiers');
-
+        echo '<br>URL='.$url;
+        
         $cnt = $this -> readfile($url);
         $xml = simplexml_load_string($cnt);
 
         $LI = $this -> xml_values_array($xml -> ListIdentifiers -> header);
         $token = $this -> xml_value($xml -> ListIdentifiers -> resumptionToken);
         $response = $this -> xml_value($xml -> responseDate);
-
+        
         $this -> update_token($id, $token);
         $sx = '<br><b>Token: ' . $token . '</b>';
         $sx .= '<br><b>Response: ' . $response . '</b>';
@@ -1312,12 +1119,12 @@ class oai_pmh extends CI_model {
             if (count($rlt) == 0) {
                 $this -> load -> view('content', $data);
                 $sql = "insert brapci_article_suporte 
-						(
-						bs_status, bs_article, bs_type, 
-						bs_adress, bs_journal_id, bs_update
-						) values (
-						'@','$art','URL',
-						'$txt',''," . date("Ymd") . ')';
+                        (
+                        bs_status, bs_article, bs_type, 
+                        bs_adress, bs_journal_id, bs_update
+                        ) values (
+                        '@','$art','URL',
+                        '$txt',''," . date("Ymd") . ')';
                 $this -> db -> query($sql);
             } else {
             }
@@ -1328,16 +1135,16 @@ class oai_pmh extends CI_model {
 
     public function repository_list() {
         $sql = "select * from source_source 
-						where jnl_active <> 'X'
-						AND jnl_url_oai <> ''	
-						order by jnl_name
-						";
+                        where jnl_active <> 'X'
+                        AND jnl_url_oai <> ''   
+                        order by jnl_name
+                        ";
         $rlt = $this->db->query($sql);
-		$rlt = $rlt->result_array();
+        $rlt = $rlt->result_array();
         $sx = '';
         for ($r=0;$r < count($rlt);$r++)
-        	{
-        	$line = $rlt[$r];
+            {
+            $line = $rlt[$r];
             $last = $line['update_at'];
             $url = $line['jnl_url'];
             $link = '<A HREF="' . trim($line['jnl_url']) . '" target="_new">';
@@ -1379,14 +1186,14 @@ class oai_pmh extends CI_model {
 
             /* Insere na agenda */
             $sql = "insert into oai_cache (
-					cache_oai_id, cache_status, cache_journal, 
-					cache_prioridade, cache_datastamp, cache_setSpec, 
-					cache_tentativas
-					) values (
-					'$ida','@','$njid',
-					'1','$date','$setSepc',
-					0
-					)";
+                    cache_oai_id, cache_status, cache_journal, 
+                    cache_prioridade, cache_datastamp, cache_setSpec, 
+                    cache_tentativas
+                    ) values (
+                    '$ida','@','$njid',
+                    '1','$date','$setSepc',
+                    0
+                    )";
             $this -> db -> query($sql);
             return ('<span class="label label-success">Insert!</span>');
         }
@@ -1460,13 +1267,13 @@ class oai_pmh extends CI_model {
         } else {
             $data = date("Ymd");
             $sql = "insert into oai_listsets (
-							ls_setspec, ls_setname, ls_setdescription,
-							ls_journal, ls_status, ls_data,
-							ls_equal, ls_tipo, ls_equal_ed
-							) values (
-							'$set','$set','',
-							'$jid','A','$data',
-							'$tema','S','')";
+                            ls_setspec, ls_setname, ls_setdescription,
+                            ls_journal, ls_status, ls_data,
+                            ls_equal, ls_tipo, ls_equal_ed
+                            ) values (
+                            '$set','$set','',
+                            '$jid','A','$data',
+                            '$tema','S','')";
             $rlt = $this -> db -> query($sql);
         }
         return ('');
@@ -1478,11 +1285,11 @@ class oai_pmh extends CI_model {
         if ($jid > 0) { $wh = " cache_journal = '" . strzero($jid, 7) . "' ";
         }
         $sql = "select * from oai_cache 
-						where cache_status = 'A'
-						and $wh
-						order by cache_tentativas
-						limit 1
-					";
+                        where cache_status = 'A'
+                        and $wh
+                        order by cache_tentativas
+                        limit 1
+                    ";
         $rlt = db_query($sql);
 
         if ($line = db_read($rlt)) {
@@ -1528,11 +1335,11 @@ class oai_pmh extends CI_model {
 
                 /* Valida se existe article cadastrado */
                 $sql = "select * from brapci_article where ar_edition = '" . $article['issue_id'] . "' 
-						and 
-						(ar_titulo_1 like '$titulo%' or ar_titulo_2 like '$titulo%')
-						and 
-						ar_journal_id = '" . strzero($jid, 7) . "'
-				";
+                        and 
+                        (ar_titulo_1 like '$titulo%' or ar_titulo_2 like '$titulo%')
+                        and 
+                        ar_journal_id = '" . strzero($jid, 7) . "'
+                ";
                 $article['section'] = '';
                 $rlt = db_query($sql);
                 if ($line = db_read($rlt)) {
@@ -1756,10 +1563,10 @@ class oai_pmh extends CI_model {
             $jid = strzero($jid, 7);
 
             $sql = "selectx * from brapci_edition where 
-									ed_vol = '$vol'
-									and ed_nr = '$nr'
-									and ed_ano = '$ano' 
-									and ed_journal_id = '$jid' ";
+                                    ed_vol = '$vol'
+                                    and ed_nr = '$nr'
+                                    and ed_ano = '$ano' 
+                                    and ed_journal_id = '$jid' ";
             $rlt = db_query($sql);
             $sx = "v. $vol, n. $nr, $ano";
             $this -> issue = $sx;
@@ -1938,10 +1745,10 @@ class oai_pmh extends CI_model {
     function _deletar_coleta_oai_cache_next($id) {
         $jid = strzero($id, 7);
         $sql = "select * from oai_cache
-					inner join brapci_journal on jnl_codigo = cache_journal
-					where cache_journal = '$jid'
-					and cache_status = '@'
-			";
+                    inner join brapci_journal on jnl_codigo = cache_journal
+                    where cache_journal = '$jid'
+                    and cache_status = '@'
+            ";
         $rlt = db_query($sql);
 
         $sr = 'nothing to harvesting';
@@ -1981,10 +1788,10 @@ class oai_pmh extends CI_model {
 
     function oai_resumo_to_harvesing() {
         $sql = "select count(*) as total, cache_journal, jnl_nome from oai_cache 
-					inner join brapci_journal on jnl_codigo = cache_journal
-						where cache_status = '@'
-						group by cache_journal, jnl_nome
-						order by jnl_nome ";
+                    inner join brapci_journal on jnl_codigo = cache_journal
+                        where cache_status = '@'
+                        group by cache_journal, jnl_nome
+                        order by jnl_nome ";
         $rlt = db_query($sql);
         $t = array(0, 0, 0, 0);
         $sx = '<h1>Record to harvesting</h1>';
@@ -1998,10 +1805,10 @@ class oai_pmh extends CI_model {
 
     function oai_resumo_to_progress() {
         $sql = "select count(*) as total, cache_journal, jnl_nome from oai_cache 
-					inner join brapci_journal on jnl_codigo = cache_journal
-						where cache_status = 'A'
-						group by cache_journal, jnl_nome
-						order by jnl_nome ";
+                    inner join brapci_journal on jnl_codigo = cache_journal
+                        where cache_status = 'A'
+                        group by cache_journal, jnl_nome
+                        order by jnl_nome ";
         $rlt = db_query($sql);
         $t = array(0, 0, 0, 0);
         $sx = '<br><br><h1>Record to process</h1>';
@@ -2025,8 +1832,8 @@ class oai_pmh extends CI_model {
         }
 
         $sql = "select count(*) as total, cache_status from oai_cache 
-						where $wh 
-						group by cache_status ";
+                        where $wh 
+                        group by cache_status ";
         $rlt = db_query($sql);
         $t = array(0, 0, 0, 0);
         while ($line = db_read($rlt)) {
@@ -2061,16 +1868,16 @@ class oai_pmh extends CI_model {
 
     function doublePDFlink() {
         $sql = "select * from (
-						SELECT bs_adress, count(*) as total, max(id_bs) as id 
-							FROM `brapci_article_suporte` 
-						WHERE bs_type = 'URL' 
-						 	and bs_adress like 'http%'
-						 	and (bs_status ='A' or bs_status = '@')
-						 	and bs_adress <> ''
-						 group by bs_adress
-					) as tabela
-				where total > 1
-				";
+                        SELECT bs_adress, count(*) as total, max(id_bs) as id 
+                            FROM `brapci_article_suporte` 
+                        WHERE bs_type = 'URL' 
+                            and bs_adress like 'http%'
+                            and (bs_status ='A' or bs_status = '@')
+                            and bs_adress <> ''
+                         group by bs_adress
+                    ) as tabela
+                where total > 1
+                ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) > 0) {
@@ -2079,9 +1886,9 @@ class oai_pmh extends CI_model {
                 $adress = $line['bs_adress'];
                 $id = $line['id'];
                 $sql = "update brapci_article_suporte 
-						set bs_status = 'D' 
-					WHERE bs_adress = '$adress' 
-							and id_bs <> $id ";
+                        set bs_status = 'D' 
+                    WHERE bs_adress = '$adress' 
+                            and id_bs <> $id ";
                 $xrlt = $this -> db -> query($sql);
             }
         } else {
@@ -2092,28 +1899,28 @@ class oai_pmh extends CI_model {
     function artcle_wifout_file($pag = 0) {
         $off = $pag * 350;
         $sql = "select count(*) as total from brapci_article
-					LEFT JOIN (
-						select count(*) as total, bs_article from brapci_article_suporte 
-								where bs_status <> 'X' and bs_type = 'PDF' 
-								group by bs_article
-						) as tabela ON bs_article = ar_codigo
-					WHERE TOTAL is null AND ar_status <> 'X' 
-					limit 50 offset $off";
+                    LEFT JOIN (
+                        select count(*) as total, bs_article from brapci_article_suporte 
+                                where bs_status <> 'X' and bs_type = 'PDF' 
+                                group by bs_article
+                        ) as tabela ON bs_article = ar_codigo
+                    WHERE TOTAL is null AND ar_status <> 'X' 
+                    limit 50 offset $off";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $sx = '<h4>' . $rlt[0]['total'] . '</h4>';
 
         $sql = "select ar_codigo, ar_titulo_1, jnl_nome from brapci_article
-					LEFT JOIN (
-						select count(*) as total, bs_article from brapci_article_suporte 
-								where bs_status <> 'X' and bs_type = 'PDF' 
-								group by bs_article
-						) as tabela
-					ON bs_article = ar_codigo
-					INNER JOIN brapci_journal ON jnl_codigo = ar_journal_id
-					
-					WHERE TOTAL is null AND ar_status <> 'X'					
-					ORDER BY jnl_nome, ar_codigo";
+                    LEFT JOIN (
+                        select count(*) as total, bs_article from brapci_article_suporte 
+                                where bs_status <> 'X' and bs_type = 'PDF' 
+                                group by bs_article
+                        ) as tabela
+                    ON bs_article = ar_codigo
+                    INNER JOIN brapci_journal ON jnl_codigo = ar_journal_id
+                    
+                    WHERE TOTAL is null AND ar_status <> 'X'                    
+                    ORDER BY jnl_nome, ar_codigo";
         /* removido em 27/07/2017 - limit 350 offset $off"; */
 
         $rlt = $this -> db -> query($sql);
@@ -2140,13 +1947,13 @@ class oai_pmh extends CI_model {
         $OFFSET = ($pag * 100);
         $data = date("Ymd");
         $sql = "select * from brapci_article_suporte 
-					WHERE bs_update <> '$data' 
-						and bs_status <> 'X'
-						and bs_type = 'PDF'
-					order by id_bs 
-					LIMIT 100 OFFSET $OFFSET
-					
-					";
+                    WHERE bs_update <> '$data' 
+                        and bs_status <> 'X'
+                        and bs_type = 'PDF'
+                    order by id_bs 
+                    LIMIT 100 OFFSET $OFFSET
+                    
+                    ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         $sx = '';
@@ -2172,14 +1979,14 @@ class oai_pmh extends CI_model {
 
     function totalPDFharvesting() {
         $sql = "select count(*) as total from (
-						SELECT `bs_article` as art, count(*) as total FROM `brapci_article_suporte` WHERE bs_type = 'URL' group by bs_article
-						   )
-						   as tebela
-						 inner join brapci_article_suporte on art = bs_article
-						 where total = 1 and bs_adress like 'http%'
-						 and bs_status ='A' or bs_status = '@'
-						 and art <> '' 
-					limit 1";
+                        SELECT `bs_article` as art, count(*) as total FROM `brapci_article_suporte` WHERE bs_type = 'URL' group by bs_article
+                           )
+                           as tebela
+                         inner join brapci_article_suporte on art = bs_article
+                         where total = 1 and bs_adress like 'http%'
+                         and bs_status ='A' or bs_status = '@'
+                         and art <> '' 
+                    limit 1";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) > 0) {
@@ -2192,17 +1999,17 @@ class oai_pmh extends CI_model {
 
     function nextPDFharvesting() {
         $sql = "select * from (
-							SELECT `bs_article` as art, count(*) as total 
-							FROM `brapci_article_suporte` 
-							WHERE bs_type = 'URL' group by bs_article
-						   )
-						   as tebela
-						 inner join brapci_article_suporte on art = bs_article
-						 where total = 1 and bs_adress like 'http%'
-						 and bs_status ='A' or bs_status = '@'
-						 and art <> '' 
-					order by art desc
-					limit 1";
+                            SELECT `bs_article` as art, count(*) as total 
+                            FROM `brapci_article_suporte` 
+                            WHERE bs_type = 'URL' group by bs_article
+                           )
+                           as tebela
+                         inner join brapci_article_suporte on art = bs_article
+                         where total = 1 and bs_adress like 'http%'
+                         and bs_status ='A' or bs_status = '@'
+                         and art <> '' 
+                    order by art desc
+                    limit 1";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) > 0) {
@@ -2219,14 +2026,14 @@ class oai_pmh extends CI_model {
     function nextPDFconvert() {
         $data = date("Ymd");
         $sql = "select * from brapci_article_suporte where bs_status = 'T'
-					and bs_update <> $data
-					limit 1";
+                    and bs_update <> $data
+                    limit 1";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) > 0) {
             $id = $rlt[0]['id_bs'];
             $sql = "update brapci_article_suporte set bs_status = 'U', bs_update = $data 
-						where id_bs = " . $id;
+                        where id_bs = " . $id;
             $this -> db -> query($sql);
             return ($rlt[0]);
         } else {
@@ -2286,5 +2093,202 @@ class oai_pmh extends CI_model {
                 }         
             return($sx);
         }
+   function getRecordScielo_oai_dc($id = 0, $dt) {
+        $this -> load -> model("sources");
+        $sql = "select * from source_listidentifier where id_li = $id";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        if (count($rlt) > 0) {
+            $line = $rlt[0];
+            $jnl = $line['li_jnl'];
+
+            $data = $this -> sources -> le($jnl);
+            $url = $this -> oai_url($data, 'GetRecordScielo') . troca($line['li_identifier'],'oai:scielo:','');
+            $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
+            echo '[[11]]'.$url;
+            exit;
+            $cnt = $this -> readfile($url);
+            //$cnt = troca($cnt,'<![CDATA[ ','');
+            //$cnt = troca($cnt,'<![CDATA[','');
+            //$cnt = troca($cnt,' ]]>','');
+            //$cnt = troca($cnt,']]>','');
+
+            $cnt = troca($cnt, 'oai_dc:', '');
+            $cnt = troca($cnt, 'xml:', '');
+            $cnt = troca($cnt, 'xlink:', '');            
+            
+            $cnt = troca($cnt, 'article-meta', 'article_meta');
+            $cnt = troca($cnt, 'journal-meta', 'journal_meta');
+            $cnt = troca($cnt, 'journal-title', 'journal_title');            
+            $cnt = troca($cnt, 'article-id', 'article_id');
+            $cnt = troca($cnt, 'title-group', 'title_group');
+            $cnt = troca($cnt, 'article-title', 'article_title');
+            $cnt = troca($cnt, 'contrib-group', 'contrib_group');
+            $cnt = troca($cnt, 'given-names', 'given_names');
+            $cnt = troca($cnt, 'kwd-group', 'kwd_group');
+            $cnt = troca($cnt, 'pub-date', 'pub_date');
+            $cnt = troca($cnt, 'self-uri', 'self_uri');         
+            
+            $xml = simplexml_load_string($cnt);
+           
+            /*************************************************** relation **********************/
+            $rcn = $xml -> front -> article_meta;
+            $identifier = $this -> xml_values($rcn -> article_id);
+            $dt['identifier'] = $identifier;
+            
+            /******************************************************* TITLE **********************/
+            $is = $xml -> front -> article_meta -> title_group;
+            $title = array();
+            for ($r = 0; $r <= count($is); $r++) {
+                $tit = (string)$is->article_title[$r];
+                $lang = '';
+                foreach ($xml -> front -> article_meta -> title_group -> article_title[$r] -> attributes() as $atrib => $value) {
+                    if ($atrib == 'lang') { $lang = (string)$value;
+                    }
+                }
+                array_push($title, array('title' => $tit, 'lang' => $lang));
+            }
+            $dt['title'] = $title;
+
+            /******************************************************* AFILIATION *******************/
+            $aff = array();
+            $is = $xml -> front -> article_meta -> aff;
+            
+            for ($r=0;$r < count($is);$r++)
+                {
+                    $tit = (string)$is[$r]->institution;
+                    if (substr($tit,0,1) == ',') { $tit = trim(substr($tit,1,strlen($tit))); }
+                    $tit = NBR_autor($tit, 3);
+                    foreach ($is[$r] -> attributes() as $atrib => $value) {
+                        //echo '<br>'.$atrib.'=='.$value;
+                        if ($atrib == 'id') { $aff[(string)$value] = $tit; }
+                    }    
+                }        
+            /******************************************************* CREATOR *******************/         
+            $is = $xml -> front -> article_meta -> contrib_group;
+            $author = array();
+
+            for ($r = 0; $r < count($is->contrib); $r++) {
+                $tit = (string)$is -> contrib[$r]->name->given_names;
+                $tit = trim(trim($tit).' '.(string)$is -> contrib[$r]->name->surname);
+                $af = '';
+                foreach ($is -> contrib[$r]->xref -> attributes() as $atrib => $value) {
+                    if ($atrib == 'rid') { $af = trim((string)$value); }
+                }                
+                $tit = NBR_autor($tit, 1);
+                array_push($author, array('name' => $tit,'type' => 'author','aff'=> $aff[$af],'email'=>''));
+            }
+            $dt['authors'] = $author;    
+           
+
+            
+            /******************************************************* SUBJECT *******************/
+            $is = $xml -> front -> article_meta -> kwd_group;
+            $key = '';
+            for ($r = 0; $r < count($is->kwd); $r++) {
+                $tit = (string)$is -> kwd[$r];
+                $tit = lowercase($tit);
+                $tit = UpperCase(substr($tit,0,1)).substr($tit,1,strlen($tit));
+                $lang = 'pt';
+                
+                foreach ($is -> kwd[$r]-> attributes() as $atrib => $value) {
+                    if ($atrib == 'lng') { $lang = trim((string)$value); }
+                }                
+                $key .= trim($tit).'@'.$lang.'; ';
+            }
+            $subject = splitx(';', $key);
+            $dt['subject'] = $subject;
+            
+            /*************************************************** description ********************/
+            $is = $xml -> front -> article_meta -> abstract;
+            $abstract = array();
+            for ($r = 0; $r < count($is); $r++) {
+                $tit = trim((string)$is[$r]->p);
+                $lang = '';
+                foreach ($is[$r] -> attributes() as $atrib => $value) {
+                    if ($atrib == 'lang') { $lang = (string)$value;
+                    }
+                }
+                array_push($abstract, array('descript' => $tit, 'lang' => $lang));
+            }
+            $dt['abstract'] = $abstract;
+
+            
+            /*************************************************** issue ********************/            
+            $is = $xml -> front -> article_meta -> pub_date;
+                
+                $year = (string)$is->year;
+                $month = (string)$is->month;
+                $day = (string)$is->day;
+                
+                $date = strzero($year,4).'-'.strzero($month,2).'-'.strzero($day,2);
+                
+                
+                /******************************************************* Source *******************/
+                $is = $xml -> front -> journal_meta;
+                $source = (string)$is->journal_title;
+                
+                
+                /******************************************************* setSpec *******************/                
+                $is = $xml -> front -> article_meta;
+                $vol = (string)$is->volume;
+                $nr = (string)$is->numero;
+                
+                if (strlen($vol) > 0)
+                    {
+                        $source .= ', v. '.$vol;
+                    }
+                if (strlen($nr) > 0)
+                    {
+                        $source .= ', n. '.$nr;
+                    }
+                if (strlen($year) > 0)
+                    {
+                        $source .= ', '.$year.'.';
+                    }                    
+                
+                /******************************************************* setSpec *******************/
+                $section = "Artigo";
+              
+                $issue_id = 'jnl:'.strzero($line['li_jnl'],5).'-'.$year.'-'.$vol.'-'.$nr;
+
+                $iss['year'] = $year;
+                $iss['month'] = $month;
+                $iss['day'] = $day;
+                
+                $iss['start_page'] = (string)$is->fpage;
+                $iss['end_page'] = (string)$is->lpage;
+                $iss['section'] = $section;
+                $iss['issue_id'] = $issue_id;
+                $iss['vol'] = $vol;
+                $iss['nr'] = $nr;
+                $iss['sourcer'] = $source;
+                $dt['issue'] = $iss;
+            
+
+            /*************************************************** source ************************/
+            $relation = array();
+            $is = $xml -> front -> article_meta -> self_uri;
+            for ($r=0;$r < count($is);$r++)
+                {
+                    foreach ($is[$r] -> attributes() as $atrib => $value) {
+                        //echo '<br>'.$atrib.'=='.$value;
+                        if ($atrib == 'href') { array_push((string)$value);
+                        }
+                    }   
+                }
+            //http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en
+
+            $dt['subject'] = $subject;
+            $dt['identifier'] = $identifier;
+            $dt['source'] = $source;
+            $dt['relation'] = $relation;
+            $dt['date'] = $date;
+        }
+print_r($dt);
+exit;
+
+        return ($dt);
+    }
 }
 ?>

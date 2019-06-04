@@ -325,16 +325,16 @@ class res extends CI_Controller {
         echo $sx;
     }
 
-    public function journals($act = '', $p = '') {
+    public function journals($act = '', $p = '') {        
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
-        $this -> load -> model('oai_pmh');
+        $this -> load -> model('oai_pmh');        
         $this -> load -> model('sources');
         $this -> cab();
         $html = '';
         $data = array();
         $data['content'] = '';
-
+        
         if (strlen($act) == 0) {
 
             $data['content'] = '';
@@ -491,6 +491,7 @@ class res extends CI_Controller {
         if (!perfil("#ADM")) {
             redirect(base_url(PATH));
         }
+
         $this -> load -> model('sources');
         $this -> load -> model('searchs');
         $this -> load -> model('oai_pmh');
@@ -501,6 +502,7 @@ class res extends CI_Controller {
         $this -> load -> model('Elasticsearch_brapci20');
         $this -> cab();
         $data['title'] = 'OAI';
+        
         switch($verb) {
             case 'GetRecordScielo' :
                 $dt = array();
@@ -543,7 +545,9 @@ class res extends CI_Controller {
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
                 break;
             case 'ListIdentifiers' :
+                echo '<br>'.date("Y-m-d H:i:s");
                 $html = $this -> sources -> info($id);
+                echo '<br>'.date("Y-m-d H:i:s");
                 $html .= '<div class="row"><div class="col-12">' . $this -> oai_pmh -> ListIdentifiers($id) . '</div></div>';
                 break;
             case 'info' :
