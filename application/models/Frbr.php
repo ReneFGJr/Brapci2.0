@@ -519,6 +519,9 @@ class frbr extends CI_model {
         }
         /******************************************************************************/
         $prop = 'hasSource';
+        echo '<pre>';
+        print_r($dt);
+        echo '</pre>';
         for ($r = 0; $r < count($dt['source']); $r++) {
             $title = $dt['source'][$r]['name'];
             $lang = $dt['source'][$r]['lang'];

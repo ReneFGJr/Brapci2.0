@@ -505,13 +505,15 @@ class res extends CI_Controller {
         
         switch($verb) {
             case 'GetRecordScielo' :
+                $this -> load -> model('oai_pmh_scielo');
+                
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
                 if ($idc > 0) {
-                    $dt = $this -> oai_pmh -> getRecordScielo_oai_dc($idc, $dt);
+                    $dt = $this -> oai_pmh_scielo -> getRecordScielo_oai_dc($idc, $dt);
                     $dt['idc'] = $idc;
-                    $html = $this -> sources -> infoScielo($id);
-                    $html .= $this -> oai_pmh -> processScielo($dt);
+                    $html = $this -> sources -> info($id);
+                    $html .= $this -> oai_pmh -> process($dt);
                     $html .= '<meta http-equiv="Refresh" content="5">';
                 } else {
                     $html = $this -> sources -> info($id);
@@ -545,9 +547,7 @@ class res extends CI_Controller {
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
                 break;
             case 'ListIdentifiers' :
-                echo '<br>'.date("Y-m-d H:i:s");
                 $html = $this -> sources -> info($id);
-                echo '<br>'.date("Y-m-d H:i:s");
                 $html .= '<div class="row"><div class="col-12">' . $this -> oai_pmh -> ListIdentifiers($id) . '</div></div>';
                 break;
             case 'info' :

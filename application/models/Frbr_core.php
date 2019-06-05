@@ -289,6 +289,11 @@ class frbr_core extends CI_model {
 
     /******************************************************************* RDF NAME ***/
     function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
+        
+        if (is_array($n))
+            {
+                return(0);
+            }
         $this -> load -> model('indexer');
         $n = trim($n);
         $n = $this -> utf8_detect($n);
