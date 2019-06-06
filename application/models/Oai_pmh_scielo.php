@@ -13,13 +13,15 @@ class oai_pmh_scielo extends CI_model {
             $data = $this -> sources -> le($jnl);
             //$url = $this -> oai_pmh -> oai_url($data, 'GetRecordScielo') . troca($line['li_identifier'], 'oai:scielo:', '');
             $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid='.troca($line['li_identifier'], 'oai:scielo:', '').'&lang=en';
-            echo $url;            
-            //$url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
+            $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
             $cnt = $this -> oai_pmh -> readfile($url);
             //$cnt = troca($cnt,'<![CDATA[ ','');
             //$cnt = troca($cnt,'<![CDATA[','');
             //$cnt = troca($cnt,' ]]>','');
             //$cnt = troca($cnt,']]>','');
+            $cnt = html_entity_decode($cnt);
+            //$cnt = utf8_encode($cnt);
+            echo '<pre>'.$cnt.'</pre>';
 
             $cnt = troca($cnt, 'oai_dc:', '');
             $cnt = troca($cnt, 'xml:', '');
