@@ -176,7 +176,7 @@ class sources extends CI_Model {
         array_push($cp, array('$S100', 'jnl_url', msg('jnl_url'), False, True));
         array_push($cp, array('$S100', 'jnl_url_oai', msg('jnl_url_oai'), False, True));
         array_push($cp, array('$S100', 'jnl_oai_set', msg('jnl_oai_set'), False, True));
-        array_push($cp, array('$O 0:Não&1:Sim', 'jnl_scielo', msg('jnl_scielo'), False, True));
+        array_push($cp, array('$O 0:Não&1:Sim', 'jnl_scielo', msg('jnl_scielo'), True, True));
 
         array_push($cp, array('$A', '', msg('jnl_issn_title'), False, True));
         array_push($cp, array('$S30', 'jnl_issn', msg('jnl_issn'), False, True));
@@ -186,7 +186,6 @@ class sources extends CI_Model {
 
         array_push($cp, array('$HV', 'jnl_oai_last_harvesting', date("Y-m-d"), True, True));
         array_push($cp, array('$HV', 'jnl_cidade', '0', False, True));
-        array_push($cp, array('$HV', 'jnl_scielo', '0', False, True));
         array_push($cp, array('$HV', 'jnl_collection', '', False, True));
         $op = '1:' . msg('yes, with OAI');
         $op .= '&2:' . msg('yes, without OAI');

@@ -13,15 +13,17 @@ class oai_pmh_scielo extends CI_model {
             $data = $this -> sources -> le($jnl);
             //$url = $this -> oai_pmh -> oai_url($data, 'GetRecordScielo') . troca($line['li_identifier'], 'oai:scielo:', '');
             $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid='.troca($line['li_identifier'], 'oai:scielo:', '').'&lang=en';
-            $url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
+            //$url = 'http://www.scielo.br/scieloOrg/php/articleXML.php?pid=S0103-37862005000200006&lang=en';
             $cnt = $this -> oai_pmh -> readfile($url);
+            $cnt2 = $cnt;
+            
             //$cnt = troca($cnt,'<![CDATA[ ','');
             //$cnt = troca($cnt,'<![CDATA[','');
             //$cnt = troca($cnt,' ]]>','');
             //$cnt = troca($cnt,']]>','');
-            $cnt = html_entity_decode($cnt);
+            //$cnt = html_entity_decode($cnt);
             //$cnt = utf8_encode($cnt);
-            echo '<pre>'.$cnt.'</pre>';
+            //echo '<pre>'.$cnt.'</pre>';
 
             $cnt = troca($cnt, 'oai_dc:', '');
             $cnt = troca($cnt, 'xml:', '');
@@ -40,6 +42,10 @@ class oai_pmh_scielo extends CI_model {
             $cnt = troca($cnt, 'self-uri', 'self_uri');
 
             $xml = simplexml_load_string($cnt);
+            
+            //echo '<pre>';
+            //print_r($xml);
+            //echo '</pre>';
 
             /*************************************************** relation **********************/
             $rcn = $xml -> front -> article_meta;
@@ -47,13 +53,12 @@ class oai_pmh_scielo extends CI_model {
             $dt['identifier'] = $identifier;
 
             /******************************************************* TITLE **********************/
-            $is = $xml -> front -> article_meta -> title_group;
-            print_r((array)$is);
+            $is = $xml -> front -> article_meta -> title_group -> article_title;
             $title = array();
-            for ($r = 0; $r <= count($is); $r++) {
-                $tit = (string)$is -> article_title[$r];
+            for ($r = 0; $r < count($is); $r++) {
+                $tit = (string)$is[$r];
                 $lang = '';
-                foreach ($xml -> front -> article_meta -> title_group -> article_title[$r] -> attributes() as $atrib => $value) {
+                foreach ($is[$r] -> attributes() as $atrib => $value) {
                     if ($atrib == 'lang') { $lang = (string)$value;
                     }
                 }

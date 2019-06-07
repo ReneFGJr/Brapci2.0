@@ -148,7 +148,7 @@ class oai_pmh extends CI_model {
                 }
             }
         } else {
-            echo '<pre>';
+            echo '<pre>xxxxxxxxxxxxxxxxxxxx';
             print_r($dt);
             echo "OPS";
             exit;
@@ -2088,9 +2088,9 @@ class oai_pmh extends CI_model {
                     print_r($creator);
                     echo '<hr>';
                     
-                    echo '<pre>';
-                    print_r($xml);
-                    echo '</pre>';        
+                    //echo '<pre>';
+                    //print_r($xml);
+                    //echo '</pre>';        
                 }         
             return($sx);
         }
