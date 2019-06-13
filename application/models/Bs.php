@@ -168,7 +168,7 @@ class Bs extends CI_model {
 
     function script_all($s) {
         $sx = '<div class="col-md-12">';
-        $sx .= '<span onclick="mark_all();" style="cursor: pointer;">' . msg('select_all') . '</span>' . cr();
+        $sx .= '<span onclick="mark_all();" style="cursor: pointer;">' . msg('select_page') . '</span>' . cr();
         $sx .= '
                 <script>
                         function mark_all()

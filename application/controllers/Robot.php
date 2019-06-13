@@ -160,5 +160,32 @@ class Robot extends CI_Controller {
         echo strip_tags($html);
         $this -> footer();
     }
+    public function patent($verb='') {
+        $id = get("id");
+        $id2 = get("id2");
 
+        $this -> load -> model('sources');
+        $this -> load -> model('oai_pmh');
+        $this -> load -> model('export');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('patents');
+        $this -> load -> helper('form_sisdoc');
+        $this -> load -> model('Elasticsearch');
+        $this -> load -> model('Elasticsearch_patent');
+        $this -> cab();
+        $data['title'] = 'OAI-Patent';
+        $html = '';
+        switch($verb) {
+            case 'harvesting':
+                $this->patents->harvesting();
+                break;
+            default :
+                $html = $this -> patents -> repository_list($id);
+                break;
+        }
+
+        echo strip_tags($html);
+        $this -> footer();
+    }
 }
