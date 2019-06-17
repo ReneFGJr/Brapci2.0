@@ -27,7 +27,6 @@ $config['index'] = '';
 |
 */
 $config['base_url'] = '';
-DEFINE("PATH","index.php/res/");
 
 DEFINE("HTTP","http://[::1]/projeto/Brapci2.0/");
 //DEFINE("HTTP","http://143.54.114.150/Brapci2.0/");

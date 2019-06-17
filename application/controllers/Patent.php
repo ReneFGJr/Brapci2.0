@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+define('PATH','index.php/patent');
 class Patent extends CI_Controller {
 
     function __construct() {
@@ -38,9 +38,9 @@ class Patent extends CI_Controller {
                 }
             }
         }
-        $this -> load -> view('header/header.php', $data);
+        $this -> load -> view('patent/header/header.php', $data);
         if (!isset($data['nocab'])) {
-            $this -> load -> view('header/menu_top.php', $data);
+            $this -> load -> view('patent/header/menu_top.php', $data);
         }
         $this -> load -> model("socials");
     }
@@ -79,52 +79,19 @@ class Patent extends CI_Controller {
         //$result = $client->index($params);
     }
 
-    public function zera($pg = '') {
-        if (!perfil("#ADM")) {
-            redirect(PATH);
-        }
-        $this -> cab();
-        $this -> load -> model('elasticsearch');
-        if ($pg == '') {
-            $sql = "TRUNCATE xsource_listidentifier;";
-            $this -> db -> query($sql);
-            $sql = "TRUNCATE xrdf_concept;";
-            $this -> db -> query($sql);
-            $sql = "TRUNCATE xrdf_data;";
-            $this -> db -> query($sql);
-            $sql = "TRUNCATE xrdf_name;";
-            $this -> db -> query($sql);
-            $sql = "TRUNCATE xsource_oai_log;";
-            $this -> db -> query($sql);
-
-            $rst = $this -> elasticsearch -> delete_all('article');
-            $sx = '<div class="container">';
-            $sx .= '<div class="row">';
-            $sx .= '<div class="col-md-12">';
-            $sx .= '<h1>' . msg('DELETING DATABASE') . '</h1>';
-            $sx .= '</div>';
-            $sx .= '</div>';
-
-            $sx .= bs_alert("success", msg('all_data_deleted'));
-            $sx .= '</div>';
-            $data['content'] = $sx;
-            $this -> load -> view('show', $data);
-            $this -> footer();
-        }
-    }
-
     public function index() {
         $this -> load -> model('elasticsearch');
         $this -> load -> model('libraries');
         $this -> load -> model('sources');
         $this -> load -> model('searchs');
+        $this -> load -> model('patents');
         $this -> load -> model('events');
         $this -> load -> model('frbr');
         $this -> cab();
 
         $data['events'] = '';
 
-        $this -> load -> view('brapci/form', $data);
+        $this -> load -> view('patent/form', $data);
 
         if (strlen(get("q")) > 0) {
             /****************************************************************************/
@@ -144,7 +111,6 @@ class Patent extends CI_Controller {
         } else {
             /****************************************************************************/
             $data['content'] = $this -> searchs -> historic();
-            //$data['content'] .= '<div class="col-md-2">xxxxxxxxxx</div>';
 
             $this -> load -> view('show', $data);
         }

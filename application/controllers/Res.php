@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+DEFINE("PATH","index.php/res/");
 class res extends CI_Controller {
 
     function __construct() {
