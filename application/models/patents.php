@@ -1,5 +1,12 @@
 <?php
 class patents extends CI_model {
+    var $sz = 20;
+    var $s = '1';
+
+    function relatorio($id = 0) {
+        $sql = "select tp, ano, count(*) as total from ( SELECT substr(p_nr,3,2) as tp, substr(p_nr,5,4) as ano FROM `patent` where p_nr like 'BR%' ) as tabela group by tp, ano order by ano desc,tp";
+        $sql = "SELECT count(*) as total FROM patent";
+    }
 
     function le($id) {
         $sql = "select * from patent.patent where id_p = $id";
@@ -202,7 +209,7 @@ class patents extends CI_model {
             $sx .= '</td>';
             $sx .= '<td align="center" colspan=3  style="border: 1px solid #000000;">';
             $sx .= $xline['ps_nome'];
-            $sx .= ' ('.$xline['prior_sigla_pais'].')';
+            $sx .= ' (' . $xline['prior_sigla_pais'] . ')';
             $sx .= '</td>';
 
             $sx .= '<td align="center" colspan=3  style="border: 1px solid #000000;">';
@@ -263,10 +270,10 @@ class patents extends CI_model {
             $sx .= '</td>';
             $sx .= '<td colspan=7  style="border: 1px solid #000000;">';
             if (strlen($xline['pd_comentario']) == 0) {
-                $sx .= $xline['ps_name'];
+                $sx .= troca($xline['ps_name'], '_', '-');
             } else {
-                $sx .= $xline['ps_name'];
-                $sx .= '<br>' . '<span style="color: #0000ff">' . troca($xline['pd_comentario'],'_','-') . '</span>';
+                $sx .= troca($xline['ps_name'], '_', '-');
+                $sx .= '<br>' . '<span style="color: #0000ff">' . troca($xline['pd_comentario'], '_', '-') . '</span>';
             }
 
             $sx .= '</td>';
@@ -355,6 +362,8 @@ class patents extends CI_model {
             }
             if (isset($pp -> titulo)) {
                 $dt = $this -> xml_read($pp -> titulo);
+                if (!isset($dt[0])) { $dt[0] = '';
+                }
                 $p['patent_titulo'] = troca($dt[0], '_', '-');
                 $p['patent_titulo_inid'] = $dt['inid'];
             }
@@ -509,9 +518,9 @@ class patents extends CI_model {
                 $p['comentario'] = $dt[0];
                 $p['comentario_indi'] = $dt['inid'];
             }
-            echo $this -> process($p, $issue).' -> '.$sect;
+            echo $this -> process($p, $issue) . ' -> ' . $sect;
             ob_flush();
-            flush();            
+            flush();
         }
         return ("");
     }
@@ -641,6 +650,7 @@ class patents extends CI_model {
     }
 
     function harvesting($id = '') {
+        $t1 = date("d/m/Y H:i:s");
         if (strlen($id) == 0) {
             $sql = "select * from patent.patent_source where ps_status = 1
                             ORDER BY ps_last_harvesting
@@ -657,24 +667,31 @@ class patents extends CI_model {
 
         $this -> check_diretory();
         $method = $line['ps_method'];
-
+        $ok = 0;
         switch($method) {
             case 'INPI' :
                 echo "================================" . cr();
-                echo $id.cr();
+                echo $id . cr();
                 echo "================================" . cr();
 
                 $this -> harvest_patent($id);
                 $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
-                $sx = $this -> method_inpi($file);
+                if (file_exists($file)) {
+                    $sx = $this -> method_inpi($file);
+                }
                 break;
         }
         echo cr() . '#########FIM DO PROCESSO#############';
-        $sql = "update patent.patent_source set 
+        if ($ok == 1) {
+            $sql = "update patent.patent_source set 
                         ps_last_harvesting = '" . date("Y-m-d") . "',
-                        ps_issue = ($id +1)
+                        ps_issue = ($id)
                         where id_ps = $ids ";
-        $rlt = $this->db->query($sql);
+            $rlt = $this -> db -> query($sql);
+        }
+        $t2 = date("d/m/Y H:i:s");
+        echo cr() . $t1;
+        echo cr() . $t2;
     }
 
     function repository_list() {
@@ -732,6 +749,9 @@ class patents extends CI_model {
     }
 
     function relacao_agente_patent($idp, $age, $relacao, $seq) {
+        if (strlen($seq) == 0) {
+            $seq = 1;
+        }
         $sql = "select * from patent.patent_agent_relation 
                         WHERE rl_patent = $idp
                         AND rl_agent = $age
@@ -1002,7 +1022,7 @@ class patents extends CI_model {
     }
 
     function prioritario($idp, $d) {
-        $prioc = troca($d['prior_numero_prioridade'],"'","");
+        $prioc = troca($d['prior_numero_prioridade'], "'", "");
         $pais = $d['prior_sigla_pais'];
         $seq = $d['prior_seq'];
         $data = brtos($d['prior_data_prioridade']);
@@ -1028,7 +1048,7 @@ class patents extends CI_model {
         $p = round(get("p"));
         if ($p == 0) { $p = 1;
         }
-
+        echo '--->' . $t;
         $type = 'patent';
         $q = $this -> elasticsearch -> query($type, $n, $t);
         //$q = $this->ElasticSearch->query_all($n);
@@ -1037,6 +1057,20 @@ class patents extends CI_model {
             //print_r($q);
             //echo '</pre>';
         }
+        switch($t) {
+            case '2' :
+                $sql = "select * from patent.patent_agent where pa_nome like '%$n%' order by pa_nome";
+                $rlt = $this -> db -> query($sql);
+                $rlt = $rlt -> result_array();
+                $sx = '<ul>';
+                for ($r = 0; $r < count($rlt); $r++) {
+                    $line = $rlt[$r];
+                    $sx .= '<li>' . $line['pa_nome'] . '</li>';
+                }
+                $sx .= '</ul>';
+                return ($sx);
+        }
+
         /*************** history ***************/
         $data['q'] = $n;
         $data['type'] = $t;
@@ -1109,6 +1143,87 @@ class patents extends CI_model {
 
         return ($sx);
         /*********************************************************************************/
+    }
+
+    function save_history($data) {
+        if (get("h") == '1') {
+            return ("");
+        }
+
+        $user = 0;
+        $date = date("Y-m-d");
+        $hour = date("H:i:s");
+        $session = $this -> s;
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        if (isset($_SESSION['id_us'])) {
+            $user = $_SESSION['id_us'];
+        }
+        $q = UpperCase($data['q']);
+        $t = round($data['type']);
+        $total = round($data['total']);
+        $page = round(GET("p"));
+
+        $sql = "select * from patent._search 
+                    where s_date = '$date' 
+                        and s_hour = '$hour'
+                        and s_query = '$q'
+                        and s_type = $t
+                        and s_user = $user
+                        and s_total = $total
+                        and s_session = s_session";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        if (count($rlt) == 0) {
+            if (strlen($q) > 0) {
+                $sql = "insert into patent._search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session, s_ip) ";
+                $sql .= " values ";
+                $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip')";
+                $this -> db -> query($sql);
+            }
+        }
+        return ('');
+    }
+
+    function pages($n = 0, $t = 0) {
+        $sz = $this -> sz;
+        $pgs = ((int)($t / $sz) + 1);
+        $q = get("q");
+        $q = troca($q, '"', '¢');
+        $link = base_url('index.php/res/?q=' . $q . '&type=' . get("type"));
+
+        $p = round(get("p"));
+        if ($p == 0) { $p = 1;
+        }
+        /********* PAGINA INICIAL ******************/
+        $pgi = $p - 5;
+        if ($pgi < 1) { $pgi = 1;
+        }
+
+        $pgf = ($pgi + 9);
+        $pgm = ((int)($t / $sz) + 1);
+        if ($pgf > $pgm) { $pgf = $pgm;
+        }
+
+        $sx = '<nav aria-label="Page navigation example">
+                    <ul class="pagination">';
+        if ($pgi > 1) {
+            $sx .= '    <li class="page-item"><a class="page-link" href="' . $link . '&p=' . ($pgi - 1) . '">&laquo;</a></li>' . cr();
+        }
+
+        for ($r = $pgi; $r <= $pgf; $r++) {
+            $class = "";
+            if ($r == $p) {
+                $class = ' active ';
+            }
+            $sx .= '<li class="page-item ' . $class . '"><a class="page-link" href="' . $link . '&p=' . $r . '">' . $r . '</a></li>' . cr();
+        }
+
+        if ($pgf < $pgm) {
+            $sx .= '<li class="page-item"><a class="page-link" href="' . $link . '&p=' . ($pgf + 1) . '">&raquo;</a></li>' . cr();
+        }
+        $sx .= '</ul></nav>' . cr();
+        return ($sx);
     }
 
 }

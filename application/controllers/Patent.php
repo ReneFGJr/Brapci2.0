@@ -103,7 +103,7 @@ class Patent extends CI_Controller {
                 $term = get("q");
             }
             $term = troca($term, '¢', '"');
-            $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
+            $data['content'] = '' . $this -> patents -> s($term, $type) . '';
 
             //$data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);

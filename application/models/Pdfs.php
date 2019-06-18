@@ -183,6 +183,16 @@ class pdfs extends CI_model {
 			if ((strpos($link, '/view/')) or (strpos($link, '/viewFile/')) or (strpos($link, '/viewArticle/')) or (strpos($link, '/download/'))) {
 				$method = 1;
 			}
+            
+            if (strpos($link,'scielo.php') > 0)
+                {
+                    $method=1; 
+                    /* Base do Scielo */
+                    $txt = file_get_contents($link);
+                    $txt = substr($txt,strpos($txt,'citation_pdf_url'),1024);
+                    $txt = substr($txt,strpos($txt,'http'),strlen($txt));
+                    $link = substr($txt,0,strpos($txt,'"'));
+                }
 
 			switch($method) {
 				case '1' :
@@ -229,6 +239,8 @@ class pdfs extends CI_model {
 								$this -> file_save($file, $txt, $id, 'DOC', $jnl);
 								break;
 							default :
+                                echo $link.'<br>';
+                                echo 'ID:'.$id.'<br>';
 								echo '===><pre>[' . $type . ']</pre>';
 								exit ;
 						}
