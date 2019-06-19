@@ -160,7 +160,7 @@ class Robot extends CI_Controller {
         echo strip_tags($html);
         $this -> footer();
     }
-    public function patent($verb='',$id='') {
+    public function patent($verb='',$ida='') {
         $id = get("id");
         $id2 = get("id2");
 
@@ -178,8 +178,11 @@ class Robot extends CI_Controller {
         $html = '';
         switch($verb) {
             case 'harvesting':
-                $this->patents->harvesting($id);
+                $this->patents->harvesting($ida);
                 break;
+            case 'check':
+                $this->patents->check_duplicate($ida);
+                break;                
             default :
                 $html = $this -> patents -> repository_list($id);
                 break;

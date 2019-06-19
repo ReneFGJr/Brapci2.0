@@ -2,10 +2,165 @@
 class patents extends CI_model {
     var $sz = 20;
     var $s = '1';
+    
+    function check_duplicate()
+        {
+            $sql = "select * from (
+                SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
+                FROM patent.patent_prioridade
+                group by prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent
+                ) as tabela 
+                where total > 1 limit 500";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $wh = "";
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    if (strlen($wh) > 0)
+                        {
+                            $wh .= ' OR ';
+                        }
+                    $wh .= '(id_prior = '.$line['id_prior'].')'; 
+                }
+                if (strlen($wh) > 0)
+                    {
+                        echo cr()."Excluindo ".count($rlt)." repeticoes de prioridade";
+                        ob_flush();
+                        flush();
+                        $sql = "delete from patent.patent_prioridade where ".$wh;
+                        $rlt = $this->db->query($sql);
+                    }
+            /************ Classificaction *************/
+            $sql = "select * from (
+                        SELECT count(*) as total, max(id_c) as id_c, c_patent, c_c, c_cod 
+                        FROM patent.patent_classification
+                        group by c_patent, c_c, c_cod
+                            ) as tabela
+                            where total > 1 limit 500";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $wh = "";
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    if (strlen($wh) > 0)
+                        {
+                            $wh .= ' OR ';
+                        }
+                    $wh .= '(id_c = '.$line['id_c'].')'; 
+                }
+                if (strlen($wh) > 0)
+                    {
+                        echo cr()."Excluindo ".count($rlt)." repeticoes de classificacao";
+                        ob_flush();
+                        flush();                        
+                        $sql = "delete from patent.patent_classification where ".$wh;
+                        $rlt = $this->db->query($sql);
+                    }  
+            /********************************* autoria **************************/
+            $sql = "select * from (
+                SELECT count(*) as total, max(id_rl) as id_rl, rl_patent, rl_agent, rl_relation 
+                FROM patent.patent_agent_relation
+                group by rl_patent, rl_agent, rl_relation
+                ) as tabela 
+                where total > 1
+                limit 500";
+            $rlt = $this->db->query($sql);  
+            $rlt = $rlt->result_array();
+            $wh = "";
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    if (strlen($wh) > 0)
+                        {
+                            $wh .= ' OR ';
+                        }
+                    $wh .= '(id_rl = '.$line['id_rl'].')'; 
+                }
+                if (strlen($wh) > 0)
+                    {
+                        echo cr()."Excluindo ".count($rlt)." repeticoes de agentes";
+                        ob_flush();
+                        flush();                        
+                        $sql = "delete from patent.patent_agent_relation where ".$wh;
+                        $rlt = $this->db->query($sql);
+                    }                                        
+        }
+    
+    function harvesting($id = '') {
+        $debug = 0;
+        echo '==>'.$id.cr();
+        $t1 = date("d/m/Y H:i:s");
+        
+        $h = array('00','04','20');
+        $auth = 0;
+        for ($r=0;$r < count($h);$r++)
+            {
+                if ($h[$r] == date("H")) { $auth = 1; }
+            }
+        if ($id == '1') { $auth = 1; $id = ''; }
+        
+        if ($auth == 0)
+            {
+                return("Hora não autorizada!");
+            }
+        /*************************/
+        $method = 'NRML';
+        
+        /**************************/
+        if (strlen($id) == 0) {
+            $sql = "select * from patent.patent_source where ps_status = 1
+                            ORDER BY ps_last_harvesting
+                            limit 1";
+            $rlt = $this -> db -> query($sql);
+            $rlt = $rlt -> result_array();
+            if (count($rlt) == 0) {
+                echo cr() . "Nada para coletar";
+            }
+            $line = $rlt[0];
+            $id = $line['ps_issue'] + 1;
+            $ids = $line['id_ps'];
+            $method = $line['ps_method'];
+        }
+        $this -> check_diretory();
+        
+        $ok = 0;
+        switch($method) {
+            case 'INPI' :
+                echo "================================" . cr();
+                echo $id . cr();
+                echo "================================" . cr();
+
+                $this -> harvest_patent($id);
+                $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
+                if (file_exists($file)) {
+                    $sx = $this -> method_inpi($file);
+                    $ok = 1;
+                }
+                break;
+        }
+        echo cr() . '#########FIM DO PROCESSO#############';
+        if ($ok == 1) {
+            $sql = "update patent.patent_source set 
+                        ps_last_harvesting = '" . date("Y-m-d") . "',
+                        ps_issue = ($id)
+                        where id_ps = $ids ";
+            $rlt = $this -> db -> query($sql);
+        }
+        $t2 = date("d/m/Y H:i:s");
+        echo cr() . $t1;
+        echo cr() . $t2;
+    }    
 
     function relatorio($id = 0) {
         $sql = "select tp, ano, count(*) as total from ( SELECT substr(p_nr,3,2) as tp, substr(p_nr,5,4) as ano FROM `patent` where p_nr like 'BR%' ) as tabela group by tp, ano order by ano desc,tp";
         $sql = "SELECT count(*) as total FROM patent";
+        $sql = "select * from (
+                SELECT count(*) as total, max(id_prior) as max, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent FROM `patent_prioridade`
+                group by prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent
+                ) as tabela 
+                where total > 1";      
     }
 
     function le($id) {
@@ -152,7 +307,7 @@ class patents extends CI_model {
         for ($r = 0; $r < count($line['relacao']); $r++) {
             $xline = $line['relacao'][$r];
             if ($xline['rl_relation'] == 'I') {
-                $sx .= '<li><b>' . $xline['pa_nome'] . '<b> ';
+                $sx .= '<li><b>' . $xline['pa_nome'] . '</b> ';
 
                 if (strlen($xline['pa_pais'])) {
                     $sx .= '(';
@@ -306,12 +461,14 @@ class patents extends CI_model {
             $rlti = $this -> db -> query($sqli);
             $rlt = $this -> db -> query($sql);
             $rlt = $rlt -> result_array();
+            sleep(0.1);
         }
         $id_issue = $rlt[0]['id_issue'];
         return ($id_issue);
     }
 
     function method_inpi($file) {
+        $debug = 0;
         $cnt = file_get_contents($file);
         $cnt = troca($cnt, '-', '_');
         $xml = simplexml_load_string($cnt);
@@ -334,7 +491,8 @@ class patents extends CI_model {
         }
         $is = $xml;
         /* despachos */
-        $debug = 0;
+        
+
         foreach ($is as $key => $value) {
             $p = array();
             $p['section'] = trim((string)$value -> codigo);
@@ -617,6 +775,7 @@ class patents extends CI_model {
                                         ('$desc','$class','','pt','$cod',
                                         '$ca1','$ca2','$ca3',$ca4,$ca5)";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
             return ("");
         }
     }
@@ -645,54 +804,12 @@ class patents extends CI_model {
                                         values
                                         ('$desc','$sec','',1,1)";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
             return ("");
         }
     }
 
-    function harvesting($id = '') {
-        $t1 = date("d/m/Y H:i:s");
-        if (strlen($id) == 0) {
-            $sql = "select * from patent.patent_source where ps_status = 1
-                            ORDER BY ps_last_harvesting
-                            limit 1";
-            $rlt = $this -> db -> query($sql);
-            $rlt = $rlt -> result_array();
-            if (count($rlt) == 0) {
-                echo cr() . "Nada para coletar";
-            }
-            $line = $rlt[0];
-            $id = $line['ps_issue'] + 1;
-            $ids = $line['id_ps'];
-        }
 
-        $this -> check_diretory();
-        $method = $line['ps_method'];
-        $ok = 0;
-        switch($method) {
-            case 'INPI' :
-                echo "================================" . cr();
-                echo $id . cr();
-                echo "================================" . cr();
-
-                $this -> harvest_patent($id);
-                $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
-                if (file_exists($file)) {
-                    $sx = $this -> method_inpi($file);
-                }
-                break;
-        }
-        echo cr() . '#########FIM DO PROCESSO#############';
-        if ($ok == 1) {
-            $sql = "update patent.patent_source set 
-                        ps_last_harvesting = '" . date("Y-m-d") . "',
-                        ps_issue = ($id)
-                        where id_ps = $ids ";
-            $rlt = $this -> db -> query($sql);
-        }
-        $t2 = date("d/m/Y H:i:s");
-        echo cr() . $t1;
-        echo cr() . $t2;
-    }
 
     function repository_list() {
 
@@ -744,6 +861,7 @@ class patents extends CI_model {
                                 values
                                 ('$id','$sec','$cot','$issue','INPI')";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
@@ -764,6 +882,7 @@ class patents extends CI_model {
                                 values
                                 ('$age','$relacao','$idp',$seq)";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
@@ -781,6 +900,7 @@ class patents extends CI_model {
                                 values
                                 ('$pct','$pct_dt','$id')";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
@@ -798,6 +918,7 @@ class patents extends CI_model {
                                 values
                                 ('$pct','$pct_dt','$id')";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
@@ -815,18 +936,23 @@ class patents extends CI_model {
                                 values
                                 ('$issue','$kc','$id')";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
 
     function process($d, $issue) {
+        $debug = 0;
         $sx = '';
+        if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo Patente'; }
         if (isset($d['patent_nr'])) {
+            if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Número da Patent'; }
             $id = $this -> patent($d);
 
             $sx .= cr() . $d['patent_nr'] . ' process (' . $id . ')';
 
             /************************ History ******************/
+            if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo despacho'; }
             $this -> despacho($issue, $d, $id);
 
             //echo '<pre>';
@@ -836,7 +962,8 @@ class patents extends CI_model {
             /****************** KINDCODE ******************/
             if (isset($d['patent_nr_kindcode'])) {
                 $kind = $d['patent_nr_kindcode'];
-                $this -> pct($id, $kind, $issue);
+                if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo KINDCODE'; }
+                $this -> kindcode($id, $kind, $issue);
             }
 
             /****************** PCT **********************/
@@ -844,6 +971,7 @@ class patents extends CI_model {
                 $pct = $d['pedido_internacional_numero_pct'];
                 $pct_dt = $d['pedido_internacional_numero_pct_data'];
                 $pct_dt = brtos($pct_dt);
+                if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo PCT'; }
                 $this -> pct($id, $pct, $pct_dt);
             }
 
@@ -851,6 +979,7 @@ class patents extends CI_model {
             if (isset($d['publicacao_internacional_numero_ompi'])) {
                 $pct = $d['publicacao_internacional_numero_ompi'];
                 $pct_dt = $d['publicacao_internacional_numero_ompi_data'];
+                if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo PUB'; }
                 $pct_dt = brtos($pct_dt);
                 $this -> pub($id, $pct, $pct_dt);
             }
@@ -868,6 +997,7 @@ class patents extends CI_model {
                 if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
                 }
                 $ida = $this -> agent($name, $pais, $estado);
+                if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo TITULARES'; }
                 $this -> relacao_agente_patent($id, $ida, 'A', $seq);
             }
             /****************** Inventor **********************/
@@ -883,6 +1013,7 @@ class patents extends CI_model {
                 if (isset($line['estado'])) { $estado = $line['pais'];
                 }
                 $ida = $this -> agent($name, $pais, $estado);
+                if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo INVENTORES'; }
                 $this -> relacao_agente_patent($id, $ida, 'I', $seq);
             }
             /****************** Classificacao **********************/
@@ -890,18 +1021,21 @@ class patents extends CI_model {
                 $class = $d['classificacao_internacional'];
                 for ($r = 0; $r < count($class); $r++) {
                     $line = $class[$r];
+                    if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo Classificacao'; }
                     $this -> classification($id, $line);
                 }
             }
             /****************** Classificacao **********************/
             if (isset($d['prioridade_unionista'])) {
                 $class = $d['prioridade_unionista'];
-                for ($r = 0; $r < count($class); $r++) {
-                    $line = $class[$r];
+                for ($s = 0; $s < count($class); $s++) {
+                    $line = $class[$s];
+                    if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Processo Unionista'; }
                     $this -> prioritario($id, $line);
                 }
             }
         }
+        if ($debug == 1) { echo ''.cr().date("Y-m-d H:i:s B").' - Fim'; }
         return ($sx);
     }
 
@@ -926,12 +1060,14 @@ class patents extends CI_model {
                                 values
                                 ($id,'$c1','$c2','$data','$seq', '$cl')";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
 
     function agent($name = '', $country = '', $state = '') {
         $name = troca($name, "'", '´');
+        $name = troca($name, "_", '-');
         $sql = "select * from patent.patent_agent where pa_nome = '$name'";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -943,6 +1079,7 @@ class patents extends CI_model {
             $rlti = $this -> db -> query($sqli);
             $rlt = $this -> db -> query($sql);
             $rlt = $rlt -> result_array();
+            sleep(0.1);
         }
         $line = $rlt[0];
 
@@ -995,6 +1132,7 @@ class patents extends CI_model {
             $rlti = $this -> db -> query($sqli);
             $rlt = $this -> db -> query($sql);
             $rlt = $rlt -> result_array();
+            sleep(0.1);
         }
         $line = $rlt[0];
         $idp = $line['id_p'];
@@ -1022,8 +1160,8 @@ class patents extends CI_model {
     }
 
     function prioritario($idp, $d) {
-        $prioc = troca($d['prior_numero_prioridade'], "'", "");
-        $pais = $d['prior_sigla_pais'];
+        $prioc = trim(troca($d['prior_numero_prioridade'], "'", ""));
+        $pais = trim((string)$d['prior_sigla_pais']);
         $seq = $d['prior_seq'];
         $data = brtos($d['prior_data_prioridade']);
         $sql = "select * from patent.patent_prioridade
@@ -1040,6 +1178,7 @@ class patents extends CI_model {
                                 ($seq,'$prioc','$pais',
                                 '$data',$idp)";
             $rlt = $this -> db -> query($sql);
+            sleep(0.1);
         }
         return (1);
     }
@@ -1065,7 +1204,8 @@ class patents extends CI_model {
                 $sx = '<ul>';
                 for ($r = 0; $r < count($rlt); $r++) {
                     $line = $rlt[$r];
-                    $sx .= '<li>' . $line['pa_nome'] . '</li>';
+                    $link = '<a href="' . base_url(PATH . '/vi/' . $line['id_pa']) . '">';
+                    $sx .= '<li>' . $link . troca($line['pa_nome'], '_', '-') . '</a>' . '</li>';
                 }
                 $sx .= '</ul>';
                 return ($sx);
@@ -1180,6 +1320,7 @@ class patents extends CI_model {
                 $sql .= " values ";
                 $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip')";
                 $this -> db -> query($sql);
+                sleep(0.1);
             }
         }
         return ('');
@@ -1223,6 +1364,35 @@ class patents extends CI_model {
             $sx .= '<li class="page-item"><a class="page-link" href="' . $link . '&p=' . ($pgf + 1) . '">&raquo;</a></li>' . cr();
         }
         $sx .= '</ul></nav>' . cr();
+        return ($sx);
+    }
+
+    function instituicao_list($id) {
+        $sql = "select * from patent.patent_agent_relation
+                    INNER JOIN patent.patent ON id_p = rl_patent 
+                    where rl_agent = $id";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '';
+        $sx .= '<table class="table">';
+        $t = 0;
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $t++;
+            $sx .= '<tr>';
+            $link = '<a href="' . base_url(PATH . '/v/' . $line['id_p']) . '">';
+            $sx .= '<td>';
+            $sx .= '<nobr>' . $link . $line['p_nr'] . '</a></nobr>';
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+            $sx .= strtoupper($line['p_title']);
+            $sx .= '</td>';
+
+            $sx .= '</tr>';
+        }
+        $sx .= '<tr><td colspan=2>Total: ' . $t . '</td></tr>';
+        $sx .= '</table>';
         return ($sx);
     }
 
