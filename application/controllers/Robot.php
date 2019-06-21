@@ -176,6 +176,7 @@ class Robot extends CI_Controller {
         $this -> cab();
         $data['title'] = 'OAI-Patent';
         $html = '';
+        echo '- '.$verb;
         switch($verb) {
             case 'harvesting':
                 $this->patents->harvesting($ida);

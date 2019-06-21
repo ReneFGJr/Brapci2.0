@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-define('PATH','index.php/patent');
+define('PATH','index.php/patent/');
 class Patent extends CI_Controller {
 
     function __construct() {
