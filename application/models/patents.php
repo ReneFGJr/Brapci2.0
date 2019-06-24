@@ -2,7 +2,7 @@
 class patents extends CI_model {
     var $sz = 20;
     var $s = '1';
-    var $wait = 1;
+    var $wait = 0.5;
     function check_duplicate() {
         $sql = "select * from (
                 SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
@@ -416,9 +416,9 @@ class patents extends CI_model {
 
         $sx .= '<tr align="center">';
         $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . $line['p_pct'] . '</td>';
-        $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . $line['p_pct_data'] . '</td>';
+        $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . stodbr($line['p_pct_data']) . '</td>';
         $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . $line['p_pub'] . '</td>';
-        $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . $line['p_pub_data'] . '</td>';
+        $sx .= '<td colspan=2" style="border: 1px solid #000000;">' . stodbr($line['p_pub_data']) . '</td>';
         $sx .= '<td colspan=2" style="border: 1px solid #000000;">-</td>';
         $sx .= '</tr>';
 
@@ -546,11 +546,14 @@ class patents extends CI_model {
         $l = 0;
         $cd = '';
         $p = array();
+        $cmdo = '';
         while (!feof($fn)) {
             $l++;
             $result = fgets($fn);
             $result = utf8_encode($result);
             $result = troca($result, '~', '');
+            $result = troca($result, '^', '');
+            $result = troca($result, '$', '');
             $ln = $result;
             //echo '<br>' . $l . ' - ' . $result;
 
@@ -586,12 +589,25 @@ class patents extends CI_model {
             }
 
             $cmd = substr($ln, 0, 4);
+            if ((substr($cmd, 0, 1) != '(') and (substr($cmdo, 0, 1) == '(')) {
+                $result = $cmdo . ' ' . $result;
+                $cmd = $cmdo;
+            } else {
+                $cmdo = $cmd;
+            }
+
+            //echo $cmdo.'==='.$result . cr();
+            //if ($l > 30) {
+                //print_r($p);
+                 //exit ;
+            //}
+
             $v = trim(substr($result, 4, strlen($result)));
             switch($cmd) {
                 case '(Cd)' :
                     /* Processar linha */
                     if (count($p) > 0) {
-                        echo $this -> process($p, $issue) . ' -> ' . $sect;
+                        echo $this -> process($p, $issue) . ' (section) ' . $sect;
                         ob_flush();
                         flush();
                         //exit ;
@@ -600,6 +616,16 @@ class patents extends CI_model {
                     $p = array();
                     $sect = $v;
                     $sect_title = '';
+                    
+                    if ($sect == 'Mi - Interposicao') {
+                        $sect = "MI";
+                        $sect_title = 'Mi - Interposicao';
+                    }
+                    if ($sect == 'Mi - Recurso - Decisao') {
+                        $sect = "MR";
+                        $sect_title = 'Mi - Recurso - Decisao';
+                    }
+                                        
                     if ($sect == 'PR - Nulidades') {
                         $sect = "PR";
                         $sect_title = 'Nulidades';
@@ -607,6 +633,27 @@ class patents extends CI_model {
                     if ($sect == 'PR - Recursos - Decisoes') {
                         $sect = "RE";
                         $sect_title = 'Recursos - Decisoes';
+                    }
+                    if ($sect == 'PR - Recursos - Despachos') {
+                        $sect = "RD";
+                        $sect_title = 'PR - Recursos - Despachos';
+                    }
+                    if ($sect == 'MJ - Interposicao') {
+                        $sect = "MJ";
+                        $sect_title = 'MJ - Interposicao';
+                    }                    
+                    if ($sect == 'MJ - Recurso - Decisao') {
+                        $sect = "MR";
+                        $sect_title = 'MJ - Recurso - Decisao';
+                    }
+                    if ($sect == 'PR - Cancelamentos') {
+                        $sect = "PC";
+                        $sect_title = 'PR - Cancelamentos';
+                    }                       
+                                     
+                    if (strlen($sect) > 5) {
+                        echo '=====###==' . $sect;
+                        exit ;
                     }
                     $p['section'] = $sect;
                     $p['section_title'] = $sect_title;
@@ -637,18 +684,28 @@ class patents extends CI_model {
                     $p['patent_nr'] = $v;
                     break;
                 case '(22)' :
-                    $p['patent_nr_deposit_date'] = trim($v);
+                    $dt = trim($v);
+                    if (strlen($dt) == 8) {
+                        $dt = substr($dt, 0, 6) . '19' . substr($dt, 6, 2);
+                    }
+                    $p['patent_nr_deposit_date'] = $dt;
                     break;
                 case '(30)' :
                     $dtt = array();
                     $dtt['prior_inid'] = '30';
                     $seqq = count($p['prioridade_unionista']);
                     $dtt['prior_seq'] = $seqq + 1;
-
-                    $dtt['prior_sigla_pais'] = substr($v, 11, 2);
-                    $dtt['prior_numero_prioridade'] = substr($v, 14, strlen($v));
-                    $dtt['prior_data_prioridade'] = substr($v, 0, 10);
-                    $p['prioridade_unionista'][$seqq] = $dtt;
+                    if (substr($v, 8, 1) == ' ') {
+                        $dtt['prior_sigla_pais'] = substr($v, 9, 2);
+                        $dtt['prior_numero_prioridade'] = substr($v, 12, strlen($v));
+                        $dtt['prior_data_prioridade'] = substr($v, 0, 6) . '19' . substr($v, 6, 2);
+                        $p['prioridade_unionista'][$seqq] = $dtt;
+                    } else {
+                        $dtt['prior_sigla_pais'] = substr($v, 11, 2);
+                        $dtt['prior_numero_prioridade'] = substr($v, 14, strlen($v));
+                        $dtt['prior_data_prioridade'] = substr($v, 0, 10);
+                        $p['prioridade_unionista'][$seqq] = $dtt;
+                    }
                     break;
                 case '(51)' :
                     $dtt = array();
@@ -657,8 +714,8 @@ class patents extends CI_model {
                             $v[$q + 3] = ';';
                         }
                     }
+                    $v = troca($v,'G08B 13,22','G08B 13/22');
                     $v = troca($v, ',', ';');
-                    echo '<br>' . $v;
                     $cl = splitx(';', $v . ';');
                     for ($rc = 0; $rc < count($cl); $rc++) {
                         $seq = count($p['classificacao_internacional']);
@@ -666,7 +723,7 @@ class patents extends CI_model {
                         $dtt['cip_inid'] = '51';
                         $dtt['cip_seq'] = $seq + 1;
                         $dtt['cip_ano'] = '2006.01';
-                        $dtt['cip_classe'] = $cl[$rc];
+                        $dtt['cip_classe'] = $this -> formatar_classe($cl[$rc]);
                         $this -> classes($cl[$rc], '', $dtt['cip_ano']);
                         $p['classificacao_internacional'][$seq] = $dtt;
                     }
@@ -788,9 +845,6 @@ class patents extends CI_model {
         }
         /* Processar linha */
         if (count($p) > 0) {
-            echo '<pre>';
-            print_r($p);
-            echo '</pre>';
             echo $this -> process($p, $issue) . ' -> ' . $sect;
             ob_flush();
             flush();
@@ -1074,7 +1128,19 @@ class patents extends CI_model {
         }
     }
 
+    function formatar_classe($class) {
+        $class = troca($class,"'",'');
+        $class = troca($class,'  ',' ');
+        $class = troca($class,'  ',' ');
+        if (substr($class,7,1) == ',') { $class[7] = '/'; }
+        if (!substr($class, 4, 1) != ' ') {
+            $class = substr($class, 0, 4) . ' ' . substr($class, 4, 10);
+        }
+        return ($class);
+    }
+
     function classes($class = '', $desc = '', $cod = '') {
+        $class = $this -> formatar_classe($class);
         if (strlen(trim($class)) == 0) {
             $sql = "select * from patent.patent_class";
             $rlt = $this -> db -> query($sql);
@@ -1088,9 +1154,6 @@ class patents extends CI_model {
             }
             return ($secs);
         } else {
-            if (!substr($class, 4, 1) != ' ') {
-                $class = substr($class, 0, 4) . ' ' . substr($class, 4, 10);
-            }
 
             $sql = "select * from patent.patent_class where cc_class = '$class' and cc_cod = '$cod'";
             $rlt = $this -> db -> query($sql);
@@ -1108,7 +1171,7 @@ class patents extends CI_model {
                                         cc_c1,cc_c2,cc_c3,cc_c4,cc_c5)
                                         values
                                         ('$desc','$class','','pt','$cod',
-                                        '$ca1','$ca2','$ca3',$ca4,$ca5)";
+                                        '$ca1','$ca2','$ca3','$ca4','$ca5')";
             $rlt = $this -> db -> query($sql);
             sleep($this -> wait);
             return ("");
@@ -1275,7 +1338,7 @@ class patents extends CI_model {
     }
 
     function process($d, $issue) {
-        $debug = 1;
+        $debug = 0;
         $sx = '';
         if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo Patente';
         }
@@ -1825,6 +1888,34 @@ class patents extends CI_model {
         $sx .= '<tr><td colspan=2>Total: ' . $t . '</td></tr>';
         $sx .= '</table>';
         return ($sx);
+    }
+
+    function zera() {
+        echo "********* ZERAR **********";
+        $sql = "TRUNCATE patent.patent";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_agent";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_agent_relation";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_class";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_classification";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_despacho";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_issue";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_kindcode";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_pct";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_prioridade";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_pub";
+        $this -> db -> query($sql);
+        $sql = "TRUNCATE patent.patent_section";
+        $this -> db -> query($sql);
     }
 
 }

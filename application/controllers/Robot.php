@@ -178,6 +178,9 @@ class Robot extends CI_Controller {
         $html = '';
         echo '- '.$verb;
         switch($verb) {
+            case 'zera':
+                $this->patents->zera();
+                break;            
             case 'harvesting':
                 $this->patents->harvesting($ida);
                 break;

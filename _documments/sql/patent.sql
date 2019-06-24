@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.4.1deb2ubuntu2.1
+-- version 4.5.4.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 21, 2019 at 07:23 PM
--- Server version: 5.7.26-0ubuntu0.16.04.1
--- PHP Version: 7.0.33-8+ubuntu16.04.1+deb.sury.org+1
+-- Generation Time: Jun 21, 2019 at 11:27 PM
+-- Server version: 5.7.11
+-- PHP Version: 5.6.18
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -42,18 +42,6 @@ CREATE TABLE `patent` (
   `p_fase_nacional` date NOT NULL DEFAULT '0001-01-01'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `patent`
---
-
-INSERT INTO `patent` (`id_p`, `p_nr`, `p_dt_deposito`, `p_dt_publicacao`, `p_dt_concessao`, `p_title`, `p_resumo`, `p_situacao`, `p_pct`, `p_pct_data`, `p_pub`, `p_pub_data`, `p_fase_nacional`) VALUES
-(1, 'BR112014016802-4', '2013-01-04', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01'),
-(2, 'BR112014017448-2', '2013-01-10', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01'),
-(3, 'BR112014019431-9', '2013-02-07', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01'),
-(4, 'BR112014023658-5', '2013-03-28', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01'),
-(5, 'BR112014023869-3', '2013-03-15', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01'),
-(6, 'BR112014024574-6', '2013-04-04', '0000-00-00', '0000-00-00', '', '', 0, '', '0001-01-01', '', '0001-01-01', '0001-01-01');
-
 -- --------------------------------------------------------
 
 --
@@ -70,18 +58,6 @@ CREATE TABLE `patent_agent` (
   `pa_cnpj` char(20) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `patent_agent`
---
-
-INSERT INTO `patent_agent` (`id_pa`, `pa_use`, `pa_nome`, `pa_pais`, `pa_estado`, `pa_tipo`, `pa_cnpj`) VALUES
-(1, 0, 'OMTHERA PHARMACEUTICALS, INC', 'US', '', '0', ''),
-(2, 0, 'REALM THERAPEUTICS, INC', 'US', '', '0', ''),
-(3, 0, 'ARGENTUM HOLDING SÀR', 'LU', '', '0', ''),
-(4, 0, 'GLOBAL BIO THERAPEUTICS, INC', 'US', '', '0', ''),
-(5, 0, 'SANOFI-AVENTIS DEUTSCHLAND GMB', 'DE', '', '0', ''),
-(6, 0, 'PRONUTRIA BIOSCIENCES, INC', 'US', '', '0', '');
-
 -- --------------------------------------------------------
 
 --
@@ -96,18 +72,6 @@ CREATE TABLE `patent_agent_relation` (
   `rl_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rl_seq` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Dumping data for table `patent_agent_relation`
---
-
-INSERT INTO `patent_agent_relation` (`id_rl`, `rl_patent`, `rl_agent`, `rl_relation`, `rl_created`, `rl_seq`) VALUES
-(1, 28979, 1, 'A', '2019-06-21 19:23:03', 1),
-(2, 1, 2, 'A', '2019-06-21 19:23:08', 1),
-(3, 2, 3, 'A', '2019-06-21 19:23:13', 1),
-(4, 3, 4, 'A', '2019-06-21 19:23:18', 1),
-(5, 4, 5, 'A', '2019-06-21 19:23:23', 1),
-(6, 5, 6, 'A', '2019-06-21 19:23:29', 1);
 
 -- --------------------------------------------------------
 
@@ -161,17 +125,6 @@ CREATE TABLE `patent_despacho` (
   `pd_method` char(5) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
---
--- Dumping data for table `patent_despacho`
---
-
-INSERT INTO `patent_despacho` (`id_pd`, `pd_patent`, `pd_issue`, `pd_section`, `pd_comentario`, `pd_created`, `pd_method`) VALUES
-(1, 2, 7, '6.6.1', '', '2019-06-21 19:23:10', 'INPI'),
-(2, 3, 7, '6.6.1', '', '2019-06-21 19:23:15', 'INPI'),
-(3, 4, 7, '6.6.1', '', '2019-06-21 19:23:20', 'INPI'),
-(4, 5, 7, '6.6.1', '', '2019-06-21 19:23:26', 'INPI'),
-(5, 6, 7, '6.6.1', '', '2019-06-21 19:23:31', 'INPI');
-
 -- --------------------------------------------------------
 
 --
@@ -199,16 +152,6 @@ CREATE TABLE `patent_kindcode` (
   `pk_code` char(5) NOT NULL,
   `pk_patent` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `patent_kindcode`
---
-
-INSERT INTO `patent_kindcode` (`id_pk`, `pk_issue`, `pk_code`, `pk_patent`) VALUES
-(1, 7, 'A8', 3),
-(2, 7, 'A8', 4),
-(3, 7, 'A2', 5),
-(4, 7, 'A8', 6);
 
 -- --------------------------------------------------------
 
@@ -698,17 +641,17 @@ ALTER TABLE `_search`
 -- AUTO_INCREMENT for table `patent`
 --
 ALTER TABLE `patent`
-  MODIFY `id_p` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_p` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `patent_agent`
 --
 ALTER TABLE `patent_agent`
-  MODIFY `id_pa` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_pa` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `patent_agent_relation`
 --
 ALTER TABLE `patent_agent_relation`
-  MODIFY `id_rl` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rl` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `patent_class`
 --
@@ -723,7 +666,7 @@ ALTER TABLE `patent_classification`
 -- AUTO_INCREMENT for table `patent_despacho`
 --
 ALTER TABLE `patent_despacho`
-  MODIFY `id_pd` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pd` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `patent_issue`
 --
@@ -733,7 +676,7 @@ ALTER TABLE `patent_issue`
 -- AUTO_INCREMENT for table `patent_kindcode`
 --
 ALTER TABLE `patent_kindcode`
-  MODIFY `id_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `patent_pais_sigla`
 --
