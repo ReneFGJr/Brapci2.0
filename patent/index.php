@@ -1,0 +1,1 @@
+<meta http-equiv="refresh" content="0; url=http://www.brapci.inf.br/index.php/patent">

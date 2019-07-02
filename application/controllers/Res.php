@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-DEFINE("PATH","index.php/res/");
+DEFINE("PATH", "index.php/res/");
 class res extends CI_Controller {
 
     function __construct() {
@@ -325,16 +325,16 @@ class res extends CI_Controller {
         echo $sx;
     }
 
-    public function journals($act = '', $p = '') {        
+    public function journals($act = '', $p = '') {
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
-        $this -> load -> model('oai_pmh');        
+        $this -> load -> model('oai_pmh');
         $this -> load -> model('sources');
         $this -> cab();
         $html = '';
         $data = array();
         $data['content'] = '';
-        
+
         if (strlen($act) == 0) {
 
             $data['content'] = '';
@@ -502,11 +502,11 @@ class res extends CI_Controller {
         $this -> load -> model('Elasticsearch_brapci20');
         $this -> cab();
         $data['title'] = 'OAI';
-        
+
         switch($verb) {
             case 'GetRecordScielo' :
                 $this -> load -> model('oai_pmh_scielo');
-                
+
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
                 if ($idc > 0) {
@@ -525,7 +525,7 @@ class res extends CI_Controller {
                 //$html = '';
                 //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
-                break;            
+                break;
             case 'GetRecord' :
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
@@ -672,7 +672,7 @@ class res extends CI_Controller {
                         break;
                     case 'csv' :
                         $this -> bs -> mark_export_csv();
-                        break;                        
+                        break;
                     case 'doc' :
                         $this -> bs -> mark_export_doc();
                         break;
@@ -1418,7 +1418,7 @@ class res extends CI_Controller {
                 } else {
                     $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
                     $rst = $this -> bibliometrics -> csv_to_net($txt);
-                    $this -> bibliometrics -> download_file($rst,'.net');
+                    $this -> bibliometrics -> download_file($rst, '.net');
                     return ('');
                 }
                 break;
@@ -1475,6 +1475,30 @@ class res extends CI_Controller {
         } else {
             echo "OPS";
         }
+    }
+
+    function labels($pg = '') {
+        if (perfil("#ADM") > 0) {
+            $this -> load -> model('frbr');
+            $this -> cab();
+            $this -> frbr -> labels($pg);
+            $this -> footer();
+        } else {
+            redirect(base_url(PATH));
+        }
+    }
+
+    function labels_ed($id = '', $chk = '', $close = 0) {
+        if (perfil("#ADM") > 0) {
+
+            $this -> load -> model('frbr');
+            $this -> cab();
+            $this -> frbr -> labels_ed($id, $chk, $close);
+            $this -> footer();
+        } else {
+            redirect(base_url(PATH));
+        }
+
     }
 
 }

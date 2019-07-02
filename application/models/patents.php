@@ -2,7 +2,7 @@
 class patents extends CI_model {
     var $sz = 20;
     var $s = '1';
-    var $wait = 0.5;
+    var $wait = 0.7;
     function check_duplicate() {
         $sql = "select * from (
                 SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
@@ -559,19 +559,37 @@ class patents extends CI_model {
 
             /* ISSUE */
             if ($l == 1) {
-                $tp = substr($result, 0, 3);
-
+                $tp = substr(trim($result), 0, 3);
+                $nr = substr(trim($result),0,strpos(trim($result),' '));
+                if ($nr == sonumero($nr))
+                    {
+                        $tp = 'NRS';
+                    }
                 switch ($tp) {
-                    case 'REV' :
-                        $numero = sonumero(substr($result, 0, strpos($result, 'COM')));
-                        $ano = round(substr($result, strlen($result) - 3, 2));
+                    case 'NRS' :
+                        $result = trim($result);
+                        $numero = sonumero($nr);                       
+                        $ano = round(substr($result, strlen($result) - 2, 2));                        
                         if ($ano > 90) { $ano = 1900 + $ano;
                         }
-                        $data = substr($result, strlen($result) - 9, 6) . $ano;
+                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano,4);
                         $dt['year'] = $ano;
                         $dt['num'] = $numero;
                         $dt['vol'] = '';
-                        $dt['pusblished'] = brtos($data);
+                        $dt['pusblished'] = brtos($dta);
+                        $dt['jid'] = '1';                        
+                        break;
+                    case 'REV' :
+                        $result = trim($result);
+                        $numero = sonumero(substr($result, 0, strpos($result, 'COM')));                       
+                        $ano = round(substr($result, strlen($result) - 2, 2));                        
+                        if ($ano > 90) { $ano = 1900 + $ano;
+                        }
+                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano,4);
+                        $dt['year'] = $ano;
+                        $dt['num'] = $numero;
+                        $dt['vol'] = '';
+                        $dt['pusblished'] = brtos($dta);
                         $dt['jid'] = '1';
                         break;
                     case 'No.' :
@@ -649,11 +667,20 @@ class patents extends CI_model {
                     if ($sect == 'PR - Cancelamentos') {
                         $sect = "PC";
                         $sect_title = 'PR - Cancelamentos';
-                    }                       
+                    } 
+                    if ($sect == 'PR - Recursos - Decisões') {
+                        $sect = "RC";
+                        $sect_title = 'PR - Recursos - Decisões';
+                    }
+                    if ($sect == 'Mi - Interposições')
+                        {
+                            $sect = 'Mt';
+                            $sect_title = 'Mi - Interposições';
+                        }                                          
                                      
                     if (strlen($sect) > 5) {
-                        echo '=====###==' . $sect;
-                        exit ;
+                        $sect = substr($sect,0,2);
+                        $sect_title = $sect;
                     }
                     $p['section'] = $sect;
                     $p['section_title'] = $sect_title;
@@ -1483,7 +1510,13 @@ class patents extends CI_model {
         $cl1 = troca($cl, ' ', ';');
         $c = splitx(';', $cl1);
         $c1 = $c[0];
-        $c2 = $c[1];
+        if (!isset($c[1]))
+            {
+                $c2 = '-1';
+            } else {
+                $c2 = $c[1];        
+            }
+        
         $data = substr($l['cip_ano'], 0, 7);
         $seq = $l['cip_seq'];
 

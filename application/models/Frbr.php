@@ -755,7 +755,45 @@ class frbr extends CI_model {
         }
         return ($sx);
     }
+    function labels($pg) {
+        $form = new form;
 
+        $form -> fd = array('id_n', 'n_name');
+        $form -> lb = array('id', msg('n_name'));
+        $form -> mk = array('', 'L', 'L', 'L');
+
+        $form -> tabela = 'rdf_name';
+        $form -> see = false;
+        $form -> novo = false;
+        $form -> edit = true;
+
+        $form -> row_edit = base_url(PATH . 'labels_ed');
+        $form -> row_view = base_url(PATH . '');
+        $form -> row = base_url(PATH . 'labels');
+        $tela = row($form, $pg);
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+    }
+
+    function labels_ed($id, $chk, $close = 0) {
+        $form = new form;
+        $form -> id = $id;
+
+        $cp = array();
+        array_push($cp, array('$H8', 'id_n', '', false, false));
+        array_push($cp, array('$T80:5', 'n_name', msg('Label'), True, True));
+        $tela = $form -> editar($cp, 'rdf_name');
+
+        if ($form -> saved > 0) {
+            if ($close == 1) {
+                $tela = '<script> wclose(); </script>';
+            } else {
+                redirect(base_url(PATH . 'labels/'));
+            }
+        }
+        $data['content'] = $tela;
+        $this -> load -> view('show', $data);
+    }
 }
 
 //require ("Frbr_core.php");
