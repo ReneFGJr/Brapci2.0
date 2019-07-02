@@ -2,7 +2,7 @@
 class patents extends CI_model {
     var $sz = 20;
     var $s = '1';
-    var $wait = 0.7;
+    var $wait = 0.9;
     function check_duplicate() {
         $sql = "select * from (
                 SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
