@@ -1950,6 +1950,35 @@ class patents extends CI_model {
         $sql = "TRUNCATE patent.patent_section";
         $this -> db -> query($sql);
     }
+    function summary()
+        {
+            $sx = '<h1>'.msg('summary').'</h1>';
+            $sql = "select count(*) as total,  
+                            max(issue_published) as issue_published,
+                            max(issue_created ) as issue_created                            
+                            from patent.patent_issue";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $line = $rlt[0];
+            $sx .= '<ul>';
+            $sx .= '<li>'.msg('last_proccess').': <b>'.stodbr($line['issue_created']).' '.substr($line['issue_created'],10,9).'</b></li>'.cr();            
+            $sx .= '<li>'.msg('issues_proccess').': <b>'.number_format($line['total'],0,',','.').'</b>'.' ('.stodbr($line['issue_published']).')'.'</li>'.cr();            
+                        
+            $sql = "select count(*) as total from patent.patent";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $line = $rlt[0];            
+            $sx .= '<li>'.msg('patents_proccess').': <b>'.number_format($line['total'],0,',','.').'</b></li>'.cr();
 
+            $sql = "select count(*) as total from patent.patent_agent";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $line = $rlt[0];            
+            $sx .= '<li>'.msg('agents_proccess').': <b>'.number_format($line['total'],0,',','.').'</b></li>'.cr();
+            $sx .= '</ul>';
+                        
+            $sx = '<div class="row"><div class="col-md-12">'.$sx.'</div></div>';                        
+            return($sx);
+        }
 }
 ?>

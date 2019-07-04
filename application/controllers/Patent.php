@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-define('PATH','index.php/patent/');
+define('PATH', 'index.php/patent/');
 class Patent extends CI_Controller {
 
     function __construct() {
@@ -118,24 +118,35 @@ class Patent extends CI_Controller {
         $this -> footer();
     }
 
-    function v($id=0) {
-        $this->load->model('patents');
-        $this->cab();
-        $sx = $this->patents->view($id);
+    function v($id = 0) {
+        $this -> load -> model('patents');
+        $this -> cab();
+        $sx = $this -> patents -> view($id);
         $data['content'] = $sx;
         $data['title'] = 'Patent';
-        $this->load->view('show',$data);
-        $this->footer();
+        $this -> load -> view('show', $data);
+        $this -> footer();
     }
-    
-    function vi($id=0) {
-        $this->load->model('patents');
-        $this->cab();
-        $sx = $this->patents->instituicao_list($id);
+
+    function vi($id = 0) {
+        $this -> load -> model('patents');
+        $this -> cab();
+        $sx = $this -> patents -> instituicao_list($id);
         $data['content'] = $sx;
         $data['title'] = 'Patent';
-        $this->load->view('show',$data);
-        $this->footer();
-    }    
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
+    function summary() {
+        $this -> load -> model('patents');
+        $this -> cab();
+        $sx = $this -> patents -> summary();
+        $data['content'] = $sx;
+        $data['title'] = 'Patent';
+        $this -> load -> view('show', $data);
+        $this -> footer();
+
+    }
 
 }
