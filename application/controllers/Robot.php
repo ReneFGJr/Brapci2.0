@@ -195,4 +195,15 @@ class Robot extends CI_Controller {
         echo strip_tags($html);
         $this -> footer();
     }
+
+    function watson($id='')
+        {
+            $this->load->model('watsons');
+            echo "## Watson Index Catalog ##".cr();           
+            $txt = 'O presente artigo tem por objetivo apresentar o resultado das ações desenvolvidas no projeto de extensão intitulado Inclusão digital de agentes terceirizados do Campus IV da UFPB, executado durante o ano de 2015. O estudo fundamenta-se na concepção de que uma verdadeira política de inclusão digital deverá se basear na capacitação para o acesso à informação, sendo classificado como descritivo, exploratório e de natureza quanti-qualitativa. As ações do projeto foram elaboradas e executadas com vistas a contribuir para o desenvolvimento social e profissional do público-alvo. As melhorias identificadas quanto ao seu desempenho sinalizam que tais ações configuram o primeiro passo para a inclusão digital e social dos participantes do projeto. Sugere-se, por fim, que o projeto tenha continuidade junto a este público, bem como que possa se estender aos seus familiares, conforme sugerido pelos próprios participantes, na avaliação final desta ação extensionista';
+            $r = $this->watsons->NLP($txt);
+            echo '<pre>';
+            print_r($r);
+            echo '</pre>';            
+        }
 }

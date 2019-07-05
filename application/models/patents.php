@@ -125,18 +125,23 @@ class patents extends CI_model {
                 $this -> harvest_patent($id);
                 $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
                 if (file_exists($file)) {
+                    echo '# Method 1'.cr();
                     $sx = $this -> method_inpi($file);
                     $ok = 1;
-                } else {
+                } else {                    
                     $file = '_repository_patent/inpi/txt/P' . $id . '.txt';
-                    if (file_exists($file)) {
+                    if (file_exists($file)) {                       
+                        echo '# Method 2'.cr();
                         $sx = $this -> method_inpi_txt($file);
                         $ok = 1;
                     } else {
+                        echo '# Method 3'.cr();
                         $file = '_repository_patent/inpi/txt/P' . $id . '.TXT';
                         if (file_exists($file)) {
                             $sx = $this -> method_inpi_txt($file);
                             $ok = 1;
+                        } else {
+                            echo '-File not found-'.$file;
                         }
                     }
                 }
