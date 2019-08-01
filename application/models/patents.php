@@ -125,23 +125,23 @@ class patents extends CI_model {
                 $this -> harvest_patent($id);
                 $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
                 if (file_exists($file)) {
-                    echo '# Method 1'.cr();
+                    echo '# Method 1' . cr();
                     $sx = $this -> method_inpi($file);
                     $ok = 1;
-                } else {                    
+                } else {
                     $file = '_repository_patent/inpi/txt/P' . $id . '.txt';
-                    if (file_exists($file)) {                       
-                        echo '# Method 2'.cr();
+                    if (file_exists($file)) {
+                        echo '# Method 2' . cr();
                         $sx = $this -> method_inpi_txt($file);
                         $ok = 1;
                     } else {
-                        echo '# Method 3'.cr();
+                        echo '# Method 3' . cr();
                         $file = '_repository_patent/inpi/txt/P' . $id . '.TXT';
                         if (file_exists($file)) {
                             $sx = $this -> method_inpi_txt($file);
                             $ok = 1;
                         } else {
-                            echo '-File not found-'.$file;
+                            echo '-File not found-' . $file;
                         }
                     }
                 }
@@ -559,38 +559,39 @@ class patents extends CI_model {
             $result = troca($result, '~', '');
             $result = troca($result, '^', '');
             $result = troca($result, '$', '');
+            $result = troca($result, 'ˆ', '');
+
             $ln = $result;
             //echo '<br>' . $l . ' - ' . $result;
 
             /* ISSUE */
             if ($l == 1) {
                 $tp = substr(trim($result), 0, 3);
-                $nr = substr(trim($result),0,strpos(trim($result),' '));
-                if ($nr == sonumero($nr))
-                    {
-                        $tp = 'NRS';
-                    }
+                $nr = substr(trim($result), 0, strpos(trim($result), ' '));
+                if ($nr == sonumero($nr)) {
+                    $tp = 'NRS';
+                }
                 switch ($tp) {
                     case 'NRS' :
                         $result = trim($result);
-                        $numero = sonumero($nr);                       
-                        $ano = round(substr($result, strlen($result) - 2, 2));                        
+                        $numero = sonumero($nr);
+                        $ano = round(substr($result, strlen($result) - 2, 2));
                         if ($ano > 90) { $ano = 1900 + $ano;
                         }
-                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano,4);
+                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
                         $dt['year'] = $ano;
                         $dt['num'] = $numero;
                         $dt['vol'] = '';
                         $dt['pusblished'] = brtos($dta);
-                        $dt['jid'] = '1';                        
+                        $dt['jid'] = '1';
                         break;
                     case 'REV' :
                         $result = trim($result);
-                        $numero = sonumero(substr($result, 0, strpos($result, 'COM')));                       
-                        $ano = round(substr($result, strlen($result) - 2, 2));                        
+                        $numero = sonumero(substr($result, 0, strpos($result, 'COM')));
+                        $ano = round(substr($result, strlen($result) - 2, 2));
                         if ($ano > 90) { $ano = 1900 + $ano;
                         }
-                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano,4);
+                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
                         $dt['year'] = $ano;
                         $dt['num'] = $numero;
                         $dt['vol'] = '';
@@ -621,8 +622,8 @@ class patents extends CI_model {
 
             //echo $cmdo.'==='.$result . cr();
             //if ($l > 30) {
-                //print_r($p);
-                 //exit ;
+            //print_r($p);
+            //exit ;
             //}
 
             $v = trim(substr($result, 4, strlen($result)));
@@ -639,7 +640,7 @@ class patents extends CI_model {
                     $p = array();
                     $sect = $v;
                     $sect_title = '';
-                    
+
                     if ($sect == 'Mi - Interposicao') {
                         $sect = "MI";
                         $sect_title = 'Mi - Interposicao';
@@ -648,7 +649,7 @@ class patents extends CI_model {
                         $sect = "MR";
                         $sect_title = 'Mi - Recurso - Decisao';
                     }
-                                        
+
                     if ($sect == 'PR - Nulidades') {
                         $sect = "PR";
                         $sect_title = 'Nulidades';
@@ -664,7 +665,7 @@ class patents extends CI_model {
                     if ($sect == 'MJ - Interposicao') {
                         $sect = "MJ";
                         $sect_title = 'MJ - Interposicao';
-                    }                    
+                    }
                     if ($sect == 'MJ - Recurso - Decisao') {
                         $sect = "MR";
                         $sect_title = 'MJ - Recurso - Decisao';
@@ -672,19 +673,18 @@ class patents extends CI_model {
                     if ($sect == 'PR - Cancelamentos') {
                         $sect = "PC";
                         $sect_title = 'PR - Cancelamentos';
-                    } 
+                    }
                     if ($sect == 'PR - Recursos - Decisões') {
                         $sect = "RC";
                         $sect_title = 'PR - Recursos - Decisões';
                     }
-                    if ($sect == 'Mi - Interposições')
-                        {
-                            $sect = 'Mt';
-                            $sect_title = 'Mi - Interposições';
-                        }                                          
-                                     
+                    if ($sect == 'Mi - Interposições') {
+                        $sect = 'Mt';
+                        $sect_title = 'Mi - Interposições';
+                    }
+
                     if (strlen($sect) > 5) {
-                        $sect = substr($sect,0,2);
+                        $sect = substr($sect, 0, 2);
                         $sect_title = $sect;
                     }
                     $p['section'] = $sect;
@@ -746,7 +746,7 @@ class patents extends CI_model {
                             $v[$q + 3] = ';';
                         }
                     }
-                    $v = troca($v,'G08B 13,22','G08B 13/22');
+                    $v = troca($v, 'G08B 13,22', 'G08B 13/22');
                     $v = troca($v, ',', ';');
                     $cl = splitx(';', $v . ';');
                     for ($rc = 0; $rc < count($cl); $rc++) {
@@ -1161,10 +1161,11 @@ class patents extends CI_model {
     }
 
     function formatar_classe($class) {
-        $class = troca($class,"'",'');
-        $class = troca($class,'  ',' ');
-        $class = troca($class,'  ',' ');
-        if (substr($class,7,1) == ',') { $class[7] = '/'; }
+        $class = troca($class, "'", '');
+        $class = troca($class, '  ', ' ');
+        $class = troca($class, '  ', ' ');
+        if (substr($class, 7, 1) == ',') { $class[7] = '/';
+        }
         if (!substr($class, 4, 1) != ' ') {
             $class = substr($class, 0, 4) . ' ' . substr($class, 4, 10);
         }
@@ -1420,17 +1421,21 @@ class patents extends CI_model {
                 $line = $tit[$r];
                 $pais = '';
                 $estado = '';
-                $name = $line['nome'];
-
+                $name = $line['nome'] . ';';
+                $name = troca($name,',',';');
                 $seq = $line['nome_seq'];
-                if (isset($line['nome_pais'])) { $pais = $line['nome_pais'];
+                $name = splitx(';', $name);
+                for ($a = 0; $a < count($name); $a++) {
+                    if (isset($line['nome_pais'])) { $pais = $line['nome_pais'];
+                    }
+                    if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
+                    }
+                    $ida = $this -> agent($name[$a], $pais, $estado);
+                    if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo TITULARES';
+                    }
+                    $this -> relacao_agente_patent($id, $ida, 'T', $seq);
+                    $seq++;
                 }
-                if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
-                }
-                $ida = $this -> agent($name, $pais, $estado);
-                if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo TITULARES';
-                }
-                $this -> relacao_agente_patent($id, $ida, 'T', $seq);
             }
             /****************** Inventor **********************/
             $tit = $d['inventor'];
@@ -1438,16 +1443,22 @@ class patents extends CI_model {
                 $line = $tit[$r];
                 $pais = '';
                 $estado = '';
-                $name = $line['nome'];
+                $name = $line['nome'] . ';';
+                $name = troca($name,',',';');
                 $seq = $line['nome_seq'];
-                if (isset($line['pais'])) { $pais = $line['pais'];
+                $name = splitx(';', $name);
+                for ($a = 0; $a < count($name); $a++) {
+                    if (isset($line['nome_pais'])) { $pais = $line['nome_pais'];
+                    }
+                    if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
+                    }
+                    $ida = $this -> agent($name[$a], $pais, $estado);
+                    if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo TITULARES';
+                    }
+                    $this -> relacao_agente_patent($id, $ida, 'I', $seq);
+                    $seq++;
                 }
-                if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
-                }
-                $ida = $this -> agent($name, $pais, $estado);
-                if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo INVENTORES';
-                }
-                $this -> relacao_agente_patent($id, $ida, 'I', $seq);
+
             }
             /****************** Despachante **********************/
             $tit = $d['procurador'];
@@ -1455,16 +1466,22 @@ class patents extends CI_model {
                 $line = $tit[$r];
                 $pais = '';
                 $estado = '';
-                $name = $line['nome'];
+                $name = $line['nome'] . ';';
+                $name = troca($name,',',';');
                 $seq = $line['nome_seq'];
-                if (isset($line['pais'])) { $pais = $line['pais'];
+                $name = splitx(';', $name);
+                for ($a = 0; $a < count($name); $a++) {
+                    if (isset($line['nome_pais'])) { $pais = $line['nome_pais'];
+                    }
+                    if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
+                    }
+                    $ida = $this -> agent($name[$a], $pais, $estado);
+                    if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo TITULARES';
+                    }
+                    $this -> relacao_agente_patent($id, $ida, 'P', $seq);
+                    $seq++;
                 }
-                if (isset($line['nome_endereco_uf'])) { $estado = $line['nome_endereco_uf'];
-                }
-                $ida = $this -> agent($name, $pais, $estado);
-                if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo Procurador';
-                }
-                $this -> relacao_agente_patent($id, $ida, 'P', $seq);
+
             }
             /****************** Escritorio **********************/
             $tit = $d['depositante'];
@@ -1515,13 +1532,12 @@ class patents extends CI_model {
         $cl1 = troca($cl, ' ', ';');
         $c = splitx(';', $cl1);
         $c1 = $c[0];
-        if (!isset($c[1]))
-            {
-                $c2 = '-1';
-            } else {
-                $c2 = $c[1];        
-            }
-        
+        if (!isset($c[1])) {
+            $c2 = '-1';
+        } else {
+            $c2 = $c[1];
+        }
+
         $data = substr($l['cip_ano'], 0, 7);
         $seq = $l['cip_seq'];
 
@@ -1694,6 +1710,10 @@ class patents extends CI_model {
 
     function prioritario($idp, $d) {
         $prioc = trim(troca($d['prior_numero_prioridade'], "'", ""));
+        if (strpos($prioc,';') > 0)
+            {
+                $prioc = strpos($prioc,0,strpos($prioc,';'));
+            }
         $pais = trim((string)$d['prior_sigla_pais']);
         $seq = $d['prior_seq'];
         $data = brtos($d['prior_data_prioridade']);
@@ -1955,35 +1975,36 @@ class patents extends CI_model {
         $sql = "TRUNCATE patent.patent_section";
         $this -> db -> query($sql);
     }
-    function summary()
-        {
-            $sx = '<h1>'.msg('summary').'</h1>';
-            $sql = "select count(*) as total,  
+
+    function summary() {
+        $sx = '<h1>' . msg('summary') . '</h1>';
+        $sql = "select count(*) as total,  
                             max(issue_published) as issue_published,
                             max(issue_created ) as issue_created                            
                             from patent.patent_issue";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $line = $rlt[0];
-            $sx .= '<ul>';
-            $sx .= '<li>'.msg('last_proccess').': <b>'.stodbr($line['issue_created']).' '.substr($line['issue_created'],10,9).'</b></li>'.cr();            
-            $sx .= '<li>'.msg('issues_proccess').': <b>'.number_format($line['total'],0,',','.').'</b>'.' ('.stodbr($line['issue_published']).')'.'</li>'.cr();            
-                        
-            $sql = "select count(*) as total from patent.patent";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $line = $rlt[0];            
-            $sx .= '<li>'.msg('patents_proccess').': <b>'.number_format($line['total'],0,',','.').'</b></li>'.cr();
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $line = $rlt[0];
+        $sx .= '<ul>';
+        $sx .= '<li>' . msg('last_proccess') . ': <b>' . stodbr($line['issue_created']) . ' ' . substr($line['issue_created'], 10, 9) . '</b></li>' . cr();
+        $sx .= '<li>' . msg('issues_proccess') . ': <b>' . number_format($line['total'], 0, ',', '.') . '</b>' . ' (' . stodbr($line['issue_published']) . ')' . '</li>' . cr();
 
-            $sql = "select count(*) as total from patent.patent_agent";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $line = $rlt[0];            
-            $sx .= '<li>'.msg('agents_proccess').': <b>'.number_format($line['total'],0,',','.').'</b></li>'.cr();
-            $sx .= '</ul>';
-                        
-            $sx = '<div class="row"><div class="col-md-12">'.$sx.'</div></div>';                        
-            return($sx);
-        }
+        $sql = "select count(*) as total from patent.patent";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $line = $rlt[0];
+        $sx .= '<li>' . msg('patents_proccess') . ': <b>' . number_format($line['total'], 0, ',', '.') . '</b></li>' . cr();
+
+        $sql = "select count(*) as total from patent.patent_agent";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $line = $rlt[0];
+        $sx .= '<li>' . msg('agents_proccess') . ': <b>' . number_format($line['total'], 0, ',', '.') . '</b></li>' . cr();
+        $sx .= '</ul>';
+
+        $sx = '<div class="row"><div class="col-md-12">' . $sx . '</div></div>';
+        return ($sx);
+    }
+
 }
 ?>

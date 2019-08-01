@@ -337,7 +337,7 @@ class export extends CI_Model {
         echo '<th>link</th>';
         echo '</tr>';
         $id = 0;
-        for ($r=0;$r < 100000;$r++)
+        for ($r=0;$r < 300000;$r++)
             {
                 $f = 'c/'.$r.'/name.xls';
                 if (file_exists($f))

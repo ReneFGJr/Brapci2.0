@@ -90,6 +90,7 @@
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'vocabulary'); ?>"><?php echo msg('admin_vocabulary'); ?></a>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'config'); ?>"><?php echo msg('admin_config'); ?></a>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'labels'); ?>"><?php echo msg('admin_labels'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'qualis'); ?>"><?php echo msg('admin_qualis'); ?></a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'export'); ?>"><?php echo msg('admin_export'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'metadata'); ?>"><?php echo msg('admin_metadata'); ?></a>						

@@ -1501,4 +1501,27 @@ class res extends CI_Controller {
 
     }
 
+    function qualis($id = '', $act = '') {
+        $this -> load -> model("qualis");
+        $this -> cab();
+        switch($act) {
+            case 'row' :
+                $data = $this -> qualis -> journal_row();
+                break;             
+            case 'journal' :
+                $data = $this -> qualis -> journal_show($id);
+                break;            
+            case 'inport' :
+                $data['title'] = 'Qualis Inport';
+                $data['content'] = $this -> qualis -> inport();
+                break;
+            default :
+                $data['title'] = 'Qualis';
+                $data['content'] = $this -> qualis -> resume();
+                break;
+        }
+        $this -> load -> view('show', $data);
+        $this -> footer();
+    }
+
 }
