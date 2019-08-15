@@ -5,6 +5,33 @@ class handle extends CI_model {
     var $domain = 'brapci/';
     var $contact = 'brapcici@gmail.com';
 
+    function form() {
+        $form = new form;
+        $cp = array();
+        array_push($cp, array('$H8', '', '', false, false));
+
+        $op = '20.500.11959:20.500.11959 (CEDAP)';
+        array_push($cp, array('$O ' . $op, '', 'Handle', true, true));
+        array_push($cp, array('$S100', '', 'Handle Nº', true, true));
+        array_push($cp, array('$S100', '', 'Link', true, true));
+        //array_push($cp, array('$S100', '', 'e-mail', true, true));
+        $tela = $form -> editar($cp, '');
+
+        if ($form -> saved > 0) {
+            $this -> prefix = get("dd1");
+            $this -> domain = "";
+            $hdl = get("dd2");
+            $url = get("dd3");
+            $c = $this -> cmd_header();
+            $c .= $this -> create_handle($hdl, $url);
+            $hdl = fopen('/hs/cmd/cmd1', 'w+');
+            fwrite($hdl, $c);
+            fclose($hdl);
+        }
+
+        return ($tela);
+    }
+
     function handle_register() {
         $file = '/hs/cmd/status';
         if (file_exists($file)) {
@@ -14,8 +41,8 @@ class handle extends CI_model {
             echo '<br>=> Processamento ok!';
         } else {
             echo '<br>=> Não processado!';
-        }        
-        
+        }
+
         /* Seleciona todos os não registrados e em processo de registro */
         $sql = "select * from handle where hdl_status <= 1 limit 5000";
         $rlt = $this -> db -> query($sql);
@@ -25,9 +52,9 @@ class handle extends CI_model {
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $c .= $this -> create_handle($line['hdl_name'], $line['hdl_url']);
-            
+
             $sql = "update handle set hdl_status = 1 where id_hdl = " . $line['id_hdl'];
-            $this -> db -> query($sql);            
+            $this -> db -> query($sql);
         }
 
         $hdl = fopen('/hs/cmd/cmd1', 'w+');
@@ -36,7 +63,7 @@ class handle extends CI_model {
 
         $output = shell_exec('sh /hs/cmd/c');
         echo "=><pre>$output</pre>";
-    
+
         echo '<pre>Gerado com ' . strlen($c) . ' bytes</pre>';
         exit ;
     }
@@ -54,8 +81,10 @@ class handle extends CI_model {
     }
 
     function cmd_header() {
-        $c = 'AUTHENTICATE PUBKEY:300:0.NA/20.500.11959' . cr(); ;
-        $c .= '/hs/svr_2/admpriv.bin|448545ct' . cr(); ;
+        $c = 'AUTHENTICATE PUBKEY:300:0.NA/20.500.11959' . cr();
+        ;
+        $c .= '/hs/svr_2/admpriv.bin|448545ct' . cr();
+        ;
         $c .= cr();
 
         $c .= 'HOME 143.54.114.150:2641:TCP' . cr();

@@ -1467,10 +1467,17 @@ class res extends CI_Controller {
 
     function handle($act = '', $token = '') {
         if ((perfil("#ADM") > 0) or ($token == '0mhHuERfFBpuwULJSZXGNJc5agPVZZHe')) {
-            if ($act = 'register') {
-                $this -> cab();
-                $this -> load -> model("handle");
-                echo '<pre>' . $this -> handle -> handle_register() . '</pre>';
+            switch($act) {
+                case 'register' :
+                    $this -> cab();
+                    $this -> load -> model("handle");
+                    echo '<pre>' . $this -> handle -> handle_register() . '</pre>';
+                    break;
+                case 'form':
+                    $this -> cab();
+                    $this -> load -> model("handle");
+                    echo '<pre>' . $this -> handle -> form() . '</pre>';
+                    break;
             }
         } else {
             echo "OPS";
@@ -1507,10 +1514,10 @@ class res extends CI_Controller {
         switch($act) {
             case 'row' :
                 $data = $this -> qualis -> journal_row();
-                break;             
+                break;
             case 'journal' :
                 $data = $this -> qualis -> journal_show($id);
-                break;            
+                break;
             case 'inport' :
                 $data['title'] = 'Qualis Inport';
                 $data['content'] = $this -> qualis -> inport();
