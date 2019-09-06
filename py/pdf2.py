@@ -1,3 +1,4 @@
+#pip3 install PyPDF2
 import os
 import sys
 import unittest

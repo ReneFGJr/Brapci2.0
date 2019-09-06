@@ -573,6 +573,7 @@ class patents extends CI_model {
             }
             $result = $rs;
             $ln = $result;
+            $result = troca($result,"'","´");
             //echo '<br>' . $l . ' - ' . $result;
 
             /* ISSUE */
@@ -626,6 +627,24 @@ class patents extends CI_model {
                         $dt['vol'] = '';
                         $dt['pusblished'] = brtos($dta);
                         $dt['jid'] = '1';
+                        break;                        
+                    case 'Rpi' :
+                        $result = trim($result);
+                        if (substr($result, 0, 6) == 'Rpi No') {
+                            $numero = sonumero(substr($result, 0, 13));
+                        } else {
+                            $numero = sonumero(substr($result, 0, 9));
+                        }
+
+                        $ano = round(substr($result, strlen($result) - 2, 2));
+                        if ($ano > 90) { $ano = 1900 + $ano;
+                        }
+                        $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
+                        $dt['year'] = $ano;
+                        $dt['num'] = $numero;
+                        $dt['vol'] = '';
+                        $dt['pusblished'] = brtos($dta);
+                        $dt['jid'] = '1';
                         break;
                     case 'No.' :
                         $dt['year'] = substr($result, 15, 4);
@@ -636,6 +655,9 @@ class patents extends CI_model {
                         break;
                     default :
                         echo 'ERRO DE REGISTRO==>' . $tp;
+                        echo cr();
+                        echo cr();
+                        echo cr();
                         exit ;
                 }
                 $issue = $this -> issue($dt);
@@ -1482,6 +1504,7 @@ class patents extends CI_model {
             /****************** PCT **********************/
             if (isset($d['pedido_internacional_numero_pct'])) {
                 $pct = $d['pedido_internacional_numero_pct'];
+                $pct = troca($pct,"'","");
                 $pct_dt = $d['pedido_internacional_numero_pct_data'];
                 $pct_dt = brtos($pct_dt);
                 if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo PCT';
@@ -1492,6 +1515,7 @@ class patents extends CI_model {
             /****************** PUB **********************/
             if (isset($d['publicacao_internacional_numero_ompi'])) {
                 $pct = $d['publicacao_internacional_numero_ompi'];
+                $pct = troca($pct,"'","");
                 $pct_dt = $d['publicacao_internacional_numero_ompi_data'];
                 if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo PUB';
                 }
@@ -1705,6 +1729,7 @@ class patents extends CI_model {
         if (isset($d['publicacao_internacional_numero_ompi'])) {
             $pub_data = brtos($d['publicacao_internacional_numero_ompi_data']);
             $pub = $d['publicacao_internacional_numero_ompi'];
+            $pub = troca($pub,"'","");
         }
         if (isset($d['patent_nr_deposit_date'])) {
             $pat_dd = brtos($d['patent_nr_deposit_date']);
@@ -1715,6 +1740,9 @@ class patents extends CI_model {
             $pat_title = strtoupper((string)$pat_title);
             $pat_title = troca($pat_title, '"', '');
             $pat_title = troca($pat_title, "'", '');
+            $pat_title = troca($pat_title, "/", '');
+            $pat_title = troca($pat_title, chr(134), '');
+            $pat_title = troca($pat_title, '\\', '');
             $pat_title = utf8_encode($pat_title);
         }
         if (!isset($d['patent_resumo'])) {
