@@ -823,14 +823,18 @@ class patents extends CI_model {
                         $dtt = array();
                         for ($q = 0; $q < strlen($v); $q++) {
                             if (substr($v, $q, 1) == '/') {
-                                $v[$q + 3] = ';';
+                                $ca = substr($v, $q, strlen($v));
+                                $ca = strpos($ca,' ');
+                                $v[$q + $ca] = ';';
                             }
                         }
+
                         $v = troca($v, 'G08B 13,22', 'G08B 13/22');
                         $v = troca($v, ',', ';');
                         $cl = splitx(';', $v . ';');
                         for ($rc = 0; $rc < count($cl); $rc++) {
-                            
+                            if (substr($cl[$rc],0,1) != '(')
+                            {
                             $seq = count($p['classificacao_internacional']);
                             $dtt = array();
                             $dtt['cip_inid'] = '51';
@@ -839,6 +843,7 @@ class patents extends CI_model {
                             $dtt['cip_classe'] = $this -> formatar_classe($cl[$rc]);
                             $this -> classes($cl[$rc], '', $dtt['cip_ano']);
                             $p['classificacao_internacional'][$seq] = $dtt;
+                            }
                         }
                         $max = 51;
                     } else {
@@ -970,7 +975,7 @@ class patents extends CI_model {
                     break;
                 case '(86)' :
                     $v = trim($v);
-                    $p['pedido_internacional_numero_pct'] = trim(substr($v, 0, strlen($v) - 13));
+                    $p['pedido_internacional_numero_pct'] = trim(substr($v, 0, strpos($v,'/')));
                     $p['pedido_internacional_numero_pct_data'] = substr($v, strlen($v) - 10, 10);
                     break;
                 case '(87)' :
@@ -1253,7 +1258,7 @@ class patents extends CI_model {
         if (substr($class, 7, 1) == ',') { $class[7] = '/';
         }
         if (!substr($class, 4, 1) != ' ') {
-            $class = substr($class, 0, 4) . ' ' . substr($class, 4, 10);
+            $class = substr($class, 0, 4) . ' ' . substr($class, 4, strlen($class));
         }
         return ($class);
     }
