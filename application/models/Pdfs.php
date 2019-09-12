@@ -61,11 +61,12 @@ class pdfs extends CI_model {
 			$p = 0;
 		}
 		$prop1 = $this -> frbr_core -> find_class('hasUrl');
+        $prop3 = $this -> frbr_core -> find_class('hasRegisterId');
 		$prop2 = $this -> frbr_core -> find_class('hasFileStorage');
 		$sql = "
 				select count(*) as total from rdf_data AS R1
 					left JOIN rdf_data AS R2 ON R1.d_r1 = R2.d_r1 and R2.d_p = $prop2
-				  where R1.d_p = $prop1 and R2.d_p is null ";
+				  where (R1.d_p = $prop1 OR R1.d_p = $prop3) and R2.d_p is null ";
 		$s = 'P1:'.date("d/m/Y H:i:s").'<br>';				  
 		$rlt = $this -> db -> query($sql);
 		$s .= 'P2:'.date("d/m/Y H:i:s").'<br>';
@@ -103,7 +104,7 @@ class pdfs extends CI_model {
 			$sx .= ', ' . msg('left') . ' ' . $total . ' files';
 			if ($rs == '1') {
 				//echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/' . (round($id))) . '">';
-				echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/') . '">';
+				echo '<meta http-equiv="refresh" content="15;' . base_url(PATH . 'tools/pdf_import/') . '">';
 			}
 			$s .= 'CURL: '.date("d/m/Y H:i:s").'<br>';
 			$sx .= ' ' . $this -> harvesting_pdf_curl($id);
@@ -117,6 +118,11 @@ class pdfs extends CI_model {
 	function harvesting_pdf_curl($id) {
 		$links = array();
 		$links2 = array();
+        $dd = $this->frbr_core->le($id);
+        if ($dd['c_class'] == 'Journal')
+            {
+                return("JOURNAL - ".$id);
+            }
 		$data = $this -> frbr_core -> le_data($id);
 
 		for ($r = 0; $r < count($data); $r++) {
@@ -134,7 +140,8 @@ class pdfs extends CI_model {
 				$file = troca($file, ':', '_');
 			}
 			if ($attr == 'hasUrl') {
-				if (substr($vlr, 0, 4) == 'http') {
+				if (strpos(' '.$vlr,'http') > 0) {
+				    $vlr = substr($vlr,strpos($vlr,'http'),strlen($vlr));
 					array_push($links, $vlr);
 				}
 			}
@@ -145,6 +152,8 @@ class pdfs extends CI_model {
 			}
             
 		}
+		
+        echo '<h1>'.$id.'</h1>';
 
         if ((count($links) == 0) and (count($links2) > 0))
             {
@@ -182,7 +191,7 @@ class pdfs extends CI_model {
 			$link = $links[$r];
 			if ((strpos($link, '/view/')) or (strpos($link, '/viewFile/')) or (strpos($link, '/viewArticle/')) or (strpos($link, '/download/'))) {
 				$method = 1;
-			}
+			}         
             
             if (strpos($link,'scielo.php') > 0)
                 {
@@ -197,22 +206,38 @@ class pdfs extends CI_model {
 			switch($method) {
 				case '1' :
 					$link = $this -> method_1($link, $file, $id);
-					//echo '<br>' . ($r+1) . '. ' . $link;
+					echo '<br>' . ($r+1) . '. ' . $link;
 					try {
 						$rsp = load_page($link);
 						$txt = $rsp['content'];
 						$type = $rsp['content_type'];
 						/* save pdf */
-
+						
+						/**************** Correções de regras de download ************************/
+						if (strpos($link,'revista.arquivonacional.gov.br') > 0)
+                            {
+                                $type = 'application/pdf';
+                            }
+                        
 						if (strpos($type, ';') > 0) {
 							$type = substr($type, 0, strpos($type, ';'));
 						}
+                        
+                        /******************** Tipos de arquivos recebidos ************************/
 						switch($type) {
 							case 'application/pdf' :
 								$this -> file_pdf($file, $txt, $id, $jnl);
                                 return("pdf");
 								//echo ' - ' . msg('save_pdf');
 								break;
+                            case 'application/octet-stream' :
+                                $this -> file_pdf($file, $txt, $id, $jnl);
+                                return("pdf");
+                                break;
+                            case 'application/save-as' :
+                                $this -> file_pdf($file, $txt, $id, $jnl);
+                                return("pdf");
+                                break;                                                                
 							case 'application/zip' :
 								$this -> file_save($file, $txt, $id, 'ZIP', $jnl);
 								//echo ' - ' . msg('save_pdf');
@@ -242,6 +267,9 @@ class pdfs extends CI_model {
                                 echo $link.'<br>';
                                 echo 'ID:'.$id.'<br>';
 								echo '===><pre>[' . $type . ']</pre>';
+                                echo '<hr><pre>';
+                                print_r($rsp);
+                                echo '</pre>';
 								exit ;
 						}
 
@@ -514,7 +542,7 @@ EOD;
 		$sx .= '</div>';
 		$sx .= '</div>';
 		if ($tot >= $limit) {
-			$sx .= '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/pdf_check?p=' . ($offset + $limit)) . '">';
+			$sx .= '<meta http-equiv="refresh" content="15;' . base_url(PATH . 'tools/pdf_check?p=' . ($offset + $limit)) . '">';
 		} else {
 			$sx .= '<div class="row">';
 			$sx .= '<div class="col-md-12">';
