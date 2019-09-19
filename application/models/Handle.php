@@ -14,7 +14,7 @@ class handle extends CI_model {
         array_push($cp, array('$O ' . $op, '', 'Handle', true, true));
         array_push($cp, array('$S100', '', 'Handle Nº', true, true));
         array_push($cp, array('$S100', '', 'Link', true, true));
-        //array_push($cp, array('$S100', '', 'e-mail', true, true));
+        array_push($cp, array('$S100', '', 'e-mail', true, true));
         $tela = $form -> editar($cp, '');
 
         if ($form -> saved > 0) {
@@ -22,11 +22,19 @@ class handle extends CI_model {
             $this -> domain = "";
             $hdl = get("dd2");
             $url = get("dd3");
+            $email = get("dd4");
             $c = $this -> cmd_header();
             $c .= $this -> create_handle($hdl, $url);
-            $hdl = fopen('/hs/cmd/cmd1', 'w+');
-            fwrite($hdl, $c);
-            fclose($hdl);
+            $fhdl = fopen('/hs/cmd/cmd1', 'w+');
+            fwrite($fhdl, $c);
+            fclose($fhdl);
+                       
+            $sql = "insert into handle 
+                        (hdl_name, hdl_url, hdl_status, hdl_email)
+                        values
+                        ('$hdl','$url',1,'$email')";
+            $rlt = $this->db->query($sql);
+            $tela = '<h1>Handle registrado</h1>';
         }
 
         return ($tela);

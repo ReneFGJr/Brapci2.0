@@ -62,6 +62,7 @@
 		</div>
 		-->
 		<div class="col-md-6 hidden-xs text-right">
+		    <?php if(!isset($_SESSION["user"])) { ?>
 			<div class="fb-page"
 			data-href="https://www.facebook.com/brapci.ci/"
 			data-width="400"
@@ -71,6 +72,7 @@
 			show_facepile="true"></div>
 			<br>
 			<br>
+			<?php } ?>
 		</div>
 	</div>
 </div>

@@ -878,6 +878,7 @@ class res extends CI_Controller {
         $this -> load -> model('frbr_core');
         $this -> load -> model('pdfs');
         $this -> pdfs -> harvesting_pdf($d1);
+        echo '===>'.$d1.'-'.$d2;
         exit ;
         $this -> load -> library('Pdfmerger');
         $pdf = new PDFMerger;
