@@ -2124,11 +2124,10 @@ function summary() {
 }
 function rel($tipo==1)    
     /*
-    SELECT pd_section, ps_name, count(*) as total FROM `patent_despacho`
+    SELECT pd_section, count(*) as total FROM `patent_despacho`
     INNER JOIN patent_issue on issue_source = pd_issue
-    LEFT JOIN patent_section on pd_section = ps_acronic
     where issue_year = 2010
-    group by pd_section, ps_name
+    group by pd_section
     order by pd_section
     */
 
