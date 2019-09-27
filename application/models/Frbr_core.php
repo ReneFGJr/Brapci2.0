@@ -273,6 +273,62 @@ class frbr_core extends CI_model {
         return ($sx);
     }
 
+    function index_list_3($lt = 'G', $class = 'Person', $nouse = 0) {
+        $f = $this -> find_class($class);
+        $this -> check_language();
+        $wh = '';
+        if ($nouse == 1) {
+            $wh .= " and C1.cc_use = 0 ";
+        }
+        if (strlen($lt) > 0) {
+            $wh .= " and (N1.n_name like '$lt%') ";
+        }
+
+        $sql = "select length(trim(N1.n_name)) as sz,
+                        N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                        FROM rdf_concept as C1
+                        INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+                        LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                        LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0                        
+                        ORDER BY sz desc";
+
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        $l = '';
+        $sx = '';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $idx = $line['id_cc'];
+            $name_use = trim($line['n_name']);
+            $name_use = troca($name_use,'"','');
+            $name_use = troca($name_use,'[','');
+            $name_use = troca($name_use,']','');
+            $name_use = troca($name_use,'(','');
+            $name_use = troca($name_use,')','');
+            $name_use = troca($name_use,'|','');
+            $name_use = troca($name_use,'{','');
+            $name_use = troca($name_use,'}','');
+            try {
+                $name_use = iconv('UTF-8','ISO-8859-1',$name_use);    
+            } catch (\Exception $e) {
+                echo 'Erro em:'.$name_use.'<br>';
+            }           
+            
+            $name_use = troca($name_use,'¿','');
+            $name_use = troca($name_use,'¼','');            
+            $name_use = trim(LowerCaseSQL($name_use));
+
+            if (strlen($name_use) > 0)
+                    {
+                        $sx .= $name_use . ' {'.$idx.'}'.cr();
+                    }
+        }
+        return ($sx);
+    }    
+
     /***  FIND CLASS **/
     function find_class($class) {
         $sql = "select * from rdf_class

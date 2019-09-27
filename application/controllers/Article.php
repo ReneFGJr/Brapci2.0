@@ -15,6 +15,7 @@
 /* @author: Rene Faustino Gabriel Junior <renefgj@gmail.com>
  * @date: 2015-12-01
  */
+define("PATH",'index.php/article/');
 
 class article extends CI_Controller {
 	function __construct() {

@@ -461,6 +461,7 @@ class export extends CI_Model {
         }
         return ($sx);
     }
+   
 
     function export_subject_reverse($pg = 0) {
         $this -> load -> model('searchs');
