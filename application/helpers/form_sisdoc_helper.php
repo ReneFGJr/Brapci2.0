@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.19.03.29
+ * @version     v0.19.05.25
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -715,11 +715,13 @@ function nbr_autor($xa, $tp) {
     ////////// 1 e 2
     $xp2a = LowerCase($xp2);
     $xa = trim(trim($xp2) . ' ' . trim($xp1));
-    if (($tp == 1) or ($tp == 2)) {
+    if (($tp == 1) or ($tp == 2) or ($tp == 11)) {
         if ($tp == 1) { $xp1 = UpperCase($xp1);
         }
         $xa = trim(trim($xp1) . ', ' . trim($xp2));
         if ($tp == 2) { $xa = UpperCase(trim(trim($xp1) . ', ' . trim($xp2)));
+        }
+        if ($tp == 11) { $xp1 = ($xp1);
         }
     }
     if (($tp == 3) or ($tp == 4) or ($tp == 9)) {
@@ -2589,6 +2591,8 @@ if (!function_exists('form_edit')) {
                 $ntype = trim(substr($type, 2, strlen($type)));
                 $ntype = troca($ntype, ':', ';') . ';';
                 $param = splitx(';', $ntype);
+                if (!isset($param[1])) { $param[1] = 10; }
+                if (!isset($param[0])) { $param[0] = 80; }
 
                 /* TR da tabela */
                 $tela .= $tr;
@@ -2600,20 +2604,18 @@ if (!function_exists('form_edit')) {
                 if ($required == 1) { $tela .= ' <font color="red">*</font> ';
                 }
 
-                $tela = '
-                        <script src="js/ckeditor.js"></script>
-                        <textarea name="editor1" id="editor1" rows="10" cols="80">
-                            This is my textarea to be replaced with CKEditor.
-                        </textarea>
-                        <script>
-                            // Replace the <textarea id="editor1"> with a CKEditor
-                            // instance, using default configuration.
-                            CKEDITOR.replace( \'editor1\' );
-                        </script>';
-
                 $data = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'rows' => $param[1], 'cols' => $param[0], 'class' => 'form-control form_textarea ');
                 $tela .= $td . form_textarea($data);
-                $tela .= $tdn . $trn;
+                $tela .= $tdn . $trn;                
+
+                $tela = '<script src="'.base_url('js/ckeditor/ckeditor.js').'"></script>'.cr();                
+                $tela .= '<textarea name="'.$dn.'" id="'.$dn.'" rows="10" cols="80">'.$vlr.'</textarea>'.cr();
+                $tela .= '
+                        <script>
+                            CKEDITOR.replace( \''.$dn.'\' );
+                        </script>';
+                                
+                
                 break;                
         }
         $ddi++;
@@ -3039,5 +3041,62 @@ function romano($n)
                 $r = 'ERRO '.$n;
             }
         return($r);               
-    }    
+    }
+
+function isbn10to13($isbn)
+{
+   $isbn = trim($isbn);
+   if(strlen($isbn) == 12){ // if number is UPC just add zero
+      $isbn13 = '0'.$isbn;}
+   else
+   {
+      $isbn2 = substr("978" . trim($isbn), 0, -1);
+      $sum13 = genchksum13($isbn2);
+      $isbn13 = "$isbn2$sum13";
+   }
+   return ($isbn13);
+}
+
+function isbn13to10($isbn) {
+    if (preg_match('/^\d{3}(\d{9})\d$/', $isbn, $m)) {
+        $sequence = $m[1];
+        $sum = 0;
+        $mul = 10;
+        for ($i = 0; $i < 9; $i++) {
+            $sum = $sum + ($mul * (int) $sequence{$i});
+            $mul--;
+        }
+        $mod = 11 - ($sum%11);
+        if ($mod == 10) {
+            $mod = "X";
+        }
+        else if ($mod == 11) {
+            $mod = 0;
+        }
+        $isbn = $sequence.$mod;
+    }
+    return $isbn;
+}
+
+function genchksum13($isbn)
+{
+   $isbn = trim($isbn);
+   $tb = 0;
+   for ($i = 0; $i <= 12; $i++)
+   {
+      $tc = substr($isbn, -1, 1);
+      $isbn = substr($isbn, 0, -1);
+      $ta = ($tc*3);
+      $tci = substr($isbn, -1, 1);
+      $isbn = substr($isbn, 0, -1);
+      $tb = $tb + $ta + $tci;
+   }
+   
+   $tg = ($tb / 10);
+   $tint = intval($tg);
+   if ($tint == $tg) { return 0; }
+   $ts = substr($tg, -1, 1);
+   $tsum = (10 - $ts);
+   return $tsum;
+}    
 ?>
