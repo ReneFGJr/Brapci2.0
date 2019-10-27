@@ -434,6 +434,10 @@ class frbr_core extends CI_model {
         $data['use'] = $this -> le_remissiva($id);
         $data['id'] = $id;
 
+        echo '<pre>';
+        print_r($data);
+        echo '</pre>';
+
         $sx = $this -> load -> view('find/view/journal', $data, true);
         return ($sx);
     }
@@ -1179,7 +1183,7 @@ class frbr_core extends CI_model {
         return ($sx);
     }
 
-    function form_ajax($path, $id, $dt) {
+    function form_ajax($path, $id, $dt=array()) {
         $tela = '';
         $sql = "select cl2.c_class as rg from rdf_class as cl1
                         LEFT JOIN rdf_form_class ON sc_propriety = cl1.id_c
@@ -1187,10 +1191,15 @@ class frbr_core extends CI_model {
                         WHERE cl1.c_class = '" . $path . "' and cl1.c_type = 'P' ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
-        $type = $path;
+        $type = (string)$path;
+        if (!is_array($dt))
+        {
+            $dt = array();
+        }
         if (count($rlt) > 0) {
             $line = $rlt[0];
             $type = $line['rg'];
+
         }
         /**********************************************************************************/
         $dt['type'] = $type;

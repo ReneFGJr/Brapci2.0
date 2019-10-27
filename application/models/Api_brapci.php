@@ -1,6 +1,31 @@
 <?php
 class Api_brapci extends CI_model
 {
+	function index($act,$token)
+		{
+			$q = get("q");
+			$dt['error'] = 0;
+			switch($act)
+			{
+				case 'genere':
+				$q = nbr_autor($q,7);
+				$this->load->model("Genero");
+				$dt['name'] = $q;
+				$dt['response'] = $this->Genero->consulta($q);
+				break;
+
+				case 'catalog':
+				$dt['services'] = 'genere';
+				break;
+
+				default:
+				$dt = array();
+				$dt['error'] = '404';
+				$dt['description'] = 'Service not found';
+				break;
+			}
+			echo json_encode($dt);
+		}
 	function nlp($txt)
 	{
 		$t = $txt;
@@ -78,7 +103,6 @@ class Api_brapci extends CI_model
 		fwrite($hdl, $txt);
 		fclose($hdl);
 		return ('Exported');		
-
 		}
 
 	function create_index_list($class = 'Subject') {
@@ -94,6 +118,11 @@ class Api_brapci extends CI_model
 		fwrite($hdl, $txt);
 		fclose($hdl);
 		return ('Exported');			
+	}
+
+	function genere($name='')
+	{
+
 	}
 
 }	

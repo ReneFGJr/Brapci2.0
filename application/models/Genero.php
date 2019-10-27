@@ -78,9 +78,13 @@ class genero extends CI_model
             
             if (strpos($name,' ') > 0)
                 {
-                    $name = trim(substr($name,0,strpos($name,' ')));
+                    $name1 = trim(substr($name,0,strpos($name,' ')));
+                    $nameZ = trim(substr($name,strpos($name,' '),strlen($name)));
+                    $name2 = trim(substr($nameZ,0,strpos($nameZ,' ')));
+                    $nameZ = trim(substr($nameZ,strpos($nameZ,' '),strlen($nameZ)));
+                    $name3 = trim(substr($nameZ,0,strpos($nameZ,' ')));
                 }
-            $sql = "select * from genre where gn_first_name = '$name' ";
+            $sql = "select * from genre where gn_first_name = '$name1' ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             if (count($rlt) > 0)
@@ -98,6 +102,30 @@ class genero extends CI_model
                             $g = 'feminino';
                         }
                 }
+
+            /*************************************** Segundo nome ************/
+            if ($g == 'Genero indefinido')
+            {
+            $sql = "select * from genre where gn_first_name = '$name2' ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) > 0)
+                {
+                    $line = $rlt[0];
+                    $f = $line['gn_frequency_female'];
+                    $m = $line['gn_frequency_male'];
+                    $p = 2*(((int)(100 * $m / ($m + $f))) - 50);
+                    if ($p > 90)
+                        {
+                            $g = 'masculino';
+                        }
+                    if ($p < -90)
+                        {
+                            $g = 'feminino';
+                        }
+                }
+
+            }
             return($g);
         }        
     }

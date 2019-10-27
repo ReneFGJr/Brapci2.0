@@ -2194,7 +2194,7 @@ if (!function_exists('form_edit')) {
 
                 $options = array('' => msg('::select an option::'));
                 for ($r = 0; $r < count($param); $r++) {
-                    if (count(trim($param[$r])) > 0) {
+                    if (strlen(trim($param[$r])) > 0) {
                         $nterm = splitx(':', $param[$r] . ':');
                         if (isset($nterm[0])) {
                             $key = $nterm[0];

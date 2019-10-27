@@ -77,8 +77,8 @@ DEFINE("BASE_PUBLIC","brapci_public.");
 $db['default'] = array(
     'dsn'   => '',
     'hostname' => 'localhost',
-    'username' => 'root',
-    'password' => 'root',
+    'username' => 'sa',
+    'password' => '448545ct',
     'database' => 'brapci',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',

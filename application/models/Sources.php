@@ -402,12 +402,12 @@ class sources extends CI_Model {
                 array_push($ar, $n);
             }
         }
-        asort($ar);
+        rsort($ar);
 
         $sx = '';
         $ed = 0;
         $xano = '';
-        $sx = '<table>';
+        $sx = '<table class="table">';
         foreach ($ar as $key => $value) {
             $n = $value;
             $name_use = substr($n, 0, strpos($n, '#'));
@@ -436,14 +436,14 @@ class sources extends CI_Model {
                 $sx .= '</td></tr>' . cr();
 
                 $sx .= '<tr>';
-                $sx .= '<td style="background-color: #00ff00;">';
+                $sx .= '<td style="background-color: #f0f0f0;">';
                 $ed++;
             }
-            $sx .= '<div style="width: 80px; text-align: center; height: 120px; border: 1px solid #808080; margin: 10px 10px; float: left;">';
-            $sx .= '<a href="' . base_url(PATH . 'v/' . $idx) . '">';
-            $sx .= $name_use;
-            $sx .= '</a>';
+            $sx .= '<a href="' . base_url(PATH . 'v/' . $idx) . '">';            
+            $sx .= '<div style="width: 120px; text-align: center; height: 60px; border: 1px solid #808080; margin: 1px 5px; float: left;">';
+            $sx .= $name_use;            
             $sx .= '</div>';
+            $sx .= '</a>';
 
         }
         $sx .= '</td>';

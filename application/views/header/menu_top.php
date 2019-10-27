@@ -46,10 +46,7 @@
   </button>
 
   <div class="collapse navbar-collapse fsz" id="navbarSupportedContent">
-    <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link fsz " href="<?php echo base_url(PATH . 'basket'); ?>">&nbsp;<span id="basket"><?php echo $this->bs->selected(); ?>&nbsp;</span></a>
-                </li>        
+    <ul class="navbar-nav ml-auto">       
       <li class="nav-item active">
         <a class="nav-link" href="<?php echo base_url(PATH); ?>">&nbsp;<?php echo msg('home'); ?>&nbsp;<span class="sr-only">(current)</span></a>
       </li>
@@ -147,3 +144,17 @@
 		}
 	}); 
 </script>
+
+<?php
+$bsq = $this->bs->selected();
+if (strlen($bsq) > 0)
+{
+	echo '<a href="'.base_url(PATH . 'basket').'">
+		<div id="basket" class="text-center" style="position: fixed; top: 80;  width: 100px; margin-left: 10px; border: 1px solid #8080ff; border-radius: 6px; padding: 5px;">
+			Selected
+			<br>'.$bsq.'</div></a>'.cr();
+} else {
+	echo '<a href="'.base_url(PATH . 'basket').'">
+		<div id="basket" class="text-center" style="position: fixed; top: 80;  width: 100px; margin-left: 10px; border: 1px solid #ffffff; border-radius: 6px; padding: 5px;"></div></a>'.cr();
+}
+?>

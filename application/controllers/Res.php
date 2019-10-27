@@ -19,6 +19,7 @@ class res extends CI_Controller {
         #$this -> load -> helper('xml_dom');
         $this -> load -> model("socials");
         $this -> load -> model('bs');
+        $this -> load -> helper('rdf');
         //$this -> load -> helper('email');
         $this -> load -> helper('bootstrap');
         date_default_timezone_set('America/Sao_Paulo');
@@ -471,19 +472,30 @@ class res extends CI_Controller {
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/author') . '">' . msg('Authors') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/subject') . '">' . msg('Subject') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/corporate') . '">' . msg('CorporateBody') . '</a></li>';
+                $sx .= '<br/>';
                 $sx .= '<h3>' . msg('Journals') . '</h3>' . cr();
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/collection') . '">' . msg('Collection') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/journal') . '">' . msg('Journal') . '</a></li>';
                 $sx .= '<li><a href="' . base_url(PATH . 'indice/sections') . '">' . msg('Sections') . '</a></li>';
-
+                $sx .= '<br/>';
+                $sx .= '<h3>' . msg('Indiceadores') . '</h3>' . cr();
                 //$sx .= '<li><a href="' . base_url(PATH . 'indice/words') . '">' . msg('Words') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'indicador/genere') . '">' . msg('Genere') . '</a></li>';
 
                 $sx .= '</ul>';
         }
         $data['content'] = '<div class="row"><div class="col-md-12"><h1>' . $title . '</h1></div></div>' . $sx;
         $data['content'] = $sx;
         $this -> load -> view('show', $data);
+        $this -> footer();
+    }
 
+    function indicador($act='',$id='')
+    {
+        $this->cab();
+        $this->load->model('bi');
+        $data['content'] = $this->bi->action($act,$id);
+        $this -> load -> view('show', $data);
         $this -> footer();
     }
 
@@ -1531,5 +1543,11 @@ class res extends CI_Controller {
         $this -> load -> view('show', $data);
         $this -> footer();
     }
+
+    function api($act='',$token='')
+        {
+            $this->load->model('api_brapci');
+            $this->api_brapci->index($act,$token);
+        }
 
 }
