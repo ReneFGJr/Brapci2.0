@@ -141,7 +141,12 @@ class Bs extends CI_model {
             }
         }
         if ($tot > 0) {
-            $tot = '<span class="btn-primary" style="padding: 0px 10px; border-radius: 10px;">' . $tot . '</span>';
+            $tot = '<a href="'.base_url(PATH . 'basket').'">
+                <div class="text-center" style="border: 1px solid #8080ff; border-radius: 6px;  padding: 5px;">
+                '.msg('Selected').'
+                <br>
+                <span class="btn-primary" style="padding: 0px 10px; border-radius: 10px;">' . $tot . '</span>
+                </div></a>'.cr();            
         } else {
             $tot = '';
         }

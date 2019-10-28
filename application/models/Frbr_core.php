@@ -434,10 +434,6 @@ class frbr_core extends CI_model {
         $data['use'] = $this -> le_remissiva($id);
         $data['id'] = $id;
 
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-
         $sx = $this -> load -> view('find/view/journal', $data, true);
         return ($sx);
     }

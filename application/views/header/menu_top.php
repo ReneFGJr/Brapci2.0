@@ -150,9 +150,8 @@ $bsq = $this->bs->selected();
 if (strlen($bsq) > 0)
 {
 	echo '<a href="'.base_url(PATH . 'basket').'">
-		<div id="basket" class="text-center" style="position: fixed; top: 80;  width: 100px; margin-left: 10px; border: 1px solid #8080ff; border-radius: 6px; padding: 5px;">
-			Selected
-			<br>'.$bsq.'</div></a>'.cr();
+		<div id="basket" class="text-center" style="position: fixed; top: 80;  width: 100px; margin-left: 10px; padding: 5px;">
+			'.$bsq.'</div></a>'.cr();
 } else {
 	echo '<a href="'.base_url(PATH . 'basket').'">
 		<div id="basket" class="text-center" style="position: fixed; top: 80;  width: 100px; margin-left: 10px; border: 1px solid #ffffff; border-radius: 6px; padding: 5px;"></div></a>'.cr();

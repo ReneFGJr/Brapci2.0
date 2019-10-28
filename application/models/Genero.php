@@ -70,6 +70,65 @@ class genero extends CI_model
                 }
                 
         }
+    function author_check($p,$i)
+        {
+            $off = round($i);
+            $rdf = new rdf;
+            $t = 0;
+            $sx = '<div class="col-md-12">';
+            $q = 'Genero indefinido';
+            $id = $rdf->find($q,'Gender');
+            $sql = "SELECT * FROM `rdf_data` 
+                        where d_r2 = $id  
+                        and id_d >= $off
+                        order by id_d
+                        limit 20
+                    ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx .= '<ul>';
+            for ($r=0;$r < count($rlt);$r++)
+            {
+                $t++;
+                $line = $rlt[$r];
+                $idr = $line['d_r1'];
+                $off = $line['id_d'];
+                
+                $data = $rdf->le_data($idr);
+                $nome = '';
+                for ($y=0;$y < count($data);$y++)
+                {
+                    $ln = $data[$y];
+                    if ($ln['c_class'] == 'prefLabel')
+                    {
+                        $nome = nbr_autor($ln['n_name'],7);
+                    }
+                }
+
+                if (strlen($nome) > 0)
+                {
+                    $genero = $this->consulta($nome);
+                }
+                $link = '<a href="'.base_url(PATH.'a/'.$line['d_r1']).'" target="_new'.$line['d_r1'].'">';
+                $sx .= '<li>'.$link.$nome.'</a>- '.$genero.' '.$idr;
+                if ($genero != $q)
+                {
+                    $sx .= ' - <span style="color:green;"><b>Update to '.$genero.'</b></span>';
+                    $idg = $rdf->find($genero,'Gender');
+                    $sql = "update rdf_data set d_r2 = ".$idg." where id_d = ".$line['id_d'];
+                    $rrr = $this->db->query($sql);
+                }
+                $sx .= '</li>';
+            }
+            $sx .= '</ul>';
+            $sx .= '</div>';
+            $sx .= '<br><hr><a href="'.base_url(PATH.'tools/genere/'.$off).'" class="btn btn-primary">'.msg('next').'</a>';
+            if ($t > 0)
+                {
+                    $sx .= '<meta http-equiv="refresh" content="5;URL='.base_url(PATH.'tools/genere/'.$off).'">';
+                }
+            return($sx);
+        }
     function consulta($name)
         {
             $name = trim(nbr_autor($name,7));

@@ -41,13 +41,13 @@ class BI extends CI_model
 	        	$sx .= ''.number_format($line['total'],0,',','.');
 	        	$sx .= '</td>';
 	        	$sx .= '<td class="text-center">';
-	        	$sx .= ''.number_format($line['total']/$tot*100,1,',','.').'%';
+	        	$sx .= ''.number_format($line['total']/$tot*100,2,',','.').'%';
 	        	$sx .= '</td>';
 	        	$sx .= '</tr>';	        	
 	        }
 	        $sx .= '<tr><th class="text-right">'.msg("Total").'</th>
 	        				<th class="text-center"><b>'.number_format($tot,0,',','.').'</b></th>
-	        				<th class="text-center"><b>100,0%</b></th>
+	        				<th class="text-center"><b>100,00%</b></th>
 	        				</tr>';
 	        $sx .= '</table>';
 	        $sx .= '</div>';			

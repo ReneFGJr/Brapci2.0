@@ -1005,10 +1005,19 @@ class res extends CI_Controller {
                 $txt .= '<h4>' . msg('tools_remissive') . '</h4>';
                 $txt .= '<ul>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/remissive') . '">' . msg('tools_remissive_check') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/genere') . '">' . msg('tools_genre') . '</a>';
                 $txt .= '</ul>';
 
                 $txt .= '</div>';
                 $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+                break;
+            case 'genere':
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $this -> load -> model("Genero");
+                $sx = $this -> Genero -> author_check($p, $id);
+                $data['content'] = $sx;
                 $this -> load -> view('show', $data);
                 break;
             case 'oai_import' :
