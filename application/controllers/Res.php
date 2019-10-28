@@ -1000,6 +1000,7 @@ class res extends CI_Controller {
                 $txt .= '<h4>' . msg('tools_title_check') . '</h4>';
                 $txt .= '<ul>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check') . '">' . msg('tools_pdf_check') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check_article') . '">' . msg('tools_pdf_check_article') . '</a>';
                 $txt .= '</ul>';
 
                 $txt .= '<h4>' . msg('tools_remissive') . '</h4>';
@@ -1011,6 +1012,15 @@ class res extends CI_Controller {
                 $txt .= '</div>';
                 $data['content'] = $txt;
                 $this -> load -> view('show', $data);
+                break;
+            case 'pdf_check_article':
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $this -> load -> model("pdfs");
+                $sx = '<h1>PDF Check</h1>';
+                $sx .= '<br><p>Localizar artigos sem PDF</p>';
+                $data['content'] = $sx.$this->pdfs->journals_files();
+                $this -> load -> view('show', $data);                
                 break;
             case 'genere':
                 $this -> load -> model("frbr");
@@ -1463,6 +1473,16 @@ class res extends CI_Controller {
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
+                break;
+            case 'remove_tags':
+                if ((strlen($dd1) == 0) or (strlen($dd1) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> remove_tags($dd1, $dd2);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }            
                 break;
             case 'change_to' :
                 if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {

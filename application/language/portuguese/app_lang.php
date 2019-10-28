@@ -15,10 +15,11 @@
 /* @author: Rene Faustino Gabriel Junior <renefgj@gmail.com>
  * @date: 2015-12-01
  */
-if (!function_exists(('msg')))
+#if (!function_exists(('msg')))
 	{
 		function msg($t)
 			{
+				//return($t.'====');
 				$CI = &get_instance();
 				if (strlen($CI->lang->line($t)) > 0)
 					{
@@ -28,7 +29,6 @@ if (!function_exists(('msg')))
 					}
 			}
 	}
-
 
 
 /* Cited */
@@ -213,5 +213,8 @@ $lang['event'] = 'Área de eventos';
 
 $lang['cache_status'] = 'Situação dos trabalhos';
 $lang['genere'] = 'Genêro';
-/* $lang = array(); */
+$lang['Selected'] = 'Seleção';
+$lang['change_to'] = 'Muda strings DE/PARA';
+$lang['remove_tags'] = "Remove Tags/Html";
+$lang['Genere'] = "Indicadores de Gênero do autores";
 ?>

@@ -33,11 +33,26 @@ class bibliometrics extends CI_model {
             $sx .= '</a>';
             $sx .= '</li>'; 
 
+            $sx .= '<li>';
+            $sx .= '<a href="'.base_url(PATH.'bibliometric/remove_tags').'">';
+            $sx .= msg('remove_tags');
+            $sx .= '</a>';
+            $sx .= '</li>';            
+
             $sx .= '</ul>';
             $sx .= '</div>';
             $sx .= '</div>';
             return($sx);
         }
+    function remove_tags($d1)
+        {
+            $d1 = troca($d1,' [','<');
+            $d1 = troca($d1,'] ','>');
+            $d1 = troca($d1,'[','<');
+            $d1 = troca($d1,']','>');
+            $d1 = strip_tags($d1);
+            return($d1);
+        }        
     function change_text_to($d1,$d2)
         {
             $ln = troca($d2,chr(13),';');

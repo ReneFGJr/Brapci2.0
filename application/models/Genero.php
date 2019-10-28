@@ -70,6 +70,54 @@ class genero extends CI_model
                 }
                 
         }
+    function author_check_instituicoes()
+        {        
+            $rdf = new rdf;
+            $t = 0;
+            $sx = '<div class="col-md-12">';
+            $q = 'Genero indefinido';
+            $id = $rdf->find($q,'Gender');
+            $idg = $rdf->find('Outro (instituição)','Gender');
+
+            $wh = " (n_name like '%editor%') OR (n_name like '%grupo%') OR (n_name like '%revista%') 
+                        OR (n_name like '%comissao%') OR (n_name like '%instituto%')
+                         OR (n_name like '%equipe%')  OR (n_name like '%bibliotec%')
+                          OR (n_name like '%arquivist%')  OR (n_name like '%departament%')
+                           OR (n_name like '%gestor%') OR (n_name like '%admin%')
+                            OR (n_name like '%autor%') OR (n_name like '%comite%')
+                             OR (n_name like '%ibict%') OR (n_name like '%centro%')
+                              OR (n_name like '%universid%') OR (n_name like '%unesco%')
+                               OR (n_name like '%informa%')";
+
+            $sql = "SELECT * FROM rdf_data
+                        INNER JOIN rdf_concept ON id_cc = d_r1
+                        INNER JOIN rdf_name ON cc_pref_term = id_n
+                        where d_r2 = $id  
+                        AND ($wh)
+                        order by id_d
+                        limit 20
+                    ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx .= '<ul>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $link = '<a href="'.base_url(PATH.'a/'.$line['d_r1']).'" target="_new'.$line['d_r1'].'">';
+                    $sx .= '<li>'.$link.$line['n_name'].'</a>'.'</li>';
+
+                    $sql = "update rdf_data set d_r2 = ".$idg." where id_d = ".$line['id_d'];
+                    $rrr = $this->db->query($sql);                   
+                }
+            $sx .= '</ul>';
+            $sx .= '</div>';
+
+
+
+
+
+            return($sx);
+        }
     function author_check($p,$i)
         {
             $off = round($i);
@@ -80,7 +128,7 @@ class genero extends CI_model
             $id = $rdf->find($q,'Gender');
             $sql = "SELECT * FROM `rdf_data` 
                         where d_r2 = $id  
-                        and id_d >= $off
+                        and id_d > $off
                         order by id_d
                         limit 20
                     ";
@@ -101,7 +149,8 @@ class genero extends CI_model
                     $ln = $data[$y];
                     if ($ln['c_class'] == 'prefLabel')
                     {
-                        $nome = nbr_autor($ln['n_name'],7);
+                        $nome = UpperCaseSql($ln['n_name']);
+                        $nome = nbr_autor($nome,7);
                     }
                 }
 
@@ -122,10 +171,16 @@ class genero extends CI_model
             }
             $sx .= '</ul>';
             $sx .= '</div>';
-            $sx .= '<br><hr><a href="'.base_url(PATH.'tools/genere/'.$off).'" class="btn btn-primary">'.msg('next').'</a>';
+            
             if ($t > 0)
                 {
+                    $sx .= '<br><hr><a href="'.base_url(PATH.'tools/genere/'.$off).'" class="btn btn-primary">'.msg('next').'</a>';
                     $sx .= '<meta http-equiv="refresh" content="5;URL='.base_url(PATH.'tools/genere/'.$off).'">';
+                } else {
+                    $sx .= '<h1>'.msg("end of job").'</h1>';
+                    $sx .= '<br><hr><a href="'.base_url(PATH).'" class="btn btn-primary">'.msg('return').'</a>';
+
+                    $sx .= $this->author_check_instituicoes();
                 }
             return($sx);
         }
@@ -142,6 +197,10 @@ class genero extends CI_model
                     $name2 = trim(substr($nameZ,0,strpos($nameZ,' ')));
                     $nameZ = trim(substr($nameZ,strpos($nameZ,' '),strlen($nameZ)));
                     $name3 = trim(substr($nameZ,0,strpos($nameZ,' ')));
+                } else {
+                    $name1 = 'xxxxxx';
+                    $name2 = 'xxxxxx';
+                    $name3 = 'xxxxxx';
                 }
             $sql = "select * from genre where gn_first_name = '$name1' ";
             $rlt = $this->db->query($sql);

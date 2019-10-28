@@ -5,6 +5,59 @@ class pdfs extends CI_model {
 		echo '<script> 	window.opener.location.reload(); close();  </script>';
 	}
 
+	function journals_files()
+		{
+			$sx = '';
+			$dd1 = get("dd1");
+			$dd2 = round(get("dd2"));
+			if (strlen($dd1) == 0)
+			{
+				$sql ="select * from source_source where jnl_active = 1 order by jnl_name";
+				$rlt = $this->db->query($sql);
+				$rlt = $rlt->result_array();
+				$sx .= '<ul>';
+				for ($r=0;$r < count($rlt);$r++)
+				{
+					$line = $rlt[$r];
+					$link = '<a href="'.base_url(PATH.'tools/pdf_check_article/?dd1='.$line['id_jnl']).'">';
+					$sx .= '<li>'.$link.$line['jnl_name'].'</a>'.'</li>';
+				}
+				$sx .= '</ul>';
+			} else {
+				$sql ="select * from source_source where id_jnl = $dd1 order by jnl_name";
+				$rlt = $this->db->query($sql);
+				$rlt = $rlt->result_array();			
+				$idj = $rlt[0]['jnl_frbr'];
+				//'hasFileStorage'
+
+				$sql = "select * from (
+					    SELECT d1.d_r1 as art FROM `rdf_data` as d1
+							INNER JOIN rdf_class ON d_p = id_c and c_class = 'isPubishIn'
+							where d1.d_r2 = $idj
+					    ) as tabela
+					    LEFT JOIN rdf_data as d2 ON art = d2.d_r1 and d_p = 76
+					     where d_r1 IS NULL and art > $dd2
+					     order by art
+					     ";
+
+			     $rlt = $this->db->query($sql);
+			     $rlt = $rlt->result_array();
+			     $sx .= 'Total de '.count($rlt).' arquivos PDF para coletar<hr>';
+			     $sx .= '<ul>';
+			     for ($r=0;$r < count($rlt);$r++)
+			     {
+			     		$line = $rlt[$r];
+			     		$sx .= '<li>'.$line['art'].'</li>';
+			     }
+				 $sx .= '</ul>';
+				 $xart = $rlt[0]['art'];
+				 echo '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/pdf_check_article/?dd1='.$dd1.'&dd2='.$xart) . '">';	     		 
+	     		 $sx .= $this -> pdfs -> harvesting_pdf($xart);
+			     
+			}
+			return($sx);
+		}
+
 	function upload($id = '') {
 		$data = $this -> frbr_core -> le_data($id);
 		for ($r = 0; $r < count($data); $r++) {
@@ -104,7 +157,7 @@ class pdfs extends CI_model {
 			$sx .= ', ' . msg('left') . ' ' . $total . ' files';
 			if ($rs == '1') {
 				//echo '<meta http-equiv="refresh" content="1;' . base_url(PATH . 'tools/pdf_import/' . (round($id))) . '">';
-				echo '<meta http-equiv="refresh" content="15;' . base_url(PATH . 'tools/pdf_import/') . '">';
+				echo '<meta http-equiv="refresh" content="30;' . base_url(PATH . 'tools/pdf_import/') . '">';
 			}
 			$s .= 'CURL: '.date("d/m/Y H:i:s").'<br>';
 			$sx .= ' ' . $this -> harvesting_pdf_curl($id);
