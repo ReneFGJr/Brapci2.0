@@ -131,7 +131,8 @@ class Patent extends CI_Controller {
     function vi($id = 0) {
         $this -> load -> model('patents');
         $this -> cab();
-        $sx = $this -> patents -> instituicao_list($id);
+        $sx = $this -> patents -> instituicao($id);
+        $sx .= $this -> patents -> instituicao_list($id);
         $data['content'] = $sx;
         $data['title'] = 'Patent';
         $this -> load -> view('show', $data);

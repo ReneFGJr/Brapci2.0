@@ -38,6 +38,7 @@ class export extends CI_Model {
         $source = '';
         $title = '';
         $abstract = '';
+        $urld = '';
         /* Doblin Core */
         $dc = '';
 
@@ -48,6 +49,9 @@ class export extends CI_Model {
             //echo $type.'=>'.$l['n_name'].'<hr>';
             //print_r($l);
             switch($type) {
+            	case 'hasFileStorage':
+            		$urld = base_url(PATH.'download/'.trim($l['d_r2']));
+            		break;
                 case 'hasPageStart' :
                     $pagi = trim($l['n_name']);
                     break;
@@ -170,6 +174,7 @@ class export extends CI_Model {
         $txt3 .= '<td>' . $abstract . '</td>';
         $txt3 .= '<td>' . $idx . '</td>';
         $txt3 .= '<td>' . base_url(PATH . 'v/' . $idx) . '</td>';
+        $txt3 .= '<td>' . $urld . '</td>';
         
         $txt4 = '';
         $txt4 .= '"' . strip_tags($aut2) . '"';
@@ -182,6 +187,7 @@ class export extends CI_Model {
         $txt4 .= ',"' . $abstract . '"';
         $txt4 .= ',"' . $idx . '"';
         $txt4 .= ',"' . base_url(PATH . 'v/' . $idx) . '"';  
+        $txt4 .= ',"' . $urld . '"';
         $txt4 = troca($txt4,chr(13),' ');
         $txt4 = troca($txt4,chr(10),'');      
 
