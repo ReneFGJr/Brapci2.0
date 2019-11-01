@@ -584,6 +584,17 @@ class patents extends CI_model {
                     $tp = 'NRS';
                 }
                 switch ($tp) {
+                    case 'No ' :
+                    $result = trim($result);                    
+                    $numero = sonumero(substr($result,3,4));
+                    $ano = round(substr($result, strlen($result) - 4, 4));
+                    $dta = substr($result, strlen($result) - 10, 10);
+                    $dt['year'] = $ano;
+                    $dt['num'] = $numero;
+                    $dt['vol'] = '';
+                    $dt['pusblished'] = brtos($dta);
+                    $dt['jid'] = '1';
+                    break;
                     case 'NRS' :
                     $result = trim($result);
                     $numero = sonumero($nr);
@@ -1367,6 +1378,7 @@ function despacho($issue, $d, $id) {
     }
 
     $cot = troca($d['comentario'], "'", '');
+    $cot = troca($cot, "\\", '-');
     $sec = $d['section'];
     $sql = "select * from patent.patent_despacho 
     where pd_patent = $id 
@@ -1382,8 +1394,9 @@ function despacho($issue, $d, $id) {
         ('$id','$sec','$cot','$issue','INPI')";
         $rlt = $this -> db -> query($sql);
         sleep($this -> wait);
+        return(1);
     }
-    return (1);
+    return (0);
 }
 
 function relacao_agente_patent($idp, $age, $relacao, $seq) {
@@ -1496,14 +1509,16 @@ $sx .= cr() . $d['patent_nr'] . ' process (' . $id . ')';
 /************************ History ******************/
 if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo despacho';
 }
-$this -> despacho($issue, $d, $id);
-
-/****************** KINDCODE ******************/
-if (isset($d['patent_nr_kindcode'])) {
-    $kind = $d['patent_nr_kindcode'];
-    if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo KINDCODE';
-}
-$this -> kindcode($id, $kind, $issue);
+if ($this -> despacho($issue, $d, $id) == 0){
+    echo ' * old *';
+} else {
+    echo ' * novo *';
+    /****************** KINDCODE ******************/
+    if (isset($d['patent_nr_kindcode'])) {
+        $kind = $d['patent_nr_kindcode'];
+        if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo KINDCODE';
+    }
+    $this -> kindcode($id, $kind, $issue);
 }
 
 /****************** PCT **********************/
@@ -1632,6 +1647,7 @@ if (isset($d['prioridade_unionista'])) {
         if ($debug == 1) { echo '' . cr() . date("Y-m-d H:i:s B") . ' - Processo Unionista';
     }
     $this -> prioritario($id, $line);
+}
 }
 }
 }
@@ -2035,7 +2051,15 @@ function pages($n = 0, $t = 0) {
     $sx .= '</ul></nav>' . cr();
     return ($sx);
 }
+function instituicao($id) {
+    $sql = "select * from patent.patent_agent
+    where id_pa = $id";
+    $rlt = $this -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+    print_r($rlt);
+    $sx = '';
 
+}
 function instituicao_list($id) {
     $sql = "select * from patent.patent_agent_relation
     INNER JOIN patent.patent ON id_p = rl_patent 
@@ -2122,7 +2146,8 @@ function summary() {
     $sx = '<div class="row"><div class="col-md-12">' . $sx . '</div></div>';
     return ($sx);
 }
-function rel($tipo==1)    
+function rel($tipo=1)    
+{   
     /*
     SELECT pd_section, ps_name, count(*) as total FROM `patent_despacho`
     INNER JOIN patent_issue on issue_source = pd_issue
@@ -2132,5 +2157,6 @@ function rel($tipo==1)
     order by pd_section
     */
 
+}
 }
 ?>
