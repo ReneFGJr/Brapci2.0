@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.19.05.25
+ * @version     v0.19.10.30
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -995,13 +995,20 @@ class form {
         $ed = new form;
         $ed -> id = $this -> id;
         $ed -> tabela = $tabela;
+        if (isset($this->return))
+                {
+                    $_POST['return'] = $this->return;
+                    echo '<HR>';
+                }
+        
         /* Valida botao */
         $bt = 0;
         for ($r = 0; $r < count($cp); $r++) {
             if (UpperCaseSQL(substr($cp[$r][0], 0, 2)) == '$B') { $bt = 1;
             }
         }
-        if ($bt == 0) { array_push($cp, array('$B8', '', msg('submit'), False, False));
+        if ($bt == 0) { 
+            array_push($cp, array('$B8', '', msg('submit'), False, False));            
         }
 
         /* Monta forumário */
@@ -1077,7 +1084,7 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
     /* algoritimo */
     $page = substr($page, 0, strpos($page, '/'));
     $link = $obj -> row;
-
+    $npage = round($npage);
     $pagi = $npage;
     $pagf = $npage + 6;
 
@@ -1233,7 +1240,8 @@ if (!function_exists('form_edit')) {
             $npag = 1;
         }
         $start = round($pag);
-        $offset = $obj -> offset;
+        $offset = (integer)$obj -> offset;
+        $pag = round($pag);
         $start = $pag * $offset;
         $CI = &get_instance();
 
@@ -1822,7 +1830,7 @@ if (!function_exists('form_edit')) {
     }
 
     /* Formulario */
-    function form_field($cp, $vlr, $name = '', $table = 1) {
+    function form_field($cp, $vlr, $name = '', $table = 1, $return='') {
         global $dd, $ddi;
         /* Zera tela */
         $tela = '';
@@ -2024,13 +2032,24 @@ if (!function_exists('form_edit')) {
             case 'B' :
                 IF (strlen($label) > 0) {
                     $tela .= $tr . $tdl . $td;
-                    $dados = array('name' => 'acao', 'id' => 'acao', 'value' => $label, 'class' => 'form_submit btn btn-primary');
+                    $dados = array('name' => 'acao', 'id' => 'acao', 'value' => $label, 'class' => 'form_submit btn btn-primary');                    
+
+                    if (isset($_POST['return']) > 0)
+                            {
+                                $label = msg("return");
+                                $tela .= '<a href="'.$_POST['return'].'" class="form_submit btn btn-outline-warning">'.msg('return').'</a> '.cr();
+                            }
                     $tela .= form_submit($dados);
                     $tela .= $tdn . $trn;
                 } else {
                     $vlr = $cp[2];
                     $dados = array($dn => $vlr);
                     $tela .= '<input type="hidden" name="acao" id="acao" value="submit">' . cr();
+                    if (isset($_POST['return']) > 0)
+                            {
+                                $label = msg("return");
+                                $tela .= ' <a href="'.$_POST['return'].'" class="form_submit btn btn-outline-warning">'.msg('return').'</a>'.cr();
+                            }                    
                     break;
                 }
                 break;
@@ -2095,21 +2114,11 @@ if (!function_exists('form_edit')) {
             /* File */
             case 'FILE' :
                 $tela .= $tr;
-                $CI = &get_instance();
-                $CI -> load -> model('geds');
-                $CI -> geds -> tabela = $vlr;
+                if (isset($_FILES['tmp_name']))
+                    {
+                        $vlr = $_FILES['tmp_name'];
+                    }
 
-                $tbl = $cp[0];
-
-                $tbl = substr($tbl, strpos($tbl, ':') + 1, strlen($tbl));
-                $pag = substr($tbl, strpos($tbl, ':') + 1, strlen($tbl));
-                $tbl = substr($tbl, 0, strpos($tbl, ':'));
-                $idp = strzero($cp[2], 7);
-
-                $CI -> geds -> tabela = $tbl;
-                $tela = $CI -> geds -> list_files_table($idp, $pag);
-
-                $tela .= $CI -> geds -> form_upload($idp, $pag);
 
             /* Simple Submit File */
             case 'SFILE' :
