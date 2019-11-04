@@ -423,7 +423,7 @@ class rdf
 	}	
 
 	/***  FIND CLASS **/
-	function find_class($class) {
+	function find_class($class,$create=1) {
 		$CI = &get_instance();
 		$nclass = $class;
 		$wh = '';
@@ -849,13 +849,14 @@ class rdf
 	}	
 
 	/******************************************************************* RDF NAME ***/
-	function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
+	function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {		
 		$CI = &get_instance();
 		if (is_array($n))
 		{
 			return(0);
 		}
 		$n = trim($n);
+		if ((strlen($n) == 0) or ($n == '--')) { return(0); }
 		$lang = trim($lang);
 		$lang = troca($lang, '@', '');
 		if (strlen($lang) > 5) { $lang = substr($lang, 0, 5);
@@ -886,6 +887,7 @@ class rdf
 
 	/**************************************************************************** SET PROPRIETY *****/
 	function set_propriety($r1, $prop, $r2, $lit = 0) {
+		if (($r1 == 0) or (($r2 == 0) and ($lit == 0))) { return(False); }
 		$CI = &get_instance();
 		$rdf = new rdf;
 		/****************************** Literal ************/
@@ -924,6 +926,7 @@ class rdf
 		$CI = &get_instance();
 		$cl = $this -> find_class($class);
 		$term = $this -> frbr_name($term, $lang);
+		if ($term == 0) { return(0); }
 
 		$dt = date("Y/m/d H:i:s");
 		$date = date("Y-m-d");

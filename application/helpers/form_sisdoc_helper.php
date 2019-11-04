@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.19.10.30
+ * @version     v0.19.11.01
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -3107,5 +3107,24 @@ function genchksum13($isbn)
    $ts = substr($tg, -1, 1);
    $tsum = (10 - $ts);
    return $tsum;
-}    
+} 
+
+function age($data)
+    {
+    // Separa em dia, mês e ano
+    $data = sonumero($data);
+    $dia = substr($data,6,2);
+    $mes = substr($data,4,2);
+    $ano = substr($data,0,4);
+   
+    // Descobre que dia é hoje e retorna a unix timestamp
+    $hoje = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
+
+    // Descobre a unix timestamp da data de nascimento do fulano
+    $nascimento = mktime( 0, 0, 0, $mes, $dia, $ano);
+   
+    // Depois apenas fazemos o cálculo já citado :)
+    $idade = floor((((($hoje - $nascimento) / 60) / 60) / 24) / 365.25);        
+    return($idade);
+    }   
 ?>

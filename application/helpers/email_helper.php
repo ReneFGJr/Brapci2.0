@@ -17,6 +17,42 @@
  * Sistema de e-mail
  */
 
+function email($para,$assunto,$texto,$de=1)
+{
+    /* de */
+    $sql = "select * from mensagem_own where id_m = " . round($de);
+    $CI = &get_instance();
+    $rlt = $CI -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+    $line = $rlt[0];
+
+    print_r($line);
+
+    $CI->load->library('email');
+    $config = array();
+    $config['protocol'] = 'smtp';
+    $config['smtp_host'] = $line['smtp_host'];
+    $config['smtp_user'] = $line['smtp_user'];
+    $config['smtp_pass'] = $line['smtp_pass'];
+    $config['smtp_port'] = $line['smtp_port'];
+    $config['validate']  = TRUE;
+    $config['mailtype']  = 'html';
+    $config['charset']   = 'utf-8';
+    $config['newline']   = "\r\n";        
+    $CI->email->initialize($config);
+    $CI->email->set_newline("\r\n");
+
+    $CI->email->from($line['m_email'], 'Meu E-mail');
+    $CI->email->subject("Assunto do e-mail");
+    $CI->email->reply_to($line['m_email']);
+    $CI->email->to($para); 
+    //$this->email->cc('email_copia@dominio.com');
+    //$this->email->bcc('email_copia_oculta@dominio.com');
+    $CI->email->message("Aqui vai a mensagem ao seu destinatário");
+    $CI->email->send();
+    print_r($CI->email);
+}
+
 function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
     global $sem_copia;
 
@@ -42,8 +78,6 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
     for ($r = 0; $r < count($anexos); $r++) {
         $CI -> email -> attach($anexos[$r]);
     }
-
-
 
     /* Header & footer */
     $email_header = '';
@@ -95,40 +129,40 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
         $sx .= '<br>';
         $sx .= '</div>';
         $sx .= '<script>
-                setTimeout(function() { $(\'#email_enviado\').fadeOut(\'fast\');}, 3000);
-                </script>
-                ';
+        setTimeout(function() { $(\'#email_enviado\').fadeOut(\'fast\');}, 3000);
+        </script>
+        ';
         $proto = $CI->email->protocol;
         switch($proto)
-            {
+        {
             case 'm':
-                $to      = 'renefgj@gmail.com';
-                $subject = 'Assunto sem caracteres especiais';
-                $message = 'conteudo do email. 
-                Atencao para codificacao do texto, clientes de email podem interpretar errado';
-                
-                $headers = 'From: Brapci.inf.br <brapcici@gmail.com> ' . "\r\n" .
-                           'Reply-To: brapcici@gmail.com' . "\r\n" .
-                           'X-Mailer: PHP/' . phpversion();
-                
-                $real_sender = '-f brapcici@gmail.com';
-                
-                mail($to, $subject, $message, $headers, $real_sender);
-                break;              
+            $to      = 'renefgj@gmail.com';
+            $subject = 'Assunto sem caracteres especiais';
+            $message = 'conteudo do email. 
+            Atencao para codificacao do texto, clientes de email podem interpretar errado';
+
+            $headers = 'From: Brapci.inf.br <brapcici@gmail.com> ' . "\r\n" .
+            'Reply-To: brapcici@gmail.com' . "\r\n" .
+            'X-Mailer: PHP/' . phpversion();
+
+            $real_sender = '-f brapcici@gmail.com';
+
+            mail($to, $subject, $message, $headers, $real_sender);
+            break;              
             default:
-                return($CI -> email -> send());
-                break;
-            }
+            return($CI -> email -> send());
+            break;
+        }
         return (1);
     } else {
         echo('<font color="red">Proprietário do e-mail (' . $de . ') não configurado (veja mensagem_own)</font>');
         exit ;
     }
 }
- 
- 
+
+
 function enviaremail_xx($para='') {
-    
+
     $this->load->library('email');
     
     $config = Array('protocol' => 'smtp', 'smtp_host' => 'ssl://smtp.googlemail.com', 'smtp_port' => 465, 'smtp_user' => 'brapcici@gmail.com', 'smtp_pass' => '448545ct', 'mailtype' => 'html', 'charset' => 'iso-8859-1');
