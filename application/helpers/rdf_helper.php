@@ -442,9 +442,14 @@ class rdf
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		if (count($rlt) == 0) {
-			$this->class_create($nclass);
-			$rlt = $CI -> db -> query($sql);
-			$rlt = $rlt -> result_array();
+			if ($create == 1)
+			{
+				$this->class_create($nclass);
+				$rlt = $CI -> db -> query($sql);
+				$rlt = $rlt -> result_array();
+			} else {
+				return(0);
+			}
 		}
 		$line = $rlt[0];
 		return ($line['id_c']);
