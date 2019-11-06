@@ -2309,7 +2309,7 @@ if (!function_exists('form_edit')) {
                 $form = '';
 
                 for ($r = 0; $r < count($param); $r++) {
-                    if (count(trim($param[$r])) > 0) {
+                    if (strlen(trim($param[$r])) > 0) {
                         $nterm = splitx(':', $param[$r] . ':');
                         $key = $nterm[0];
                         $valor = $nterm[1];
