@@ -192,6 +192,7 @@ class pdfs extends CI_model {
 				$file = troca($file, '.', '_');
 				$file = troca($file, ':', '_');
 			}
+
 			if ($attr == 'hasUrl') {
 				if (strpos(' '.$vlr,'http') > 0) {
 				    $vlr = substr($vlr,strpos($vlr,'http'),strlen($vlr));
@@ -210,6 +211,7 @@ class pdfs extends CI_model {
 
         if ((count($links) == 0) and (count($links2) > 0))
             {
+            	echo "OK";
                 for ($r=0;$r < count($links2);$r++)
                     {
                         $link = $links2[$r];
@@ -232,7 +234,24 @@ class pdfs extends CI_model {
                                     {
                                         array_push($links, $txt);
                                     }
-                            }                       
+                            }
+                        if (strpos($txt,'frame src="') > 0)
+                            {
+                                /*****************************/
+                                $d = 'frame src="';
+                                $pos = strpos($txt,$d)+strlen($d);
+                                $txt = substr($txt,$pos,1000);
+                                
+                                /*****************************/
+                                $d = '" frameborder';
+                                $pos = strpos($txt,$d)+strlen($d);
+                                $txt = substr($txt,0,$pos);
+                                $txt = substr($txt,0,strpos($txt,'"')); 
+                                if ((strlen($txt) > 0) and (substr($txt,0,4) == 'http'))
+                                    {
+                                        array_push($links, $txt);
+                                    }
+                            }                                                   
                     }
             }
         
@@ -336,7 +355,7 @@ class pdfs extends CI_model {
 					break;
 			}
 		}
-exit;
+		exit;
 		return (msg("Harvesting"));
 	}
 
