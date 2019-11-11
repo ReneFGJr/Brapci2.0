@@ -21,6 +21,11 @@ require("journal_process.php");
                     echo '<br><tt>ISSN: '.$issn.'</tt>';
                 } 
 
+            if (strlen($validity) > 0)
+                {
+                    echo '<br><tt>'.msg('validity').': '.$validity.'</tt>';
+                }                 
+
             if (strlen($url) > 0)
                 {
                     echo '<br><tt>Site (URL): '.$url.'</tt>';
@@ -29,7 +34,7 @@ require("journal_process.php");
             if (strlen($contact) > 0)
                 {
                     echo '<br><tt>'.msg('Contact').': '.$contact.'</tt>';
-                } 
+                }               
 
 
             if (strlen($coll) > 0)
@@ -65,6 +70,8 @@ require("journal_process.php");
                         echo $this->frad->find_remissiva($w);
                         echo ' ';
                         echo '<a href="'.base_url(PATH.'a/'.$id).'" class="btn btn-outline-primary">'.msg('edit').'</a>';
+                        echo ' ';
+                        echo '<a href="'.base_url(PATH.'jnl_edit/'.$id_jnl).'" class="btn btn-outline-primary">'.msg('edit_source').'</a>';                        
                         echo '<br/>';
                         echo '<br/>';
                     }               

@@ -186,7 +186,10 @@ class sources extends CI_Model {
 
         array_push($cp, array('$HV', 'jnl_oai_last_harvesting', date("Y-m-d"), True, True));
         array_push($cp, array('$HV', 'jnl_cidade', '0', False, True));
-        array_push($cp, array('$HV', 'jnl_collection', '', False, True));
+        $op = 'JA:Revista Brasileira';
+        $op .= '&JE:Revista Estrangeira';
+        $op .= '&EV:Evento Brasileiro';
+        array_push($cp, array('$O '.$op, 'jnl_collection', msg('journal_type'), True, True));
         $op = '1:' . msg('yes, with OAI');
         $op .= '&2:' . msg('yes, without OAI');
         $op .= '&3:' . msg('No, finished');
@@ -200,7 +203,12 @@ class sources extends CI_Model {
         if (count($line) == 0) {
             return ("");
         }
-        $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
+        if ($line['jnl_frbr'] > 0)
+            {
+                $link = '<a href="' . base_url(PATH . 'v/' . $line['jnl_frbr']) . '">';
+            } else {        
+                $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
+            }
         $sx = $link . $line['jnl_name'] . '</a>';
 
         $link = '<a href="' . $line['jnl_url'] . '" target="_new"><sup>(l)</sup></a>';
@@ -224,6 +232,21 @@ class sources extends CI_Model {
             return ( array());
         }
     }
+
+    function le_frbr($id) {
+        if (($id == 0) or ($id == '')) {
+            return ( array());
+        }
+        $sql = "select * from " . $this -> table . " where jnl_frbr = " . $id;
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        if (count($rlt) > 0) {
+            $line = $rlt[0];
+            return ($line);
+        } else {
+            return ( array());
+        }
+    }    
 
     function button_new_issue($id = '') {
         $sx = '';
@@ -253,16 +276,32 @@ class sources extends CI_Model {
     function list_sources() {
         $sql = "select * from " . $this -> table . " 
                             where jnl_active = 1
-                            order by jnl_name
+                            order by jnl_collection, jnl_name
                         ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         /**************************** MOUNT HTML ***********/
+        $xlt = '';
+        $xtp = '';
         $sx = '<div class="col-12">' . CR;
         $sx .= '<ol class="journals">';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
-            $sx .= '<li>' . $this -> jnl_name($line) . '</li>';
+            $tp = $line['jnl_collection'];
+            if ($tp != $xtp)
+            {
+                $sx .= '</ol>';
+                $sx .= '<h1>'.msg('collection_'.$tp).'</h1>';
+                $sx .= '<ol class="journals">';
+                $xtp = $tp;
+            }
+            $lt = substr(UpperCaseSql($line['jnl_name']),0,1);
+            if ($lt != $xlt)
+            {
+                $xlt = $lt;
+                $sx .= '<h5>-'.$lt.'-</h5>';
+            }
+            $sx .= '<li>' . $this -> jnl_name($line) .'</li>';
         }
         $sx .= '</ol>';
         $sx .= '</div>' . CR;
