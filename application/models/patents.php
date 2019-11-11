@@ -3,6 +3,61 @@ class patents extends CI_model {
     var $sz = 20;
     var $s = '1';
     var $wait = 0.9;
+
+    function check($id=0)
+    {
+        $sx = $this->check_names($id);
+        return($sx);
+    }
+
+    function check_duplicatas()
+    {
+
+        /**** Consulta SQL ********************/
+        $sql = "select * FROM (SELECT count(*) as total, p_nrn FROM `patent` group by p_nrn) as tabela where total > 1 order by total desc";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        for ($r=0;$r < count($rlt);$r++)
+        {
+            $line = $rlt[$r];
+            
+        }
+        
+    }
+
+    function check_names()
+    {
+        /**** Consulta SQL ********************/
+        $sql = "select * from patent.patent where p_nrn like '%-%' limit 100";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<ul>';
+        for ($r=0;$r < count($rlt);$r++)
+        {
+            $line = $rlt[$r];
+            $nr = trim($line['p_nrn']);
+            $c = array("-");
+            for ($y = 0;$y < count($c);$y++)
+            {
+                if (strpos($nr,$c[$y]) > 0)
+                {
+                    $nr = substr($nr,0,strpos($nr,'-'));        
+                }                
+            }
+            $sql = "update patent.patent set p_nrn = '".$nr."' where id_p = ".$line['id_p'];
+            $rltq = $this->db->query($sql);
+            $sx .= '<li>'.$nr.' <span style="color: green"><b>Updated</b></span></li>';
+        }        
+        $sx .= '</ul>';
+        if (count($rlt) > 0)
+        {
+            $sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0').'">';
+        } else {
+
+        }
+        
+        return($sx);
+    }
     function check_duplicate() {
         $sql = "select * from (
         SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
