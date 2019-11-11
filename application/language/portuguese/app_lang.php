@@ -100,9 +100,10 @@ $lang['help'] = 'Ajuda sobre a Brapci';
 $lang['our_colletions'] = 'Nossa coleção';
 $lang['journal_timeline'] = 'Criação das Publicações - Timeline';
 
-$lang['edit_source'] = 'Editar';
+$lang['edit_source'] = 'Editar Fonte';
+$lang['edit'] = 'Editar';
+$lang['Remissive'] = 'Remissivas';
 $lang['return_to_up'] = 'retorna ao topo';
-
 
 $lang['admin_journals'] = 'Fontes indexadas';
 $lang['admin_export'] = 'Exportar dados';
@@ -217,4 +218,15 @@ $lang['Selected'] = 'Seleção';
 $lang['change_to'] = 'Muda strings DE/PARA';
 $lang['remove_tags'] = "Remove Tags/Html";
 $lang['Genere'] = "Indicadores de Gênero do autores";
+
+$lang['validity'] = 'Vigência';
+$lang['not_informed'] = 'não informado';
+$lang['event_site'] = 'Site do Evento';
+
+$lang['Indiceadores'] = "Indicadores";
+
+$lang['collection_EV'] = 'Eventos';
+$lang['collection_JA'] = 'Revistas Brasileiras';
+$lang['collection_JE'] = 'Revistas Internacionais';
+$lang['config_event'] = 'Eventos Científicos';
 ?>

@@ -426,15 +426,19 @@ class frbr_core extends CI_model {
     }
 
     function journal_show($id) {
+        $this->load->model("sources");
+        $this->load->model("oai_pmh");
         $data = array();
         $sx = '';
 
         $data = $this -> le($id);
         $data['person'] = $this -> le_data($id);
         $data['use'] = $this -> le_remissiva($id);
+        $data['source'] = $this -> sources->le_frbr($data['id_cc']);
         $data['id'] = $id;
 
         $sx = $this -> load -> view('find/view/journal', $data, true);
+        $sx .= $this -> sources -> show_issues($data['source']['id_jnl']);
         return ($sx);
     }
 
@@ -536,7 +540,7 @@ class frbr_core extends CI_model {
                 $tela .= '<div class="col-md-12">';
                 $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="middle">';
                 $linkca = '</a>';
-                $tela .= '<h2>' . $linkc . $data['n_name'] . $linkca . '</h2>';
+                $tela .= '' . $linkc . $data['n_name'] . $linkca . '</h2>';
                 $tela .= '</div>';
                 $tela .= '</div>';
             }

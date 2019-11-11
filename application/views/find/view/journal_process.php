@@ -9,13 +9,28 @@ $coll = '';
 $contact = '';
 $issn = '';
 $editor = '';
+$validity = '';
 $url = '';
 $w = $id;
 $link = '<a href="'.base_url(PATH.'a/'.$w).'">';
-
-//echo $link.'[ed]</a>';
+$linkr = '<a href="'.base_url(PATH.'v/'.$w).'">';
+$linka = '</a>';
 $img = '';
 $cutter = ''; 
+$id_jnl = $source['id_jnl'];
+
+/***************************************************************** SOURCES *****/
+if ($source['jnl_ano_inicio'] > 0)
+{
+    $validity = $linkr.$source['jnl_ano_inicio'].$linka;
+
+    if ($source['jnl_ano_final'] > 0)
+    {
+        $validity .= '-'.$linkr.$source['jnl_ano_final'].$linka;
+    } else {
+        $validity .= '-'.$linkr.'vigente'.$linka;
+    }
+}
 
 for ($r=0;$r < count($use);$r++)
     {
@@ -32,7 +47,6 @@ for ($r=0;$r < count($person);$r++)
             {
             case 'hasUrl':
 				$url  .= '<a href="'.trim($line['n_name']).'" target="_new'.date("mis").'">'.trim($line['n_name']).'</a> ';
-				echo $url;
 				break;
             case 'hasEditor':
             	if (strlen($editor) > 0)

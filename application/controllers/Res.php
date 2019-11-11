@@ -179,11 +179,18 @@ class res extends CI_Controller {
     public function collections() {
         $this -> load -> model('sources');
         $this -> cab();
-        $tela = $this -> sources -> list_sources();
-        $tela .= $this -> sources -> timelines(1972);
+        $tela = '<div class="row">';
+        $tela .= '<div class="col-md-6">';
+        $tela .= '<h1>' . msg('our_colletions') . '</h1>';
+        $tela .= $this -> sources -> list_sources();
+        $tela .= '</div>';
+        $tela .= '<div class="col-md-6">';
+        $tela .= $this -> sources -> timelines(1960);
+        $tela .= '</div>';
+        $tela .= '</div>';
 
         $data = array();
-        $data['content'] = '<h1>' . msg('our_colletions') . '</h1>' . $tela;
+        $data['content'] = $tela;
         $this -> load -> view('show', $data);
         $this -> footer();
     }
@@ -226,6 +233,7 @@ class res extends CI_Controller {
         $tela = $this -> frbr -> vv($id);
 
         $data['content'] = $tela;
+        $data['title'] = '';
         $this -> load -> view('show', $data);
 
         $this -> footer();
@@ -793,8 +801,13 @@ class res extends CI_Controller {
         }
     }
 
-    function event($act = '') {
+    function event($act = '',$id='') {
         $this -> load -> model('events');
+        if ($id != '')
+        {
+            $this->events->click($id);
+            exit;
+        }
         $this -> cab();
         $data['content'] = '<div class="row">';
         $data['content'] .= '<div class="col-md-12">';
@@ -1235,7 +1248,7 @@ class res extends CI_Controller {
 
     }
 
-    public function config($tools = '', $ac = '') {
+    public function config($tools = '', $ac = '',$i1='',$i2='',$i3='') {
         $this -> load -> model("frbr");
 
         /********************* EXPORTS ************************/
@@ -1271,6 +1284,15 @@ class res extends CI_Controller {
                 $this -> load -> model("frbr_clients");
                 $tela .= $this -> frbr_clients -> export_class();
                 break;
+            case 'event' :
+                /* acao */
+                $this -> load -> model("events");
+                if (strlen($ac) > 0) {
+                    $tela .= $this -> events -> $ac($i1,$i2,$i3);
+                } else {
+                    $tela .= $this -> events -> events_lista();
+                }
+                break;                
             case 'class' :
                 /* acao */
                 $this -> load -> model("frbr_core");
@@ -1313,6 +1335,7 @@ class res extends CI_Controller {
                 $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/forms') . '">' . msg('config_forms') . '</a></li>' . cr();
                 $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/class') . '">' . msg('config_class') . '</a></li>' . cr();
                 $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/email') . '">' . msg('config_email') . '</a></li>' . cr();
+                $tela .= '<li>' . '<a href="' . base_url(PATH . 'config/event') . '">' . msg('config_event') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
                 $tela .= '</div>' . cr();
                 break;
