@@ -1487,6 +1487,16 @@ class res extends CI_Controller {
                     return ('');
                 }
                 break;
+            case 'csv_to_matrix_ocorrencia' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                    $rst = $this -> bibliometrics -> csv_to_matrix_ocorrencia($txt);
+                    $this -> bibliometrics -> download_file($rst);
+                    return ('');
+                }
+                break;                
             case 'semicolon_to_list' :
                 if (strlen($dd1) == 0) {
                     $tela .= $this -> bibliometrics -> form_1();

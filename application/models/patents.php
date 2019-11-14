@@ -7,22 +7,37 @@ class patents extends CI_model {
     function check($id=0)
     {
         $sx = $this->check_names($id);
+        $sx = $this->check_duplicatas($id);
         return($sx);
     }
 
     function check_duplicatas()
     {
-
         /**** Consulta SQL ********************/
-        $sql = "select * FROM (SELECT count(*) as total, p_nrn FROM `patent` group by p_nrn) as tabela where total > 1 order by total desc";
+        $sql = "select * from (
+        select p_nrn, count(*) as total FROM patent.patent group by p_nrn
+        ) as tabela
+        where total > 1 and p_nrn <> ''
+        limit 10";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
         for ($r=0;$r < count($rlt);$r++)
         {
             $line = $rlt[$r];
-            
-        }
-        
+            $np = $line['p_nrn'];
+
+                    /**** Consulta SQL ********************/
+                    $sql = "select * from patent.patent where p_nrn = '".$line['p_nrn']."'";
+                    $xrlt = $this->db->query();
+                    $xrlt = $xrlt->result_array();
+                    for ($x=0;$x < count($xrlt);$x++)
+                        {
+                            $xline = $xrlt[$r];
+                            print_r($xline);
+                            exit;
+                        }
+                    
+        }        
     }
 
     function check_names()

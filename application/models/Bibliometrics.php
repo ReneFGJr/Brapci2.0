@@ -25,7 +25,13 @@ class bibliometrics extends CI_model {
             $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix').'">';
             $sx .= msg('csv_to_matrix');
             $sx .= '</a>';
-            $sx .= '</li>';            
+            $sx .= '</li>';    
+
+            $sx .= '<li>';
+            $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix_ocorrencia').'">';
+            $sx .= msg('csv_to_matrix_ocorrencia');
+            $sx .= '</a>';
+            $sx .= '</li>';          
 
             $sx .= '<li>';
             $sx .= '<a href="'.base_url(PATH.'bibliometric/change_to').'">';
@@ -272,7 +278,9 @@ class bibliometrics extends CI_model {
                 return($sx);
             }
 
-        function csv_to_matrix($txt)
+ 
+
+       function csv_to_matrix_ocorrencia($txt)
             {
                 $txt = $this->trata($txt);
                 $txt = troca($txt,';','£');
@@ -289,6 +297,20 @@ class bibliometrics extends CI_model {
                         $mn = $lns[$r];
                         $mn = troca($mn,'£',';');
                         $au = splitx(';',$mn.';');
+
+                        $ax = array();
+                        $ai = array();
+                        for ($z=0;$z < count($au);$z++)
+                        {
+                            $nn = $au[$z];
+                            if (!isset($ax[$nn]))
+                            {
+                                array_push($ai,$nn);
+                                $ax[$nn] = $nn;
+                            }
+                        }
+
+                        $au = $ai;
                         
                         for ($a=0;$a < count($au);$a++)
                             {
@@ -345,7 +367,7 @@ class bibliometrics extends CI_model {
                             }
                         
                     }
-                
+
                 /*  matriz */
                 $sx = '#;';
                 foreach ($nf as $key => $val1) {
@@ -366,7 +388,7 @@ class bibliometrics extends CI_model {
                 }
                 $sx  .= '';
                 return($sx);
-            }
+            } 
         function detect_language($t)
             {
                 $t = ' '.lowercase($t).' ';
