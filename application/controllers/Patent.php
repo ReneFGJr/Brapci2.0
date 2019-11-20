@@ -6,7 +6,7 @@ class Patent extends CI_Controller {
     function __construct() {
 
         parent::__construct();
-        $this -> lang -> load("app", "portuguese");
+        $this -> lang -> load("patent", "portuguese");
         $this -> load -> database();
         $this -> load -> helper('url');
         $this -> load -> library('session');
@@ -151,12 +151,12 @@ class Patent extends CI_Controller {
 
     function check($id=0) {
         $this -> load -> model('patents');
-        $this -> cab();
+        //$this -> cab();
         $sx = $this -> patents -> check($id);
         $data['content'] = $sx;
         $data['title'] = 'Patent';
         $this -> load -> view('show', $data);
-        $this -> footer();
+        //$this -> footer();
 
     }
 

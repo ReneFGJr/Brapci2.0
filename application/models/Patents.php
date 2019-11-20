@@ -6,38 +6,123 @@ class patents extends CI_model {
 
     function check($id=0)
     {
-        $sx = $this->check_names($id);
-        $sx = $this->check_duplicatas($id);
+        $dd = get("dd1");
+        switch ($dd)
+            {
+                default:
+                $sx = $this->check_names($id);
+                break;
+
+                ### Checa duplicatas das patentes
+                case '1':
+                $sx = $this->check_duplicatas($id);
+                break;
+            }
+        
+        
         return($sx);
     }
 
     function check_duplicatas()
     {
+        $sx = '';
         /**** Consulta SQL ********************/
         $sql = "select * from (
-        select p_nrn, count(*) as total FROM patent.patent group by p_nrn
+        select p_nrn, count(*) as total FROM patent.patent 
+            where not p_nrn like '%*%'
+            group by p_nrn
         ) as tabela
         where total > 1 and p_nrn <> ''
-        limit 10";
+        limit 1000";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
         for ($r=0;$r < count($rlt);$r++)
         {
             $line = $rlt[$r];
-            $np = $line['p_nrn'];
+            $np = $line['p_nrn'];            
 
-                    /**** Consulta SQL ********************/
-                    $sql = "select * from patent.patent where p_nrn = '".$line['p_nrn']."'";
-                    $xrlt = $this->db->query();
-                    $xrlt = $xrlt->result_array();
-                    for ($x=0;$x < count($xrlt);$x++)
+            /**** Consulta SQL ********************/
+            $sql = "select * from patent.patent 
+                        where p_nrn = '".$np."'";
+            echo cr().date("Ymd-H:i:s").' 1. '.$np.' ('.$r.'/'.count($rlt).') ##############';
+            $xrlt = $this->db->query($sql);
+            $xrlt = $xrlt->result_array();
+            echo cr().date("Ymd-H:i:s").' 1. '.$np.' RESPONSE';
+            $ids = array();
+            $title = '';
+            $abstract = '';
+            for ($x=0;$x < count($xrlt);$x++)
+            {
+                $xline = $xrlt[$x];
+                if (strlen($xline['p_title']) > 0)
+                {
+                    if (strlen($title) > 0)
+                    {
+                        if (strpos($title,'?') > 0)
                         {
-                            $xline = $xrlt[$r];
-                            print_r($xline);
-                            exit;
+                            $title = $xline['p_title'];    
                         }
-                    
-        }        
+                    } else {
+                        $title = $xline['p_title'];
+                    }                    
+                }
+                if (strlen($xline['p_resumo']) > 0)
+                {
+                    $abstract = $xline['p_resumo'];
+                }
+                array_push($ids,$xline['id_p']);  
+                //$sx .= $xline['id_p'].' ';
+            }
+            
+            $idi = $ids[0];
+            for ($x=0;$x < count($ids);$x++)
+            {
+                echo cr().date("Ymd-H:i:s").' 1A. IDS '.$ids[$x]. ' ====';
+                ob_flush();
+                flush();
+
+                $compl = '';
+                if ($x > 0)
+                {
+                    $compl = ", p_nr = concat('*',p_nr), p_nrn = concat('*',p_nrn) ";
+                    $sql = "update patent.patent_agent_relation set rl_patent = $idi where rl_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);
+                    echo cr().date("Ymd-H:i:s").' 2. ';
+
+                    $sql = "update patent.patent_classification set c_patent = $idi where c_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);
+                    echo cr().date("Ymd-H:i:s").' 3. ';
+
+                    $sql = "update patent.patent_despacho set pd_patent = $idi where pd_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);
+                    echo cr().date("Ymd-H:i:s").' 4. ';
+
+                    $sql = "update patent.patent_pct set pct_patent = $idi where pct_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);  
+                    echo cr().date("Ymd-H:i:s").' 5. ';                                      
+
+                    $sql = "update patent.patent_prioridade set prior_patent = $idi where prior_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);  
+                    echo cr().date("Ymd-H:i:s").' 6. ';                                      
+
+                    $sql = "update patent.patent_pub set pub_patent = $idi where pub_patent = ".$ids[$x];
+                    $xrlt = $this->db->query($sql);                                        
+                    echo cr().date("Ymd-H:i:s").' 7. ';
+                }
+                $sql = "update patent.patent set p_title = '$title', p_resumo = '$abstract' $compl where id_p = ".$ids[$x];
+                $xrlt = $this->db->query($sql);
+                echo cr().date("Ymd-H:i:s").' 8. ';
+            }
+        }  
+
+        if (count($rlt) > 0)
+        {
+            //$sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=1').'">';
+        } else {
+            //$sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=2').'">';
+        }   
+        exit; 
+        return($sx);          
     }
 
     function check_names()
@@ -68,7 +153,7 @@ class patents extends CI_model {
         {
             $sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0').'">';
         } else {
-
+            $sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=1').'">';
         }
         
         return($sx);
@@ -193,7 +278,7 @@ class patents extends CI_model {
             echo "================================" . cr();
 
             $this -> harvest_patent($id);
-            $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml';
+            $file = '_repository_patent/inpi/txt/Patente_' . $id . '.xml2';
             if (file_exists($file)) {
                 echo '# Method 1' . cr();
                 $sx = $this -> method_inpi($file);
@@ -653,6 +738,7 @@ class patents extends CI_model {
                 if ($nr == sonumero($nr)) {
                     $tp = 'NRS';
                 }
+                echo $result.cr();
                 switch ($tp) {
                     case 'No ' :
                     $result = trim($result);                    
@@ -844,6 +930,10 @@ class patents extends CI_model {
         break;
         case '(11)' :
         if ($max < 11) {
+            if (strpos($v,'-') > 0)
+            {
+                $v = substr($v,0,strpos($v,'-'));
+            }
             $p['patent_nr'] = $v;
             $max = 11;
         } else {
@@ -1848,9 +1938,9 @@ function patent($d) {
     $rlt = $rlt -> result_array();
     if (count($rlt) == 0) {
         $sqli = "insert into patent.patent
-        (p_nr, p_dt_deposito)
+        (p_nr,p_nrn, p_dt_deposito)
         values
-        ('$pat_nr', '$pat_dd')";
+        ('$pat_nr','$pat_nr', '$pat_dd')";
         $rlti = $this -> db -> query($sqli);
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -2145,7 +2235,7 @@ function instituicao_list($id) {
         $sx .= '<tr>';
         $link = '<a href="' . base_url(PATH . '/v/' . $line['id_p']) . '">';
         $sx .= '<td>';
-        $sx .= '<nobr>' . $link . $line['p_nr'] . '</a></nobr>';
+        $sx .= '<nobr>' . $link . $line['p_nrn'] . '</a></nobr>';
         $sx .= '</td>';
 
         $sx .= '<td>';
