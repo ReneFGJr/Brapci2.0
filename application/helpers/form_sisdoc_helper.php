@@ -1077,14 +1077,19 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
     $term = $obj -> term;
     $npage = $obj -> npag;
     $field = $obj -> field;
+    $npage = round($npage);
 
     /* Campos para busca */
     $fd = $obj -> lb;
 
-    /* algoritimo */
+    $sx = '<table class="table lt2" width="100%">';
+    $sx .= '<tr valign="middle"><td width="35%" class="visible-lg">';
     $page = substr($page, 0, strpos($page, '/'));
     $link = $obj -> row;
-    $npage = round($npage);
+
+    /* algoritimo */
+    /* Desativado em 20/11/2019
+    
     $pagi = $npage;
     $pagf = $npage + 6;
 
@@ -1095,30 +1100,32 @@ function npag($obj, $blank = 1, $tot = 10, $offset = 20) {
         $pagi = 1;
     }
 
-    $sx = '<table class="table lt2" width="100%">';
+    
     $sx .= '<tr valign="middle"><td width="35%" class="visible-lg">';
     $sx .= '<ul id="npag" class="npag">';
     if ($pagi > 1) {
         $linka = '<A HREF="' . $link . '/' . ($pagi - 1) . '" class="link lt1 small">';
         $sx .= $linka . '<li><<</li></A> ';
     }
-
+    */
     /* PAGINACAO */
+    /* Desativado em 20/11/2019
     if ($pagf > $tot) { $pagf = $tot;
     }
     for ($r = $pagi; $r < ($pagf + 1); $r++) {
         $linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1 small">';
         $sx .= $linka . '<li class="lt1">' . $r . '</li></a>' . chr(10) . chr(13);
     }
-    /* */
+    /*
     if ($pagf < $pagm) {
         $linka = '<A HREF="' . $link . '/' . $r . '" class="link lt1 small">';
         $sx .= $linka . '<li>>></li></A>';
     }
     $sx .= '</ul>' . cr();
     $sx .= '</td><td>';
-
-    /* */
+    */
+    
+    /* Paginacao */
     $sx .= ' Page:';
     $linka = $link . '/';
     $sx .= '<select onChange="location=\'' . $linka . '\'+this.options[this.selectedIndex].value;">';
@@ -1241,6 +1248,7 @@ if (!function_exists('form_edit')) {
         }
         $start = round($pag);
         $offset = (integer)$obj -> offset;
+        $pag .= get("pag");
         $pag = round($pag);
         $start = $pag * $offset;
         $CI = &get_instance();

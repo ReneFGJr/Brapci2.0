@@ -32,8 +32,11 @@ class rdf
 		$msg['sc_global'] = 'Global';
 		$msg['sc_local'] = 'Classe somente deste sistema';
 		$msg['return'] = '<< Voltar';
-		$msg['edit'] = 'editar';
+		$msg['edit'] = 'Editar';
+		$msg['edit_class'] = 'Editar Classe';
 		$msg['submit'] = 'Gravar >>';
+		$msg['Classe_name'] = 'Classe';
+		$msg['check_form'] = 'Checar formulário';
 	}
 
 	#################################################### LE CONCEPT
@@ -290,6 +293,8 @@ class rdf
 		$line = $this->le_class($id);
 		if (count($line) == 0)
 		{
+			echo "OPS";
+			exit;
 			redirect(base_url(PATH.'class'));
 		}
 		switch($line['c_type'])
@@ -313,11 +318,6 @@ class rdf
 			$sx .= 'URL Source: <b>'.$line['c_url'].'</b></br>'.cr();
 			$sx .= 'Atualizado em <b>'.stodbr($line['c_url_update']).'</b></br>'.cr();
 			$sx .= '</div>'.cr();
-
-			$sx .= '<div class="col-md-5">'.cr();
-			$sx .= '<h4>'.msg('class_proprieties').'</h4>';
-			$sx .= $this->form_class($line['id_c']);
-			$sx .= '</div>'.cr();				
 
 			break;
 			case 'P':
@@ -351,7 +351,7 @@ class rdf
 		$line = $rlt[0];
 		$sx .= '<h3>class: ' . $line['c_class'] . '</h3>';
 		$sx .= '<div class="col-md-12 small">';
-		$sx .= '| <a href="'.base_url(PATH.$line['c_class']).'">'.msg('return').' </a>';
+		$sx .= '| <a href="'.base_url(PATH).'">'.msg('return').' </a>';
 		$sx .= '| <a href="'.base_url(PATH.'a/'.$r).'">'.msg('edit').'</a> |';
 		$sx .= '</div>';
 
@@ -489,6 +489,25 @@ class rdf
 			$rlt = $rlt->result_array();
 		}
 		return($rlt[0]['id_c']);
+	}
+
+	function prefixn($dt)
+	{
+		$pre = trim($dt['prefix_ref']);
+		$class = trim($dt['c_class']);
+		if (strlen($class) > 0)
+		{
+			if (strlen($pre) > 0)
+			{
+				$sx = $pre.':'.$class;
+			} else {
+				$sx = $class;
+			}
+		} else {
+			$sx = '<i>'.msg('none').'</i>';
+		}
+		return($sx);
+		
 	}
 
 	function prefix($pre)	
@@ -641,35 +660,6 @@ class rdf
 		return($tela);	
 	}
 
-	###################################################### FORM
-	function form_class($cl)		
-	{
-		$sx = '<div class="small">| <a href="'.base_url(PATH.'class/form/'.$cl.'/0/0').'">'.msg('add_new_propriety').'</a> |</div>';
-
-		$CI = &get_instance();
-		$cp = 'id_sc, p1.c_class as PROP, c1.c_class as RANGER, sc_class';
-		$sql = "select $cp from rdf_form_class 
-		INNER JOIN rdf_class as p1 ON p1.id_c = sc_propriety
-		INNER JOIN rdf_class as c1 ON c1.id_c = sc_range
-		where sc_class = ".round($cl);
-
-		$rlt = $CI->db->query($sql);
-		$rlt = $rlt->result_array();
-
-		for ($r=0;$r < count($rlt);$r++)
-		{
-			$line = $rlt[$r];
-			$sx .= msg($line['PROP']).' -> ';
-			$sx .= msg($line['RANGER']);
-			$sx .= ' ';
-			$sx .= '<div class="small">| <a href="'.base_url(PATH.'class/form/'.$line['sc_class'].'/'.$line['id_sc']).'">'.msg('edit').'</a>';
-			$sx .=' |</div>'.cr();
-		}
-
-
-		return($sx);
-
-	}
 	function form_ed($id,$cl=0) {
 		$form = new form;
 		$form -> id = $id;
@@ -992,7 +982,6 @@ class rdf
 		}
 		/**********************************************************************************/
 		$dt['type'] = $type;
-        //echo '==>'.$type;
 		switch($type) {
 			case 'ISBN' :
 			$tela .= $this -> cas_flex($path, $id, $dt);
@@ -1032,6 +1021,37 @@ class rdf
 		}
 	}    
 
+	/************************************* checa formulário de dados ***********/
+	function form_check($class=0)
+	{
+		$CI = &get_instance();
+		$sql = "SELECT * FROM (
+		select d_p, id_c as c from rdf_data 
+		INNER JOIN rdf_concept ON d_r1 = id_cc
+		INNER JOIN rdf_class ON cc_class = id_c
+		where id_c = $class
+		group by d_p, id_c
+		) as tabela
+		LEFT JOIN rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
+		LEFT JOIN rdf_class as t2 ON sc_propriety = t2.id_c";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		for ($r=0;$r < count($rlt);$r++)
+		{
+			$line = $rlt[$r];
+			$exist = $line['sc_class'];
+			if ($exist == '')
+			{
+				$prop = $line['d_p'];
+				$sql = "insert into rdf_form_class
+				(sc_class,sc_propriety,sc_range,sc_library, sc_global, sc_ativo)
+				values
+				($class,$prop,0,".LIBRARY.",0,1)";
+				$xrlt = $CI -> db -> query($sql);							
+			}
+		}
+	}
+
 	/*********************************** editar dados ***************************/
 	function form($id, $dt) {
 		$CI = &get_instance();
@@ -1041,8 +1061,37 @@ class rdf
 
 		$sx .= '<h3>class: ' . $dt['c_class'] . '</h3>';
 		$sx .= '<div class="col-md-12 small">';
-		$sx .= '| <a href="'.base_url(PATH.'v/'.$dt['id_cc']).'">'.msg('return').' </a> |';
+		$sx .= '| <a href="'.base_url(PATH.'v/'.$dt['id_cc']).'">'.msg('return').' </a> ';
+		$sx .= '| <a href="'.base_url(PATH.'a/'.$dt['id_cc'].'/check_form').'">'.msg('check_form').' </a> ';
+		$sx .= '| <a href="'.base_url(PATH.'a/'.$dt['id_cc'].'/class').'">'.msg('edit_class').' </a> ';
+		$sx .= '|';
+		
 		$sx .= '</div>';        
+
+		/***** editar classe */		
+		if ((isset($dt['action'])) and ($dt['action'] == 'class'))
+		{
+			$sx .= '<div class="col-md-12">';
+			$form = new form;
+			$form->id = $id;
+			$cp = array();
+			array_push($cp,array('$H8','id_cc','',false,false));
+			$op = "select * from rdf_class where c_type = 'C'";
+			array_push($cp,array('$Q id_c:c_class:'.$op,'cc_class',msg('Classe_name'),true,true));
+			$sx .= $form->editar($cp,'rdf_concept');
+			$sx .= '</div>';
+			if ($form->saved > 0)
+			{
+				redirect(base_url(PATH.'a/'.$dt['id_cc']));
+			}
+		}
+
+		/***** checar formulário da classe */		
+		if ((isset($dt['action'])) and ($dt['action'] == 'check_form'))
+		{
+			$this->form_check($dt['cc_class']);
+			redirect(base_url(PATH.'a/'.$dt['id_cc']));
+		}		
 
 		/* complementos */
 		switch($class) {
@@ -1061,10 +1110,11 @@ class rdf
 			WHERE d_r1 = $id and d_r2 = 0";
 			/*****************/
 			$sql = "select * from rdf_form_class
-			INNER JOIN rdf_class ON id_c = sc_propriety
-			LEFT JOIN (" . $sqla . ") as table1 ON id_c = prop 
+			INNER JOIN rdf_class as t0 ON id_c = sc_propriety
+			LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
+			LEFT JOIN rdf_class as t2 ON sc_range = t2.id_c
 			where sc_class = $class 
-			order by sc_ord, id_sc, c_order";
+			order by sc_ord, id_sc, t0.c_order";
 
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
@@ -1090,20 +1140,21 @@ class rdf
 				$cap = msg($line['c_class']);
 
 				$link = '<a href="#" id="action_' . trim($line['c_class']) . '" data-toggle="modal" data-target=".bs-example-modal-lg">';
-				//$link = '<a href="#" id="action_' . trim($line['c_class']) . '">';
 				$linka = '</a>';
 				$sx .= '<tr>';
 				$sx .= '<td width="25%" align="right">';
+
 				if ($xcap != $cap) {
 					$sx .= '<nobr><i>' . msg($line['c_class']) . '</i></nobr>';
 					$sx .= '<td width="1%">' . $link . '[+]' . $linka . '</td>';
 					$xcap = $cap;
-
 				} else {
 					$sx .= '&nbsp;';
 					$sx .= '<td>-</td>';
 				}
 				$sx .= '</td>';
+
+				/***************** Editar campo *******************************************/
 				$sx .= '<td style="border-bottom: 1px solid #808080;">';
 				if (strlen($line['n_name']) > 0) {
 					$linkc = '<a href="' . base_url(PATH . 'v/' . $line['idcc']) . '" class="middle">';
@@ -1113,20 +1164,20 @@ class rdf
 					$sx .= $link . '<font style="color: red;" title="Excluir lancamento">[X]</font>' . $linka;
 					$sx .= '</span>';
 				}
-				$sx .= '</td>';
-				$sx .= '</tr>';
 				$js .= 'jQuery("#action_' . trim($line['c_class']) . '").click(function() 
 				{
 					carrega("' . trim($line['c_class']) . '");
 					jQuery("#dialog").modal("show"); 
 				});' . cr();
+				$sx .= '</td>';
+				$sx .= '</tr>';				
 			}
 			$sx .= '</table>';
 			break;
 		}
-		$js2 = 'function carrega($id)
+		$js1 = 'function carrega($id)
 		{
-			jQuery.ajax({ url: "' . base_url(PATH . 'class/ajax/') . '"+$id+"/"+' . $id . '+"?nocab=true",
+			jQuery.ajax({ url: "' . base_url(PATH . 'config/class/ajax/') . '"+$id+"/"+' . $id . '+"?nocab=true",
 			context: document.body })  
 			.done(function( html ) { jQuery( "#model_texto" ).html( html );	});
 		} ';
@@ -1471,17 +1522,76 @@ class rdf
 			return($tela);			
 
 		}
+
+		function class_view_form($id='')
+		{
+			$CI = &get_instance();
+			$sql = "select sc_class, sc_propriety, sc_ord, id_sc,
+			t1.c_class as c_class, t2.prefix_ref as prefix_ref,
+			t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref
+			FROM rdf_form_class
+			INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
+			LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
+
+			LEFT JOIN rdf_class as t3 ON t3.id_c = sc_range
+			LEFT JOIN rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
+
+			where sc_class = $id
+			AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
+			order by sc_ord";
+			$rlt = $CI -> db -> query($sql);
+			$rlt = $rlt -> result_array();	
+			$sx = '<div class="col-md-6">';
+			$sx .= '<h4>'.msg("Form").'</h4>';
+			$sx .= '<table class="table">';
+			$sx .= '<tr><th width="4%">#</th>';
+			$sx .= '<th width="47%">'.msg('propriety').'</th>';
+			$sx .= '<th width="47%">'.msg('range').'</th>';
+			$sx .= '</tr>';
+			for ($r=0;$r < count($rlt);$r++)			
+			{
+				$line = $rlt[$r];
+				$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/forms/'.$line['id_sc']).'\',800,600);">';
+				$linka = '</a>';
+				$sx .= '<tr>';
+
+				$sx .= '<td align="center">';
+				$sx .= $line['sc_ord'];
+				$sx .= '</td>';
+
+				/* CLASS */
+				$prop = $this->prefixn($line);
+				$sx .= '<td>';	
+				$sx .= $link;			
+				$sx .= msg($line['c_class']).' ('.$prop.')';
+				$sx .= $linka;
+				$sx .= '</td>';
+
+				/* RANGE */
+				$dt = array();
+				$dt['c_class'] = $line['pc_class'];
+				$dt['prefix_ref'] = $line['pc_prefix_ref'];
+				$sx .= '<td>';
+				$sx .= $this->prefixn($dt);
+				$sx .= '</td>';
+				$sx .= '</tr>';
+			}
+			$sx .= '</table>';
+			$sx .= '</div>';
+			return($sx);
+		}
 		function class_view_data($id = '') {
+			$CI = &get_instance();
 			$rdf = new rdf;
 			$sx = '';
-			$sx .= '<div class="row"><div class="col-md-12">';
+			$sx .= '<div class="col-md-6">';
 			$sx .= '<h4>Dados</h4>';
 			/********************************************/
 			if (strlen($id) == 0) {
 				$sql = "select * from rdf_class 
 				WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
 				ORDER BY c_class ";
-				$rlt = $this -> db -> query($sql);
+				$rlt = $CI -> db -> query($sql);
 				$rlt = $rlt -> result_array();
 				$sx .= '<ul>';
 				for ($r = 0; $r < count($rlt); $r++) {
@@ -1502,7 +1612,7 @@ class rdf
 				}
 				$sx .= '</ul>';
 			}
-			$sx .= '</div></div>';
+			$sx .= '</div>';
 			return ($sx);
 		}
 
@@ -1693,20 +1803,36 @@ class rdf
 		{
 			$tela = '==>'.$tools.'==>'.$ac.'==>'.$id;
 			echo $tela;
-				//exit;
+			//exit;
 			switch($tools)
 			{
+
+
 				/***************************************************** CLASSE */
 				case 'class':
 				$tela = '<div class="row">';
 				switch($ac)
 				{
+					/**************** AJAX **************/
+					case 'ajax':	
+					$chk = md5($id);	
+					echo $this->ajax($id,$chk);
+					exit;
+					break;
+
+					/**************** FORMULARIOS **************/
+					case 'forms':
+					$tela .= msg('FORMS');
+					$tela .= $this -> form_ed($id);
+					break;
+
 					/**************** view **************/
 					case 'view':
 					$tela = '<div class="row">';
 					$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
 					$tela .= $this->class_view($id);				
 					$tela .= $this->class_view_data($id);
+					$tela .= $this->class_view_form($id);
 					$tela .= '</div>';						
 					break;
 
@@ -1723,7 +1849,7 @@ class rdf
 					$chk = md5($id);	
 					echo $this->ajax_update($id,$chk);
 					exit;
-					break;
+					break;				
 
 					default:
 					/**************** row **************/
@@ -1741,14 +1867,7 @@ class rdf
 					} else {
 						$tela .= $this->class_view($ac);
 					}
-
-
 					$tela .= '</div>';
-					break;
-
-					case 'forms' :
-					$tela .= msg('FORMS');
-					$tela .= $this -> form_class();
 					break;
 
 					case 'authority' :
