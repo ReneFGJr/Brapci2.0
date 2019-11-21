@@ -886,6 +886,7 @@ class rdf
 		if (count($rlt) == 0) {
 			$sqli = "insert into rdf_name (n_name, n_lang, n_md5) values ('$n','$lang','$md5')";
 			$rlt = $CI -> db -> query($sqli);
+			sleep(0.3);
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 		}
@@ -2055,7 +2056,7 @@ function config($tools,$ac='',$id='',$id2='',$id3='')
 	{
 		/***************************************************** CLASSE */
 		case 'class':
-		$tela = '<div class="container" style="background-color: red;"><div class="row">';
+		$tela = '<div class="container"><div class="row">';
 		switch($ac)
 		{
 			/**************** AJAX SEARCH *******/
