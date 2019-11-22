@@ -58,6 +58,22 @@ class rdf
 			return ( array());
 		}
 	}
+	/* Identifica ID da lista com as propriedades */
+	function filter($dt,$prop)
+		{
+			$rst = array();
+			for ($r=0;$r < count($dt);$r++)
+			{
+				$ln = $dt[$r];
+				$class = trim($ln['c_class']);
+				if (trim($ln['c_class']) == trim($prop))
+				{
+				$ids = $ln['d_r1'];
+				array_push($rst,$ids);
+				}
+			}
+			return($rst);
+		}
 
 	function find($n, $prop = '', $equal = 1) {
 		$CI = &get_instance();
@@ -84,6 +100,7 @@ class rdf
 		INNER JOIN rdf_class ON d_p = id_c
 		INNER JOIN rdf_concept ON id_cc = d_r1
 		where $wh";
+		
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 
@@ -1303,6 +1320,10 @@ class rdf
 				if ($this->exist_prefLabel($id))
 				{
 					$tela .= message("Já existe um nome preferencial para este termo",5);	
+					$tela .= '<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+					</div>                  
+					';
 				} else {
 					$this->update_prefLabel($id);
 					$tela .= $this -> cas_text($id, $id2);	
@@ -1947,37 +1968,37 @@ function data_exclude($id) {
 }	
 
 function exist_prefLabel($id)
-	{
-		$CI = &get_instance();
-		$prop = $this->find_class('prefLabel');
+{
+	$CI = &get_instance();
+	$prop = $this->find_class('prefLabel');
 
-		$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
-		$rlt = $CI->db->query($sql);
-		$rlt = $rlt->result_array();
-		if (count($rlt) > 0)
-		{
-			return(1);
-		}
-		return(0);	
+	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+	$rlt = $CI->db->query($sql);
+	$rlt = $rlt->result_array();
+	if (count($rlt) > 0)
+	{
+		return(1);
 	}
+	return(0);	
+}
 
 function update_prefLabel($id)
-	{
-		$CI = &get_instance();
-		$prop = $this->find_class('prefLabel');
+{
+	$CI = &get_instance();
+	$prop = $this->find_class('prefLabel');
 
-		$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
-		$rlt = $CI->db->query($sql);
-		$rlt = $rlt->result_array();
-		if (count($rlt) > 0)
-		{
-			$line = $rlt[0];
-			$term = $line['d_literal'];
-			print($line);
-			exit;
-		}
-		return(0);	
-	}	
+	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+	$rlt = $CI->db->query($sql);
+	$rlt = $rlt->result_array();
+	if (count($rlt) > 0)
+	{
+		$line = $rlt[0];
+		$term = $line['d_literal'];
+		print($line);
+		exit;
+	}
+	return(0);	
+}	
 
 function ajax_search($id, $type = '') {
 	$CI = &get_instance();
