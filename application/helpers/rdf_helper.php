@@ -60,20 +60,20 @@ class rdf
 	}
 	/* Identifica ID da lista com as propriedades */
 	function filter($dt,$prop)
+	{
+		$rst = array();
+		for ($r=0;$r < count($dt);$r++)
 		{
-			$rst = array();
-			for ($r=0;$r < count($dt);$r++)
+			$ln = $dt[$r];
+			$class = trim($ln['c_class']);
+			if (trim($ln['c_class']) == trim($prop))
 			{
-				$ln = $dt[$r];
-				$class = trim($ln['c_class']);
-				if (trim($ln['c_class']) == trim($prop))
-				{
 				$ids = $ln['d_r1'];
 				array_push($rst,$ids);
-				}
 			}
-			return($rst);
 		}
+		return($rst);
+	}
 
 	function find($n, $prop = '', $equal = 1) {
 		$CI = &get_instance();
@@ -1384,104 +1384,107 @@ class rdf
 	}	
 
 	function cas_text($id, $prop, $dt = array()) {
+		if (!isset($dt['label1'])) 
+		{ 
+			$dt['label1'] = msg('name');
+		}
+
+		$tela = '';
+		$tela .= '<span style="font-size: 75%">'.msg('form_text').'</span><br>'.cr();
+		$tela .= '<textarea col=80 row=3 id="dd51" name="dd51" class="form-control">'.cr();
+		$tela .= '</textarea>'.cr();
+		$tela .= '<input type="hidden" name="dd55" id="dd55" value="'.$prop.'">'.cr();
+		$tela .= '<input type="hidden" name="dd54" id="dd54" value="'.$id.'">'.cr();
+		$tela .= '<input type="hidden" name="dd53" id="dd53" value="text">'.cr();
+		$tela .= '<br/>';
+		$tela .= '
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+		<button type="button" class="btn btn-warning" style="display: none;" id="save">Incluir</button>
+		<button type="button" class="btn btn-primary" id="submt">Salvar</button>
+		</div>                  
+		';		
+		$tela .= '<div id="dd51a"></div>';
+		$tela .= '<script>'.cr();
+		$tela .= '	
+		/************ submit ***************/
+		jQuery("#submt").click(function() 
+		{
+			var $key = jQuery("#dd51").val();
+			var $key2 = jQuery("#dd54").val();
+			var $key3 = jQuery("#dd55").val();
+			var $type = jQuery("#dd53").val();
+			$.ajax(
+			{
+				type: "POST",
+				url: "' . base_url(PATH . 'config/class/ajax_save/'.$id.'?nocab=t') . '",
+				data: "q="+$key+"&dd10="+$key2+"&dd11="+$key3+"&type="+$type,
+				success: function(data){
+					$("#dd51a").html(data);
+				}
+			}
+			);                           
+		}
+		);
+		</script>';
+
+		/**************** fim ******************/
+		return ($tela);
+	}		
+
+	function cas_ajax($path, $id, $dt = array()) {
 		if (!isset($dt['label1'])) { $dt['label1'] = msg('name');
 	}
 
+	/* */
+	$type = '';
+	if (isset($dt['type'])) {
+		$type = $dt['type'];
+	}
 	$tela = '';
-	$tela .= '<span style="font-size: 75%">'.msg('form_text').'</span><br>'.cr();
-	$tela .= '<textarea col=80 row=3 id="dd51" name="dd51" class="form-control">'.cr();
-	$tela .= '</textarea>'.cr();
-	$tela .= '<input type="hidden" name="dd55" id="dd55" value="'.$prop.'">'.cr();
-	$tela .= '<input type="hidden" name="dd54" id="dd54" value="'.$id.'">'.cr();
-	$tela .= '<input type="hidden" name="dd53" id="dd53" value="text">'.cr();
-	$tela .= '<br/>';
-	$tela .= '
-	</div>
-	<div class="modal-footer">
-	<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-	<button type="button" class="btn btn-warning" style="display: none;" id="save">Incluir</button>
-	<button type="button" class="btn btn-primary" id="submt">Salvar</button>
-	</div>                  
-	';		
-	$tela .= '<div id="dd51a"></div>';
+	$tela .= '<span style="font-size: 75%">filtro do [' . $dt['label1'] . ']</span><br>';
+	$tela .= '<input type="text" id="dd50" name="dd50" class="form-control">'.cr();
+	$tela .= '<span style="font-size: 75%">selecione o [' . $dt['label1'] . ']</span><br>'.cr();
+	$tela .= '<div id="dd51a"><select class="form-control" size=5 name="dd51" id="dd51"></select></div>'.cr();
 	$tela .= '<script>'.cr();
+	$tela .= '
+	/************ keyup *****************/
+	jQuery("#dd50").keyup(function() 
+	{
+		var $key = jQuery("#dd50").val();
+		$.ajax(
+		{
+			type: "POST",
+			url: "' . base_url(PATH . 'config/class/ajax_search/' . $path . '/' . $id . '/' . $type.'?nocab=T') . '",
+			data:"q="+$key,
+			success: function(data){
+				$("#dd51a").html(data);
+			}
+		}
+		);
+	});';
 	$tela .= '	
 	/************ submit ***************/
 	jQuery("#submt").click(function() 
 	{
 		var $key = jQuery("#dd51").val();
-		var $key2 = jQuery("#dd54").val();
-		var $key3 = jQuery("#dd55").val();
-		var $type = jQuery("#dd53").val();
 		$.ajax(
 		{
 			type: "POST",
-			url: "' . base_url(PATH . 'config/class/ajax_save/'.$id.'?nocab=t') . '",
-			data: "q="+$key+"&dd10="+$key2+"&dd11="+$key3+"&type="+$type,
+			url: "' . base_url(PATH . 'ajax/ajax3/' . $path . '/' . $id) . '",
+			data: "q="+$key,
 			success: function(data){
 				$("#dd51a").html(data);
 			}
+			});                           
 		}
-		);                           
-	}
-	);
-	</script>';
-
-	/**************** fim ******************/
-	return ($tela);
-}		
-
-function cas_ajax($path, $id, $dt = array()) {
-	if (!isset($dt['label1'])) { $dt['label1'] = msg('name');
-}
-
-/* */
-$type = '';
-if (isset($dt['type'])) {
-	$type = $dt['type'];
-}
-$tela = '';
-$tela .= '<span style="font-size: 75%">filtro do [' . $dt['label1'] . ']</span><br>';
-$tela .= '<input type="text" id="dd50" name="dd50" class="form-control">'.cr();
-$tela .= '<span style="font-size: 75%">selecione o [' . $dt['label1'] . ']</span><br>'.cr();
-$tela .= '<div id="dd51a"><select class="form-control" size=5 name="dd51" id="dd51"></select></div>'.cr();
-$tela .= '<script>'.cr();
-$tela .= '
-/************ keyup *****************/
-jQuery("#dd50").keyup(function() 
-{
-	var $key = jQuery("#dd50").val();
-	$.ajax(
-	{
-		type: "POST",
-		url: "' . base_url(PATH . 'config/class/ajax_search/' . $path . '/' . $id . '/' . $type.'?nocab=T') . '",
-		data:"q="+$key,
-		success: function(data){
-			$("#dd51a").html(data);
-		}
-	}
-	);
-});';
-$tela .= '	
-/************ submit ***************/
-jQuery("#submt").click(function() 
-{
-	var $key = jQuery("#dd51").val();
-	$.ajax({
-		type: "POST",
-		url: "' . base_url(PATH . 'ajax/ajax3/' . $path . '/' . $id) . '",
-		data: "q="+$key,
-		success: function(data){
-			$("#dd51a").html(data);
-		}
-		});                           
-		});
+		);
 		</script>';
 
 		/**************** fim ******************/
 		return ($tela);
 	}
-
 
 	function view_data($id) {
 		$CI = &get_instance();
@@ -1671,6 +1674,71 @@ function tools($tools,$ac,$id)
 	}
 	return($tela);			
 
+}
+
+/************************************************************************** CREATE C */
+function export_c($id)
+{
+	$dt = $this->le($id);
+	$class = $dt['c_class'];
+	$file = 'name.nm';
+	$txt = '';
+
+	switch($class)
+	{
+		/********************************************** ENDERECO ******************/
+		case 'Address':
+		$dts = $this->le_data($id);
+		$cep = $this->recupera($dts,'hasAddressCep');
+		if (strlen($cep) > 0) { $cep = substr($cep,0,2).'.'.substr($cep,2,3).'-'.substr($cep,5,3); }
+		$cidade = $this->recupera($dts,'hasAddressCity');
+		$ativo = $this->recupera($dts,'isAddressActive');
+		$tipo = $this->recupera($dts,'isAddressType');
+		$bairro = $this->recupera($dts,'isNeighborhood');
+		$rua = $this->recupera($dts,'isStreet');
+		$ruanr = $this->recupera($dts,'isStreetNumber');
+		$work = $this->recupera($dts,'workCorporateBody');
+
+		$txt = '<i>'.$tipo.'</i>';
+		if (strlen($work) > 0)
+		{
+			$txt .= '<br/><b>'.$work.'</b>';
+		}
+		$txt .= '<br>'.$rua.' '.$ruanr.'<br>'.$bairro.' - '.$cidade;
+		if (strlen($cep) > 0)
+			{ $txt .= '<br>CEP: '.$cep; }
+
+		if (($ativo != 'SIM') and ($ativo != 'YES'))
+		{
+			$txt = '<s>'.$txt.'</s>';
+		}		
+		break;
+	}
+	/******************************************** SALVA ARQUIVOS *********************/
+	if (strlen($txt) > 0)
+	{
+		$dir = 'c';
+		check_dir($dir);
+		$dir = 'c/'.$id.'/';
+		check_dir($dir);
+
+		if (strlen($file) > 0) { file_put_contents ($dir.$file,$txt) ;}
+	}
+	return(1);
+}
+
+function recupera($dt,$prop)
+{
+	$vlr = '';
+	for ($r=0;$r < count($dt);$r++)
+	{
+		$line = $dt[$r];
+		if ($line['c_class'] == $prop)
+		{
+			$vlr = $line['n_name'];
+		}
+	}
+	return($vlr);
 }
 
 function class_view_form($id='')
