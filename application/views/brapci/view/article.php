@@ -4,15 +4,19 @@ $key['pt'] = '';
 $key['en'] = '';
 $key['es'] = '';
 $key['fr'] = '';
+$disponivel_em = '';
 $section = '';
 $source = '';
 $author = '';
+$authores = array();
 $journal = '';
 $idurl = '';
 $pdf = '<img src="' . base_url('img/icone/icone_pdf_off.png') . '" class="img-fluid" title="'.msg('PDF not avaliable').'">';
 $linkpdf = '<a href="#">';
 $linkpdfa = '</a>';
 $epdf = 0;
+$pg_first = '';
+$pg_last = '';
 $doi = '';
 if (!isset($social))
     {
@@ -34,6 +38,18 @@ for ($r = 0; $r < count($article); $r++) {
 	//echo '<br>' . $class.' ==> '.$value;
 
 	switch(trim($class)) {
+		case 'dateOfAvailability':
+			$disponivel_em = $value;
+			break;
+		case 'hasRegisterId':
+			if (substr($value,0,2) == '10') { $doi = $value; }
+			break;
+		case 'hasPageEnd':
+			$pg_first = $value;
+			break;
+		case 'hasPageStart':
+			$pg_last = $value;
+			break;
 		case 'hasFileStorage':
 			$pdf = '<img src="' . base_url('img/icone/icone_pdf.png') . '" class="img-fluid">';
 			$linkpdf = '<span onclick="newxy2(\''.base_url(PATH.'download/'.$d_r2).'\',1024,800);" target="_new" style="cursor: pointer;">';
@@ -57,6 +73,7 @@ for ($r = 0; $r < count($article); $r++) {
 			if (strlen($author) > 0) { $author .= '; ';
 			}
 			$author .= $link . $value . $linka;
+			array_push($authores,$value);
 			break;
 		case '' :
 			break;
@@ -89,10 +106,12 @@ for ($r = 0; $r < count($article); $r++) {
 			break;
 	}
 }
+
 ?>
 </div>
 <header>
     <title><?php echo $title;?></title>
+    <?php require("article_metadata.php"); ?>
 </header>
 <div class="row">
 	<div class="col-8">
@@ -169,6 +188,8 @@ for ($r = 0; $r < count($article); $r++) {
 				echo '</a>';
 				echo '</div>';
 			}
+		echo '<br><br>';
+		echo $altmetrics;
 		
 		?>
 	</div>

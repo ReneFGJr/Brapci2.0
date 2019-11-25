@@ -375,6 +375,12 @@ class frbr extends CI_model {
     function show_article($id) {
         $tela = '';
         $data = $this -> frbr_core -> le_data($id);
+
+        /*********************************** Altmetrics ****************/
+        $rdf = new rdf;
+        $dados['doi'] = $rdf->recupera($data,'hasRegisterId');
+        $dados['altmetrics'] = $this->altmets->altmetrics($dados['doi']);
+
         $article = $dados['article'] = $data;
         $dados['social'] = $this -> nets -> twitter($data);
         $dados['social'] .= $this -> nets -> facebook($data);

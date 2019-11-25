@@ -220,6 +220,7 @@ class res extends CI_Controller {
         $this -> load -> model('genero');
         $this -> load -> model('frad');
         $this -> load -> model('handle');
+        $this -> load -> model('altmets');
 
         $vv = $this -> frbr_core -> le_data($id);
         $data['meta'] = $vv;
