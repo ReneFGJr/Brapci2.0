@@ -5,7 +5,7 @@
 		<title>API Brapci - Base de Dados em Ciência da Informação</title>    
 		<META NAME="title" CONTENT="Brapci - Base de Dados em Ciência da Informação - API">
 		<META NAME="url" CONTENT="http://www.brapci.inf.br/">
-		<META NAME="description" CONTENT="API para organização da informação">
+		<META NAME="description" CONTENT="Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.">
 
 		<META NAME="keywords" CONTENT="artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia">
 		<META NAME="copyright" CONTENT="Brapci">
@@ -63,33 +63,32 @@
 				</ul>
 			</div>
 		</nav>
-
-		<div class="container-fluid">
+		<div class="container">
 			<div class="row">
-				<div class="table-of-contents"><?php include("ide_apis.php");?></div>
-				<div class="col-md-8">
-					<?php require("api_nlp.php");?>
-					<?php require("api_genere.php");?>
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<h1>API - Brapci</h1>
+					<form method="post" target="result" action="<?php echo base_url('index.php/api/cmd/'.md5('nlp').'/nlp');?>">
+						Text to process
+						<textarea name="dd1" rows="10" style="width: 100%;"><?php echo get("dd1");?></textarea>
+						<br>
+						<input type="submit" name="action" value="Processing >>>" >
+					</form>
 				</div>
-				<div class="col-md-2">
+				<div class="col-md-1">
 
 				</div>
 			</div>
 		</div>
 
+
+		<div class="container">
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<iframe name="result" src="<?php echo base_url('index.php/api/cmd/'.$token.'/null');?>" style="width: 100%; height: 400px;">OLA</iframe>
+				</div>
+			</div>
+		</div>
+
 		<br><br><br><br><br><br><br>
-
-
-
-		<style>
-			.table-of-contents {
-				display: table-cell;
-				width: 320px;
-				height: 100%;
-				background: #eee;
-				border-right: 1px solid #ececec;
-				padding-left: 20px;
-				padding-top: 40px;
-				z-index: 2;
-			}
-		</style>

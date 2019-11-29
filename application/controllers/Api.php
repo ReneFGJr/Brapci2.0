@@ -24,42 +24,68 @@ class api extends CI_Controller {
 		date_default_timezone_set('America/Sao_Paulo');
 	}
 	function index()
-		{
-			$data['token'] = md5('api');
-			$this->load->view('api/ide',$data);
-		}
-
-
-	function cmd($tkn='',$cmd='',$a2='',$a3='',$a4='',$a5='',$a6='')
 	{
-		$this->load->model("API_Brapci");
-		$rsp = array();
-		if ($tkn == '') 
-		{
-			$cmd = 'tkn';
+		$data['token'] = md5('api');
+		$this->load->view('api/ide',$data);
+	}
 
-		}
+
+	function cmd($cmd='',$a2='',$a3='',$a4='',$a5='',$a6='')
+	{
+		$this->load->model("api_brapci");
+		$tkn = get("token");
+		$q = get("q");
+
+		$rsp = array();
 		$rsp = array(date("Y-m-d H:i:s")=>'data',$cmd=>'command');
 		switch($cmd)
 		{
 			case 'nlp':
-				$txt = get("dd1");
-				$txt = (string)$txt;
-				$this->API_Brapci->nlp($txt);
-				print_r($rsp);
-				exit;
+			$txt = get("dd1");
+			$txt = (string)$txt;
+			$this->api_brapci->nlp($txt);
+			print_r($rsp);
+			exit;
 			break;
+
+			/************************************ GENERO ***************************/
+			case 'genere':
+			$this->load->model("genero");
+			$rsp[$q] = 'name';	
+			$rsp[$this->genero->api($q)] = 'genre';
+			$rsp[strtoupper(substr($this->genero->api($q),0,1))] = 'genre_abrev';
+			$type = get("type");
+			switch ($type)
+			{
+				case 'abrev':
+				foreach ($rsp as $key => $value) {
+					# code...
+					if ($value == 'genre_abrev') { echo $key; exit; }
+				}
+				break;
+			
+				case 'txt':
+				foreach ($rsp as $key => $value) {
+					# code...
+					if ($value == 'genre') { echo $key; exit; }
+				}
+				break;				
+			}
+			break;
+
 			case 'null':
 			break;	
 			case 'export':
-				$this->API_Brapci->create_index_list();
-				$this->API_Brapci->create_stopwords();
-				
+			$this->api_brapci->create_index_list();
+			$this->api_brapci->create_stopwords();
+
 			case 'tkn':
 			
 			break;
 			default:
-			$rsp['000'] = 'status';
+			$rsp['999'] = 'status';
+			$rsp['API "'.(string)$cmd.'" not found'] = 'message';
+			$rsp['Looking http://www.brapci.inf.br/api'] = 'url';
 			break;
 		}
 		header('Content-Type: application/xml');

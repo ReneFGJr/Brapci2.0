@@ -13,11 +13,13 @@ echo '	<meta name="DC.Date.created" scheme="ISO8601" content="'.$disponivel_em.'
 //<meta name="DC.Date.issued" scheme="ISO8601" content="2018-04-19"/>
 //<meta name="DC.Date.modified" scheme="ISO8601" content="2018-04-19"/>
 /********************************************************** Resumos **************/
-foreach ($abs as $keys => $value) 
+if (isset($abs))
+{
+	foreach ($abs as $keys => $value) 
 	{
-	echo '<meta name="DC.Description" xml:lang="'.$keys.'" content="'.$value.'"/>'.cr(); 
+		echo '<meta name="DC.Description" xml:lang="'.$keys.'" content="'.$value.'"/>'.cr(); 
 	}
-
+}
 echo '<meta name="DC.Format" scheme="IMT" content="application/pdf"/>'.cr();
 echo '<meta name="DC.Identifier" content="'.$id.'"/>'.cr();
 echo '	<meta name="DC.Identifier.pageNumber" content="'.$pg_first.'-'.$pg_last.'"/>'.cr();
@@ -33,9 +35,9 @@ echo '	<meta name="DC.Source" content="'.$journal.'"/>'.cr();
 //<meta name="DC.Source.Volume" content="24"/>
 
 /******************************* KEYWORDS **********************************/
-$keys = $key;
+$keys = ($key);
 foreach ($keys as $keyx => $value) {
-	$vlrs = splitx(';',$value.';');
+	$vlrs = splitx('.',strip_tags($value).'.');
 	for ($r=0;$r < count($vlrs);$r++)
 	{
 		echo '	<meta name="DC.Subject" xml:lang="'.$keyx.'" content="'.$vlrs[$r].'"/>'.cr();	
@@ -69,7 +71,7 @@ if (strlen($doi) > 0) 		{ 	echo '	<meta name="citation_doi" content="'.$doi.'"/>
 //echo '<meta name="citation_abstract_html_url" content="'..'">'.cr();
 echo '<meta name="citation_language" content="pt"/>'.cr();
 foreach ($keys as $keyx => $value) {
-	$vlrs = splitx(';',$value.';');
+	$vlrs = splitx('.',strip_tags($value).'.');
 	for ($r=0;$r < count($vlrs);$r++)
 	{
 		echo '	<meta name="citation_keywords" xml:lang="'.$keyx.'" content="'.$vlrs[$r].'"/>'.cr();	

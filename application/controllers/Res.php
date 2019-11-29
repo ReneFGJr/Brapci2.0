@@ -823,12 +823,16 @@ class res extends CI_Controller {
 
     function export($tp = '', $pg = 0) {
         $this -> load -> model('export');
+        $this -> load -> model('genero');
         $this -> load -> model('frbr_core');
         $this -> load -> model('elasticsearch');
 
         $this -> cab();
 
         switch($tp) {
+            case 'genere' :
+                $tela = $this -> genero -> export();
+                break;            
             case 'all_xls' :
                 $this -> export -> all_xls();
                 break;
@@ -869,7 +873,7 @@ class res extends CI_Controller {
                 $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
-
+                $tela .= '<li><a href="' . base_url(PATH . 'export/genere') . '">' . msg('export_genere') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
                 break;
         }

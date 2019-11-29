@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# REGRAS PARA IGNORAR
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %(REQUEST_FILENAME} !-d
+
+# REGRA GERAL
+RewriteRule . /projetos/Brapci2.0/index.php [L]
