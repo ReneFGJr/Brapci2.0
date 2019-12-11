@@ -603,6 +603,8 @@ class oai_pmh extends CI_model {
             /************************************************ numero *****************/
             $n = troca($n,'N.','n.');
             $n = troca($n,'Núm.','n.');
+            $n = troca($n,'Núm.:','n.');
+            $n = troca($n,':','');
             $n = troca($n,'No ','n.');
             $n = troca($n,'No. ','n.');
             $n = troca($n,'Nº ','n.');
