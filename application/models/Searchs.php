@@ -61,7 +61,8 @@ class searchs extends CI_Model {
         $q = get("q");
         $q = troca($q, '"', '¢');
         $link = base_url('index.php/res/?q=' . $q . '&type=' . get("type"));
-
+        if (strlen(get("year_s")) > 0) { $link .= '&year_s='.round(get("year_s")); }
+        if (strlen(get("year_e")) > 0) { $link .= '&year_e='.round(get("year_e")); }
         $p = round(get("p"));
         if ($p == 0) { $p = 1;
         }
@@ -283,7 +284,7 @@ class searchs extends CI_Model {
         }
 
         $sx = '<div class="container"><div class="row">';
-        $sx .= $this -> bs -> script_all($st);
+        $sx .= $this -> bs -> script_all($st,$n,$t);
         $sx .= '<div class="col-8">' . $this -> pages($n, $total) . '</div>' . cr();
         $sx .= '<div class="col-4">Total ' . $total . '</div>' . cr();
         $sx .= '</div></div>';

@@ -682,6 +682,10 @@ class res extends CI_Controller {
         $this -> bs -> ajax_mark($key, $vlr);
     }
 
+    function mark_all($key = '', $vlr = '') {        
+        $this -> bs -> ajax_mark_all($key, $vlr);
+    }
+
     function basket($fcn = '', $arg = '') {
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');

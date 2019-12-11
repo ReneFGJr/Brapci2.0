@@ -153,6 +153,7 @@ $lang['csv_selected'] = 'Exportar CSV';
 $lang['doc_selected'] = 'Exportar DOC';
 $lang['select_page'] = 'Selecionar Página';
 $lang['select_all'] = 'Selecionar Tudo';
+$lang['select_all_page'] = 'Selecionar Tudo';
 $lang['not_match_to'] = 'Nada localizado para';
 $lang['admin_vocabulary'] = 'Vocabulário controlado';
 $lang['admin_config'] = 'Configurações';

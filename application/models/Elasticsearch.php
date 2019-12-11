@@ -300,7 +300,7 @@ class elasticsearch extends CI_model {
      * @return type
      */
 
-    public function query($type, $q, $t, $ord = 0) {
+    public function query($type, $q, $t, $ord = 0,$full=0) {
         $OR = 0;
         if (strpos($q, ' OR ')) { $OR = 1;
             $q = troca($q, ' OR ', ' ');
@@ -312,7 +312,13 @@ class elasticsearch extends CI_model {
         // https://www.youtube.com/watch?v=5lO4cAQlaEw&t=26s
         // https://www.youtube.com/watch?v=MXFp4OPdV4I
         /******************* PAGINACAO *******/
-        $sz = $this -> searchs -> sz;
+        if ($full == 0)
+        {
+            $sz = $this -> searchs -> sz;    
+        } else {
+            $sz = 10000;
+        }
+        
         $p = round(get("p"));
         $fr = ($p - 1);
         if ($fr < 0) { $fr = 0;
