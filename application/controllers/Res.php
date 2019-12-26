@@ -1476,6 +1476,16 @@ class res extends CI_Controller {
         $tela .= '<div class="row">';
         $tela .= '<div class="col-md-12">';
         switch($ac) {
+            case 'cited_analyse':
+                if (strlen($dd1) == 0) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> cited_analyse($dd1);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= $rst;
+                }            
+                break;
             case 'csv_to_net' :
                 if (!(isset($_FILES['userfile']['tmp_name']))) {
                     $tela .= $this -> bibliometrics -> form_file(msg($ac));

@@ -178,6 +178,27 @@ class rdf
 		return ($rlt);
 	}  
 
+	/******************************** PREFIX AND SUFIX ************/
+    function rdf_prefix($url = '') {
+    	$CI = &get_instance();
+        $pre = substr($url, 0, strpos($url, ':'));
+        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
+        $sx = $pre;
+        $sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
+        $rlt = $CI -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $line = $rlt[0];
+        $uri = trim($line['prefix_url']);
+        return ($uri);
+    }
+
+    function rdf_sufix($url = '') {
+        $pre = substr($url, 0, strpos($url, ':'));
+        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
+        return ($pos);
+    }
+
+
 	function pagination($t) 
 	{
 		$pg = round('0' . get("pg"));
@@ -1542,8 +1563,10 @@ class rdf
 		return ($l . $n . $la);
 	}
 
-	function search($d) {
-		if (!isset($d['dd1'])) {
+	function search($d) 
+	{
+		if (!isset($d['dd1'])) 
+		{
 			return ('');
 		}
 		$dd1 = $d['dd1'];
@@ -1552,730 +1575,1047 @@ class rdf
 		$lns = splitx(';', $dd1);
 		$sx = '';
 		$wh = '';
-		for ($r = 0; $r < count($lns); $r++) {
-			if (strlen($wh) > 0) { $wh .= ' AND ';
-		}
-		$wh .= " (n_name like '%" . $lns[$r] . "%')";
-	}
-	if (strlen($wh) == 0) {
-		return ('');
-	}
-	$cps = 'c_class, id_c, n_name, id_cc';
-	$sql = "select $cps from rdf_concept
-	INNER JOIN rdf_name ON id_n = cc_pref_term 
-	INNER JOIN rdf_class ON id_c = cc_class
-	WHERE $wh AND c_find = 1  AND cc_library = " . LIBRARY . "
-	group by $cps";
-	$rlt = $this -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	$sx .= '<div class="container">' . cr();
-	$sx .= '<div class="row">' . cr();
-	for ($r = 0; $r < count($rlt); $r++) {
-		$line = $rlt[$r];
-		$class = $line['c_class'];
-		$classC = $line['c_class'];
-		if (substr($class,0,strlen('Tesauro')) == 'Tesauro')
+		for ($r = 0; $r < count($lns); $r++) 
 		{
-			$classC = 'Tesauro';
+			if (strlen($wh) > 0) 
+			{ 
+				$wh .= ' AND ';
+			}
+			$wh .= " (n_name like '%" . $lns[$r] . "%')";
 		}
-		switch ($classC) {
-			case 'CDU' :
-			$idw = $line['id_cc'];
-			$img = $this -> recupera_imagem($idw, 'img/icon/icone_cdu.jpg');
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_type($line, 'UDC', $img) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'Corporate Body' :
-			$idw = $line['id_cc'];
-			$img = $this -> recupera_imagem($idw, 'img/icon/icone_build.jpg');
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_corporate($line) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'SerieName' :
-			$idw = $line['id_cc'];
-			$img = $this -> recupera_imagem($idw);
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_seriename($line) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'Tesauro' :
-			$idw = $line['id_cc'];
+		if (strlen($wh) == 0) 
+		{
+			return ('');
+		}
+		$cps = 'c_class, id_c, n_name, id_cc';
+		$sql = "select $cps from rdf_concept
+		INNER JOIN rdf_name ON id_n = cc_pref_term 
+		INNER JOIN rdf_class ON id_c = cc_class
+		WHERE $wh AND c_find = 1  AND cc_library = " . LIBRARY . "
+		group by $cps";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx .= '<div class="container">' . cr();
+		$sx .= '<div class="row">' . cr();
+		for ($r = 0; $r < count($rlt); $r++) 
+		{
+			$line = $rlt[$r];
+			$class = $line['c_class'];
+			$classC = $line['c_class'];
+			if (substr($class,0,strlen('Tesauro')) == 'Tesauro')
+			{
+				$classC = 'Tesauro';
+			}
+			switch ($classC) {
+				case 'CDU' :
+				$idw = $line['id_cc'];
+				$img = $this -> recupera_imagem($idw, 'img/icon/icone_cdu.jpg');
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_type($line, 'UDC', $img) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'Corporate Body' :
+				$idw = $line['id_cc'];
+				$img = $this -> recupera_imagem($idw, 'img/icon/icone_build.jpg');
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_corporate($line) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'SerieName' :
+				$idw = $line['id_cc'];
+				$img = $this -> recupera_imagem($idw);
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_seriename($line) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'Tesauro' :
+				$idw = $line['id_cc'];
+				//$link = '<a href="' . base_url(PATH . 'v/' . $line['id_c']) . '" target="_new">';
+				$link = '<a href="' . base_url(PATH . 'v/' . $idw) . '" target="_new">';
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$img = $this -> recupera_imagem($idw);                    
+				$sx .= $link;
+				$sx .= $img;
+				$sx .= $line['n_name'];
+				$sx .= '</a><br><sup>';
+				$sx .= msg($line['c_class']);
+				$sx .= '</sup>';
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'Work' :
+				$idw = $line['id_cc'];
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_manifestation_by_works($idw) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'BookChapter' :
+				$idw = $line['id_cc'];
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_chapter($line) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'Person' :
+				$idw = $line['id_cc'];
+				$img = $this -> recupera_imagem($idw);
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_person($line) . cr();
+				$sx .= '</div>' . cr();
+				break;
+
+				case 'Item' :
+				$idw = $line['id_cc'];
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$sx .= $this -> show_manifestation_by_item($idw) . cr();
+				$sx .= '<br><br><span style="font-size: 12px;">Tombo:' . $line['n_name'] . '</span>';
+				$sx .= '</div>' . cr();
+				break;
+
+				default :
+				$idw = $line['id_cc'];
                     //$link = '<a href="' . base_url(PATH . 'v/' . $line['id_c']) . '" target="_new">';
-			$link = '<a href="' . base_url(PATH . 'v/' . $idw) . '" target="_new">';
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$img = $this -> recupera_imagem($idw);                    
-			$sx .= $link;
-			$sx .= $img;
-			$sx .= $line['n_name'];
-			$sx .= '</a><br><sup>';
-			$sx .= msg($line['c_class']);
-			$sx .= '</sup>';
-			$sx .= '</div>' . cr();
-			break;
-			case 'Work' :
-			$idw = $line['id_cc'];
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_manifestation_by_works($idw) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'BookChapter' :
-			$idw = $line['id_cc'];
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_chapter($line) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'Person' :
-			$idw = $line['id_cc'];
-			$img = $this -> recupera_imagem($idw);
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_person($line) . cr();
-			$sx .= '</div>' . cr();
-			break;
-			case 'Item' :
-			$idw = $line['id_cc'];
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-			$sx .= $this -> show_manifestation_by_item($idw) . cr();
-			$sx .= '<br><br><span style="font-size: 12px;">Tombo:' . $line['n_name'] . '</span>';
-			$sx .= '</div>' . cr();
-			break;
-			default :
-			$idw = $line['id_cc'];
-                    //$link = '<a href="' . base_url(PATH . 'v/' . $line['id_c']) . '" target="_new">';
-			$link = '<a href="' . base_url(PATH . 'v/' . $idw) . '" target="_new">';
-			$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
+				$link = '<a href="' . base_url(PATH . 'v/' . $idw) . '" target="_new">';
+				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
                     //$sx .= '<h1>[' . $class . ']</h1>';
-			$sx .= $link;
-			$sx .= $line['n_name'];
-			$sx .= '</a>';
-			$sx .= ' (';
-			$sx .= msg($line['c_class']);
-			$sx .= ')' . cr();
-			$sx .= '</div>' . cr();
-			break;
+				$sx .= $link;
+				$sx .= $line['n_name'];
+				$sx .= '</a>';
+				$sx .= ' (';
+				$sx .= msg($line['c_class']);
+				$sx .= ')' . cr();
+				$sx .= '</div>' . cr();
+				break;
+			}
 		}
+		$sx .= '</div>';
+		$sx .= '</div>';
+		return ($sx);
 	}
-	$sx .= '</div>';
-	$sx .= '</div>';
-	return ($sx);
-}
 
-function tools($tools,$ac,$id)
-{
-	$tela = '';
-	switch($tools) {
-		case 'class' :
-		$tela .= $rdf -> classes_lista();
-		break;
-		case 'class-ed' :
-		$tela .= $rdf -> classes_ed($id);
-		break;            
-	}
-	return($tela);			
 
-}
+	/***************** Gerador de ìndices **************/
+    function index_work($lt = '') {
+    	$CI = &get_instance();
+        $class = "Work";
+        $f = $this -> find_class($class);
 
-/************************************************************************** CREATE C */
-function export_c($id)
-{
-	$dt = $this->le($id);
-	$class = $dt['c_class'];
-	$file = 'name.nm';
-	$txt = '';
+        $sql = "select * from rdf_concept 
+                        INNER JOIN rdf_name ON cc_pref_term = id_n
+                        where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
+                        ORDER BY n_name";
+        $rlt = $CI -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '<ul>';
+        $l = '';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $xl = substr(LowerCaseSql($line['n_name']), 0, 1);
+            if ($xl != $l) {
+                $sx .= '<h4>' . UpperCaseSql($xl) . '</h4>';
+                $l = $xl;
+            }
+            $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
+            $name = $link . $line['n_name'] . '</a>';
+            $sx .= '<li>' . $name . '</li>' . cr();
+        }
+        return ($sx);
+    }
 
-	switch($class)
-	{
-		/********************************************** ENDERECO ******************/
-		case 'Address':
-		$dts = $this->le_data($id);
-		$cep = $this->recupera($dts,'hasAddressCep');
-		if (strlen($cep) > 0) { $cep = substr($cep,0,2).'.'.substr($cep,2,3).'-'.substr($cep,5,3); }
-		$cidade = $this->recupera($dts,'hasAddressCity');
-		$ativo = $this->recupera($dts,'isAddressActive');
-		$tipo = $this->recupera($dts,'isAddressType');
-		$bairro = $this->recupera($dts,'isNeighborhood');
-		$rua = $this->recupera($dts,'isStreet');
-		$ruanr = $this->recupera($dts,'isStreetNumber');
-		$work = $this->recupera($dts,'workCorporateBody');
 
-		$txt = '<i>'.$tipo.'</i>';
-		if (strlen($work) > 0)
-		{
-			$txt .= '<br/><b>'.$work.'</b>';
-		}
-		$txt .= '<br>'.$rua.' '.$ruanr.'<br>'.$bairro.' - '.$cidade;
-		if (strlen($cep) > 0)
-			{ $txt .= '<br>CEP: '.$cep; }
+	function index_author($lt = '') {
+		$CI = &get_instance();
+		$class = "Person";
+		$f = $this -> find_class($class);
 
-		if (($ativo != 'SIM') and ($ativo != 'YES'))
-		{
-			$txt = '<s>'.$txt.'</s>';
-		}		
-		break;
-	}
-	/******************************************** SALVA ARQUIVOS *********************/
-	if (strlen($txt) > 0)
-	{
-		$dir = 'c';
-		check_dir($dir);
-		$dir = 'c/'.$id.'/';
-		check_dir($dir);
-
-		if (strlen($file) > 0) { file_put_contents ($dir.$file,$txt) ;}
-	}
-	return(1);
-}
-
-function recupera($dt,$prop)
-{
-	$vlr = '';
-	for ($r=0;$r < count($dt);$r++)
-	{
-		$line = $dt[$r];
-		if ($line['c_class'] == $prop)
-		{
-			$vlr = $line['n_name'];
-		}
-	}
-	return($vlr);
-}
-
-function class_view_form($id='')
-{
-	$CI = &get_instance();
-	$sql = "select sc_class, sc_propriety, sc_ord, id_sc,
-	t1.c_class as c_class, t2.prefix_ref as prefix_ref,
-	t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref
-	FROM rdf_form_class
-	INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
-	LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
-
-	LEFT JOIN rdf_class as t3 ON t3.id_c = sc_range
-	LEFT JOIN rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
-
-	where sc_class = $id
-	AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
-	order by sc_ord";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();	
-	$sx = '<div class="col-md-6">';
-	$sx .= '<h4>'.msg("Form").'</h4>';
-	$sx .= '<table class="table">';
-	$sx .= '<tr><th width="4%">#</th>';
-	$sx .= '<th width="47%">'.msg('propriety').'</th>';
-	$sx .= '<th width="47%">'.msg('range').'</th>';
-	$sx .= '</tr>';
-	for ($r=0;$r < count($rlt);$r++)			
-	{
-		$line = $rlt[$r];
-		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/forms/'.$line['id_sc']).'\',800,600);">';
-		$linka = '</a>';
-		$sx .= '<tr>';
-
-		$sx .= '<td align="center">';
-		$sx .= $line['sc_ord'];
-		$sx .= '</td>';
-
-		/* CLASS */
-		$prop = $this->prefixn($line);
-		$sx .= '<td>';	
-		$sx .= $link;			
-		$sx .= msg($line['c_class']).' ('.$prop.')';
-		$sx .= $linka;
-		$sx .= '</td>';
-
-		/* RANGE */
-		$dt = array();
-		$dt['c_class'] = $line['pc_class'];
-		$dt['prefix_ref'] = $line['pc_prefix_ref'];
-		$sx .= '<td>';
-		$sx .= $this->prefixn($dt);
-		$sx .= '</td>';
-		$sx .= '</tr>';
-	}
-	$sx .= '</table>';
-	$sx .= '</div>';
-	return($sx);
-}
-function class_view_data($id = '') {
-	$CI = &get_instance();
-	$rdf = new rdf;
-	$sx = '';
-	$sx .= '<div class="col-md-6">';
-	$sx .= '<h4>Dados</h4>';
-	/********************************************/
-	if (strlen($id) == 0) {
-		$sql = "select * from rdf_class 
-		WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
-		ORDER BY c_class ";
+		$sql = "select * from rdf_concept 
+		INNER JOIN rdf_name ON cc_pref_term = id_n
+		where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
+		ORDER BY n_name";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
-		$sx .= '<ul>';
+		$sx = '<ul>';
+		$l = '';
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
-			$link = '<a href="' . base_url(PATH.'vocabulary/' . $line['c_class']) . '">';
-			$linka = '</a>';
-			$sx .= '<li>' . $link . msg($line['c_class']) . $linka . '</li>';
+			$xl = substr($line['n_name'], 0, 1);
+			if ($xl != $l) {
+				$sx .= '<h4>' . $xl . '</h4>';
+				$l = $xl;
+			}
+			$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
+			$name = $link . $line['n_name'] . '</a>';
+			$sx .= '<li>' . $name . '</li>' . cr();
 		}
-		$sx .= '</ul>';
-	} else {
-		$ln = $rdf -> data_classes($id);
 		$sx .= '<ul>';
-		for ($r = 0; $r < count($ln); $r++) {
-			$l = $ln[$r];
-			$link = '<a href="' . base_url(PATH.'v/' . $l['id_cc']) . '">';
-			$linka = '</a>';
-			$sx .= '<li>' . $link . $l['n_name'] . $linka . '</li>';
+		return ($sx);
+	}
+
+	function index_other($lt = '', $class = 'isPublisher') {
+		$CI = &get_instance();
+		$f = $this -> find_class($class);
+
+		$sql = "select d_r2, n_name, id_cc from rdf_data
+		LEFT JOIN rdf_concept on d_r2 = id_cc  
+		LEFT JOIN rdf_name ON cc_pref_term = id_n
+		where d_P = " . $f . " AND cc_library = " . LIBRARY . "
+		GROUP BY d_r2, n_name, id_cc
+		ORDER BY n_name";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '<ul>';
+		$l = '';
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$xl = substr($line['n_name'], 0, 1);
+			if ($xl != $l) {
+				$sx .= '<h4>' . $xl . '</h4>';
+				$l = $xl;
+			}
+			$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
+			$name = $link . $line['n_name'] . '</a>';
+			$sx .= '<li>' . $name . '</li>' . cr();
 		}
-		$sx .= '</ul>';
+		$sx .= '<ul>';
+		return ($sx);
 	}
-	$sx .= '</div>';
-	return ($sx);
-}
 
-function data_classes($d) {
-	$CI = &get_instance();
-	if (sonumero($d) == $d)
+	function tools($tools,$ac,$id)
 	{
-		$id = $d;
-	} else {
-		$id = $this -> find_class($d);	
-	}
-
-	$sql = "select * from rdf_concept 
-	INNER JOIN rdf_name ON cc_pref_term = id_N
-	WHERE cc_class = $id
-	ORDER BY n_name ";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	return ($rlt);
-}	
-function classes_lista() {
-	$CI = &get_instance();
-	/**************** class *************************/
-	$sql = "select * from rdf_class where c_type = 'C' order by c_type, c_class";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	$sx = '';
-	$tp = '';
-	$lg = array('C' => 'Classe', 'P' => 'Propriedade');
-	$sx .= '<div class="row">';
-	$sx .= '<div class="col-md-1">';
-	$sx .= '<b>' . $lg['C'] . '</b>';
-	$sx .= '</div>';
-
-	$sx .= '<div class="col-md-5">';
-	for ($r = 0; $r < count($rlt); $r++) {
-		$line = $rlt[$r];
-		$link = '<a href="' . base_url(PATH . 'vocabulary_ed/' . $line['id_c']) . '">';
-
-		$sx .= msg($line['c_class']);
-		$sx .= ' (' . $link . $line['c_class'] . '</a>' . ')';
-		$sx .= '<br>';
-	}
-	$sx .= '</div>';
-
-	/**************** propriety **********************/
-	$sql = "select * from rdf_class where c_type = 'P' order by c_type, c_class";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	$sx .= '<div class="col-md-1">';
-	$sx .= '<b>' . $lg['P'] . '</b>';
-	$sx .= '</div>';
-
-	$sx .= '<div class="col-md-5">';
-	for ($r = 0; $r < count($rlt); $r++) {
-		$line = $rlt[$r];
-		$xtp = $line['c_type'];
-		$link = '<a href="' . base_url(PATH . 'vocabulary_ed/' . $line['id_c']) . '">';
-		$sx .= msg($line['c_class']);
-		$sx .= ' (' . $link . $line['c_class'] . '</a>' . ')';
-		$sx .= '<br>';
-	}
-	$sx .= '</div>';
-	$sx .= '</div>';
-	return ($sx);
-}
-function class_update_data($dta)
-{	
-	$CI = &get_instance();	
-	$sx = '';	
-	$id = $dta['id_c'];
-	if (isset($dta['c_url']) and (strlen($dta['c_url']) > 10)) 
-	{
-		$sx = '
-		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
-		' . msg('update_vocabulary') . '
-		</button>
-
-		<!-- Modal -->
-		<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-		<div class="modal-content">
-		<div class="modal-header">
-		<h5 class="modal-title" id="exampleModalLongTitle">Importação de Vocabulários</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		<span aria-hidden="true">&times;</span>
-		</button>
-		</div>
-
-		<div class="modal-body" id="cnt">
-		<span style="font-size:75%">Aguardando comando!</span>                                                            
-		</div>
-		<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-		<input type="submit" id="dd50" class="btn btn-primary" value="Atualizar">
-		</div>
-		</div>
-		</div>
-		</div>';
-		$sx .= '
-		<script>
-		jQuery("#dd50").click(function() 
-		{ jQuery("#cnt").html("Buscando...");
-		$.ajax(
-		{ method: "POST", url: "' . base_url(PATH . 'config/class/ajax_update/' . $id.'?nocab=true') . '", data: { name: "John", location: "Boston" }}) .done(function( msg ) {	jQuery("#cnt").html(msg);}); }
-		);
-		</script>'; 
-	}
-	return($sx);
-}		
-function ajax_update($id)
-{
-	$CI = &get_instance();
-	$cl = $this -> le_class($id);
-	if (count($cl) == 0) {
-		echo "Erro de classe [$id]";
-		exit ;
-	}
-	$url = trim($cl['c_url']);
-	$t = read_link($url);
-	$class = $cl['c_class'];
-	$this -> inport_rdf($t, $class);
-	$sql = "update rdf_class set c_url_update = '" . date("Y-m-d") . "' where id_c = " . $cl['id_c'];
-	$rlt = $CI -> db -> query($sql);
-	$sx = '';            		
-}
-function inport_rdf($t, $class = '') {
-	if (strlen($class) == 0) {
-		echo 'Classe não definida na importação';
-		retur('');
-	}
-	$ln = $t;
-	$ln = troca($ln, ';', ':.');
-	$ln = troca($ln, chr(13), ';');
-	$ln = troca($ln, chr(10), ';');
-	$lns = splitx(';', $ln);
-	for ($r = 0; $r < count($lns); $r++) {
-		$ln = $lns[$r];
-		$ln = troca($ln, chr(9), ';');
-
-		$l = splitx(';', $ln);
-		if (count($l) == 3) {
-			$prop = $l[1];
-			$term = $l[2];
-			$resource = $l[0];
-			if ($prop == 'skosxl:is_synonymous') {
-				$prop = 'skos:altLabel';
-			}
-			if ($prop == 'skosxl:literalForm') {
-				$prop = 'skos:altLabel';
-			}
-			if ($prop == 'skosxl:isSingular') {
-				$prop = 'skos:altLabel';
-			}
-			switch($prop) {
-				case 'skos:prefLabel' :
-				$item = $this -> frbr_name($term);
-				$p_id = $this -> rdf_concept($item, $class, $resource);
-				$this -> set_propriety($p_id, $prop, 0, $item);
-				break;
-				default :
-				$item = $this -> frbr_name($term);
-				$p_id = $this -> rdf_concept_find_id($resource);
-				if ($p_id > 0) {
-					$this -> set_propriety($p_id, $prop, 0, $item);
-				}
-				break;
-			}
+		$tela = '';
+		switch($tools) {
+			case 'class' :
+			$tela .= $rdf -> classes_lista();
+			break;
+			case 'class-ed' :
+			$tela .= $rdf -> classes_ed($id);
+			break;            
 		}
-	}
-	echo '<span style="color: #0000ff">Fim da importação</span>';
-}            	
-function rdf_concept_find_id($r) {
-	$CI = &get_instance();
-	$id = 0;
-	$sql = "select * from rdf_concept where cc_origin = '$r'";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	if (count($rlt) > 0) {
-		$line = $rlt[0];
-		return ($line['id_cc']);
-	}
-	return ($id);
-}
+		return($tela);			
 
-/*************************************** Exclude RDF Data *******************/
-function data_exclude($id) {
-	$CI = &get_instance();
-	$sql = "select * from rdf_data where id_d = " . $id;
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
-	if (count($rlt) > 0) {
-		$line = $rlt[0];
-		if ($line['d_r1'] > 0) {
-			$sql = "update rdf_data set
-			d_r1 = " . ((-1) * $line['d_r1']) . " ,
-			d_r2 = " . ((-1) * $line['d_r2']) . " ,
-			d_p  = " . ((-1) * $line['d_p']) . " 
-			where id_d = " . $line['id_d'];
-			$rlt = $CI -> db -> query($sql);
-		}
 	}
-}	
 
-function exist_prefLabel($id)
-{
-	$CI = &get_instance();
-	$prop = $this->find_class('prefLabel');
-
-	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
-	$rlt = $CI->db->query($sql);
-	$rlt = $rlt->result_array();
-	if (count($rlt) > 0)
+	/************************************************************************** CREATE C */
+	function export_c($id)
 	{
+		$dt = $this->le($id);
+		$class = $dt['c_class'];
+		$file = 'name.nm';
+		$txt = '';
+
+		switch($class)
+		{
+			/********************************************** ENDERECO ******************/
+			case 'Address':
+			$dts = $this->le_data($id);
+			$cep = $this->recupera($dts,'hasAddressCep');
+			if (strlen($cep) > 0) { $cep = substr($cep,0,2).'.'.substr($cep,2,3).'-'.substr($cep,5,3); }
+			$cidade = $this->recupera($dts,'hasAddressCity');
+			$ativo = $this->recupera($dts,'isAddressActive');
+			$tipo = $this->recupera($dts,'isAddressType');
+			$bairro = $this->recupera($dts,'isNeighborhood');
+			$rua = $this->recupera($dts,'isStreet');
+			$ruanr = $this->recupera($dts,'isStreetNumber');
+			$work = $this->recupera($dts,'workCorporateBody');
+
+			$txt = '<i>'.$tipo.'</i>';
+			if (strlen($work) > 0)
+			{
+				$txt .= '<br/><b>'.$work.'</b>';
+			}
+			$txt .= '<br>'.$rua.' '.$ruanr.'<br>'.$bairro.' - '.$cidade;
+			if (strlen($cep) > 0)
+				{ $txt .= '<br>CEP: '.$cep; }
+
+			if (($ativo != 'SIM') and ($ativo != 'YES'))
+			{
+				$txt = '<s>'.$txt.'</s>';
+			}		
+			break;
+		}
+		/******************************************** SALVA ARQUIVOS *********************/
+		if (strlen($txt) > 0)
+		{
+			$dir = 'c';
+			check_dir($dir);
+			$dir = 'c/'.$id.'/';
+			check_dir($dir);
+
+			if (strlen($file) > 0) { file_put_contents ($dir.$file,$txt) ;}
+		}
 		return(1);
 	}
-	return(0);	
-}
 
-function update_prefLabel($id)
-{
-	$CI = &get_instance();
-	$prop = $this->find_class('prefLabel');
-
-	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
-	$rlt = $CI->db->query($sql);
-	$rlt = $rlt->result_array();
-	if (count($rlt) > 0)
+	function recupera($dt,$prop)
 	{
-		$line = $rlt[0];
-		$term = $line['d_literal'];
-		print($line);
-		exit;
-	}
-	return(0);	
-}	
-
-function ajax_search($id, $type = '') {
-	$CI = &get_instance();
-	$tela = '<select name="dd51" id="dd51" size=5 class="form-control" onchange="change();">' . cr();
-	$vlr = get("q");
-	if (strlen($vlr) < 1) {
-		$tela .= '<option></option>' . cr();
-	} else {
-		$vlr = troca($vlr, ' ', ';');
-		$v = splitx(';', $vlr);
-		$wh = '';
-		for ($r = 0; $r < count($v); $r++) {
-			if ($r > 0) {
-				$wh .= ' and ';
+		$vlr = '';
+		for ($r=0;$r < count($dt);$r++)
+		{
+			$line = $dt[$r];
+			if ($line['c_class'] == $prop)
+			{
+				$vlr = $line['n_name'];
 			}
-			$wh .= "(n_name like '%" . $v[$r] . "%') ";
 		}
-		/* RANGE ***************************************************************/
-		if (strlen($type) > 0) {
-			$wh2 = '';
-			$ww = $this -> frbr_core -> find_class($type);
-			$wh2 = ' (cc_class = ' . $ww . ') ';
+		return($vlr);
+	}
 
-			$sql = "select * FROM rdf_class
-			WHERE c_class_main = $ww";
+	function class_view_form($id='')
+	{
+		$CI = &get_instance();
+		$sql = "select sc_class, sc_propriety, sc_ord, id_sc,
+		t1.c_class as c_class, t2.prefix_ref as prefix_ref,
+		t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref
+		FROM rdf_form_class
+		INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
+		LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
+
+		LEFT JOIN rdf_class as t3 ON t3.id_c = sc_range
+		LEFT JOIN rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
+
+		where sc_class = $id
+		AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
+		order by sc_ord";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();	
+		$sx = '<div class="col-md-6">';
+		$sx .= '<h4>'.msg("Form").'</h4>';
+		$sx .= '<table class="table">';
+		$sx .= '<tr><th width="4%">#</th>';
+		$sx .= '<th width="47%">'.msg('propriety').'</th>';
+		$sx .= '<th width="47%">'.msg('range').'</th>';
+		$sx .= '</tr>';
+		for ($r=0;$r < count($rlt);$r++)			
+		{
+			$line = $rlt[$r];
+			$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/forms/'.$line['id_sc']).'\',800,600);">';
+			$linka = '</a>';
+			$sx .= '<tr>';
+
+			$sx .= '<td align="center">';
+			$sx .= $line['sc_ord'];
+			$sx .= '</td>';
+
+			/* CLASS */
+			$prop = $this->prefixn($line);
+			$sx .= '<td>';	
+			$sx .= $link;			
+			$sx .= msg($line['c_class']).' ('.$prop.')';
+			$sx .= $linka;
+			$sx .= '</td>';
+
+			/* RANGE */
+			$dt = array();
+			$dt['c_class'] = $line['pc_class'];
+			$dt['prefix_ref'] = $line['pc_prefix_ref'];
+			$sx .= '<td>';
+			$sx .= $this->prefixn($dt);
+			$sx .= '</td>';
+			$sx .= '</tr>';
+		}
+		$sx .= '</table>';
+		$sx .= '</div>';
+		return($sx);
+	}
+	function class_view_data($id = '') {
+		$CI = &get_instance();
+		$rdf = new rdf;
+		$sx = '';
+		$sx .= '<div class="col-md-6">';
+		$sx .= '<h4>Dados</h4>';
+		/********************************************/
+		if (strlen($id) == 0) {
+			$sql = "select * from rdf_class 
+			WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
+			ORDER BY c_class ";
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
+			$sx .= '<ul>';
 			for ($r = 0; $r < count($rlt); $r++) {
 				$line = $rlt[$r];
-				$wh2 .= ' OR (cc_class = ' . $line['id_c'] . ') ';
+				$link = '<a href="' . base_url(PATH.'vocabulary/' . $line['c_class']) . '">';
+				$linka = '</a>';
+				$sx .= '<li>' . $link . msg($line['c_class']) . $linka . '</li>';
 			}
-			$wh2 = ' AND (' . $wh2 . ')';
+			$sx .= '</ul>';
 		} else {
-			$wh2 = '';
+			$ln = $rdf -> data_classes($id);
+			$sx .= '<ul>';
+			for ($r = 0; $r < count($ln); $r++) {
+				$l = $ln[$r];
+				$link = '<a href="' . base_url(PATH.'v/' . $l['id_cc']) . '">';
+				$linka = '</a>';
+				$sx .= '<li>' . $link . $l['n_name'] . $linka . '</li>';
+			}
+			$sx .= '</ul>';
 		}
-		/***********************************************************************/
-		if (strlen($wh) > 0) {
-			$sql = "select * from rdf_name
-			INNER JOIN rdf_data ON id_n = d_literal
-			INNER JOIN rdf_concept ON d_r1 = id_cc
-			INNER JOIN rdf_class ON id_c = d_p 
-			WHERE ($wh) and (n_name <> '') $wh2 
-			LIMIT 50";
-			$rlt = $CI -> db -> query($sql);
-			$rlt = $rlt -> result_array();
+		$sx .= '</div>';
+		return ($sx);
+	}
 
-			for ($r = 0; $r < count($rlt); $r++) {
-				$line = $rlt[$r];
-				$tela .= '<option value="' . $line['id_cc'] . '">' . $line['n_name'] . '</option>' . cr();
+	function data_classes($d) {
+		$CI = &get_instance();
+		if (sonumero($d) == $d)
+		{
+			$id = $d;
+		} else {
+			$id = $this -> find_class($d);	
+		}
+
+		$sql = "select * from rdf_concept 
+		INNER JOIN rdf_name ON cc_pref_term = id_N
+		WHERE cc_class = $id
+		ORDER BY n_name ";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		return ($rlt);
+	}	
+	function classes_lista() {
+		$CI = &get_instance();
+		/**************** class *************************/
+		$sql = "select * from rdf_class where c_type = 'C' order by c_type, c_class";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '';
+		$tp = '';
+		$lg = array('C' => 'Classe', 'P' => 'Propriedade');
+		$sx .= '<div class="row">';
+		$sx .= '<div class="col-md-1">';
+		$sx .= '<b>' . $lg['C'] . '</b>';
+		$sx .= '</div>';
+
+		$sx .= '<div class="col-md-5">';
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$link = '<a href="' . base_url(PATH . 'vocabulary_ed/' . $line['id_c']) . '">';
+
+			$sx .= msg($line['c_class']);
+			$sx .= ' (' . $link . $line['c_class'] . '</a>' . ')';
+			$sx .= '<br>';
+		}
+		$sx .= '</div>';
+
+		/**************** propriety **********************/
+		$sql = "select * from rdf_class where c_type = 'P' order by c_type, c_class";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx .= '<div class="col-md-1">';
+		$sx .= '<b>' . $lg['P'] . '</b>';
+		$sx .= '</div>';
+
+		$sx .= '<div class="col-md-5">';
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$xtp = $line['c_type'];
+			$link = '<a href="' . base_url(PATH . 'vocabulary_ed/' . $line['id_c']) . '">';
+			$sx .= msg($line['c_class']);
+			$sx .= ' (' . $link . $line['c_class'] . '</a>' . ')';
+			$sx .= '<br>';
+		}
+		$sx .= '</div>';
+		$sx .= '</div>';
+		return ($sx);
+	}
+	function class_update_data($dta)
+	{	
+		$CI = &get_instance();	
+		$sx = '';	
+		$id = $dta['id_c'];
+		if (isset($dta['c_url']) and (strlen($dta['c_url']) > 10)) 
+		{
+			$sx = '
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+			' . msg('update_vocabulary') . '
+			</button>
+
+			<!-- Modal -->
+			<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+			<div class="modal-content">
+			<div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLongTitle">Importação de Vocabulários</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+			</button>
+			</div>
+
+			<div class="modal-body" id="cnt">
+			<span style="font-size:75%">Aguardando comando!</span>                                                            
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+			<input type="submit" id="dd50" class="btn btn-primary" value="Atualizar">
+			</div>
+			</div>
+			</div>
+			</div>';
+			$sx .= '
+			<script>
+			jQuery("#dd50").click(function() 
+			{ jQuery("#cnt").html("Buscando...");
+			$.ajax(
+			{ method: "POST", url: "' . base_url(PATH . 'config/class/ajax_update/' . $id.'?nocab=true') . '", data: { name: "John", location: "Boston" }}) .done(function( msg ) {	jQuery("#cnt").html(msg);}); }
+			);
+			</script>'; 
+		}
+		return($sx);
+	}		
+	function ajax_update($id)
+	{
+		$CI = &get_instance();
+		$cl = $this -> le_class($id);
+		if (count($cl) == 0) {
+			echo "Erro de classe [$id]";
+			exit ;
+		}
+		$url = trim($cl['c_url']);
+		$t = read_link($url);
+		$class = $cl['c_class'];
+		$this -> inport_rdf($t, $class);
+		$sql = "update rdf_class set c_url_update = '" . date("Y-m-d") . "' where id_c = " . $cl['id_c'];
+		$rlt = $CI -> db -> query($sql);
+		$sx = '';            		
+	}
+	function inport_rdf($t, $class = '') {
+		if (strlen($class) == 0) {
+			echo 'Classe não definida na importação';
+			retur('');
+		}
+		$ln = $t;
+		$ln = troca($ln, ';', ':.');
+		$ln = troca($ln, chr(13), ';');
+		$ln = troca($ln, chr(10), ';');
+		$lns = splitx(';', $ln);
+		for ($r = 0; $r < count($lns); $r++) {
+			$ln = $lns[$r];
+			$ln = troca($ln, chr(9), ';');
+
+			$l = splitx(';', $ln);
+			if (count($l) == 3) {
+				$prop = $l[1];
+				$term = $l[2];
+				$resource = $l[0];
+				if ($prop == 'skosxl:is_synonymous') {
+					$prop = 'skos:altLabel';
+				}
+				if ($prop == 'skosxl:literalForm') {
+					$prop = 'skos:altLabel';
+				}
+				if ($prop == 'skosxl:isSingular') {
+					$prop = 'skos:altLabel';
+				}
+				switch($prop) {
+					case 'skos:prefLabel' :
+					$item = $this -> frbr_name($term);
+					$p_id = $this -> rdf_concept($item, $class, $resource);
+					$this -> set_propriety($p_id, $prop, 0, $item);
+					break;
+					default :
+					$item = $this -> frbr_name($term);
+					$p_id = $this -> rdf_concept_find_id($resource);
+					if ($p_id > 0) {
+						$this -> set_propriety($p_id, $prop, 0, $item);
+					}
+					break;
+				}
 			}
 		}
+		echo '<span style="color: #0000ff">Fim da importação</span>';
+	}            	
+	function rdf_concept_find_id($r) {
+		$CI = &get_instance();
+		$id = 0;
+		$sql = "select * from rdf_concept where cc_origin = '$r'";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) > 0) {
+			$line = $rlt[0];
+			return ($line['id_cc']);
+		}
+		return ($id);
 	}
 
-	$tela .= '</select>' . cr();
-	$tela .= '  <script>                 
-	function change()
+	/*************************************** Exclude RDF Data *******************/
+	function data_exclude($id) {
+		$CI = &get_instance();
+		$sql = "select * from rdf_data where id_d = " . $id;
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) > 0) {
+			$line = $rlt[0];
+			if ($line['d_r1'] > 0) {
+				$sql = "update rdf_data set
+				d_r1 = " . ((-1) * $line['d_r1']) . " ,
+				d_r2 = " . ((-1) * $line['d_r2']) . " ,
+				d_p  = " . ((-1) * $line['d_p']) . " 
+				where id_d = " . $line['id_d'];
+				$rlt = $CI -> db -> query($sql);
+			}
+		}
+	}	
+
+	function exist_prefLabel($id)
 	{
-		jQuery("#submt").removeAttr("disabled");
+		$CI = &get_instance();
+		$prop = $this->find_class('prefLabel');
+
+		$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+		$rlt = $CI->db->query($sql);
+		$rlt = $rlt->result_array();
+		if (count($rlt) > 0)
+		{
+			return(1);
+		}
+		return(0);	
 	}
 
-	jQuery("#submt").attr("disabled","disabled");
-	</script>';
-	return ($tela);
-}		
+	function update_prefLabel($id)
+	{
+		$CI = &get_instance();
+		$prop = $this->find_class('prefLabel');
+
+		$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+		$rlt = $CI->db->query($sql);
+		$rlt = $rlt->result_array();
+		if (count($rlt) > 0)
+		{
+			$line = $rlt[0];
+			$term = $line['d_literal'];
+			print($line);
+			exit;
+		}
+		return(0);	
+	}	
+
+	function ajax_search($id, $type = '') {
+		$CI = &get_instance();
+		$tela = '<select name="dd51" id="dd51" size=5 class="form-control" onchange="change();">' . cr();
+		$vlr = get("q");
+		if (strlen($vlr) < 1) {
+			$tela .= '<option></option>' . cr();
+		} else {
+			$vlr = troca($vlr, ' ', ';');
+			$v = splitx(';', $vlr);
+			$wh = '';
+			for ($r = 0; $r < count($v); $r++) {
+				if ($r > 0) {
+					$wh .= ' and ';
+				}
+				$wh .= "(n_name like '%" . $v[$r] . "%') ";
+			}
+			/* RANGE ***************************************************************/
+			if (strlen($type) > 0) {
+				$wh2 = '';
+				$ww = $this -> frbr_core -> find_class($type);
+				$wh2 = ' (cc_class = ' . $ww . ') ';
+
+				$sql = "select * FROM rdf_class
+				WHERE c_class_main = $ww";
+				$rlt = $CI -> db -> query($sql);
+				$rlt = $rlt -> result_array();
+				for ($r = 0; $r < count($rlt); $r++) {
+					$line = $rlt[$r];
+					$wh2 .= ' OR (cc_class = ' . $line['id_c'] . ') ';
+				}
+				$wh2 = ' AND (' . $wh2 . ')';
+			} else {
+				$wh2 = '';
+			}
+			/***********************************************************************/
+			if (strlen($wh) > 0) {
+				$sql = "select * from rdf_name
+				INNER JOIN rdf_data ON id_n = d_literal
+				INNER JOIN rdf_concept ON d_r1 = id_cc
+				INNER JOIN rdf_class ON id_c = d_p 
+				WHERE ($wh) and (n_name <> '') $wh2 
+				LIMIT 50";
+				$rlt = $CI -> db -> query($sql);
+				$rlt = $rlt -> result_array();
+
+				for ($r = 0; $r < count($rlt); $r++) {
+					$line = $rlt[$r];
+					$tela .= '<option value="' . $line['id_cc'] . '">' . $line['n_name'] . '</option>' . cr();
+				}
+			}
+		}
+
+		$tela .= '</select>' . cr();
+		$tela .= '  <script>                 
+		function change()
+		{
+			jQuery("#submt").removeAttr("disabled");
+		}
+
+		jQuery("#submt").attr("disabled","disabled");
+		</script>';
+		return ($tela);
+	}		
 
 
 
-/******************************************************* Config *************/
-function config($tools,$ac='',$id='',$id2='',$id3='')
-{
-	$sx = '';
-	$tela = '==>'.$tools.'==>'.$ac.'==>'.$id.'==>'.$id2.'==>'.$id3;
+	/******************************************************* Config *************/
+	function config($tools,$ac='',$id='',$id2='',$id3='')
+	{
+		$sx = '';
+		$tela = '==>'.$tools.'==>'.$ac.'==>'.$id.'==>'.$id2.'==>'.$id3;
 	//echo $tela;
 
-	switch($tools)
-	{
-		/***************************************************** CLASSE */
-		case 'class':
-		$tela = '<div class="container"><div class="row">';
-		switch($ac)
+		switch($tools)
 		{
-			/**************** AJAX SEARCH *******/
-			case 'ajax_save':
-			$q = get("q");
-			$id = get("dd10");
-			$pp = get("dd11");
-			$tp = get("type");
-			switch($tp)
+			/***************************************************** CLASSE */
+			case 'class':
+			$tela = '<div class="container"><div class="row">';
+			switch($ac)
 			{
-				/*************************** text **************/
-				case 'text':
-				$idn = $this->frbr_name($q);
-				echo '<br>';
-				echo '--id-->'.$id.'<br>';
-				echo '--pp-->'.$pp.'<br>';
-				$this->set_propriety($id,$pp,0,$idn);
-				echo 'Saved';
+				/**************** AJAX SEARCH *******/
+				case 'ajax_save':
+				$q = get("q");
+				$id = get("dd10");
+				$pp = get("dd11");
+				$tp = get("type");
+				switch($tp)
+				{
+					/*************************** text **************/
+					case 'text':
+					$idn = $this->frbr_name($q);
+					echo '<br>';
+					echo '--id-->'.$id.'<br>';
+					echo '--pp-->'.$pp.'<br>';
+					$this->set_propriety($id,$pp,0,$idn);
+					echo 'Saved';
+					break;
+
+					default:
+					print_r($_POST);
+					echo "############### ".$q;
+							//$this->ajax_search($id);
+					break;
+				}
 				break;
+
+				/**************** AJAX SEARCH *******/
+				case 'ajax_search':
+				$q = get("q");
+				echo "############### ".$q;
+					//$this->ajax_search($id);
+				break;
+
+				/**************** AJAX EXCLUDE **************/
+				case 'exclude':
+				echo '<div class="col-md-12">';
+				echo $this -> cas_exclude($id2);
+				echo '</div>';
+				exit;			
+				break;
+
+				case 'exclude_confirm':
+				echo message("Excluído!");
+				echo refresh('#',1);
+				$this->data_exclude($id);
+
+				break;
+
+				/**************** AJAX INCLUDE **************/
+				case 'include':	
+				echo '<div class="col-md-12">';
+				echo $this -> cas_include($id,$id2,$id3);
+				echo '</div>';
+				exit;			
+				exit;
+				break;
+
+				/**************** AJAX **************/
+				case 'ajax':	
+				$chk = md5($id);	
+				echo $this->ajax($id,$chk);
+				exit;
+				break;
+
+				/**************** FORMULARIOS **************/
+				case 'forms':
+				$tela .= msg('FORMS');
+				$tela .= $this -> form_ed($id);
+				break;
+
+				/**************** view **************/
+				case 'view':
+				$tela = '<div class="row">';
+				$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
+				$tela .= $this->class_view($id);				
+				$tela .= $this->class_view_data($id);
+				$tela .= $this->class_view_form($id);
+				$tela .= '</div>';						
+				break;
+
+				/**************** edit **************/
+				case 'ed':
+				$tela = '<div class="row">';
+				$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
+				$tela .= $this->class_ed($id);				
+				$tela .= '</div>';						
+				break;
+
+				/**************** AJAX Update **************/
+				case 'ajax_update':	
+				$chk = md5($id);	
+				echo $this->ajax_update($id,$chk);
+				exit;
+				break;				
 
 				default:
-				print_r($_POST);
-				echo "############### ".$q;
-							//$this->ajax_search($id);
+				/**************** row **************/
+				if (perfil("#ADM") > 0)
+				{
+					$tela .= '<div class="col-md-12">';
+					$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
+					$tela .= '| <a href="'.base_url(PATH.'config/class/ed/0/0').'">'.msg('new_class_propr').'</a> |';
+					$tela .= '<hr>';
+					$tela .= '</div>';
+				}		
+				if ($ac=='')				
+				{
+					$tela .= $this->class_row();
+				} else {
+					$tela .= $this->class_view($ac);
+				}
+				$tela .= '</div>';
+				break;
+
+				case 'authority' :
+				if (perfil("#ADM") == 1) {
+					if ($ac == 'update') {
+						$tela .= $this -> frbr -> viaf_update();
+					} else {
+						$tela .= '<br><a href="' . base_url(PATH . 'config/authority/update') . '" class="btn btn-secondary">' . msg('authority_update') . '</a>';
+					}
+					$tela .= '<br><br><h3>' . msg('Authority') . ' ' . msg('viaf') . '</h3>';
+					$tela .= $this -> frbr -> authority_class();
+				}
+				break;
+			}	
+		}
+		return($tela);			
+	}							
+	function btn_editar($id) {
+		$sx = '<a href="' . base_url(PATH . 'a/' . $id) . '" class="btn btn-secondary">editar</a>';
+		$sx .= ' <a href="' . base_url(PATH . 'authority_cutter/' . $id) . '" class="btn btn-secondary">atualizar Cutter</a>';
+		return ($sx);
+	}
+
+	function btn_update($id) {
+		$sx = '<a href="' . base_url(PATH . 'authority_inport_rdf/' . $id) . '" class="btn btn-secondary">atualizar dados</a> ';
+
+		return ($sx);
+	}	
+	function person_work($id) {
+		$CI = &get_instance();
+		$r = array();
+		$sql = "select d_r1, d_p, d_r2 from rdf_data 
+		where (d_r1 = $id or d_r2 = $id)
+		AND NOT (d_r1 = 0 OR d_r2 = 0)
+		ORDER BY d_r1, d_p, d_r2";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+
+		$wk = array();
+		$ww = array();
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$p = $line['d_p'];
+			$r1 = $line['d_r1'];
+			if ($r1 != $id) {
+				if (!isset($ww[$r1])) {
+					array_push($wk, $r1);
+				}
+			}
+			$r1 = $line['d_r2'];
+			if ($r1 != $id) {
+				if (!isset($ww[$r1])) {
+					array_push($wk, $r1);
+				}
+			}
+		}
+		return ($wk);
+	}
+	function show_class($wk) {
+		$CI = &get_instance();
+		$sx = '';
+		$ss = '<h5>' . msg('hasColaboration') . '</h5><ul>';
+		$wks = array();
+		for ($r = 0; $r < count($wk); $r++) {
+			$id = $wk[$r];
+
+			$data = $this -> le_data($id);
+			for ($z = 0; $z < count($data); $z++) {
+				$line = $data[$z];
+				$cl = $line['c_class'];
+				$vl = $line['n_name'];
+				$id1 = $line['d_r1'];
+				$id2 = $line['d_r2'];
+				switch ($cl) {
+					case 'hasTitle' :
+					$link = '<a href="' . base_url(PATH . 'v/' . $id1) . '">';
+					array_push($wks, $id1);
+					break;
+					case 'hasAuthor' :
+					$link = '<a href="' . base_url(PATH . 'v/' . $id2) . '">';
+					$ss .= '<li>' . $link . $vl . ' (' . ($cl) . ')</a></li>' . cr();
+					break;
+					default :
+				}
+			}
+		}
+		$ss .= '</ul>';
+        //$sx .= '<div class="row img-person" >' . cr();
+		for ($r = 0; $r < count($wks); $r++) {
+			$wk = $wks[$r];
+			$sx .= '<div class="col-md-2 text-center" style="line-height: 80%; margin-top: 40px;">';
+			$sx .= $this -> show_manifestation_by_works($wk);
+			$sx .= '</div>';
+		}
+        //$sx .= '</div>' . cr();
+
+		return ($sx);
+	}  
+
+	/*********************** BIBLIOGRAFIC ***************/
+	function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
+		$CI = &get_instance();
+		$img = base_url('img/no_cover.png');
+		$data = $this -> le_data($id);
+		$year = '';
+
+		$title = '';
+		$autor = '';
+		$nautor = '';
+		for ($r = 0; $r < count($data); $r++) {
+			$line = $data[$r];
+			$class = $line['c_class'];
+            //echo '<br>'.$class;
+			switch($class) {
+				case 'hasTitle' :
+				$title = $line['n_name'];
+				break;
+				case 'hasOrganizator' :
+				if (strlen($autor) > 0) {
+					$autor .= '; ';
+					$nautor .= '; ';
+				}
+				$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '" class="small">';
+				$autor .= $link . $line['n_name'] . ' (org.)' . '</a>';
+				break;
+				case 'hasAuthor' :
+				if (strlen($autor) > 0) {
+					$autor .= '; ';
+					$nautor .= '; ';
+				}
+
+				$idx = $line['d_r1'];
+				$link = '<a href="' . base_url(PATH . 'v/' . $idx) . '" class="small">';
+				$autor .= $link . $line['n_name'] . '</a>';
+				$nautor .= $line['n_name'];
 				break;
 			}
-			break;
+		}
+		/* expression */
+		$class = "isRealizedThrough";
+		$id_cl = $this -> find_class($class);
+		$sql = "select * from rdf_data 
+		WHERE d_r1 = $id and
+		d_p = $id_cl ";
+		$xrlt = $CI -> db -> query($sql);
+		$xrlt = $xrlt -> result_array();
 
-			/**************** AJAX SEARCH *******/
-			case 'ajax_search':
-			$q = get("q");
-			echo "############### ".$q;
-					//$this->ajax_search($id);
-			break;
+		if (count($xrlt) > 0) {
+			$ide = $xrlt[0]['d_r2'];
+			/************************************ manifestation ********/
+			$class = "isEmbodiedIn";
+			$id_cl = $this -> find_class($class);
+			$sql = "select * from rdf_data 
+			WHERE d_r1 = $ide and
+			d_p = $id_cl ";
+			$xrlt = $CI -> db -> query($sql);
+			$xrlt = $xrlt -> result_array();
+			if (count($xrlt) > 0) {
+				$idm = $xrlt[0]['d_r2'];
 
-			/**************** AJAX EXCLUDE **************/
-			case 'exclude':
-			echo '<div class="col-md-12">';
-			echo $this -> cas_exclude($id2);
-			echo '</div>';
-			exit;			
-			break;
-
-			case 'exclude_confirm':
-			echo message("Excluído!");
-			echo refresh('#',1);
-			$this->data_exclude($id);
-
-			break;
-
-			/**************** AJAX INCLUDE **************/
-			case 'include':	
-			echo '<div class="col-md-12">';
-			echo $this -> cas_include($id,$id2,$id3);
-			echo '</div>';
-			exit;			
-			exit;
-			break;
-
-			/**************** AJAX **************/
-			case 'ajax':	
-			$chk = md5($id);	
-			echo $this->ajax($id,$chk);
-			exit;
-			break;
-
-			/**************** FORMULARIOS **************/
-			case 'forms':
-			$tela .= msg('FORMS');
-			$tela .= $this -> form_ed($id);
-			break;
-
-			/**************** view **************/
-			case 'view':
-			$tela = '<div class="row">';
-			$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
-			$tela .= $this->class_view($id);				
-			$tela .= $this->class_view_data($id);
-			$tela .= $this->class_view_form($id);
-			$tela .= '</div>';						
-			break;
-
-			/**************** edit **************/
-			case 'ed':
-			$tela = '<div class="row">';
-			$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
-			$tela .= $this->class_ed($id);				
-			$tela .= '</div>';						
-			break;
-
-			/**************** AJAX Update **************/
-			case 'ajax_update':	
-			$chk = md5($id);	
-			echo $this->ajax_update($id,$chk);
-			exit;
-			break;				
-
-			default:
-			/**************** row **************/
-			if (perfil("#ADM") > 0)
-			{
-				$tela .= '<div class="col-md-12">';
-				$tela .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
-				$tela .= '| <a href="'.base_url(PATH.'config/class/ed/0/0').'">'.msg('new_class_propr').'</a> |';
-				$tela .= '<hr>';
-				$tela .= '</div>';
-			}		
-			if ($ac=='')				
-			{
-				$tela .= $this->class_row();
-			} else {
-				$tela .= $this->class_view($ac);
-			}
-			$tela .= '</div>';
-			break;
-
-			case 'authority' :
-			if (perfil("#ADM") == 1) {
-				if ($ac == 'update') {
-					$tela .= $this -> frbr -> viaf_update();
-				} else {
-					$tela .= '<br><a href="' . base_url(PATH . 'config/authority/update') . '" class="btn btn-secondary">' . msg('authority_update') . '</a>';
+				/* Image */
+				$dt2 = $this -> le_data($idm);
+                //print_r($dt2);
+                //echo '<hr>';
+				for ($r = 0; $r < count($dt2); $r++) {
+					$line = $dt2[$r];
+					$class = $line['c_class'];
+					if ($class == 'hasCover') {
+						$img = base_url('_repositorio/image/' . $line['n_name']);
+					}
+					if ($class == 'dateOfPublication') {
+						$year = '<br>' . $line['n_name'];
+					}
 				}
-				$tela .= '<br><br><h3>' . msg('Authority') . ' ' . msg('viaf') . '</h3>';
-				$tela .= $this -> frbr -> authority_class();
 			}
-			break;
-		}	
+		}
+
+		$sx = '';
+		$link = '<a href="' . base_url(PATH . 'v/' . $id) . '" style="line-height: 120%;">';
+		$sx .= $link;
+		$title_nr = $title;
+		$sz = 45;
+		if (strlen($title_nr) > $sz) {
+			$title_nr = substr($title_nr, 0, $sz);
+			while (substr($title_nr, strlen($title_nr) - 1, 1) != ' ') {
+				$title_nr = substr($title_nr, 0, strlen($title_nr) - 1);
+			}
+			$title_nr = trim($title_nr) . '...';
+		}
+
+		if ($mini == 1) {
+			$sx .= '<img src="' . $img . '" height="' . $img_size . '" style="box-shadow: 5px 5px 8px #888888; margin-bottom: 10px;" title="' . $title_nr . cr() . $nautor . cr() . troca($year, '<br>', '') . '">' . cr();
+			$sx .= '</a>';
+		} else {
+			$sx .= '<img src="' . $img . '" height="200" style="box-shadow: 5px 5px 8px #888888; margin-bottom: 10px;"><br>' . cr();
+			$sx .= '<span>' . $title_nr . '</span>';
+			$sx .= '</a>';
+			$sx .= '<br>';
+			$sx .= '<i>' . $autor . '</i>';
+			$sx .= $year;
+		}
+        //echo $line['c_class'].'<br>';
+		return ($sx);
 	}
-	return($tela);			
-}							
+
+	function show_manifestation_by_item($id = '') {
+
+		$item = $this -> le_data($id);
+
+		$idm = $this -> recupera_manifestacao_pelo_item($id);
+		$mani = $this -> le_data($idm[0]);
+
+		$ide = $this -> recupera_expressao_pela_manifestacao($idm[0]);
+		$expr = $this -> le_data($ide[0]);
+
+		$idw = $this -> recupera_work_pela_expressao($ide[0]);
+		$work = $this -> le_data($idw[0]);
+
+		$data = array();
+		$data['manifestation'] = $mani;
+		$data['expression'] = $expr;
+		$data['work'] = $work;
+		$data['item'] = $item;
+		$data['id'] = $idm[0];
+		$tela = $this -> show_item($data);
+		return ($tela);
+	}      
+    function show_rdf($url) {
+        $pre = substr($url, 0, strpos($url, ':'));
+        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
+        $uri = $this -> rdf_prefix($url);
+        $sx = '<a href="' . $uri . $pos . '" target="_new' . $url . '">' . $url . '</a>';
+        return ($sx);
+    }	
 }
 ?>

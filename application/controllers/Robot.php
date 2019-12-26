@@ -49,6 +49,13 @@ class Robot extends CI_Controller {
         $this -> load -> view('robots/status');
     }
 
+    public function pdftotext($jid='')
+        {
+            $this->load->model('pdfs');
+            $this->load->model('frbr_core');
+            $this->pdfs->pdf_to_text($jid);
+        }
+
     public function index() {
         $verb = get("verb");
         $id = get("id");
@@ -152,8 +159,13 @@ class Robot extends CI_Controller {
                 }
                 $html .= 'left >>' . $this -> oai_pmh -> leftHarvesting() . cr();
                 break;
+            case 'pnl':
+                $this -> load -> model('pnl');
+                $this->pnl->process();
+                break;
             default :
-                $html = $this -> oai_pmh -> repository_list($id);
+                //$html = $this -> oai_pmh -> repository_list($id);
+                echo '<br>No verb found';
                 break;
         }
 

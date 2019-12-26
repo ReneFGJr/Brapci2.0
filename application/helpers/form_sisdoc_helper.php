@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.19.11.21
+ * @version     v0.19.12.25
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -879,8 +879,8 @@ function highlight($text, $words) {
     return $text;
 }
 
-function UpperCaseSQL($d) {
-    //$d = strtoupper($d);
+function ascii($d)
+{    //$d = strtoupper($d);
 
     /* acentos agudos */
     $d = (str_replace(array('á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'), array('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'), $d));
@@ -900,6 +900,11 @@ function UpperCaseSQL($d) {
     /* trema */
     $d = (str_replace(array('ä', 'ë', 'ï', 'ö', 'ü', 'Ä', 'Ë', 'Ï', 'Ö', 'Ü'), array('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'), $d));
 
+    return $d;
+}
+
+function UpperCaseSQL($d) {
+    $d = ascii($d);
     $d = strtoupper($d);
     return $d;
 }

@@ -113,6 +113,18 @@ class sources extends CI_Model {
         }
         $sx .= '</li>';
 
+        $filename = $dir . 'script/cron.txt.html';
+        $sx .= '<li><h5>PDF to TEXT Status</h5>';
+        $sx .= '<h6>' . $filename . '</h6>';
+        if (file_exists($filename)) {
+            $ttt = file_get_contents($filename);
+            $ttt = troca($ttt, '<meta', '<mmmm');
+            $sx .= '<pre style="color: blue;">' . mst($ttt) . '</pre>';
+        } else {
+            $sx .= '<pre style="color: red;">Status not found</pre>';
+        }
+        $sx .= '</li>';        
+
         $sx .= '<li><h5>PDF Status</h5>';
         $filename = $dir . 'script/cron.pdf.html';
         if (file_exists($filename)) {

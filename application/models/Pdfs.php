@@ -631,5 +631,70 @@ EOD;
 		$rlt = $this -> db -> query($sql);
 	}
 
+	/********************** CONVERT PDF TO TEXT ******************/
+	function pdf_to_text($jdi='')
+	{
+		$class = 'FileStorage   ';
+		$f = $this -> frbr_core -> find_class($class);
+		$this -> frbr_core -> check_language();
+		$limit = 50;
+		$offset = round(get('p'));
+
+		$sql = "
+		select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+		N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use,
+		ft_file        
+		FROM rdf_concept as C1
+		INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+		LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+		LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+		LEFT JOIN brapci_cited.full_text ON C1.id_cc = ft_id
+		where C1.cc_class = " . $f . " and ft_id is NULL
+		limit $limit offset $offset
+		";
+		$rlt = $this -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+
+		for ($r=0;$r < count($rlt);$r++)			
+		{
+			$line = $rlt[$r];
+			$file = $line['n_name'];
+			$id = $line['id_cc'];
+			echo "($id) $file";
+			if (file_exists($file))
+			{
+				$fileo = troca($file,'.pdf','.txt');
+				if (file_exists($fileo))
+					{
+						echo ' - File has already converted';
+						$this->pdftotext_index_file($fileo,$id);
+					} else {
+						$cmd = 'pdftotext '.$file.' '.$fileo;
+						shell_exec($cmd);
+						$this->pdftotext_index_file($fileo,$id);
+						echo ' - Processado';					
+					}
+			} else {
+				echo ' - File not found';
+			}
+			echo cr();
+		}
+	}
+
+	function pdftotext_index_file($file,$id)
+		{
+			$sql = "select * from brapci_cited.full_text where ft_file = '$file'";
+			$rlt = $this->db-> query($sql);
+			$rlt = $rlt->result_array();
+			if (count($rlt) == 0)
+				{
+					$sql = "insert into brapci_cited.full_text
+							(ft_file, ft_status, ft_id)
+							values
+							('$file',1,$id)";
+					$rlt = $this->db-> query($sql);										
+				}
+			return(1);
+		}
 }
 ?>

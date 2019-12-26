@@ -1,6 +1,20 @@
 <?php
 class altmets extends CI_model
 {
+
+	function plum($doi='')
+	{
+		$sx = '';
+		if (strlen($doi) > 0)
+		{
+			$sx .= '<br/><br/>';
+			$sx .= '<span id="plum" style="font-size: 70%;">Plum X Metrics</span>';
+			$sx .= '<a href="https://plu.mx/plum/a/?doi='.$doi.'" class="plumx-plum-print-popup img-fluid"></a>';
+			$sx .= '<script type="text/javascript" src="//cdn.plu.mx/widget-all.js"></script>';
+			$sx .= '<script>window.__plumX.widgets.init();</script>';
+		}
+		return($sx);
+	}
 	function structure()
 	{
 
@@ -22,7 +36,7 @@ class altmets extends CI_model
 			$url = $ar['details_url'];
 			$link = '<a href="'.$url.'" target="_new">';
 			$linka = '</a>';
-			$img = '<a href="https://www.altmetric.com/">Altmetrics</a><br>'.$link.'<img src="'.$ar['images']->medium.'">'.$linka;			
+			$img = '<span style="font-size: 70%;">Altmetrics</span><br>'.$link.'<img src="'.$ar['images']->medium.'">'.$linka;			
 		} else {
 			$img = '';
 		}

@@ -380,6 +380,7 @@ class frbr extends CI_model {
         $rdf = new rdf;
         $dados['doi'] = $rdf->recupera($data,'hasRegisterId');
         $dados['altmetrics'] = $this->altmets->altmetrics($dados['doi']);
+        $dados['plum'] = $this->altmets->plum($dados['doi']);
 
         $article = $dados['article'] = $data;
         $dados['social'] = $this -> nets -> twitter($data);

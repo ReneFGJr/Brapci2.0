@@ -190,6 +190,7 @@ for ($r = 0; $r < count($article); $r++) {
 			}
 		echo '<br><br>';
 		echo $altmetrics;
+		echo $plum;
 		
 		?>
 	</div>
