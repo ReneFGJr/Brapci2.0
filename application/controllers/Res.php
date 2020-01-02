@@ -213,7 +213,7 @@ class res extends CI_Controller {
 
     }
 
-    public function v($id) {
+    public function v($id,$fmt='') {
         $this -> load -> model('nets');
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
@@ -225,6 +225,27 @@ class res extends CI_Controller {
         $vv = $this -> frbr_core -> le_data($id);
         $data['meta'] = $vv;
         $data['id'] = $id;
+
+        /***************************** formatos **/
+        switch($fmt)
+            {
+                case 'rdf':
+                    $rdf = new rdf;
+                    header("Content-Type: text/plain");
+                    header('Content-Disposition: attachment; filename="brapci_'.$id.'.rdf"');
+                    echo $rdf->export_rdf($id);
+                    return('');
+                    exit;
+                case 'json':
+                    $rdf = new rdf;
+                    //header("Content-Type: text/plain");
+                    //header('Content-Disposition: attachment; filename="brapci_'.$id.'.rdf"');
+                    echo $rdf->export_json($id);
+                    return('');
+                    exit;                    
+                break;
+            }
+
         $this -> cab($data);
 
         if (count($vv) == 0) {

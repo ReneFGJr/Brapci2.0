@@ -516,30 +516,69 @@ class bibliometrics extends CI_model {
         $lns = splitx(';',$ln);
         $sx = '<ol>';
         $years = array();
+        $source = array('JOURNAL'=>0,'BOOK'=>0,'PROCEEDINGS'=>0, 'TD'=>0,'SITE'=>0,'LAW'=>0,'NC'=>0);
+
         for ($r=0;$r < count($lns);$r++)
         {
             $sx .= '<li>';
             $sx .= $lns[$r];
             /**************************************** ANO ********/
             $year = $this->recover_year($lns[$r]);
-            if (isset($years[$year]))
+            if (sonumero($year) == $year)
             {
-                $years[$year] = $years[$year] + 1;
-            } else {
-                $years[$year] = 1;    
+                if (isset($years[$year]))
+                {
+                    $years[$year] = $years[$year] + 1;
+                } else {
+                    $years[$year] = 1;    
+                }
             }            
             $sx .= '<br>'.$year;
 
             /**************************************** ARTICLE *****/
             $tp = 'NC';
-            if ($this->is_journal($lns[$r])) { $tp = 'JOURNAL'; }
+            if ($this->is_law($lns[$r])) { $tp = 'LAW'; }
+            else
+            {
+                if ($this->is_tese_dissertacao($lns[$r]))
+                {
+                        $tp = 'TD'; 
+                } else {
+                    if ($this->is_journal($lns[$r])) 
+                    { 
+                        $tp = 'JOURNAL'; 
+                    }
+                    else 
+                    {
+                        if ($this->is_proceedings($lns[$r])) 
+                        { 
+                            $tp = 'PROCEEDINGS'; 
+                        } 
+                        else
+                        {
+                            if ($this->is_http($lns[$r])) 
+                            { 
+                                $tp = 'SITE'; 
+                            } 
+                            else
+                            {
+                                if ($this->is_book($lns[$r])) { $tp = 'BOOK'; }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /******************************** PROCESSA FONTS **************/
+            if (isset($source[$tp]))
+                { $source[$tp] = $source[$tp] + 1;} 
+            else 
+                { $source[$tp] = 1; }
 
             $sx .= ' - '.$tp;
-
             $sx .= '</li>';
         }
         $sx .= '</ol>';
-
 
         $sa = '<div class="row">';
 
@@ -556,30 +595,120 @@ class bibliometrics extends CI_model {
         $sa .= '<br/><span class="font-size: 70%;">anos</span>';
         $sa .= '</div>';
 
-        /***************** Journals *****************/        
-        $sa .= '<div class="col-md-2 text-center">';
-        $sa .= msg('Journals').'<br>';
-        $sa .= '<span style="font-size: 250%">'.'-'.'</span>';
-        $sa .= '<br/><span class="font-size: 70%;">itens</span>';
-        $sa .= '</div>';        
-
-        /***************** Books *****************/        
-        $sa .= '<div class="col-md-2 text-center">';
-        $sa .= msg('Books').'<br>';
-        $sa .= '<span style="font-size: 250%">'.$this->books($lns).'</span>';
-        $sa .= '<br/><span class="font-size: 70%;">itens</span>';
-        $sa .= '</div>';        
+        $sa .= '</div>';
+        $sa .= '<div class="row">';
+        /***************** Sources *****************/ 
+        foreach ($source as $key => $value) {
+            $sa .= '<div class="col-md-2 text-center">';
+            $sa .= msg($key).'<br>';
+            $sa .= '<span style="font-size: 250%">'.$value.'</span>';
+            $sa .= '<br/><span class="font-size: 70%;">itens</span>';
+            $sa .= '</div>';        
+        }            
 
         $sa .= '</row>';
 
         return($sa.$sx);
     }
-    function is_procedings($txt)
+
+
+
+    function is_http($txt)
+    {
+        $bc = array('Disponível em');
+        $ct = 0;
+        for ($r=0;$r < count($bc);$r++)
         {
-            //'Anais...';
+            if (strpos($txt,$bc[$r]))
+            {
+                $ct++;
+            }                    
+        }            
+        if ($ct > 0)
+        {
+            return(1);    
+        } else {
+            return(0);
+        }            
+    }
+
+    function is_book($txt)
+    {
+        $bc = array(': ');
+        $ct = 0;
+        for ($r=0;$r < count($bc);$r++)
+        {
+            if (strpos($txt,$bc[$r]))
+            {
+                $ct++;
+            }                    
+        }            
+        if ($ct > 0)
+        {
+            return(1);    
+        } else {
+            return(0);
+        }            
+    }    
+    function is_proceedings($txt)
+    {
+        $bc = array('Anais...','Actas...');
+        $ct = 0;
+        for ($r=0;$r < count($bc);$r++)
+        {
+            if (strpos($txt,$bc[$r]))
+            {
+                $ct++;
+            }                    
+        }            
+        if ($ct > 0)
+        {
+            return(1);    
+        } else {
+            return(0);
+        }            
+    }
+
+    function is_tese_dissertacao($txt)
+    {
+        $bc = array(' Tese',' Dissertação');
+        $ct = 0;
+        for ($r=0;$r < count($bc);$r++)
+        {
+            if (strpos($txt,$bc[$r]))
+            {
+                $ct++;
+            }                    
+        }            
+        if ($ct > 0)
+        {
+            return(1);    
+        } else {
+            return(0);
+        }            
+    }
+
+    function is_law($txt)
+    {
+        $bc = array('Lei n.');
+        $ct = 0;
+        for ($r=0;$r < count($bc);$r++)
+        {
+            if (strpos($txt,$bc[$r]))
+            {
+                $ct++;
+            }                    
+        }            
+        if ($ct > 0)
+        {
+            return(1);    
+        } else {
+            return(0);
         }
+    }
     function is_journal($txt)
     {
+        $txt = substr($txt,strlen($txt)/2,strlen($txt));
         $bc = array(' V.',' Vol.',' v.',' n.',' nr.');
         $ct = 0;
         for ($r=0;$r < count($bc);$r++)
@@ -595,12 +724,8 @@ class bibliometrics extends CI_model {
         } else {
             return(0);
         }
-        
     }
-    function books($l)
-    {
-        return('1');
-    }        
+
     function halflive($dt,$year='')
     {
         if (strlen($year) == 0)
@@ -615,7 +740,7 @@ class bibliometrics extends CI_model {
             $tov = $tov+$v;
         }
         $hl = ((int)($tot/$tov*10))/10;
-        $hl = $year - $hl;
+        $hl = round(($year - $hl)*10)/10;
         return($hl);
     }
     function recover_year($txt)

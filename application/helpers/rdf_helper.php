@@ -45,6 +45,7 @@ class rdf
 		$CI = &get_instance();
 		$sql = "select * from rdf_concept 
 		INNER JOIN rdf_class ON cc_class = id_c
+		LEFT JOIN rdf_prefix ON c_prefix = id_prefix
 		LEFT JOIN rdf_name ON cc_pref_term = id_n
 		WHERE id_cc = $id";
 		$rlt = $CI -> db -> query($sql);
@@ -130,12 +131,13 @@ class rdf
 		} else {
 			$wh = '';
 		}
-		$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
-		$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';
+		$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
+		$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
 		$sql = "select $cp,1 as rule from rdf_data as rdata
 		INNER JOIN rdf_class as prop ON d_p = prop.id_c 
 		INNER JOIN rdf_concept ON d_r2 = id_cc 
 		INNER JOIN rdf_name on cc_pref_term = id_n
+		LEFT JOIN rdf_prefix ON c_prefix = id_prefix
 		WHERE d_r1 = $id and d_r2 > 0 " . $wh . cr() . cr();
 		$sql .= ' union ' . cr() . cr();
 		/* TRABALHOS */
@@ -143,12 +145,14 @@ class rdf
 		INNER JOIN rdf_class as prop ON d_p = prop.id_c 
 		INNER JOIN rdf_concept ON d_r1 = id_cc 
 		INNER JOIN rdf_name on cc_pref_term = id_n
+		LEFT JOIN rdf_prefix ON c_prefix = id_prefix		
 		WHERE d_r2 = $id and d_r1 > 0 " . $wh . cr() . cr();
 		$sql .= ' union ' . cr() . cr();
 		$sql .= "select $cp,3 as rule from rdf_data as rdata
 		LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
 		LEFT JOIN rdf_concept ON d_r2 = id_cc 
 		LEFT JOIN rdf_name on d_literal = id_n
+		LEFT JOIN rdf_prefix ON c_prefix = id_prefix
 		WHERE d_r1 = $id and d_r2 = 0 " . $wh . cr() . cr();
 
 		/* USE */
@@ -179,24 +183,24 @@ class rdf
 	}  
 
 	/******************************** PREFIX AND SUFIX ************/
-    function rdf_prefix($url = '') {
-    	$CI = &get_instance();
-        $pre = substr($url, 0, strpos($url, ':'));
-        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
-        $sx = $pre;
-        $sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
-        $rlt = $CI -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        $line = $rlt[0];
-        $uri = trim($line['prefix_url']);
-        return ($uri);
-    }
+	function rdf_prefix($url = '') {
+		$CI = &get_instance();
+		$pre = substr($url, 0, strpos($url, ':'));
+		$pos = substr($url, strpos($url, ':') + 1, strlen($url));
+		$sx = $pre;
+		$sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$line = $rlt[0];
+		$uri = trim($line['prefix_url']);
+		return ($uri);
+	}
 
-    function rdf_sufix($url = '') {
-        $pre = substr($url, 0, strpos($url, ':'));
-        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
-        return ($pos);
-    }
+	function rdf_sufix($url = '') {
+		$pre = substr($url, 0, strpos($url, ':'));
+		$pos = substr($url, strpos($url, ':') + 1, strlen($url));
+		return ($pos);
+	}
 
 
 	function pagination($t) 
@@ -1699,32 +1703,32 @@ class rdf
 
 
 	/***************** Gerador de ìndices **************/
-    function index_work($lt = '') {
-    	$CI = &get_instance();
-        $class = "Work";
-        $f = $this -> find_class($class);
+	function index_work($lt = '') {
+		$CI = &get_instance();
+		$class = "Work";
+		$f = $this -> find_class($class);
 
-        $sql = "select * from rdf_concept 
-                        INNER JOIN rdf_name ON cc_pref_term = id_n
-                        where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
-                        ORDER BY n_name";
-        $rlt = $CI -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        $sx = '<ul>';
-        $l = '';
-        for ($r = 0; $r < count($rlt); $r++) {
-            $line = $rlt[$r];
-            $xl = substr(LowerCaseSql($line['n_name']), 0, 1);
-            if ($xl != $l) {
-                $sx .= '<h4>' . UpperCaseSql($xl) . '</h4>';
-                $l = $xl;
-            }
-            $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
-            $name = $link . $line['n_name'] . '</a>';
-            $sx .= '<li>' . $name . '</li>' . cr();
-        }
-        return ($sx);
-    }
+		$sql = "select * from rdf_concept 
+		INNER JOIN rdf_name ON cc_pref_term = id_n
+		where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
+		ORDER BY n_name";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		$sx = '<ul>';
+		$l = '';
+		for ($r = 0; $r < count($rlt); $r++) {
+			$line = $rlt[$r];
+			$xl = substr(LowerCaseSql($line['n_name']), 0, 1);
+			if ($xl != $l) {
+				$sx .= '<h4>' . UpperCaseSql($xl) . '</h4>';
+				$l = $xl;
+			}
+			$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
+			$name = $link . $line['n_name'] . '</a>';
+			$sx .= '<li>' . $name . '</li>' . cr();
+		}
+		return ($sx);
+	}
 
 
 	function index_author($lt = '') {
@@ -2610,12 +2614,108 @@ class rdf
 		$tela = $this -> show_item($data);
 		return ($tela);
 	}      
-    function show_rdf($url) {
-        $pre = substr($url, 0, strpos($url, ':'));
-        $pos = substr($url, strpos($url, ':') + 1, strlen($url));
-        $uri = $this -> rdf_prefix($url);
-        $sx = '<a href="' . $uri . $pos . '" target="_new' . $url . '">' . $url . '</a>';
-        return ($sx);
-    }	
+	function show_rdf($url) {
+		$pre = substr($url, 0, strpos($url, ':'));
+		$pos = substr($url, strpos($url, ':') + 1, strlen($url));
+		$uri = $this -> rdf_prefix($url);
+		$sx = '<a href="' . $uri . $pos . '" target="_new' . $url . '">' . $url . '</a>';
+		return ($sx);
+	}
+
+	function export_json($id)
+	{
+		$dt = $this->le($id);
+		$dd = $this->le_data($id);
+		$sx = '{';
+
+		/* Prefixo */
+		$pre = $dt['prefix_ref'];    		
+		if (strlen($pre) == 0)
+		{
+			$pre = 'brapci';
+		}
+		$sx .= '"id"'.				': "'.$id.'",'.cr();
+		$sx .= '"a"'.				': "owl:class",'.cr();
+		$sx .= '"'.$pre.':class"'.	': "'.$dt['c_class'].'",'.cr();
+
+		/**************** DADOS *******/
+		for ($r=0;$r < count($dd);$r++)
+		{
+
+			$pre = $dd[$r]['prefix_ref'];    		
+			if (strlen($pre) == 0)
+			{
+				$pre = 'brapci';
+			}
+			$vlr = $dd[$r]['d_r2'];
+			if ($vlr == 0)
+			{
+				$vlr = '"'.$dd[$r]['n_name'].'"';
+			} else {
+				if ($vlr == $id)
+				{
+					$vlr = $dd[$r]['d_r1'];
+				}
+				$vlr = '"brapci_v:'.$vlr.'"';
+			}
+			$sx .= '"'.$pre.':'.$dd[$r]['c_class'].'": ';
+			$sx .= $vlr.' ,'.cr();
+		}
+		$sx .= '"date_timestamp_get": "'.date("Y-m-d H:i:s")."'";
+		$sx .= "}";
+		return($sx);
+	}
+
+	function export_rdf($id)
+	{
+		$dt = $this->le($id);
+		$dd = $this->le_data($id);
+
+		$sx = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .'.cr();
+		$sx .= '@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .'.cr();
+		$sx .= '@prefix owl:   <http://www.w3.org/2002/07/owl#> .'.cr();
+		$sx .= '@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .'.cr();
+		$sx .= '@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .'.cr();
+		$sx .= '@prefix brapci: <'.base_url(PATH.'owl').'#> .'.cr();
+		$sx .= '@prefix brapci_v: <'.base_url(PATH.'v').'#> .'.cr();
+		$sx .= cr();
+		$sx .= '<'.base_url(PATH.'v/'.$id).'>'.cr();
+
+		$tab = chr(9);
+		/* Prefixo */
+		$pre = $dt['prefix_ref'];    		
+		if (strlen($pre) == 0)
+		{
+			$pre = 'brapci';
+		}
+		$sx .= $tab.'a'.				$tab.'owl:class ;'.cr();
+		$sx .= $tab.$pre.':class '.		$tab.$dt['c_class'].' ;'.cr();
+
+		/**************** DADOS *******/
+		for ($r=0;$r < count($dd);$r++)
+		{
+
+			$pre = $dd[$r]['prefix_ref'];    		
+			if (strlen($pre) == 0)
+			{
+				$pre = 'brapci';
+			}
+			$vlr = $dd[$r]['d_r2'];
+			if ($vlr == 0)
+			{
+				$vlr = '"'.$dd[$r]['n_name'].'"';
+			} else {
+				if ($vlr == $id)
+				{
+					$vlr = $dd[$r]['d_r1'];
+				}
+				$vlr = 'brapci_v:'.$vlr.' #'.$dd[$r]['n_name'];
+			}
+			$sx .= $tab.$pre.':'.$dd[$r]['c_class'];
+			$sx .= $tab.$vlr.' ;'.cr();
+		}
+		return($sx);
+	}
+
 }
 ?>

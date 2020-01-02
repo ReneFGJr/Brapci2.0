@@ -213,9 +213,15 @@ class socials extends CI_Model {
         return ($ok);
     }
 
-    function login() {
+    function login($simple=0) {
         //$this -> load -> view('auth_social/login_pre', null);
-        $this -> load -> view('social/login/login_signin', null);
+        if ($simple == 1)
+        {
+            $this -> load -> view('social/login/login_simple', null);    
+        } else {
+            $this -> load -> view('social/login/login_signin', null);    
+        }
+        
         //$this -> load -> view('auth_social/login_horizontal', null);
     }
 
