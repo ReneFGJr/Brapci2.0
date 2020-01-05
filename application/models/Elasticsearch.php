@@ -133,6 +133,13 @@ class elasticsearch extends CI_model {
         return $this -> call($type . '/_mapping', 'PUT', $data);
     }
 
+    public function fulltext($type='fulltext',$id,$dt)
+        {
+            $this -> index = 'full';
+            $rst = $this -> call($type . '/' . $id, 'PUT', $dt);        
+        }
+    
+
     /**
      * set the mapping for the index
      *
@@ -144,6 +151,7 @@ class elasticsearch extends CI_model {
      */
 
     public function update($id) {
+        $file_full = 'c/' . $id . 'full.txt';
         $auth = '';
         $title = '';
         $abstract = '';
@@ -217,6 +225,12 @@ class elasticsearch extends CI_model {
         $dt['year'] = $year;
         $dt['issue'] = $source;
         $dt['all'] = $title . ' ' . $abstract . ' ' . $subject;
+        $dt['full'] = '::';
+
+        if (file_exists($file_full))
+            {
+                $dt['full'] = file_get_contents($file_full);
+            }        
        
         if ($status == 'N') {
             $rst = $this -> delete($type, $id);
@@ -360,6 +374,9 @@ class elasticsearch extends CI_model {
             case '5' :
                 $fld = 'abstract';
                 break;
+            case '6' :
+                $fld = 'full';
+                break;                
             default :
                 $fld = 'all';
                 break;

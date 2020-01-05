@@ -45,7 +45,12 @@ $lang['search_2'] = 'autores';
 $lang['search_3'] = 'título';
 $lang['search_4'] = 'palavras-chave';
 $lang['search_5'] = 'resumo';
-$lang['search_6'] = 'referências';
+if (date("Ym") < 202006)
+{
+	$lang['search_6'] = 'texto completo <span style="color: orange"><b><sup>novo</sup></b></span>';
+} else {
+	$lang['search_6'] = 'texto completo';
+}
 $lang['indexs'] = 'índices';
 
 $lang['propriety'] = 'propriedade';

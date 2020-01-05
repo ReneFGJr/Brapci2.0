@@ -11,6 +11,7 @@ class export extends CI_Model {
         $file_xls = 'c/' . $idx . '/name.xls';
         $file_csv = 'c/' . $idx . '/name.csv';
         $file_rdf = 'c/' . $idx . '/name.rdf';
+        $file_full = 'c/' . $idx . 'full.txt';
 
         /************** zera dados ****/
         $sx = '';
@@ -39,6 +40,7 @@ class export extends CI_Model {
         $title = '';
         $abstract = '';
         $urld = '';
+        $urlf = '';
         /* Doblin Core */
         $dc = '';
 
@@ -51,6 +53,19 @@ class export extends CI_Model {
             switch($type) {
             	case 'hasFileStorage':
             		$urld = base_url(PATH.'download/'.trim($l['d_r2']));
+                    $urlf = trim(troca($l['n_name'],'.pdf','.txt'));
+
+                    if (substr($urlf,0,5) == '_repo')
+                    {
+                        if (file_exists($urlf))
+                        {
+                            $urlf = file_get_contents($urlf);
+                        } else {
+                            $urlf = '';
+                        }
+                    } else {
+                        $urlf = '';
+                    }
             		break;
                 case 'hasPageStart' :
                     $pagi = trim($l['n_name']);
@@ -134,6 +149,7 @@ class export extends CI_Model {
                     break;
             }
         }
+        
         $pages = '';
         if (strlen($pagi . $pagf) > 0) {
             if (strlen($pagf) > 0) {
@@ -225,6 +241,14 @@ class export extends CI_Model {
             $f = fopen($file_dc, 'w+');
             fwrite($f, $dc);
             fclose($f);
+        }
+
+        if (strlen($urlf))
+        {
+            /******************************/
+            $f = fopen($file_full, 'w+');
+            fwrite($f, $urlf);
+            fclose($f);  
         }
         return ($sx);
     }

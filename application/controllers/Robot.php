@@ -163,9 +163,14 @@ class Robot extends CI_Controller {
                 $this -> load -> model('pnl');
                 $this->pnl->process();
                 break;
+            case 'config':
+                
+                break;
             default :
                 //$html = $this -> oai_pmh -> repository_list($id);
+                echo '<img src="'.base_url('img/logo/roboti.png').'">';
                 echo '<br>No verb found';
+
                 break;
         }
 
