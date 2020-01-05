@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.19.12.25
+ * @version     v0.20.01.05
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -3156,5 +3156,209 @@ function age($data)
     // Depois apenas fazemos o cálculo já citado :)
     $idade = floor((((($hoje - $nascimento) / 60) / 60) / 24) / 365.25);        
     return($idade);
-}   
+} 
+
+function view($sx,$dt=array())
+{
+    $CI = &get_instance();
+    $dt['content'] = $sx;
+    if (!isset($dt['fluid']))
+        { $dt['fluid'] = ''; }
+    if (!isset($dt['title']))
+        { $dt['title'] = ''; }
+    $CI->load->view('screen',$dt);
+    return('1');
+}
+
+
+function le($par)
+{
+    $CI = &get_instance();
+    if (isset($par['id']))
+    {
+        $sql = "select * from ".$par['table'].' where '.$par['cp'][0][1].' = '.$par['id'];
+        $rlt = $CI->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) > 0)
+        {
+            return($rlt[0]);
+        }        
+    }
+    return(array());
+}
+
+function row2($par=array())
+{
+    $CI = &get_instance();
+    if ((count($par) == 0) or (!is_array($par)))
+    {
+        $sx = '<pre>'.cr();;
+        $sx .= 'table = &lt;nome da tabela&gt;'.cr();
+        $sx .= 'type = &lt;tipo de visualização&gt; ex: 0,1,2,...'.cr();
+        $sx .= 'cp = Array com o campo das tabelas';
+        $sx .= '</pre>'.cr();
+        return($sx);
+    }
+
+    /************************************************** View *********/
+    if (isset($par['id']))
+    {
+        $sql = "select * from ".$par['table'].' where '.$par['cp'][0][1].' = '.$par['id'];
+        $rlt = $CI->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<!-- Classe de produtos -->'.cr();
+        $sx .= '<div class="col-md-12">';
+        $sx .= '<h1>'.msg('Table').': '.$par['table'].'</h1>'.cr();
+        $sx .= '<table id="fields" class="table">'.cr();
+        $sx .= '<tr><th>Field</th></th>Value</th></tr>'.cr();
+        $i = 0;
+        foreach ($rlt[0] as $key => $value) {
+            $i++;
+            $sx .= '<tr>';
+
+            $sx .= '<td align="right">';
+            $sx .= (string)$key;
+            $sx .= '</td>';
+            $sx .= '<td><b>';
+            $sx .= (string)$value;
+            $sx .= '</b></td>';
+            $sx .= '</tr>'.cr();
+        }
+        $sx .= '</table>'.cr();
+        $sx .= '</div>';
+        return($sx);
+    }        
+
+
+    /************************************************** Row **********/
+    if (isset($par['cp']))        
+    {
+        $pag = round(get("pag"));
+        $order = get("order");
+        $filt = get("filter");
+        $filter = '';
+        if ((strlen($order) == 0) and (count($par['cp']) > 0)) 
+        { 
+            $order = 'order by '.(string)$par['cp'][1][1]; 
+        }
+        $cp = $par['cp'];
+        $limit = 'limit 50';
+        $cps = '';
+        foreach ($cp as $key => $value) {
+            if (strlen($cps) > 0) 
+            { 
+                $cps .= ', '; 
+                if (strlen($filt) > 0) 
+                { 
+                    $filter .= ' OR '; 
+                }
+            }
+            $cps .= $value[1];
+            if (strlen($filt) > 0)
+            {
+                $filter .= '('.$value[1] .' like \'%'.$filt.'%\')';
+            }
+        }
+        /* Caso a tabela esteja vazia */
+        if (count($cp) == 0)
+        {
+            $cps = '*';
+        }
+        /*************************** QUERY *****************/
+        if (strlen($filter) > 0)
+        { 
+            $where = ' where ('.$filter.')'; 
+        } else {
+            $where = '';
+        }
+        $sql = "select $cps 
+        from ".$par['table']."
+        $where 
+        $order
+        $limit ";
+
+        /************************* EXECUTA QUERY *************/
+        $rlt = $CI->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<table class="table">';
+        /* Filter */
+        $sx .= '<tr>';
+        $sx .= '<td colspan=10><form method="get">
+        <div class="input-group mb-3">
+        <input type="text" name="filter" class="form-control" placeholder="'.msg("name_to_filter").'" aria-label="'.msg("name_to_filter").'" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+        <input type="submit" value="'.msg("bt_filter").'" class="input-group-text" id="basic-addon2">
+        </div>
+
+        <div class="input-group-append">
+        <a href="'.$par['path'].'edit/0'.'"class="input-group-text" id="basic-addon3">Novo Registro</a>
+        </div>
+
+        </div>
+        </form></td>';
+        $sx .= '</tr>';
+        /* header */
+        $sx .= '<tr>';
+        foreach ($cp as $key => $value) {                    
+            $sx .= '<th>'.(string)$value[1].'</th>';                    
+        }
+        $sx .= '</tr>';
+        /* Datas */            
+        for ($r=0;$r < count($rlt);$r++)
+        {
+            $line = $rlt[$r];
+            $link = '<a href="'.$par['path'].'view/'.$line[$cp[0][1]].'">';
+            $linka = '</a>';
+            $sx .= '<tr>';
+            foreach ($line as $key => $value) {
+                $sx .= '<td>'.$link.$value.$linka.'</td>';
+            }
+            $sx .= '</tr>';
+
+        }
+        $sx .= '</table>';
+        return($sx);
+    }
+
+    /************* Sem os campos *******************************************/
+    if (!isset($par['cp']))
+    {
+        $sql = "select * from ".$par['table'].' limit 1';
+        $rlt = $CI->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<!-- Classe de produtos -->'.cr();
+        $sx .= '<div class="col-md-12">';
+        $sx .= '<h1>'.msg('Table').': '.$par['table'].'</h1>'.cr();
+        $sx .= '<table id="fields" class="table">'.cr();
+        $sx .= '<tr><th>Field</th></th>Value</th></tr>'.cr();
+        $i = 0;
+        foreach ($rlt[0] as $key => $value) {
+            $i++;
+            $sx .= '<tr>';
+
+            $sx .= '<td>'.$i.'</td>';
+            $sx .= '<td>';
+            $sx .= (string)$key;
+            $sx .= '</td>';
+            $sx .= '<td>';
+            $sx .= (string)$value;
+            $sx .= '</td>';
+
+            $sx .= '<td>';
+
+            if ($i == 1) {
+                $sx .= 'array_push($cp,array(\'$H8\',"'.$key.'","'.msg($key).'",True,True,True)); ';
+            } else {
+                $sx .= 'array_push($cp,array(\'$S100\',"'.$key.'","'.msg($key).'",True,True,True)); ';
+            }
+            $sx .= '</td>';
+
+            $sx .= '</tr>'.cr();
+        }
+        $sx .= '</table>'.cr();
+        $sx .= '</div>';
+        return($sx);
+    }
+
+}  
 ?>

