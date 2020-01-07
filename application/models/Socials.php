@@ -781,6 +781,10 @@ class socials extends CI_Model {
                     return(array());
                 }
         }
-
+    function show_perfil()
+        {
+            $sx = '<h1>Show Perfil</h1>';
+            return($sx);
+        }
 }
 ?>

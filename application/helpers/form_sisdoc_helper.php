@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.20.01.05
+ * @version     v0.20.01.07
  */
 
 /* 2017-12-21 function read_link($url) */
@@ -1865,11 +1865,15 @@ function form_edit($obj) {
     }
     if (substr($type, 0, 4) == '$MES') { $tt = 'MES';
 }
+if (substr($type, 0, 3) == '$SN') { $tt = 'SN';
+}
 if (substr($type, 0, 3) == '$SW') { $tt = 'SW';
 }
 if (substr($type, 0, 3) == '$HV') { $tt = 'HV';
 }
 if (substr($type, 0, 5) == '$LINK') { $tt = 'LINK';
+}
+if (substr($type, 0, 6) == '$NOCAB') { $tt = 'NOCAB';
 }
 if (substr($type, 0, 3) == '$AA') { $tt = 'AA';
 }
@@ -2144,6 +2148,12 @@ $(function(){
         $tela .= form_hidden($dados);
         break;
 
+        /* Oculto */
+        case 'NOCAB' :
+        $dados = array($dn => $vlr);
+        $tela .= '<input type="hidden" name="nocab" id="nocab" value="true">' . cr();
+        break;        
+
         case 'HV' :
         $vlr = $cp[2];
         $dados = array($dn => $vlr);
@@ -2209,6 +2219,28 @@ if (strlen($label) > 0) {
 break;
 
 /* Select Box */
+case 'SN':
+/* TR da tabela */
+$tela .= $tr;
+
+/* label */
+if (strlen($label) > 0) {
+    $tela .= $tdl . $label . ' ';
+}
+if ($required == 1) { $tela .= ' <font color="red">*</font> ';
+}
+
+$size = sonumero($type);
+
+$dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => $max, 'size' => $size, 'placeholder' => $label, 'class' => 'form-control form_string form_s' . $size, 'style' => 'width: 80px;');
+if ($readonly == false) { $dados['readonly'] = 'readonly';
+}
+$options = array(1=>msg('Yes'),0=>msg('No'));
+$tela .= $td . form_dropdown($dados, $options, $vlr);
+$tela .= $tdn . $trn;
+break;
+
+/********************** OPTIONS ************************************************/
 case 'O' :
 $ntype = trim(substr($type, 2, strlen($type)));
 $ntype = troca($ntype, '&', ';') . ';';
@@ -3067,7 +3099,7 @@ function redirect2($url,$time=0)
 
 function isbn10to13($isbn)
 {
-   $isbn = trim($isbn);
+ $isbn = trim($isbn);
    if(strlen($isbn) == 12){ // if number is UPC just add zero
       $isbn13 = '0'.$isbn;}
       else
@@ -3102,24 +3134,24 @@ function isbn10to13($isbn)
 
 function genchksum13($isbn)
 {
-   $isbn = trim($isbn);
-   $tb = 0;
-   for ($i = 0; $i <= 12; $i++)
-   {
-      $tc = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $ta = ($tc*3);
-      $tci = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $tb = $tb + $ta + $tci;
-  }
+ $isbn = trim($isbn);
+ $tb = 0;
+ for ($i = 0; $i <= 12; $i++)
+ {
+  $tc = substr($isbn, -1, 1);
+  $isbn = substr($isbn, 0, -1);
+  $ta = ($tc*3);
+  $tci = substr($isbn, -1, 1);
+  $isbn = substr($isbn, 0, -1);
+  $tb = $tb + $ta + $tci;
+}
 
-  $tg = ($tb / 10);
-  $tint = intval($tg);
-  if ($tint == $tg) { return 0; }
-  $ts = substr($tg, -1, 1);
-  $tsum = (10 - $ts);
-  return $tsum;
+$tg = ($tb / 10);
+$tint = intval($tg);
+if ($tint == $tg) { return 0; }
+$ts = substr($tg, -1, 1);
+$tsum = (10 - $ts);
+return $tsum;
 } 
 
 function message($l,$t=0)
@@ -3135,8 +3167,8 @@ function message($l,$t=0)
 }
 function refresh($url,$time)
 {
- $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
- return($sx);
+   $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
+   return($sx);
 }
 
 function age($data)
@@ -3271,6 +3303,18 @@ function row2($par=array())
         } else {
             $where = '';
         }
+
+        if (isset($par['where']))
+        {
+            if (strlen($where) > 0) 
+            {
+                $where .= ' AND ';
+            } else {
+                $where = ' where ';
+            }
+            $where .= ' ('.$par['where'].')';
+        }
+
         $sql = "select $cps 
         from ".$par['table']."
         $where 
@@ -3299,8 +3343,11 @@ function row2($par=array())
         $sx .= '</tr>';
         /* header */
         $sx .= '<tr>';
-        foreach ($cp as $key => $value) {                    
-            $sx .= '<th>'.(string)$value[1].'</th>';                    
+        foreach ($cp as $key => $value) {   
+            if ($value[5] == true)                 
+            {
+                $sx .= '<th>'.(string)$value[1].'</th>';                    
+            }
         }
         $sx .= '</tr>';
         /* Datas */            
@@ -3310,8 +3357,13 @@ function row2($par=array())
             $link = '<a href="'.$par['path'].'view/'.$line[$cp[0][1]].'">';
             $linka = '</a>';
             $sx .= '<tr>';
-            foreach ($line as $key => $value) {
-                $sx .= '<td>'.$link.$value.$linka.'</td>';
+
+            foreach ($cp as $key => $value) {   
+                if ($value[5] == true)                 
+                {                    
+                    $value = $line[$value[1]];
+                    $sx .= '<td>'.$link.$value.$linka.'</td>';                   
+                }
             }
             $sx .= '</tr>';
 

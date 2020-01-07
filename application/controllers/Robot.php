@@ -145,19 +145,23 @@ class Robot extends CI_Controller {
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord(0);
                 if ($idc > 0) {
-                    //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
                     $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
                     $dt['idc'] = $idc;
-                    //$txt = $this -> sources -> info($id);
-                    $txt .= $this -> oai_pmh -> process($dt);
-                    $html = $txt . cr();
+                    $html = $this -> sources -> info($id);
+                    $html .= $this -> oai_pmh -> process($dt);
                 } else {
-                    $txt = $this -> sources -> info($id);
-                    $txt .= '<h3>Fim da coleta</h3>' . cr();
-                    $txt .= '<br>' . date("d/m/Y H:i:s") . cr();
-                    $html .= $txt . cr();
+                    $html = $this -> sources -> info($id);
+                    $html .= '<h3>Fim da coleta</h3>';
+                    $html .= '<br>' . date("d/m/Y H:i:s");
                 }
-                $html .= 'left >>' . $this -> oai_pmh -> leftHarvesting() . cr();
+                echo $html;
+                /***************************************************/
+
+                //$html = '';
+                //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
+                //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
+                break;
+
                 break;
             case 'pnl':
                 $this -> load -> model('pnl');
