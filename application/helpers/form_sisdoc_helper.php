@@ -3346,7 +3346,8 @@ function row2($par=array())
         foreach ($cp as $key => $value) {   
             if ($value[5] == true)                 
             {
-                $sx .= '<th>'.(string)$value[1].'</th>';                    
+                $cps = trim((string)$value[1]);
+                $sx .= '<th>'.msg($cps).'</th>';
             }
         }
         $sx .= '</tr>';
