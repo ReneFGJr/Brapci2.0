@@ -78,8 +78,9 @@ class elasticsearch extends CI_model {
 
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        //print_r($response);
-        //exit;
+        echo '<h1>'.$url.'</h1>';
+        print_r($response);
+        exit;
 
         return json_decode($response, true);
     }
