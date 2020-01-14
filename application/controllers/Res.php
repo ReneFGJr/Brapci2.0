@@ -139,8 +139,8 @@ class res extends CI_Controller {
         } else {
             $data['events'] = '';
         }
-        //$this -> load -> view('brapci/form', $data);
-        $this -> load -> view('brapci/manutention', $data);
+        $this -> load -> view('brapci/form', $data);
+        //$this -> load -> view('brapci/manutention', $data);
 
         if (strlen(get("q")) > 0) {
             /****************************************************************************/
