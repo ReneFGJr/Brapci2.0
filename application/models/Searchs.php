@@ -148,7 +148,8 @@ class searchs extends CI_Model {
         }
         $q = UpperCase($data['q']);
         $t = round($data['type']);
-        $total = round($data['total']);
+        if (!isset($data['total'])) { $data['total'] = 0; }
+        $total = round($data['total']['value']);
         $page = round(GET("p"));
 
         $sql = "select * from _search 
@@ -268,7 +269,7 @@ class searchs extends CI_Model {
             $this -> save_history($data);
             return ('Not found');
         } else {
-            $total = $q['hits']['total'];
+            $total = $q['hits']['total']['value'];
 
             /* History */
             $data['total'] = $total;
@@ -288,7 +289,6 @@ class searchs extends CI_Model {
         $sx .= '<div class="col-8">' . $this -> pages($n, $total) . '</div>' . cr();
         $sx .= '<div class="col-4">Total ' . $total . '</div>' . cr();
         $sx .= '</div></div>';
-
         /**************************************************** Busca Parte II *****************/
         $sx .= '<div class="row result">';
 

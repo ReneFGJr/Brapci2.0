@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "Processing PDF-TO-TEXT v0.1"
+curl "http://www.brapci.inf.br/index.php/robot/pdftotext" --max-time 60
+
+
+
+
