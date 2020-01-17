@@ -139,8 +139,8 @@ class res extends CI_Controller {
         } else {
             $data['events'] = '';
         }
-        //$this -> load -> view('brapci/form', $data);
-        $this -> load -> view('brapci/manutention', $data);
+        $this -> load -> view('brapci/form', $data);
+        //$this -> load -> view('brapci/manutention', $data);
 
         if (strlen(get("q")) > 0) {
             /****************************************************************************/
@@ -154,7 +154,7 @@ class res extends CI_Controller {
             $term = troca($term, '¢', '"');
             $data['content'] = '' . $this -> searchs -> s($term, $type) . '';
 
-            //$data['content'] .= $this->searchs->historic();
+            $data['content'] .= $this->searchs->historic();
             $this -> load -> view('show', $data);
 
         } else {

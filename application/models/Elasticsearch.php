@@ -230,7 +230,7 @@ class elasticsearch extends CI_model {
             {
                 $dt['full'] = file_get_contents($file_full);
             }        
-       
+
         if ($status == 'N') {
             $rst = $this -> delete($type, $id);
             $rst = "<font color=red><b>Deleted " . $id . " " . $type . '</b></font>';
