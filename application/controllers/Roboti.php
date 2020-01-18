@@ -58,18 +58,36 @@ class Roboti extends CI_Controller {
     }
 
     function cron($path='',$id='')
-        {
-            $this->load->model('schedule');
-            $this->schedule->cron($path,$id);
-        }
+    {
+        $this->load->model('schedule');
+        $this->schedule->cron($path,$id);
+    }
 
-    function service($verb='',$act='')
+    function service($verb='',$act='',$token = '')
     {
         $id = get("id");
         $id2 = get("id2");
 
         switch($verb)
         {
+            case 'handle':
+            $this -> load -> model('handle');
+            if (($token == '0mhHuERfFBpuwULJSZXGNJc5agPVZZHe')) {
+                switch($act) {
+                    case 'register' :
+                    $this -> cab();
+                    $this -> load -> model("handle");
+                    echo $this -> handle -> handle_register() . cr();
+                    echo '=============================='.cr();
+                    echo shell_exec ( '/hs/cmd/c' );
+                    break;
+                }
+            } else {
+                echo "OPS";
+            }
+            
+            break;
+            /************************************************************************/
             case 'schedule':
             /* Json */                
             $this->load->model('schedule');

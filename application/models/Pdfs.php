@@ -96,7 +96,7 @@ class pdfs extends CI_model {
 				$txt .= fread($myfile, filesize($namef));
 				fclose($myfile);
 
-				$this -> file_pdf($file, $txt, $id);
+				$this -> file_pdf($file, $txt, $id, 0);
 				$uploadOk = 1;
 				$sx .= '<script> wclose(); </script>';
 			} else {

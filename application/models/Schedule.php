@@ -125,11 +125,12 @@ class schedule extends CI_model
 		$cmd = '';
 		$bots = $this->bots;
 		$wd = date("w");
+		$hr = date("H");
 		$task = array('cmd'=>'','bot'=>'','priority'=>999999);
 		for ($r=1;$r < count($bots);$r++)
 		{
 			$filename = $this->roboti_path.'config/'.$bots[$r].'.roboti';
-			echo '==>'.$filename.'<br>';
+			//echo '==>'.$filename.'<br>';
 			$t = file_get_contents($filename);
 			$t = troca($t,';','.,');
 			$t = troca($t,chr(13),';');
@@ -139,7 +140,7 @@ class schedule extends CI_model
 			$prio = 9999;
 			$weekdays = '';
 			$hours = '';
-
+			/* Le dados do arquivo de configuração **************************/
 			for ($y=0;$y < count($ln);$y++)
 			{
 				$l = $ln[$y];
@@ -152,44 +153,55 @@ class schedule extends CI_model
 				if (strpos(' '.$l,'hours=') > 0) 
 					{ $hours = substr($l,strpos($l,'=')+1,strlen($l)); }
 			}
-			/* Regra 1 */
-			if (($weekdays == '*') or ($weekdays == $wd))
-			{
-				/* Regra 2 */				
-				if ($task['priority'] > $prio)
-				{
-					$task['priority'] = $prio;
-					$task['bot'] = $bots[$r];
-					$task['cmd'] = $cmd;
-				}
-			}
 
-			if (strlen($task['cmd']) > 0)
+			/**************************************** PARAMETROS CMD *******/
+			$cmd = troca($cmd,'[YMD]',date("Y-m-d"));
+
+			$ok = 1;
+			/* Regra 1 - Dia da semana */
+			if (($weekdays == '*') or ($weekdays == $wd))
+				{ $ok = $ok; } else { $ok = 0; }
+
+			/* Regra 2 - Hora */
+			if (($hours == '*') or ($hours == $hr))
+				{ $ok = $ok; } else { $ok = 0; }
+
+			/* Regra Prioridade */				
+			if (($task['priority'] > $prio) and ($ok == 1))
 			{
-				$this->last_task(1,$task['bot']);
-				$output = shell_exec($task['cmd']);
-				echo $output;
-				$this->save_log($task['bot'],$output);
-			}
+				$task['priority'] = $prio;
+				$task['bot'] = $bots[$r];
+				$task['cmd'] = $cmd;
+			}		
+		}			
+
+		if (strlen($task['cmd']) > 0)
+		{
+			echo $task['cmd'].cr();
+			$this->last_task(1,$task['bot']);
+			$output = shell_exec($task['cmd']);
+			echo $output;
+			$this->save_log($task['bot'],$output);
 		}
 	}
 
-	function save_log($bot,$txt2)
-		{
-			$file = $this->roboti_path.'log/'.$bot;
-			check_dir($file);
-			$file .= '/'.date("Y-m").'-'.$bot.'.log';
-			if (file_exists($file))
-			{
-				$txt = file_get_contents($file);
-			} else {
-				$txt = '';
-			}
 
-			$sp = '------------------------------------------------------------------------------------'.cr();
-			$txt = date("Y-m-d H:i:s").' - '.$bot.cr().$txt2.cr().$sp.$txt;
-			file_put_contents($file, $txt);
+	function save_log($bot,$txt2)
+	{
+		$file = $this->roboti_path.'log/'.$bot;
+		check_dir($file);
+		$file .= '/'.date("Y-m").'-'.$bot.'.log';
+		if (file_exists($file))
+		{
+			$txt = file_get_contents($file);
+		} else {
+			$txt = '';
 		}
+
+		$sp = '------------------------------------------------------------------------------------'.cr();
+		$txt = date("Y-m-d H:i:s").' - '.$bot.cr().$txt2.cr().$sp.$txt;
+		file_put_contents($file, $txt);
+	}
 
 	function cron($path='')
 	{
@@ -206,7 +218,7 @@ class schedule extends CI_model
 			$this->last_task(1,'roboti');
 			break;
 		}
-		
+
 	}
 	function no_service()
 	{
