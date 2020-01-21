@@ -297,7 +297,7 @@ function genchksum13($isbn)
 {
    $isbn = trim($isbn);
    $tb = 0;
-   for ($i = 0; $i <= 12; $i++)
+      for ($i = 0; $i <= strlen($isbn); $i++)
    {
       $tc = substr($isbn, -1, 1);
       $isbn = substr($isbn, 0, -1);

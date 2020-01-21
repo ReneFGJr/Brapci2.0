@@ -899,7 +899,12 @@ class rdf
 	}	
 
 	/******************************************************************* RDF NAME ***/
-	function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {		
+	function rdf_name($n = '', $lang = 'pt_BR', $new = 1) 
+	{
+		$rs = $this->frbr_name($n, $lang, $new);
+		return($rs);
+	}
+	function frbr_name($n = '', $lang = 'pt_BR', $new = 1) {		
 		$CI = &get_instance();
 		if (is_array($n))
 		{
@@ -944,7 +949,7 @@ class rdf
 		/****************************** Literal ************/
 		if ((strlen($lit) > 0) AND ($lit != sonumero($lit)))
 		{
-			$lit = $rdf->frbr_name($lit, 'pt-BR');
+			$lit = $rdf->frbr_name($lit, 'pt_BR');
 		}
 
 		/********* propriedade com o prefixo ***************/
@@ -979,7 +984,7 @@ class rdf
 		return (true);
 	}
 	/*****************************************************************  RDF CONCEPT **/
-	function rdf_concept_create($class, $term, $orign = '', $lang = 'pt-BR')
+	function rdf_concept_create($class, $term, $orign = '', $lang = 'pt_BR')
 	{
 		$CI = &get_instance();
 		$cl = $this -> find_class($class);
@@ -1013,10 +1018,10 @@ class rdf
 	function language($lang) {
 		switch($lang) {
 			case 'por' :
-			$lang = 'pt-BR';
+			$lang = 'pt_BR';
 			break;
-			case 'pt_BR' :
-			$lang = 'pt-BR';
+			case 'pt-BR' :
+			$lang = 'pt_BR';
 			break;
 			case 'eng' :
 			$lang = 'en';
