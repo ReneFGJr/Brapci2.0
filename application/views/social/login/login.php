@@ -18,7 +18,7 @@ if (isset($show) and ($show==1))
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="<?php echo base_url('index.php/thesa/social/login_local');?>">
+                <form method="post" action="<?php echo base_url(PATH.'social/login_local');?>">
                     <span><?php echo msg("form_user_name");?></span>
                     <br>
                     <input type="text" name="user_login" value="<?php echo get("user_login");?>" class="form-control">

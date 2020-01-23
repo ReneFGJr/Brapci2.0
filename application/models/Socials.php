@@ -80,6 +80,44 @@ class socials extends CI_Model {
         date_default_timezone_set('America/Sao_Paulo');
     }
 
+    function social($act='')
+    {
+        if ($act == 'user_password_new') { $act = 'npass'; }
+
+        switch($act) {
+            case 'perfil' :
+            $this -> socials -> perfil();
+            break;
+            case 'pwsend' :
+            $this -> socials -> resend();
+            break;
+            case 'signup' :
+            $this -> socials -> signup();
+            break;
+            case 'logoff' :
+            $this -> socials -> logout();
+            break;
+            case 'logout' :
+            $this -> socials -> logout();
+            break;
+            case 'forgot' :
+            $this -> socials -> forgot();
+            break;
+            case 'npass':
+            $this->socials->npass();
+            break;
+            case 'login' :
+            $this -> socials -> login();
+            break;
+            case 'login_local' :
+            $this -> socials -> login_local();
+            break;
+            default :
+            echo "Function not found";
+            break;
+        }
+    }    
+
     function createDB() {
         $sql = "CREATE TABLE IF NOT EXISTS users (
                     id_us serial NOT NULL,
@@ -119,7 +157,7 @@ class socials extends CI_Model {
     function logout() {
         /* Salva session */
         $this -> security_logout();
-        redirect(base_url('index.php/'));
+        redirect(base_url(PATH));
     }
 
     function update() {
@@ -153,8 +191,8 @@ class socials extends CI_Model {
             $sx = '
                 <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="' . base_url('index.php/social/social/perfil') . '">' . msg('user_perfil') . '</a>
-                    <a class="dropdown-item" href="' . base_url('index.php/social/social/logout') . '">' . msg('user_logout') . '</a>
+                    <a class="dropdown-item" href="' . base_url(PATH.'social/perfil') . '">' . msg('user_perfil') . '</a>
+                    <a class="dropdown-item" href="' . base_url(PATH.'social/logout') . '">' . msg('user_logout') . '</a>
                 </div>                
                 ';
         } else {
@@ -208,6 +246,7 @@ class socials extends CI_Model {
             $dd1 = troca($dd1, "'", '´');
             $dd2 = troca($dd2, "'", '´');
             $ok = $this -> security_login($dd1, $dd2);
+            redirect(base_url(PATH));
         }
         return ($ok);
     }
