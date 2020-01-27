@@ -260,11 +260,11 @@ function redirect2($url,$time=0)
 
 function isbn10to13($isbn)
 {
-   $isbn = trim($isbn);
+ $isbn = trim($isbn);
  if(strlen($isbn) == 12){ // if number is UPC just add zero
-   $isbn13 = '0'.$isbn;}
-   else
-   {
+     $isbn13 = '0'.$isbn;}
+     else
+     {
       $isbn2 = substr("978" . trim($isbn), 0, -1);
       $sum13 = genchksum13($isbn2);
       $isbn13 = "$isbn2$sum13";
@@ -295,24 +295,24 @@ function isbn13to10($isbn) {
 
 function genchksum13($isbn)
 {
-   $isbn = trim($isbn);
-   $tb = 0;
-      for ($i = 0; $i <= strlen($isbn); $i++)
-   {
-      $tc = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $ta = ($tc*3);
-      $tci = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $tb = $tb + $ta + $tci;
-  }
+ $isbn = trim($isbn);
+ $tb = 0;
+ for ($i = 0; $i <= strlen($isbn); $i++)
+ {
+  $tc = substr($isbn, -1, 1);
+  $isbn = substr($isbn, 0, -1);
+  $ta = ($tc*3);
+  $tci = substr($isbn, -1, 1);
+  $isbn = substr($isbn, 0, -1);
+  $tb = $tb + $ta + $tci;
+}
 
-  $tg = ($tb / 10);
-  $tint = intval($tg);
-  if ($tint == $tg) { return 0; }
-  $ts = substr($tg, -1, 1);
-  $tsum = (10 - $ts);
-  return $tsum;
+$tg = ($tb / 10);
+$tint = intval($tg);
+if ($tint == $tg) { return 0; }
+$ts = substr($tg, -1, 1);
+$tsum = (10 - $ts);
+return $tsum;
 } 
 
 function message($l,$t=0)
@@ -326,10 +326,16 @@ function message($l,$t=0)
     </div>';
     return($sx);
 }
-function refresh($url,$time)
+function refresh($url='',$time=0)
 {
- $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
- return($sx);
+    if ($url=='')
+    {
+        $sx = '<meta http-equiv="refresh" content="'.$time.'" />';
+    } else {
+        $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
+    }
+
+    return($sx);
 }
 
 function age($data)

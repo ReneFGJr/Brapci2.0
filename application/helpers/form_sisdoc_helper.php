@@ -12,6 +12,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @version     v0.20.01.07
  */
 
+/* 2020-01-24 function 2 e 3 */
+require("form_sisdoc_helper_2.php");
+require("form_sisdoc_helper_3.php");
+
 /* 2017-12-21 function read_link($url) */
 $dd = array();
 
@@ -2579,10 +2583,14 @@ function read_link($url) {
     $read = 'file';
     switch ($read) {
         case 'file' :
-
-        $headers = get_headers($url);
-        $sta = sonumero($headers[0]);
-        $sta = substr($sta,strlen($sta)-3,3);
+        if (substr($url,0,4) == 'http')
+        {
+            $headers = get_headers($url);
+            $sta = sonumero($headers[0]);
+            $sta = substr($sta,strlen($sta)-3,3);
+        } else {            
+            $sta = '200';
+        }
 
         if ($sta != '404')
         {
@@ -2709,5 +2717,12 @@ function ucase($t) {
 
     return ($t);
 }
-require("form_sisdoc_helper_2.php");
+
+function form_focus($id)
+    {
+        $sx = '<script>';
+        $sx .= '$("#'.$id.'").focus();';
+        $sx .= '</script>';
+        return($sx);
+    }
 ?>
