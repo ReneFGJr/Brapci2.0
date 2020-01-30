@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 /**
  * CodeIgniter RDF Helpers
  *
@@ -734,17 +733,13 @@ class rdf
 		array_push($cp, array('$Q id_c:c_class:' . $sqlp, 'sc_propriety', msg('propriety'), true, true));
 		array_push($cp, array('$Q id_c:c_class:' . $sqlc2, 'sc_range', msg('range'), true, true));
 
-		array_push($cp, array('$O 1:Ativo&0:Inativo', 'sc_ativo', msg('ativo'), true, true)
-	);
+		array_push($cp, array('$O 1:Ativo&0:Inativo', 'sc_ativo', msg('ativo'), true, true));
 		array_push($cp, array('$R 0:'.msg('Yes').'&'.SYSTEM_ID.':'.msg('sc_local'), 'sc_global', msg('sc_global'), true, true));
-
-
 		array_push($cp, array('$A', '', msg('sc_group'), False, true));
 		array_push($cp, array('$S', 'sc_group', msg('sc_group'), False, true));
 		array_push($cp, array('$[1:99]', 'sc_ord', msg('ordem'), true, true));
 
-		$tela = $form -> editar($cp, 'rdf_form_class');
-
+		$tela = $form -> editar($cp, 'rdf_form_class');		
 		if ($form -> saved) {
 			if (round($cl) > 0)
 			{
@@ -1115,6 +1110,7 @@ class rdf
 		$sx .= '<div class="col-md-12 small">';
 		$sx .= '| <a href="'.base_url(PATH.'v/'.$dt['id_cc']).'">'.msg('return').' </a> ';
 		$sx .= '| <a href="'.base_url(PATH.'a/'.$dt['id_cc'].'/check_form').'">'.msg('check_form').' </a> ';
+		$sx .= '| <a href="'.base_url(PATH.'a/'.$dt['id_cc'].'/form').'">'.msg('edit_form').' </a> ';
 		$sx .= '| <a href="'.base_url(PATH.'a/'.$dt['id_cc'].'/class').'">'.msg('edit_class').' </a> ';
 		$sx .= '|';
 		
@@ -1143,7 +1139,16 @@ class rdf
 		{
 			$this->form_check($dt['cc_class']);
 			redirect(base_url(PATH.'a/'.$dt['id_cc']));
-		}		
+		}
+
+		/***** checar formulário da classe */		
+		if ((isset($dt['action'])) and ($dt['action'] == 'form'))
+		{
+			//form_ed($id,$cl=0)
+
+			$sx .= $this->form_ed($id,1);
+			//redirect(base_url(PATH.'a/'.$dt['id_cc']));
+		}				
 
 		/* complementos */
 		switch($class) {

@@ -11,6 +11,7 @@ function breadcrumb()
 
 	/****************************************************************/
 	$sx = '
+	<div class="row">
 	<nav aria-label="breadcrumb" style="margin-top: 20px;">
 	<ol class="breadcrumb">
 	<li class="breadcrumb-item"><a href="'.base_url(PATH.'/').'">Home</a></li>'.cr();
@@ -29,7 +30,10 @@ function breadcrumb()
 		$path = substr($path,strpos($path,'/')+1,strlen($path));
 	}
 	/*****************************************************************/
-	$sx .= '</ol></nav>';
+	$sx .= '</ol></nav>
+	</div>
+	</div>
+	';
 	return($sx);
 }
 

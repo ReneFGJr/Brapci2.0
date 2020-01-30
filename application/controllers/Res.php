@@ -929,6 +929,14 @@ class res extends CI_Controller {
         $this -> pdfs -> download($d1);
     }
 
+    function txt($d1 = '') {
+        $d1 = round($d1);
+        $this -> load -> model('pdfs');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> pdfs -> txt($d1);
+    }    
+
     function pdf_download($d1 = '', $d2 = '') {
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');

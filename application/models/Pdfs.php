@@ -396,6 +396,40 @@ class pdfs extends CI_model {
 		}
 	}
 
+	function txt($d1) {
+		$data = $this -> frbr_core -> le_data($d1);
+		$size = 0;
+		$name = 'File';
+		$type = 'TXT';
+		$file = '';
+		$size = 0;
+		for ($r = 0; $r < count($data); $r++) {
+			$attr = $data[$r]['c_class'];
+			$vlr = $data[$r]['n_name'];
+			switch ($attr) {
+				case 'hasFileType' :
+					$type = $vlr;
+					break;
+				case 'prefLabel' :
+					$file = $vlr;
+					break;
+				default :
+					break;
+			}
+		}
+
+		$file = troca($file,'.pdf','.txt');
+
+			header('Content-type: text/html');
+			if (file_exists($file)) {
+				readfile($file);
+			} else {
+				echo 'File not found - ' . $file;
+			}
+
+
+	}	
+
 	function directories($journal = 0) {
 		/* Prepara o nome do arquivo */
 		$filename = '_repository';
