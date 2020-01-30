@@ -347,7 +347,7 @@ class rdf
 		$line = $this->le_class($id);
 		if (count($line) == 0)
 		{
-			echo "OPS";
+			echo "OPS-2";
 			exit;
 			redirect(base_url(PATH.'class'));
 		}
@@ -358,6 +358,7 @@ class rdf
 			$sx .= '<h1>'.$line['c_class'].'</h1>';
 			$sx .= '<a href="'.base_url(PATH.'config/class/').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('return').'</a>';
 			$sx .= '<a href="'.base_url(PATH.'config/class/ed/'.$line['id_c']).'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('class_edit').'</a>';
+			$sx .= '<a href="'.base_url(PATH.'config/class/forms/'.$line['id_c'].'/0').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('form_edit_class').'</a>';			
 			$sx .= $this->class_update_data($line);			
 			$sx .= '</div>';
 			$sx .= '<div class="col-md-1">'.cr();
@@ -714,14 +715,17 @@ class rdf
 		return($tela);	
 	}
 
-	function form_ed($id,$cl=0) {
+	function form_ed($id,$id2,$cl=0) {
 		$form = new form;
 		$form -> id = $id;
 		$form -> return = base_url(PATH.'class/c/'.$cl);
-		$cp = array();
-		array_push($cp, array('$H8', 'id_sc', '', false, true));
-
+		$cp = array();	
 		$sqlc = "select * from rdf_class where c_type = 'C'";
+		if (round($id2) > 0) 
+		{ 
+			$sqlc .= ' and id_c = '.$id2; 
+			//$_POST['dd1'] = $id2;
+		}
 		$sqlp = "select * from rdf_class where c_type = 'P'";
 		$sqlc2 = "select * from rdf_class where c_type = 'C'";
 		if ($cl > 0)
@@ -729,6 +733,8 @@ class rdf
 			$sqlc .= ' AND id_c = '.round($cl);
 			$sqlc2 .= ' AND id_c <> '.round($cl);
 		}
+
+		array_push($cp, array('$H8', 'id_sc', '', false, false));
 		array_push($cp, array('$Q id_c:c_class:' . $sqlc, 'sc_class', msg('resource'), true, true));
 		array_push($cp, array('$Q id_c:c_class:' . $sqlp, 'sc_propriety', msg('propriety'), true, true));
 		array_push($cp, array('$Q id_c:c_class:' . $sqlc2, 'sc_range', msg('range'), true, true));
@@ -739,7 +745,8 @@ class rdf
 		array_push($cp, array('$S', 'sc_group', msg('sc_group'), False, true));
 		array_push($cp, array('$[1:99]', 'sc_ord', msg('ordem'), true, true));
 
-		$tela = $form -> editar($cp, 'rdf_form_class');		
+		$tela = $form -> editar($cp, 'rdf_form_class');	
+
 		if ($form -> saved) {
 			if (round($cl) > 0)
 			{
@@ -1195,7 +1202,12 @@ class rdf
 
 				$cap = msg($line['c_class']);
 
-				$link = '<a href="#" id="action_' . trim($line['c_class']) . '" data-toggle="modal" data-target=".bs-example-modal-lg">';
+				/************************************************************** LINKS EDICAO */
+				print_r($line);
+				echo '<hr>';
+				$furl = base_url(PATH.'rdf/'.$class.'/'.$line['id_sc']);
+				$link = '<a href="#" id="action_' . trim($line['c_class']) . '" 
+									onclick="newxy(\''.$furl.'\',800,800);">';
 				$linka = '</a>';
 				$sx .= '<tr>';
 				$sx .= '<td width="25%" align="right" valign="top">';
@@ -1222,51 +1234,12 @@ class rdf
 					$sx .= '</span>';
 				}
 
-				/* INCLUDE NEW DATA ******************/
-				$js .= 'jQuery("#action_' . trim($line['c_class']) . '").click(function() 
-				{
-					carrega("' . trim($line['sc_propriety']) . '");
-					jQuery("#dialog").modal("show"); 
-				});' . cr();
-
-				/* EXCLUDE DATA ******************/
-				$js .= 'jQuery("#ex' . trim($line['id_d']) . '").click(function() 
-				{
-					exclude("' . trim($line['id_d']) . '");
-					jQuery("#dialog").modal("show"); 
-				});' . cr();
-
 				$sx .= '</td>';
 				$sx .= '</tr>';				
 			}
 			$sx .= '</table>';
 			break;
 		}
-		$js1 = 'function carrega($id)
-		{
-			$url = "' . base_url(PATH . 'config/class/include/'.$id) . '/"+$id+"/?nocab=true";
-			jQuery.ajax({ url: $url,
-				context: document.body })  
-				.done(function( html ) { jQuery( "#model_texto" ).html( html );	
-			}
-			);
-		} '.cr();
-
-		$js1 .= 'function exclude($id)
-		{
-			$url = "' . base_url(PATH . 'config/class/exclude/'.$id) . '/"+$id+"/?nocab=true";
-			jQuery.ajax({ url: $url,
-				context: document.body })  
-				.done(function( html ) { jQuery( "#model_texto" ).html( html );	
-			}
-			);
-		} '.cr();		
-
-		$sx .= '<div id="dialog" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-		<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content" id="model_texto"></div></div></div>';
-        //$sx .= $this -> load -> view('modal/modal_exclude', null, true);
-		$sx .= '<script>' . $js . $js1 .'</script>';
 		return ($sx);
 	}
 
@@ -1881,7 +1854,7 @@ class rdf
 	function class_view_form($id='')
 	{
 		$CI = &get_instance();
-		$sql = "select sc_class, sc_propriety, sc_ord, id_sc,
+		$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc,
 		t1.c_class as c_class, t2.prefix_ref as prefix_ref,
 		t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref
 		FROM rdf_form_class
@@ -1896,7 +1869,7 @@ class rdf
 		order by sc_ord";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();	
-		$sx = '<div class="col-md-6">';
+		$sx = '<div class="col-md-12">';
 		$sx .= '<h4>'.msg("Form").'</h4>';
 		$sx .= '<table class="table">';
 		$sx .= '<tr><th width="4%">#</th>';
@@ -1906,7 +1879,7 @@ class rdf
 		for ($r=0;$r < count($rlt);$r++)			
 		{
 			$line = $rlt[$r];
-			$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/forms/'.$line['id_sc']).'\',800,600);">';
+			$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
 			$linka = '</a>';
 			$sx .= '<tr>';
 
@@ -1933,6 +1906,11 @@ class rdf
 		}
 		$sx .= '</table>';
 		$sx .= '</div>';
+
+		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/0').'\',800,600);">';
+		$linka = '</a>';
+		$sx .= $link.'novo'.$linka;
+
 		return($sx);
 	}
 	function class_view_data($id = '') {
@@ -2352,8 +2330,15 @@ class rdf
 				/**************** FORMULARIOS **************/
 				case 'forms':
 				$tela .= msg('FORMS');
-				$tela .= $this -> form_ed($id);
+				$tela .= $this -> class_view_form($id);
 				break;
+
+
+				/**************** FORMULARIOS **************/
+				case 'formss':
+				$tela .= msg('FORMS');
+				$tela .= $this->form_ed($id2,$id);
+				break;				
 
 				/**************** view **************/
 				case 'view':
