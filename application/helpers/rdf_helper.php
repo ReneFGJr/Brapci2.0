@@ -1043,6 +1043,7 @@ class rdf
 		LEFT JOIN rdf_form_class ON sc_propriety = cl1.id_c
 		LEFT JOIN rdf_class as cl2 ON cl2.id_c = sc_range
 		WHERE cl1.c_class = '" . $path . "' and cl1.c_type = 'P' ";
+		echo $sql;
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$type = $path;
@@ -1203,8 +1204,6 @@ class rdf
 				$cap = msg($line['c_class']);
 
 				/************************************************************** LINKS EDICAO */
-				print_r($line);
-				echo '<hr>';
 				$furl = base_url(PATH.'rdf/'.$class.'/'.$line['id_sc']);
 				$link = '<a href="#" id="action_' . trim($line['c_class']) . '" 
 									onclick="newxy(\''.$furl.'\',800,800);">';
@@ -1261,7 +1260,9 @@ class rdf
 			$rlt = $this -> db -> query($sql);
 			$sx = '';
 			break;
-			break;
+
+
+			/***********************************************************************************/
 			case 'exclude' :
 
 			break;
@@ -1271,30 +1272,14 @@ class rdf
 				echo $this -> searchs -> ajax_q($q);
 			} else {
                     //$type = $id2;
-				echo $this -> model($id, $id2, '');
+				echo '==>'.$id.'==>'.$id2;
+				echo $this -> model($id2, $id3, '');
 			}
 			break;
 		}
 	}
 	/**************************************** MODEL *****************/
 	function Model($path = '', $id = 0, $dt = '') {
-		$sx = '
-		<div class="modal-content">
-		<div class="modal-header">
-		<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		<span aria-hidden="true">&times;</span>
-		</button>
-		</div>
-		<div class="modal-body">
-		...
-		</div>
-		<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-		<button type="button" class="btn btn-primary">Save changes</button>
-		</div>
-		</div>            
-		';
 		$sx = '
 		<div class="modal-header" >                    
 		<h4 class="modal-title" id="myModalLabel">Modal - ' . $path . '</h4>
@@ -1907,7 +1892,7 @@ class rdf
 		$sx .= '</table>';
 		$sx .= '</div>';
 
-		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/0').'\',800,600);">';
+		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$id.'/0').'\',800,600);">';
 		$linka = '</a>';
 		$sx .= $link.'novo'.$linka;
 
@@ -2544,8 +2529,6 @@ class rdf
 
 				/* Image */
 				$dt2 = $this -> le_data($idm);
-                //print_r($dt2);
-                //echo '<hr>';
 				for ($r = 0; $r < count($dt2); $r++) {
 					$line = $dt2[$r];
 					$class = $line['c_class'];
