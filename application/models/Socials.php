@@ -80,13 +80,13 @@ class socials extends CI_Model {
         date_default_timezone_set('America/Sao_Paulo');
     }
 
-    function social($act='')
+    function social($act='',$id='',$chk='')
     {
         if ($act == 'user_password_new') { $act = 'npass'; }
 
         switch($act) {
             case 'perfil' :
-            $this -> socials -> perfil();
+            $this -> socials -> perfil($id,$chk);
             break;
             case 'pwsend' :
             $this -> socials -> resend();
@@ -112,45 +112,86 @@ class socials extends CI_Model {
             case 'login_local' :
             $this -> socials -> login_local();
             break;
+
+            case 'attrib':
+            $this->attributes($id,$chk);
+            redirect(base_url(PATH.'social/perfil/'.$id));
+            break;
+
+            case 'users':
+            $this-> socials->row();
+            break;
+
+            case 'user_edit':
+            $this-> socials->editar($id,$chk);
+            break;            
+
+            case 'user_password':
+            $this-> socials->change_password($id,$chk);
+            break;            
+
             default :
-            echo "Function not found";
+            echo "Function not found - ".$act;
             break;
         }
     }    
 
     function createDB() {
+        $sql = "CREATE TABLE users_perfil 
+        (
+        id_pe serial NOT NULL,
+        pe_abrev char(4) NOT NULL,
+        pe_descricao char(100) NOT NULL,
+        pe_nivel int NOT NULL DEFAULT '9'
+        ) ENGINE=InnoDB CHARSET=UTF8;
+
+        INSERT INTO users_perfil (id_pe, pe_abrev, pe_descricao, pe_nivel) VALUES
+        (1, '#ADM', 'Administrador do Sistema', 9);";
+        $this -> db -> query($sql);
+
+        $sql = "CREATE TABLE users_perfil_attrib 
+        (
+        id_pa serial NOT NULL,
+        pa_user int NOT NULL,
+        pa_perfil int NOT NULL,
+        pa_check char(32) NOT NULL,
+        pa_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) 
+        ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+
         $sql = "CREATE TABLE IF NOT EXISTS users (
-                    id_us serial NOT NULL,
-                      us_nome char(80) NOT NULL,
-                      us_email char(80) NOT NULL,
-                      us_cidade char(40) NOT NULL,
-                      us_pais char(40) NOT NULL,
-                      us_codigo char(7) NOT NULL,
-                      us_link char(80) NOT NULL,
-                      us_ativo char(1) NOT NULL,
-                      us_nivel char(1) NOT NULL,
-                      us_image text NOT NULL,
-                      us_genero char(1) NOT NULL,
-                      us_verificado char(1) NOT NULL,
-                      us_autenticador char(3) NOT NULL,
-                      us_cadastro int(11) NOT NULL,
-                      us_revisoes int(11) NOT NULL,
-                      us_colaboracoes int(11) NOT NULL,
-                      us_acessos int(11) NOT NULL,
-                      us_pesquisa int(11) NOT NULL,
-                      us_erros int(11) NOT NULL,
-                      us_outros int(11) NOT NULL,
-                      us_last int(11) NOT NULL,
-                      us_perfil text NOT NULL,
-                      us_login char(20) NOT NULL,
-                      us_password char(40) NOT NULL
-                    ) ENGINE=InnoDB;
-                    ";
+        id_us serial NOT NULL,
+        us_nome char(80) NOT NULL,
+        us_email char(80) NOT NULL,
+        us_cidade char(40) NOT NULL,
+        us_pais char(40) NOT NULL,
+        us_codigo char(7) NOT NULL,
+        us_link char(80) NOT NULL,
+        us_ativo char(1) NOT NULL,
+        us_nivel char(1) NOT NULL,
+        us_image text NOT NULL,
+        us_genero char(1) NOT NULL,
+        us_verificado char(1) NOT NULL,
+        us_autenticador char(3) NOT NULL,
+        us_cadastro int(11) NOT NULL,
+        us_revisoes int(11) NOT NULL,
+        us_colaboracoes int(11) NOT NULL,
+        us_acessos int(11) NOT NULL,
+        us_pesquisa int(11) NOT NULL,
+        us_erros int(11) NOT NULL,
+        us_outros int(11) NOT NULL,
+        us_last int(11) NOT NULL,
+        us_perfil text NOT NULL,
+        us_login char(20) NOT NULL,
+        us_password char(40) NOT NULL
+        ) ENGINE=InnoDB;
+        ";
         $this -> db -> query($sql);
 
         /* insert Super User **********/
         $sql = "INSERT INTO users (id_us, us_nome, us_email, us_cidade, us_pais, us_codigo, us_link, us_ativo, us_nivel, us_image, us_genero, us_verificado, us_autenticador, us_cadastro, us_revisoes, us_colaboracoes, us_acessos, us_pesquisa, us_erros, us_outros, us_last, us_perfil, us_login,us_password) VALUES
-                    (1, 'Administrador', 'admin', '', '', '0000001', '', '1', '9', '', 'M', '1', '0', 20140706, 0, 0, 400, 0, 0, 0, 20170715, '#ADM', 'admin','21232f297a57a5a743894a0e4a801fc30'); ";
+        (1, 'Administrador', 'admin', '', '', '0000001', '', '1', '9', '', 'M', '1', '0', 20140706, 0, 0, 400, 0, 0, 0, 20170715, '#ADM', 'admin','21232f297a57a5a743894a0e4a801fc30'); ";
         $this -> db -> query($sql);
     }
 
@@ -158,16 +199,6 @@ class socials extends CI_Model {
         /* Salva session */
         $this -> security_logout();
         redirect(base_url(PATH));
-    }
-
-    function update() {
-        $sql = "ALTER TABLE users ADD us_password CHAR(20) NOT NULL AFTER `us_email`;";
-        $this -> db -> query($sql);
-
-        $sql = "update users set us_password = '0c499ec0eb533670fff82c60cdf7b049', us_perfil = '#ADM#BIB' where us_email = 'renefgj@gmail.com' ";
-        $this -> db -> query($sql);
-
-        redirect(base_url('index.php/social/login'));
     }
 
     function ac($id = '') {
@@ -185,16 +216,36 @@ class socials extends CI_Model {
         redirect(base_url('index.php/home'));
     }
 
+    function perfil($id)
+    {
+        $dt = $this->le($id);
+        $sx = $this->show_perfil($dt);
+
+        $cnt = '<ul>';
+        $link = '<a href="'.base_url(PATH.'social/user_password/'.$dt['id_us'].'/'.md5($dt['us_login'])).'">';
+        $linka = '</a>';
+        $cnt .= '<li>'.$link.msg('change_passwrod').$linka.'</li>';
+        $cnt .= '</ul>';
+
+        $cnt = $this->show_attri($id);
+
+        $sx = troca($sx,'<cnt/>',$cnt);
+
+        $d['content'] = $sx;
+        $this->load->view('content',$d);
+        return($sx);
+    }
+
     function menu_user() {
         if (isset($_SESSION['user']) and (strlen($_SESSION['user']) > 0)) {
             $name = $_SESSION['user'];
             $sx = '
-                <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="' . base_url(PATH.'social/perfil') . '">' . msg('user_perfil') . '</a>
-                    <a class="dropdown-item" href="' . base_url(PATH.'social/logout') . '">' . msg('user_logout') . '</a>
-                </div>                
-                ';
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="' . base_url(PATH.'social/perfil') . '">' . msg('user_perfil') . '</a>
+            <a class="dropdown-item" href="' . base_url(PATH.'social/logout') . '">' . msg('user_logout') . '</a>
+            </div>                
+            ';
         } else {
             $sx = '<A href="#" class="nav-link" data-toggle="modal" data-target="#exampleModalLong">' . msg('sign_in') . '</a>';
             $sx .= $this -> button_login_modal();
@@ -205,33 +256,33 @@ class socials extends CI_Model {
     function button_login_modal() {
         $sx = '';
         $sx .= '
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">' . msg("user_login") . '</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <form method="post" action="' . base_url('index.php/social/login') . '">
-                            <span>' . msg("form_user_name") . '</span><br>
-                            <input type="text" name="user_login" value="' . get("user_login") . '" class="form-control">
-                            <br>
-                            <span>' . msg("form_user_password") . '</span><br>
-                            <input type="password" name="user_password" value="" class="form-control">
-                            
-                            <br>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">' . msg('cancel') . '</button>
-                            &nbsp;|&nbsp;
-                            <input type="submit" name="action" value="' . msg('user_login') . '" class="btn btn-primary">
-                         </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>';
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">' . msg("user_login") . '</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <form method="post" action="' . base_url('index.php/social/login') . '">
+        <span>' . msg("form_user_name") . '</span><br>
+        <input type="text" name="user_login" value="' . get("user_login") . '" class="form-control">
+        <br>
+        <span>' . msg("form_user_password") . '</span><br>
+        <input type="password" name="user_password" value="" class="form-control">
+
+        <br>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">' . msg('cancel') . '</button>
+        &nbsp;|&nbsp;
+        <input type="submit" name="action" value="' . msg('user_login') . '" class="btn btn-primary">
+        </form>
+        </div>
+        </div>
+        </div>
+        </div>';
         $data['email_ok'] = '';
         $data['error'] = '';
         $sx = $this -> load -> view('social/login/login.php', $data, true);
@@ -259,7 +310,7 @@ class socials extends CI_Model {
         } else {
             $this -> load -> view('social/login/login_signin', null);    
         }
-        
+
         //$this -> load -> view('auth_social/login_horizontal', null);
     }
 
@@ -323,507 +374,606 @@ class socials extends CI_Model {
                     $id = $line['id_us'];
 
                     $sql = "update users set us_last = '$data',
-                                    us_acessos = (us_acessos + 1) 
-                                where us_email = '$ss_email' ";
+                    us_acessos = (us_acessos + 1) 
+                    where us_email = '$ss_email' ";
                     $this -> db -> query($sql);
                 } else {
                     $sql = "insert into users 
-                        (
-                            us_nome, us_email, us_cidade, 
-                            us_pais, us_codigo, us_link,
-                            us_ativo, us_nivel, us_genero, us_verificado, 
-                            us_cadastro, us_last
-                        ) values (
-                            '$ss_nome','$ss_email','',
-                            '','','$ss_link',
-                            1,0,'',1,
-                            $data,$data
-                        )";
-                    $CI = &get_instance();
-                    $CI -> db -> query($sql);
+                    (
+                    us_nome, us_email, us_cidade, 
+                    us_pais, us_codigo, us_link,
+                    us_ativo, us_nivel, us_genero, us_verificado, 
+                    us_cadastro, us_last
+                    ) values (
+                    '$ss_nome','$ss_email','',
+                    '','','$ss_link',
+                    1,0,'',1,
+                    $data,$data
+                )";
+                $CI = &get_instance();
+                $CI -> db -> query($sql);
 
-                    $c = 'us';
-                    $c1 = 'id_' . $c;
-                    $c2 = $c . '_codigo';
-                    $c3 = 7;
-                    $sql = "update users set us_codigo = lpad($c1,$c3,0) where $c2='' ";
-                    $rlt = $this -> db -> query($sql);
+                $c = 'us';
+                $c1 = 'id_' . $c;
+                $c2 = $c . '_codigo';
+                $c3 = 7;
+                $sql = "update users set us_codigo = lpad($c1,$c3,0) where $c2='' ";
+                $rlt = $this -> db -> query($sql);
 
-                    $sql = "select * from users where us_email = '$ss_email' ";
-                    $query = $this -> db -> query($sql);
-                    $query = $query -> result_array();
-                    $line = $query[0];
-                    $id = $line['id_us'];
-                }
-                $ss_perfil = $line['us_perfil'];
+                $sql = "select * from users where us_email = '$ss_email' ";
+                $query = $this -> db -> query($sql);
+                $query = $query -> result_array();
+                $line = $query[0];
+                $id = $line['id_us'];
+            }
+            $ss_perfil = $line['us_perfil'];
 
-                /* Salva session */
-                $data = array('id' => $id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'nivel' => $ss_nivel, 'perfil' => $ss_perfil);
-                $this -> session -> set_userdata($data);
+            /* Salva session */
+            $data = array('id' => $id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'nivel' => $ss_nivel, 'perfil' => $ss_perfil);
+            $this -> session -> set_userdata($data);
 
-                if ($this -> uri -> segment(3) == 'google') {
+            if ($this -> uri -> segment(3) == 'google') {
                     //Your code stuff here
-                } elseif ($this -> uri -> segment(3) == 'facebook') {
+            } elseif ($this -> uri -> segment(3) == 'facebook') {
                     //your facebook stuff here
 
-                } elseif ($this -> uri -> segment(3) == 'foursquare') {
+            } elseif ($this -> uri -> segment(3) == 'foursquare') {
                     // your code stuff here
-                }
-
-                $this -> session -> set_flashdata('info', $message);
-                redirect('social?tabindex=s&status=sucess');
-
-            } catch (OAuth2_Exception $e) {
-                show_error('That didnt work: ' . $e);
             }
 
-        }
-    }
+            $this -> session -> set_flashdata('info', $message);
+            redirect('social?tabindex=s&status=sucess');
 
-    function cp($id) {
-        $cp = array();
-        array_push($cp, array('$H8', 'id_us', '', False, True));
-        array_push($cp, array('$S80', 'us_nome', 'Nome', True, True));
-        if ($id == 0) {
-            array_push($cp, array('$S80', 'us_email', 'login/email', True, True));
-            array_push($cp, array('$P20', '', 'Senha', True, True));
-        }
-        array_push($cp, array('$HV', 'us_password', md5(get("dd3")), True, True));
-        array_push($cp, array('$O 1:SIM&0:NÃO', 'us_ativo', 'Ativo', True, True));
-        return ($cp);
-    }
-
-    function create_admin_user() {
-        $dt = array();
-        $dt['us_nome'] = 'Super User Admin';
-        $dt['us_email'] = 'admin';
-        $dt['us_password'] = md5('admin');
-        $dt['us_autenticador'] = 'MD5';
-        $this -> insert_new_user($dt);
-    }
-
-    function row($id = '') {
-        $form = new form;
-
-        $form -> fd = array('id_us', 'us_nome', 'us_login');
-        $form -> lb = array('id', msg('us_name'), msg('us_login'));
-        $form -> mk = array('', 'L', 'L', 'L');
-
-        $form -> tabela = $this -> table;
-        $form -> see = true;
-        $form -> novo = true;
-        $form -> edit = true;
-
-        $form -> row_edit = base_url('index.php/admin/user_edit');
-        $form -> row_view = base_url('index.php/admin/user');
-        $form -> row = base_url('index.php/admin/users');
-
-        return (row($form, $id));
-    }
-
-    function editar($id, $chk) {
-        $form = new form;
-        $form -> id = $id;
-        $cp = $this -> cp($id);
-        $data['title'] = '';
-        $data['content'] = $form -> editar($cp, $this -> table);
-        $this -> load -> view('content', $data);
-        return ($form -> saved);
-    }
-
-    function insert_new_user($data) {
-        $email = $data['us_email'];
-        $nome = $data['us_nome'];
-        $senha = $data['us_password'];
-        $auth = $data['us_autenticador'];
-        $inst = '';
-        if (isset($data['us_institution'])) {
-            $inst = $data['us_institution'];
+        } catch (OAuth2_Exception $e) {
+            show_error('That didnt work: ' . $e);
         }
 
-        $sql = "select * from " . $this -> table . " where us_email = '$email' ";
+    }
+}
+
+function cp($id) {
+    $cp = array();
+    array_push($cp, array('$H8', 'id_us', '', False, True));
+    array_push($cp, array('$S80', 'us_nome', 'Nome', True, True));
+    if ($id == 0) {
+        array_push($cp, array('$S80', 'us_email', 'login/email', True, True));
+        array_push($cp, array('$P20', '', 'Senha', True, True));
+        $pass = $this -> password_cripto(get("dd3"), 'T');
+        array_push($cp, array('$HV', 'us_password', $pass, True, True));
+    }
+    array_push($cp, array('$HV', 'us_login', get("dd2"), True, True));
+    array_push($cp, array('$O 1:SIM&0:NÃO', 'us_ativo', 'Ativo', True, True));
+    return ($cp);
+}
+
+function create_admin_user() {
+    $dt = array();
+    $dt['us_nome'] = 'Super User Admin';
+    $dt['us_email'] = 'admin';
+    $dt['us_password'] = md5('admin');
+    $dt['us_autenticador'] = 'MD5';
+    $this -> insert_new_user($dt);
+}
+
+function row($id = '') {
+    $form = new form;
+
+    $form -> fd = array('id_us', 'us_nome', 'us_login');
+    $form -> lb = array('id', msg('us_name'), msg('us_login'));
+    $form -> mk = array('', 'L', 'L', 'L');
+
+    $form -> tabela = $this -> table;
+    $form -> see = true;
+    $form -> novo = true;
+    $form -> edit = true;
+
+    $form -> row_edit = base_url(PATH.'social/user_edit');
+    $form -> row_view = base_url(PATH.'social/perfil');
+    $form -> row = base_url(PATH.'social/users');
+    $data['content'] = row($form, $id);
+    $this->load->view('content',$data);
+    return ("");
+}
+
+function editar($id, $chk) {
+    $form = new form;
+    $form -> id = $id;
+    $cp = $this -> cp($id);
+    $data['title'] = '';
+    $data['content'] = $form -> editar($cp, $this -> table);
+    $this -> load -> view('content', $data);
+
+    if ($form->saved > 0)
+    {
+        redirect(base_url(PATH.'social/users'));
+    }
+    return ($form -> saved);
+} 
+
+function insert_new_user($data) {
+    $email = $data['us_email'];
+    $nome = $data['us_nome'];
+    $senha = $data['us_password'];
+    $auth = $data['us_autenticador'];
+    $inst = '';
+    if (isset($data['us_institution'])) {
+        $inst = $data['us_institution'];
+    }
+
+    $sql = "select * from " . $this -> table . " where us_email = '$email' ";
+    $rlt = $this -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+    if (count($rlt) == 0) {
+        $sql = "insert into " . $this -> table . " 
+        (us_nome, us_email, us_password, us_ativo, us_autenticador,
+        us_perfil, us_perfil_check, us_institution,
+        us_login, us_badge)
+        values
+        ('$nome','$email','$senha','1', '$auth',
+        '','','$inst',
+        '$email','')
+        ";
+        $this -> db -> query($sql);
+        $this -> updatex();
+        $this -> update_perfil_check($data);
+        return (1);
+    } else {
+        return (-1);
+    }
+}
+
+function resend() {
+    $email = get("dd0");
+    $chk = get("chk");
+    $chk2 = md5($email . date("Ymd") . $email);
+    if ($chk2 == $chk) {
+
+    } else {
+        $data['content'] = 'Erro de checagem dos dados!';
+        $this -> load -> view('error', $data);
+    }
+}
+
+function le($id, $fld = 'id') {
+    $sql = "select * from " . $this -> table;
+    switch($fld) {
+        case 'id' :
+        $sql .= ' where id_us = ' . round($id);
+        break;
+        case 'login' :
+        $sql .= " where us_email = '$id' ";
+        break;
+        default :
+        $sql .= ' where id_us = ' . round($id);
+        break;
+    }
+    $rlt = $this -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+    if (count($rlt) == 0) {
+        return ( array());
+    } else {
+        return ($rlt[0]);
+    }
+}
+
+function updatex() {
+    $sql = "update " . $this -> table . " set us_badge = lpad(id_us,5,0) where us_badge = '' or us_badge is null ";
+    $this -> db -> query($sql);
+}
+
+function update_perfil_check($data) {
+    if (isset($data['us_email'])) {
+        $usr = $this -> le($data['us_email'], 'login');
+        $id = $usr['id_us'];
+        $pass = $usr['us_password'];
+        $perfil = $usr['us_perfil'];
+        $check = md5($id . $perfil);
+        $sql = "update " . $this -> table . " set us_perfil_check = '$check' where id_us = $id ";
         $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        if (count($rlt) == 0) {
-            $sql = "insert into " . $this -> table . " 
-                    (us_nome, us_email, us_password, us_ativo, us_autenticador,
-                    us_perfil, us_perfil_check, us_institution,
-                    us_login, us_badge)
-                    values
-                    ('$nome','$email','$senha','1', '$auth',
-                    '','','$inst',
-                    '$email','')
-                    ";
-            $this -> db -> query($sql);
-            $this -> updatex();
-            $this -> update_perfil_check($data);
+        return ('1');
+    }
+    if (isset($data['id_us'])) {
+        $usr = $this -> le($data['id_us'], 'id');
+        $id = $usr['id_us'];
+        $pass = $usr['us_password'];
+        $perfil = $usr['us_perfil'];
+        $check = md5($id . $perfil);
+        $sql = "update  " . $this -> table . " set us_perfil_check = '$check' where id_us = $id ";
+        $rlt = $this -> db -> query($sql);
+        return ('1');
+    }
+}
+
+/****************** Security login ****************/
+function security() {
+    $ok = 0;
+    if (isset($_SESSION['id'])) {
+        $id = round($_SESSION['id']);
+        if ($id > 0) {
+            return ('');
+        }
+    }
+
+    redirect(base_url('index.php/social/login'));
+}
+
+function security_logout() {
+    $data = array('id' => '', 'user' => '', 'email' => '', 'image' => '', 'perfil' => '');
+    $this -> session -> set_userdata($data);
+    return ('');
+}
+
+function action($path, $d1, $d2) {
+    switch ($path) {
+        case 'login' :
+                //$this->createDB();
+        $user = get("user_login");
+        $pass = get("user_password");
+        $ok = $this -> security_login($user, $pass);
+        if ($ok != 1) {
+            redirect(base_url(PATH.'social/form'));
+        } else {
+            redirect(base_url('index.php/main'));
+        }
+        break;
+        case 'logout' :
+        $this -> logout();
+        redirect(base_url('index.php/main'));
+        default :
+        echo 'Método não implementado';
+        exit ;
+    }
+}
+
+function security_login($login = '', $pass = '') {
+
+    /****************************** FORCA LOGIN **************/        
+    $forced = 0;
+
+    $sql = "select * from " . $this -> table . " where (us_email = '$login' OR us_login = '$login') OR (1=$forced) limit 1";
+    $rlt = $this -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+
+    if (count($rlt) > 0) {
+        $line = $rlt[0];
+
+        $dd2 = $this -> password_cripto($pass, $line['us_autenticador']);
+        $dd3 = trim($line['us_password']);
+
+        echo $dd2.'<br>'.$dd3.'<br>'.$line['us_autenticador'];
+        echo '<br>'.$pass;
+        //exit;
+
+        if (($dd2 == $dd3) or ($pass == $dd3) or ($forced == 1)) {
+            /* Salva session */
+            $ss_id = $line['id_us'];
+            $ss_user = $line['us_nome'];
+            $ss_email = $line['us_email'];
+            $ss_image = $line['us_image'];
+            $ss_perfil = $line['us_perfil'];
+            $ss_nivel = $line['us_nivel'];
+            $data = array('id' => $ss_id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'perfil' => $ss_perfil, 'nivel'=>$ss_nivel);
+            $this -> session -> set_userdata($data);
             return (1);
         } else {
-            return (-1);
-        }
-    }
-
-    function resend() {
-        $email = get("dd0");
-        $chk = get("chk");
-        $chk2 = md5($email . date("Ymd") . $email);
-        if ($chk2 == $chk) {
-
-        } else {
-            $data['content'] = 'Erro de checagem dos dados!';
-            $this -> load -> view('error', $data);
-        }
-    }
-
-    function le($id, $fld = 'id') {
-        $sql = "select * from " . $this -> table;
-        switch($fld) {
-            case 'id' :
-                $sql .= ' where id_us = ' . round($id);
-                break;
-            case 'login' :
-                $sql .= " where us_email = '$id' ";
-                break;
-            default :
-                $sql .= ' where id_us = ' . round($id);
-                break;
-        }
-        $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        if (count($rlt) == 0) {
-            return ( array());
-        } else {
-            return ($rlt[0]);
-        }
-    }
-
-    function updatex() {
-        $sql = "update " . $this -> table . " set us_badge = lpad(id_us,5,0) where us_badge = '' or us_badge is null ";
-        $this -> db -> query($sql);
-    }
-
-    function update_perfil_check($data) {
-        if (isset($data['us_email'])) {
-            $usr = $this -> le($data['us_email'], 'login');
-            $id = $usr['id_us'];
-            $pass = $usr['us_password'];
-            $perfil = $usr['us_perfil'];
-            $check = md5($id . $perfil);
-            $sql = "update " . $this -> table . " set us_perfil_check = '$check' where id_us = $id ";
-            $rlt = $this -> db -> query($sql);
-            return ('1');
-        }
-        if (isset($data['id_us'])) {
-            $usr = $this -> le($data['id_us'], 'id');
-            $id = $usr['id_us'];
-            $pass = $usr['us_password'];
-            $perfil = $usr['us_perfil'];
-            $check = md5($id . $perfil);
-            $sql = "update  " . $this -> table . " set us_perfil_check = '$check' where id_us = $id ";
-            $rlt = $this -> db -> query($sql);
-            return ('1');
-        }
-    }
-
-    /****************** Security login ****************/
-    function security() {
-        $ok = 0;
-        if (isset($_SESSION['id'])) {
-            $id = round($_SESSION['id']);
-            if ($id > 0) {
-                return ('');
-            }
-        }
-
-        redirect(base_url('index.php/social/login'));
-    }
-
-    function security_logout() {
-        $data = array('id' => '', 'user' => '', 'email' => '', 'image' => '', 'perfil' => '');
-        $this -> session -> set_userdata($data);
-        return ('');
-    }
-
-    function action($path, $d1, $d2) {
-        switch ($path) {
-            case 'login' :
-                //$this->createDB();
-                $user = get("user_login");
-                $pass = get("user_password");
-                $ok = $this -> security_login($user, $pass);
-                if ($ok != 1) {
-                    redirect(base_url(PATH.'social/form'));
-                } else {
-                    redirect(base_url('index.php/main'));
-                }
-                break;
-            case 'logout' :
-                $this -> logout();
-                redirect(base_url('index.php/main'));
-            default :
-                echo 'Método não implementado';
-                exit ;
-        }
-    }
-
-    function security_login($login = '', $pass = '') {
-        
-        /****************************** FORCA LOGIN **************/        
-        $forced = 0;
-
-        $sql = "select * from " . $this -> table . " where (us_email = '$login' OR us_login = '$login') OR (1=$forced) limit 1";
-        $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-
-        if (count($rlt) > 0) {
-            $line = $rlt[0];
-
-            $dd2 = $this -> password_cripto($pass, $line['us_autenticador']);
-            $dd3 = trim($line['us_password']);
-            
-            if (($dd2 == $dd3) or ($pass == $dd3) or ($forced == 1)) {
-                /* Salva session */
-                $ss_id = $line['id_us'];
-                $ss_user = $line['us_nome'];
-                $ss_email = $line['us_email'];
-                $ss_image = $line['us_image'];
-                $ss_perfil = $line['us_perfil'];
-                $ss_nivel = $line['us_nivel'];
-                $data = array('id' => $ss_id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'perfil' => $ss_perfil, 'nivel'=>$ss_nivel);
-                $this -> session -> set_userdata($data);
-                return (1);
-            } else {
-                return (0);
-            }
-        } else {
-            return (-1);
-        }
-    }
-
-    function my_account($id) {
-        $this -> load -> model('user_drh');
-
-        $data1 = $this -> le($id);
-        $data2 = $this -> user_drh -> le($id);
-        $data = array_merge($data1, $data2);
-
-        $tela = $this -> load -> view('auth_social/myaccount', $data, true);
-        return ($tela);
-    }
-
-    function password_cripto($pass, $tipo) {
-        switch ($tipo) {
-            case 'TXT' :
-                $dd2 = trim($pass);
-                break;
-            default :
-                $dd2 = md5($pass);
-                break;
-        }
-        return ($dd2);
-    }
-
-    function change_password($id, $new = 0) {
-        $form = new form;
-        $cp = array();
-        array_push($cp, array('$H8', '', '', false, false));
-        if ($new == 0) {
-            array_push($cp, array('$P20', '', 'Senha atual', True, True));
-        } else {
-            array_push($cp, array('$HV', '', '', False, False));
-        }
-        array_push($cp, array('$P20', '', 'Nova senha', True, True));
-        array_push($cp, array('$P20', '', 'Confirme nova senha', True, True));
-        array_push($cp, array('$B', '', 'Alterar senha', false, True));
-
-        $tela = $form -> editar($cp, '');
-
-        /* REGRAS DE VALIDACAO */
-        $data = $this -> le($id);
-        $pass = get("dd1");
-        $dd3 = $data['us_password'];
-        $p1 = get("dd2");
-        $p2 = get("dd3");
-        $dd2 = get("dd2");
-
-        //$dd2 = $this -> password_cripto($pass, $data['us_autenticador']);
-        if ($form -> saved > 0) {
-            if (($dd2 == $dd2) and (strlen($dd2) > 0)) {
-                if (($p1 == $p2) or ($new == 1)) {
-                    $sql = "update " . $this -> table . " set us_password = '" . md5($p1) . "', us_autenticador = 'MD5' where id_us = " . $id;
-                    $this -> db -> query($sql);
-                    redirect(base_url(PATH.'social/login'));
-                } else {
-                    $tela .= '<div class="alert">Senhas não conferem</div>';
-                }
-            } else {
-                $tela .= '<div class="alert">Senhas atual não confere!</div>';
-            }
-        }
-
-        return ($tela);
-    }
-
-    function user_id() {
-        if (!isset($_SESSION['id'])) {
             return (0);
         }
-
-        $us = round($_SESSION['id']);
-        return ($us);
-
+    } else {
+        return (-1);
     }
+}
 
-    function user_email_send($para, $nome, $code) {
-        $anexos = array();
-        $texto = $this -> email_cab();
-        $de = 0;
-        switch($code) {
-            case 'SIGNUP' :
-                $link = base_url(PATH.'social/npass/?dd0=' . $para . '&chk=' . checkpost_link($para . $para));
-                $assunto = utf8_decode('Cadastro de novo usuários - Brapci');
-                $texto .= utf8_decode('<p>' . msg('Dear') . ' <b>' . $nome . ',</b></p>');
-                $texto .= utf8_decode('<p>Para ativar seu cadastro é necessário clicar no link abaixo:');
-                $texto .= '<br><br>';
-                $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a></p>';
-                $de = 1;
-                break;
-            case 'PASSWORD' :
-                $this -> le_user_id($para);
-                $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
-                $assunto = msg('Cadastro de nova senha') . ' - Brapci';
-                $texto .= '<p>' . msg('Dear') . ' ' . $this -> line['us_nome'] . '</p>';
-                $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
-                $texto .= '<br><br>';
-                $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
-                $de = 1;
-                break;
-			case 'FORGOT':
-				$data = $this->le_email($para);
-                $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
-                $assunto = msg('Cadastro de nova senha') . ' - Brapci';
-                $texto .= '<p>' . msg('Dear') . ' ' . $data['us_nome'] . '</p>';
-                $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
-                $texto .= '<br><br>';
-                $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
-                $de = 1;
-                break;
-            default :
-                $assunto = 'Enviado de e-mail';
-                $texto .= ' Vinculo não informado ' . $code;
-                $de = 1;
-                break;
-        }
-        $texto .= $this -> email_foot();
-        if ($de > 0) {
-            $this->load->helper('email');
-        	enviaremail($para, $assunto, $texto, $de);
+function my_account($id) {
+    $this -> load -> model('user_drh');
+
+    $data1 = $this -> le($id);
+    $data2 = $this -> user_drh -> le($id);
+    $data = array_merge($data1, $data2);
+
+    $tela = $this -> load -> view('auth_social/myaccount', $data, true);
+    return ($tela);
+}
+
+function password_cripto($pass, $tipo) {
+    $pass = trim($pass);
+    switch ($tipo) {
+        case 'TXT' :
+        $dd2 = trim($pass);        
+        break;
+
+        default :
+        $dd2 = md5($pass);
+        break;
+    }
+    return ($dd2);
+}
+
+function change_password($id, $new = 0) {
+    $form = new form;
+    $cp = array();
+    array_push($cp, array('$H8', '', '', false, false));
+    if ($new == 0) {
+        array_push($cp, array('$P20', '', 'Senha atual', True, True));
+    } else {
+        array_push($cp, array('$HV', '', '', False, False));
+    }
+    array_push($cp, array('$P20', '', 'Nova senha', True, True));
+    array_push($cp, array('$P20', '', 'Confirme nova senha', True, True));
+
+    array_push($cp, array('$B', '', 'Alterar senha', false, True));
+
+    $tela = $this->show_perfil($id);
+    $tela .= '<hr>';
+    $tela .= $form -> editar($cp, '');
+
+    /* REGRAS DE VALIDACAO */
+    $data = $this -> le($id);
+    $pass = get("dd1");
+    $dd3 = $data['us_password'];
+    $p1 = get("dd2");
+    $p2 = get("dd3");
+    $dd2 = get("dd2");
+
+    if ($form -> saved > 0) {
+        if (($dd2 == $dd2) and (strlen($dd2) > 0)) {
+            if (($p1 == $p2) or ($new == 1)) {
+                $sql = "update " . $this -> table . " set us_password = '" . md5($p1) . "', us_autenticador = 'MD5' where id_us = " . $id;
+                $this -> db -> query($sql);
+                redirect(base_url(PATH.'social/perfil/'.$id));
+            } else {
+                $tela .= '<div class="alert">Senhas não conferem</div>';
+            }
         } else {
-            echo 'e-mail não enviado - ' . $code;
+            $tela .= '<div class="alert">Senhas atual não confere!</div>';
         }
     }
+    $d['content'] = $tela;
+    $this->load->view('content',$d);
+    return ('');
+}
 
-    /***** EMAIL */
-    function email_cab() {
-        $sx = '<table width="600" align="center"><tr><td>';
-        $sx .= '<font style="font-family: Tahoma, Verdana, Arial; font-size: 14px;">' . cr();
-        $sx .= '<font style="font-size: 24px; color: #1D0E9B; font-family: Tahoma, Arial">BRAPCI</font>' . cr();
-        $sx .= '<br>';
-        $sx .= utf8_decode('<font style="color: #1D0E9B; font-size: 12px;">Base de dados em Ciência da Informação</font>') . cr();
-        $sx .= '<hr>';
-        return ($sx);
+function user_id() {
+    if (!isset($_SESSION['id'])) {
+        return (0);
     }
 
-    function email_foot() {
-        $sx = '';
-        $sx .= '<hr>';
-        $sx .= '</td></tr></table>';
-        return ($sx);
+    $us = round($_SESSION['id']);
+    return ($us);
+
+}
+
+function user_email_send($para, $nome, $code) {
+    $anexos = array();
+    $texto = $this -> email_cab();
+    $de = 0;
+    switch($code) {
+        case 'SIGNUP' :
+        $link = base_url(PATH.'social/npass/?dd0=' . $para . '&chk=' . checkpost_link($para . $para));
+        $assunto = utf8_decode('Cadastro de novo usuários - Brapci');
+        $texto .= utf8_decode('<p>' . msg('Dear') . ' <b>' . $nome . ',</b></p>');
+        $texto .= utf8_decode('<p>Para ativar seu cadastro é necessário clicar no link abaixo:');
+        $texto .= '<br><br>';
+        $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a></p>';
+        $de = 1;
+        break;
+        case 'PASSWORD' :
+        $this -> le_user_id($para);
+        $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
+        $assunto = msg('Cadastro de nova senha') . ' - Brapci';
+        $texto .= '<p>' . msg('Dear') . ' ' . $this -> line['us_nome'] . '</p>';
+        $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
+        $texto .= '<br><br>';
+        $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
+        $de = 1;
+        break;
+        case 'FORGOT':
+        $data = $this->le_email($para);
+        $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
+        $assunto = msg('Cadastro de nova senha') . ' - Brapci';
+        $texto .= '<p>' . msg('Dear') . ' ' . $data['us_nome'] . '</p>';
+        $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
+        $texto .= '<br><br>';
+        $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
+        $de = 1;
+        break;
+        default :
+        $assunto = 'Enviado de e-mail';
+        $texto .= ' Vinculo não informado ' . $code;
+        $de = 1;
+        break;
     }
+    $texto .= $this -> email_foot();
+    if ($de > 0) {
+        $this->load->helper('email');
+        enviaremail($para, $assunto, $texto, $de);
+    } else {
+        echo 'e-mail não enviado - ' . $code;
+    }
+}
 
-    function signup() {
-        $data = array();
-        $name = get("fullName");
-        $email = get("email");
-        $inst = get("Institution");
+/***** EMAIL */
+function email_cab() {
+    $sx = '<table width="600" align="center"><tr><td>';
+    $sx .= '<font style="font-family: Tahoma, Verdana, Arial; font-size: 14px;">' . cr();
+    $sx .= '<font style="font-size: 24px; color: #1D0E9B; font-family: Tahoma, Arial">BRAPCI</font>' . cr();
+    $sx .= '<br>';
+    $sx .= utf8_decode('<font style="color: #1D0E9B; font-size: 12px;">Base de dados em Ciência da Informação</font>') . cr();
+    $sx .= '<hr>';
+    return ($sx);
+}
 
-        if ((strlen($name) > 0) and (strlen($email))) {
-            $dt = array();
-            $dt['us_nome'] = $name;
-            $dt['us_email'] = $email;
-            $dt['us_institution'] = $inst;
-            $dt['us_password'] = md5(date("YmdHis"));
-            $dt['us_autenticador'] = 'MD5';
-            $rs = $this -> insert_new_user($dt);
+function email_foot() {
+    $sx = '';
+    $sx .= '<hr>';
+    $sx .= '</td></tr></table>';
+    return ($sx);
+}
+
+function signup() {
+    $data = array();
+    $name = get("fullName");
+    $email = get("email");
+    $inst = get("Institution");
+
+    if ((strlen($name) > 0) and (strlen($email))) {
+        $dt = array();
+        $dt['us_nome'] = $name;
+        $dt['us_email'] = $email;
+        $dt['us_institution'] = $inst;
+        $dt['us_password'] = md5(date("YmdHis"));
+        $dt['us_autenticador'] = 'MD5';
+        $rs = $this -> insert_new_user($dt);
             //$rs = 1;
-            $data['erro'] = $rs;
+        $data['erro'] = $rs;
 
-            if ($rs == 1) {
-                $code = 'SIGNUP';
-                $this -> user_email_send($email, $name, $code);                
-                $this -> load -> view('social/login/login_signup_sucess', $dt);                
-                return ("");
-            }
-        }
-
-        $this -> load -> view('social/login/login_signup', $data);
-    }
-
-    function forgot() {
-        $data = array();
-        $email = get("user_login");
-
-        if (strlen($email) > 0) {
-            $dt = array();
-			$rs = 1;
-            if ($rs == 1) {
-            	$dt = $this->le_email($email);
-                $code = 'FORGOT';
-				if (count($dt) > 0)
-					{
-		                $this -> user_email_send($email, '', $code);
-                		$this -> load -> view('social/login/login_signup_sucess', $dt);
-                		return ("");						
-					} else {
-						$sx = 'Email nao localizado';
-						return("");
-					}
-            }
-        }
-
-        $this -> load -> view('social/login/login_forgot', $data);
-    }
-
-
-    function le_email($e) {
-        $sql = "select * from users where us_email = '$e'";
-        $rlt = $this -> db -> query($sql);
-        $rlt = $rlt -> result_array();
-        if (count($rlt) > 0) {
-            $line = $rlt[0];
-            return ($line);
-        } else {
-            return ( array());
+        if ($rs == 1) {
+            $code = 'SIGNUP';
+            $this -> user_email_send($email, $name, $code);                
+            $this -> load -> view('social/login/login_signup_sucess', $dt);                
+            return ("");
         }
     }
-    function token($t)
+
+    $this -> load -> view('social/login/login_signup', $data);
+}
+
+function forgot() {
+    $data = array();
+    $email = get("user_login");
+
+    if (strlen($email) > 0) {
+        $dt = array();
+        $rs = 1;
+        if ($rs == 1) {
+           $dt = $this->le_email($email);
+           $code = 'FORGOT';
+           if (count($dt) > 0)
+           {
+              $this -> user_email_send($email, '', $code);
+              $this -> load -> view('social/login/login_signup_sucess', $dt);
+              return ("");						
+          } else {
+              $sx = 'Email nao localizado';
+              return("");
+          }
+      }
+  }
+
+  $this -> load -> view('social/login/login_forgot', $data);
+}
+
+
+function le_email($e) {
+    $sql = "select * from users where us_email = '$e'";
+    $rlt = $this -> db -> query($sql);
+    $rlt = $rlt -> result_array();
+    if (count($rlt) > 0) {
+        $line = $rlt[0];
+        return ($line);
+    } else {
+        return ( array());
+    }
+}
+function token($t)
+{
+    $t = troca($t,"'",'´');
+    $sql = "select * from users where us_password = '$t' ";
+    $rlt = $this->db->query($sql);
+    $rlt = $rlt->result_array();
+    if (count($rlt) == 1)
+    {
+        $line = $rlt[0];
+        return($line);                    
+    } else {
+        return(array());
+    }
+}
+
+function attributes($id,$ack)
+    {
+        if (perfil("#ADM"))
         {
-            $t = troca($t,"'",'´');
-            $sql = "select * from users where us_password = '$t' ";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            if (count($rlt) == 1)
+            $cmd = substr($ack,0,1);
+            switch($cmd)
                 {
-                    $line = $rlt[0];
-                    return($line);                    
-                } else {
-                    return(array());
+                    case 'R':
+                    $sql = "delete from users_perfil_attrib where id_pa = ".sonumero($ack);
+                    echo $sql;
+                    break;
+
+                    case 'A':
+                    $idf = sonumero($ack);
+                    $sql = "insert into users_perfil_attrib 
+                                (
+                                pa_user, pa_perfil
+                                ) values (
+                                $id,$ipf
+                                )";
+                    echo $sql;
+                    break;
                 }
         }
-    function show_perfil()
+    }
+
+function show_attri($id)
+    {
+        $sql = "select * from users_perfil_attrib 
+                    inner join users_perfil ON id_pe = pa_perfil
+                    where pa_user = ".$id;
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx = '<table class="table">';
+        $sx .= '<tr>';
+        $sx .= '<th>ID</th>';
+        $sx .= '<th>Perfil</th>';
+        $sx .= '<th>Atribuído</th>';
+        $sx .= '<th>Ação</th>';
+        $sx .= '</tr>';
+        $nivel = $_SESSION['nivel'];
+        for ($r=0;$r < count($rlt);$r++)
         {
-            $sx = '<h1>Show Perfil</h1>';
-            return($sx);
+            $line = $rlt[$r];
+            $sx .= '<tr>';
+            $sx .= '<td>'.$line['pe_abrev'].'</td>';
+            $sx .= '<td>'.$line['pe_descricao'].'</td>';
+            $sx .= '<td>'.stodbr($line['pa_created']).'</td>';
+            
+            if ($nivel >= $line['pe_nivel'])
+            {
+                $link = '<a href="'.base_url(PATH.'social/attrib/'.$id.'/R'.$line['id_pa']).'" style="color: red;">';
+                $linka = '</a>';
+                $sx .= '<td>'.$link.'[remover]'.$linka.'</td>';
+            } else {
+                $sx .= '<td>-</td>';
+            }
+            $sx .= '</tr>';
         }
+        $sx .= '</table>';
+        return($sx);
+    }
+function show_perfil($dt)
+{
+    if (!is_array($dt))
+    {
+        $dt = $this->le($dt);
+    }
+    $sx = '<div class="row">';
+    $sx .= '<div class="col-2">';
+    $sx .= '</div>';
+    $sx .= '<div class="col-8">';
+    $sx .= '<h2>'.$dt['us_nome'].'</h2>';
+    $sx .= '<h6>'.msg('login').': <b>'.$dt['us_login'].'</b></h6>';
+    $sx .= '<cnt/>';
+    $sx .= '</div>';
+
+    $sx .= '<div class="col-2">';
+    if ($dt['us_ativo'] == 1)
+    {
+        $sx .= '<span class="btn btn-success fluid">'.msg('active').'</span>';
+    }
+    $sx .= '</div>';
+    $sx .= '</div>';
+    return($sx);
+}
 }
 ?>
