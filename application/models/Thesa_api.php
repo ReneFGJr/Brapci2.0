@@ -1,6 +1,10 @@
 <?php
 class thesa_api extends CI_model {
-	function ajax($id = '') {
+	function ajax($api,$cmd,$v1)
+	{
+		echo '===>'.$api;
+	}
+	function ajax2($id = '') {
 		$name = trim(get("dd1"));
 		$name = troca($name, '"', '');
 		$name = troca($name, "'", '');
@@ -124,6 +128,29 @@ class thesa_api extends CI_model {
 			Echo "<br>ERRO: " . $erro;
 		}
 
+	}
+
+	function check_thesa($n,$th)
+	{
+		$sx = '<a href="#" id="thesa" class="btn btn-outline-primary">'.msg('check_thesa').'</a>';
+		$sx .= '<br><div id="thesa_query" style="display: none;">buscando...</div>';
+
+		$sx .= '<script>' . cr();
+		$sx .= ' $("#thesa").click(function() { alert("Busca"); ' . cr();
+		$sx .= '   $("#thesa_query").show(1000);' . cr();
+		$sx .= '   $term = "' . $n . '";
+                    $id = "' . $th . '";
+                   $.ajax({
+                      url: "' . base_url(PATH . 'thesa/check/') . '",
+                      data: { "id": $id, "dd1": $term },
+                      context: document.body
+                    }).done(function(html) {
+                      $("#thesa_query").html(html);
+                    });';
+		$sx .= ' }); ' . cr();
+		$sx .= '</script>' . cr();
+
+		return($sx);
 	}
 
 	function update_thesa($d) {

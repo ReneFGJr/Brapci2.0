@@ -2216,10 +2216,16 @@ function instituicao($id) {
     where id_pa = $id";
     $rlt = $this -> db -> query($sql);
     $rlt = $rlt -> result_array();
-    print_r($rlt);
-    $sx = '';
+    
+    $name = $rlt[0]['pa_nome'];
 
+    $sx = '';
+    $sx .= '<h2>'.$name.'</h2>';
+    $th = 8;
+    $sx .= $this->thesa_api->check_thesa($name,$th);
+    return($sx);
 }
+
 function instituicao_list($id) {
     $sql = "select * from patent.patent_agent_relation
     INNER JOIN patent.patent ON id_p = rl_patent 

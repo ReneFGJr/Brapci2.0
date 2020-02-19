@@ -79,6 +79,12 @@ class Patent extends CI_Controller {
         //$result = $client->index($params);
     }
 
+    function thesa($api='',$cmd='',$v1='')
+        {
+            $this->load->model("thesa_api");
+            $this->thesa_api->ajax($api,$cmd,$v1);
+        }
+
     public function index() {
         $this -> load -> model('elasticsearch');
         $this -> load -> model('libraries');
@@ -130,8 +136,9 @@ class Patent extends CI_Controller {
 
     function vi($id = 0) {
         $this -> load -> model('patents');
+        $this -> load -> model('thesa_api');
         $this -> cab();
-        $sx = $this -> patents -> instituicao($id);
+        $sx = $this -> patents -> instituicao($id);        
         $sx .= $this -> patents -> instituicao_list($id);
         $data['content'] = $sx;
         $data['title'] = 'Patent';
