@@ -402,7 +402,13 @@ function row2($par=array())
     /************************************************** View *********/
     if (isset($par['id']))
     {
+        if (!isset($par['order']))
+        {
+            $par['order'] = $par['cp'][0][1];
+        }
         $sql = "select * from ".$par['table'].' where '.$par['cp'][0][1].' = '.$par['id'];
+        $sql .= ' order by '.$par['order'];
+
         $rlt = $CI->db->query($sql);
         $rlt = $rlt->result_array();
         $sx = '<!-- Classe de produtos -->'.cr();
