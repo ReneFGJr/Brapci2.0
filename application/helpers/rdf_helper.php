@@ -583,7 +583,7 @@ class rdf
 		return($sx);
 	}
 
-	function extract_id($dt,$class)
+	function extract_id($dt,$class,$id=0)
 		{
 			$rs = array();
 			for ($r=0;$r < count($dt);$r++)
@@ -591,7 +591,12 @@ class rdf
 				$prop = $dt[$r]['c_class'];
 				if ($prop == $class)
 				{
-					array_push($rs,$dt[$r]['d_r2']);
+					$idr = $dt[$r]['d_r2'];
+					if ($idr == $id)
+					{
+						$idr = $dt[$r]['d_r1'];
+					}
+					array_push($rs,$idr);
 				}
 			}
 			return($rs);

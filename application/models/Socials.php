@@ -218,7 +218,16 @@ class socials extends CI_Model {
 
     function perfil($id)
     {
+        if (strlen($id) == 0)
+            {
+                $id = round($_SESSION['id']);
+            }
         $dt = $this->le($id);
+        if (count($dt) == 0)
+        {
+            echo "Erro na Identificação do Perfil ".$id;
+            exit;
+        }
         $sx = $this->show_perfil($dt);
 
         $cnt = '<ul>';
@@ -227,7 +236,7 @@ class socials extends CI_Model {
         $cnt .= '<li>'.$link.msg('change_passwrod').$linka.'</li>';
         $cnt .= '</ul>';
 
-        $cnt = $this->show_attri($id);
+        $cnt .= $this->show_attri($id);
 
         $sx = troca($sx,'<cnt/>',$cnt);
 
@@ -470,7 +479,15 @@ function row($id = '') {
     $form -> row_edit = base_url(PATH.'social/user_edit');
     $form -> row_view = base_url(PATH.'social/perfil');
     $form -> row = base_url(PATH.'social/users');
-    $data['content'] = row($form, $id);
+
+    $sx = '<div class="container">';
+    $sx .= '<div class="row">';
+    $sx .= '<div class="col-12">';
+    $sx .= row($form, $id);
+    $sx .= '</div>';
+    $sx .= '</div>';
+    $sx .= '</div>';
+    $data['content'] = $sx;
     $this->load->view('content',$data);
     return ("");
 }
@@ -640,8 +657,8 @@ function security_login($login = '', $pass = '') {
         $dd2 = $this -> password_cripto($pass, $line['us_autenticador']);
         $dd3 = trim($line['us_password']);
 
-        echo $dd2.'<br>'.$dd3.'<br>'.$line['us_autenticador'];
-        echo '<br>'.$pass;
+        //echo $dd2.'<br>'.$dd3.'<br>'.$line['us_autenticador'];
+        //echo '<br>'.$pass;
         //exit;
 
         if (($dd2 == $dd3) or ($pass == $dd3) or ($forced == 1)) {
@@ -702,7 +719,9 @@ function change_password($id, $new = 0) {
 
     array_push($cp, array('$B', '', 'Alterar senha', false, True));
 
-    $tela = $this->show_perfil($id);
+    $dt = $this->le($id);
+
+    $tela = $this->show_perfil($dt);
     $tela .= '<hr>';
     $tela .= $form -> editar($cp, '');
 
@@ -727,7 +746,10 @@ function change_password($id, $new = 0) {
             $tela .= '<div class="alert">Senhas atual não confere!</div>';
         }
     }
-    $d['content'] = $tela;
+    $sx = '<div class="container"><div class="row"><div class="col-12">';
+    $sx .= $tela;
+    $sx .= '</div></div></div>';
+    $d['content'] = $sx;
     $this->load->view('content',$d);
     return ('');
 }
