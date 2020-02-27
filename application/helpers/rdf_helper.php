@@ -46,8 +46,13 @@ class rdf
 		$sx = '';
 		switch($path)
 		{
+			case 'text':
+			$sx = $this->text_edit($id);
+			break;
+
 			case 'form':
-			$sx = $this-> form_ajax($id, $form,$idx);
+			$form = 0;
+			$sx = $this-> form_ajax($id, $id2,$id3);
 			return($sx);
 			break;
 
@@ -96,7 +101,7 @@ class rdf
 			break;
 
 			case 'exclude':
-			if ($form == 'confirm')
+			if ($id2 == 'confirm')
 			{
 				$this->data_exclude($id);
 				$sx = '<script> wclose(); </script>';
@@ -108,7 +113,7 @@ class rdf
 
 			case 'search':
 			$sx = '';
-			$sx = $this->ajax_search($form,$id);
+			$sx = $this->ajax_search($id2,$id);
 			echo $sx;
 			exit;
 			break;
@@ -584,23 +589,23 @@ class rdf
 	}
 
 	function extract_id($dt,$class,$id=0)
+	{
+		$rs = array();
+		for ($r=0;$r < count($dt);$r++)
 		{
-			$rs = array();
-			for ($r=0;$r < count($dt);$r++)
+			$prop = $dt[$r]['c_class'];
+			if ($prop == $class)
 			{
-				$prop = $dt[$r]['c_class'];
-				if ($prop == $class)
+				$idr = $dt[$r]['d_r2'];
+				if ($idr == $id)
 				{
-					$idr = $dt[$r]['d_r2'];
-					if ($idr == $id)
-					{
-						$idr = $dt[$r]['d_r1'];
-					}
-					array_push($rs,$idr);
+					$idr = $dt[$r]['d_r1'];
 				}
+				array_push($rs,$idr);
 			}
-			return($rs);
 		}
+		return($rs);
+	}
 
 	function show_data($r) {
 		$CI = &get_instance();
@@ -633,7 +638,7 @@ class rdf
 		$sx .= '<div class="container">';
 		$sx .= '<div class="row">';
 
-		$sx .= '<h3>class: ' . $line['c_class'] . '</h3>';
+		$sx .= '<div>class: ' . $line['c_class'] . '</div>';
 
 
 		/*************************** Editar classe */
@@ -1365,7 +1370,7 @@ class rdf
 		/* complementos */
 		switch($class) {
 			default :
-			$cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d';
+			$cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
 			$sqla = "select $cp from rdf_data as rdata
 			INNER JOIN rdf_class as prop ON d_p = prop.id_c 
 			INNER JOIN rdf_concept as cpt ON d_r2 = id_cc 
@@ -1435,8 +1440,26 @@ class rdf
 				if (strlen($line['n_name']) > 0) {
 					$linkc = '<a href="' . base_url(PATH . 'v/' . $line['idcc']) . '" class="middle">';
 					$linkca = '</a>';
+					if (strlen($line['idcc']) == 0)
+					{
+						$linkc = '';
+						$linkca = '';
+					}
 
 					$sx .= $linkc . $line['n_name'] . $linkca;
+
+
+					/********************** Editar caso texto */
+
+					if (strlen($line['idcc']) == 0)
+					{
+						$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/text/'.$line['d_literal']).'\',600,400);"';
+						$elink = ' <span style="cursor: pointer;" '.$onclick.'>';
+						$elinka = '';
+						$sx .= $elink . '<font style="color: red;" title="Editar texto">[ed]</font>' . $elinka;
+					}
+
+					/********************* Excluir lancamento */
 					$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';
 					$link = ' <span style="cursor: pointer;" '.$onclick.'>';
 					$sx .= $link . '<font style="color: red;" title="Excluir lancamento">[X]</font>' . $linka;
@@ -2031,7 +2054,8 @@ class rdf
 			$CI = &get_instance();
 			$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc,
 			t1.c_class as c_class, t2.prefix_ref as prefix_ref,
-			t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref
+			t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref,
+			sc_group, sc_library
 			FROM rdf_form_class
 			INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
 			LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
@@ -2042,6 +2066,8 @@ class rdf
 			where sc_class = $id
 			AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
 			order by sc_ord";
+
+			echo $sql;
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();	
 			$sx = '<div class="col-md-12">';
@@ -2049,7 +2075,8 @@ class rdf
 			$sx .= '<table class="table">';
 			$sx .= '<tr><th width="4%">#</th>';
 			$sx .= '<th width="47%">'.msg('propriety').'</th>';
-			$sx .= '<th width="47%">'.msg('range').'</th>';
+			$sx .= '<th width="42%">'.msg('range').'</th>';
+			$sx .= '<th width="5%">'.msg('group').'</th>';
 			$sx .= '</tr>';
 			for ($r=0;$r < count($rlt);$r++)			
 			{
@@ -2077,6 +2104,13 @@ class rdf
 				$sx .= '<td>';
 				$sx .= $this->prefixn($dt);
 				$sx .= '</td>';
+
+				/* GROUP */
+				$dt = array();
+				$sx .= '<td>';
+				$sx .= $line['sc_group'];
+				$sx .= '</td>';
+
 				$sx .= '</tr>';
 			}
 			$sx .= '</table>';
@@ -2738,6 +2772,28 @@ class rdf
 			}
 			return($sx);
 		}
+		function text_edit($id)
+			{
+				$cp = array();
+				array_push($cp,array('$H8','id_n','',false,false));
+				array_push($cp,array('$T80:6','n_name',msg('text'),true,true));
+				$op = 'pt_BR:Portugues';
+				$op .= '&en:Inglês';
+				$op .= '&es:Espanhol';
+				$op .= '&un:Multilingue';
+				array_push($cp,array('$O '.$op,'n_lang',msg('language'),true,true));
+
+				$table = 'rdf_name';
+				$form = new form;
+				$form->id = $id;
+				$sx = $form->editar($cp,$table);
+
+				if ($form->saved > 0)
+				{
+					$sx = '<script> wclose(); </script>';
+				}
+				return($sx);				
+			}
 
 	}
 	?>
