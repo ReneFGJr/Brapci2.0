@@ -9,7 +9,13 @@ class searchs extends CI_Model {
         }
         if (!isset($_SESSION['s'])) {
             if (!isset($_SESSION['s'])) {
-                $_SESSION['s'] = $_SESSION['__ci_last_regenerate'];
+                if (isset($_SESSION['__ci_last_regenerate']))
+                {
+                    $_SESSION['s'] = $_SESSION['__ci_last_regenerate'];    
+                } else {
+                    $_SESSION['s'] = date("Ymdihs");
+                }
+                
             }
         }
         $this -> s = $_SESSION['s'];
