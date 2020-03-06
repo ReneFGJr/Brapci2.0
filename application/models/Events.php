@@ -160,16 +160,20 @@ class events extends CI_model {
 
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
-            $url = $line['ev_url'];
+            $url = trim($line['ev_url']);
 
             $link = '<a href="' . base_url(PATH.'event/click/'.$line['id_ev']) . '" target="_new" style="font-size: 120%; color: #808080;">';
 
             $sx .= '<tr valign="top" style="border-top: 1px solid #c0c0c0;">
-                    <td width="25%" align="center" style="padding: 10px;">';
-            $sx .= '<img src="' . base_url($line['ev_image']) . '" style="border:0px solid #ffffff;" height="40" align="center">';
-            $sx .= '</td><td>';
-            $sx .= '&nbsp;';
-            $sx .= '</td><td style="line-height: 1.2;" style="padding: 10px;" cellalign="center">';
+                    <td rowspan=2 width="25%" align="center" style="padding: 10px;">';
+            $sx .= '<img src="' . base_url($line['ev_image']) . '" style="border:0px solid #ffffff;" height="60" align="center">';
+            $sx .= '</td><td colspan=2">';
+            $sx .= $link;
+            $sx .= '<b>'.$line['ev_name'].'</b>';
+            $sx .= '</a>';
+            $sx .= '</td>';
+            $sx .= '</tr><tr>';
+            $sx .= '<td style="line-height: 1.2;" style="padding: 10px;" cellalign="center">';
             //$sx .= $link . '<b>'.$line['ev_name'] . '</b>'.'</a>';
             //$sx .= '<br>';
 
@@ -177,13 +181,15 @@ class events extends CI_model {
             $sx .= $this -> show_datas($line);
             $sx .= '</i>';
             $sx .= '<br>';
-            $sx .= '<span class="event_place">' . $line['ev_place'] . '</span>';
+            $sx .= '<span class="small">' . $line['ev_place'] . '</span>';
             $sx .= '</td>';
-            $sx .= '<td style="padding: 10px;">';
+            $sx .= '<td style="padding: 10px;" width="120" valign="top">';
             if ($url != '')
             {
                 $sx .= $link;
+                $sx .= '<span style="font-size:12px; color: blue;">';
                 $sx .= msg('event_site');
+                $sx .= '</span>';
                 $sx .= '</a>';
             } else {
                 $sx .= msg('not_informed');

@@ -134,7 +134,36 @@ class socials extends CI_Model {
             echo "Function not found - ".$act;
             break;
         }
-    }    
+    } 
+
+    function npass()
+        {            
+            $email = get("dd0");
+            $chk = get("chk");
+            $chk2 = checkpost_link($email . $email);
+            $chk3 = checkpost_link($email . date("Ymd"));
+
+            if ((($chk != $chk2) AND ($chk != $chk3)) AND (!isset($_POST['dd1']))) {
+                $data['content'] = 'Erro de Check';
+                $this -> load -> view('content', $data);
+            } else {
+                $dt = $this -> socials -> le_email($email);
+                if (count($dt) > 0) {
+                    $id = $dt['id_us'];
+                    $data['title'] = '';
+                    $tela = '<br><br><h1>' . msg('change_password') . '</h1>';
+                    $new = 1;
+                        // Novo registro
+                    $data['content'] = $tela . $this -> socials -> change_password($id, $new);
+                    $this -> load -> view('content', $data);
+                        //redirect(base_url("index.php/thesa/social/login"));
+                } else {
+                    $data['content'] = 'Email não existe!';
+                    $this -> load -> view('error', $data);
+                }
+            }
+            return('');            
+        }   
 
     function createDB() {
         $sql = "CREATE TABLE users_perfil 
@@ -788,10 +817,11 @@ function user_email_send($para, $nome, $code) {
         $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
         $de = 1;
         break;
+
         case 'FORGOT':
         $data = $this->le_email($para);
         $link = base_url(PATH.'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
-        $assunto = msg('Cadastro de nova senha') . ' - Brapci';
+        $assunto = msg('Cadastro de nova senha') . ' - SignIn';
         $texto .= '<p>' . msg('Dear') . ' ' . $data['us_nome'] . '</p>';
         $texto .= '<p>' . utf8_decode(msg('change_new_password')) . '</p>';
         $texto .= '<br><br>';
