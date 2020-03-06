@@ -1047,6 +1047,7 @@ class res extends CI_Controller {
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_import') . '">' . msg('tools_pdf_import') . '</a>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/oai_import') . '">' . msg('tools_oai_import') . '</a>';
                 $txt .= '<li>' . '<a href="' . base_url(PATH . 'journals/harvesting') . '">' . msg('harvesting_all') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/dates') . '">' . msg('harvesting_all_dates') . '</a>';
                 $txt .= '</ul>';
 
                 $txt .= '<h4>' . msg('tools_title_check') . '</h4>';
@@ -1150,6 +1151,19 @@ class res extends CI_Controller {
                 $data['content'] = $txt;
                 $this -> load -> view('show', $data);
                 break;
+            case 'dates' :
+                $this -> load -> model("pdfs");
+                $this -> load -> model("frbr");                
+                $this -> load -> model("frbr_core");
+
+                $data['title'] = msg('Tools');
+                $txt = '<div class="col-md-12">';
+                $txt .= '<h1>' . msg('harvesting_all_dates') . '</h1>';
+                $txt .= '</div>';
+                $txt .= $this -> pdfs -> harvesting_dates($id);
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+                break;                
         }
         $this -> footer(0);
     }

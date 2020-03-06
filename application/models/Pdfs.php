@@ -730,5 +730,151 @@ EOD;
 				}
 			return(1);
 		}
-}
+
+		function harvesting_dates($id=0)
+		{
+			$sx = 'Harvesting Data';
+			$id = 442; // Transinformacao
+
+			$dt = $this->frbr_core->le_data($id);
+			$issue = array();
+			$art = array();
+			/*************************** Resgata fasciculos */
+			for ($r=0;$r < count($dt);$r++)
+			{
+				$line = $dt[$r];
+				if ($line['c_class'] == 'hasIssue')
+				{
+					$id = $line['d_r1'];
+					array_push($issue,$id);
+				}
+			}
+
+			/*************************** Resgata artigos ****/
+			for ($r=0;$r <count($issue);$r++)
+			{
+				$dtb = $this->frbr_core->le_data($issue[$r]);		
+				for ($y=0;$y < count($dtb);$y++)
+				{
+					$line = $dtb[$y];
+				 	$class = trim($line['c_class']);
+					if ($class == 'hasIssueOf')
+					{
+						array_push($art,$line['d_r2']);
+					}
+				}
+			}				
+
+			/******************* Resgata dados do artigo ****/
+			$url = array();
+
+			for ($r=count($art)-1 ;$r >= 0;$r--)
+			{
+				$dtb = $this->frbr_core->le_data($art[$r]);		
+				for ($y=0;$y < count($dtb);$y++)
+				{
+					$line = $dtb[$y];
+				 	$class = trim($line['c_class']);
+				 	print_r($line);
+				 	echo '<hr>';
+					if ($class == 'hasUrl')
+					{
+						array_push($url,$line['n_name']);
+					}
+					if ($class == 'hasFileStorage')
+					{
+						array_push($url,$line['n_name']);
+					}
+
+				}
+				echo '<h1>Dados</h1>';
+				echo '<pre>';
+				print_r($url);
+				echo '</pre>';				
+
+				/*************************** Method 1 ********************/
+				$this->date_method_1($url);
+			}				
+
+			exit;
+
+			//$sql = "select * from "
+		}
+
+		function matrix()
+			{
+				$a = array('Recebida:','Recibido el');
+				$b = array('Aceito:','aprobado el');
+				$c = array('presentado el ');
+				return(array($a,$b,$c));
+			}
+
+		function recupera_data($d)
+			{
+				$ano = '0000';
+				$mes = '00';
+				$dia = '00';
+				for ($r=1960;$r < date("Y")+1;$r++)
+				{
+					$xano = (string)$r;
+					$pos = strpos($d,$xano);
+					if ( $pos )
+						{
+							echo '<br>======='.$pos.'-'.substr($d,$pos,10);
+							$ano = $r;
+						} 
+				}
+				$data = $ano.'-'.$mes.'-'.$dia;
+				if ($data == '0000-00-00') { $data = ''; }
+				return($data);
+			}		
+
+		function locate($t,$type=1)
+			{
+				echo '=============>'.$t;				
+				$d = $this->matrix();
+				if ($type == 'r')
+				{
+					$c = $d[0];
+					for ($r=0;$r < count($c);$r++)
+					{
+						$dr = trim((string)$c[$r]);
+						echo '<br>=search===>'.$dr;
+						$t1 = $t;
+						$it = 0;
+						while (strpos($t1,$dr) > 0)
+						{
+							$it++;
+							$pos = strpos($t1,$dr[$r]);
+							$td = substr($t1,$pos,30);
+							$t1 = substr($t1,$pos+strlen($dr)-1,strlen($t1));
+							echo $it.'. '.$pos.' ['.$td.']'.' - ';
+							echo '{'.$this->recupera_data($td).'}';
+							echo '<hr>';
+						}
+					}
+				}
+				exit;	
+			}
+		function date_method_1($u)
+		{			
+			for ($r=0;$r < count($u);$r++)
+			{
+				$ln = $u[$r];
+				if (substr($ln,0,11) == '_repository')
+				{
+					$file = troca($ln,'.pdf','.txt');
+						if (file_exists($file))
+						{
+							$t = file_get_contents($file);
+							$rec = $this->locate($t,'r');
+							echo '<pre>';
+							echo $t;
+							exit;
+						}
+				}
+			}
+		}
+	}		
+
 ?>
