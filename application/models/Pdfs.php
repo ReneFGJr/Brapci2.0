@@ -766,17 +766,19 @@ EOD;
 			}				
 
 			/******************* Resgata dados do artigo ****/
-			$url = array();
+			
 
 			for ($r=count($art)-1 ;$r >= 0;$r--)
 			{
+				$ok = 0;
+				$url = array();
 				$dtb = $this->frbr_core->le_data($art[$r]);		
 				for ($y=0;$y < count($dtb);$y++)
 				{
 					$line = $dtb[$y];
-				 	$class = trim($line['c_class']);
-				 	print_r($line);
-				 	echo '<hr>';
+					$class = trim($line['c_class']);
+					//print_r($line);
+					//echo '<hr>';
 					if ($class == 'hasUrl')
 					{
 						array_push($url,$line['n_name']);
@@ -785,17 +787,59 @@ EOD;
 					{
 						array_push($url,$line['n_name']);
 					}
-
+					if ($class == 'wasReceivedOn')
+					{
+						$ok++;
+					}
+					if ($class == 'wasAcceptedOn')
+					{
+						$ok++;
+					}					
 				}
 				echo '<h1>Dados</h1>';
 				echo '<pre>';
 				print_r($url);
-				echo '</pre>';				
-
-				/*************************** Method 1 ********************/
-				$this->date_method_1($url);
-			}				
-
+				echo '</pre>';
+				
+				if ($ok == 0)
+				{			
+					echo '<h1>'.$art[$r].'</h1>';					
+					/*************************** Method 1 ********************/
+					$DT = $this->date_method_1($url);
+					if (isset($DT['REC']) and (strpos($DT['REC'],'00')))
+					{
+						echo "<BR>OPS =REC= ".$DT['REC'];
+						EXIT;
+					}
+					if (isset($DT['ACT']) and (strpos($DT['ACT'],'00')))
+					{
+						echo "<BR>OPS =ACT= ".$DT['ACT'];
+						EXIT;
+					}
+					if (isset($DT['REC']) and (!strpos($DT['REC'],'00')))
+					{
+						$idn = $this -> frbr_core -> frbr_name($DT['REC']);
+						$idd = $this -> frbr_core -> rdf_concept($idn,'Date');
+						$prop = 'wasReceivedOn';
+						$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);
+					}
+					if (isset($DT['ACT']) and (!strpos($DT['ACT'],'00')))
+					{
+						$idn = $this -> frbr_core -> frbr_name($DT['ACT']);
+						$idd = $this -> frbr_core -> rdf_concept($idn,'Date');
+						$prop = 'wasAcceptedOn';
+						$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);					
+					}
+					if (isset($DT['APR']) and (!strpos($DT['APR'],'00')))
+					{
+						$idn = $this -> frbr_core -> frbr_name($DT['APR']);
+						$idd = $this -> frbr_core -> rdf_concept($idn,'Date');
+						$prop = 'wasPresentationOn';
+						$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);					
+					}
+				}
+			}	
+			echo "FIM";	
 			exit;
 
 			//$sql = "select * from "
@@ -803,58 +847,138 @@ EOD;
 
 		function matrix()
 			{
-				$a = array('Recebida:','Recibido el');
-				$b = array('Aceito:','aprobado el');
-				$c = array('presentado el ');
-				return(array($a,$b,$c));
+				$a = array('Recebida:','Recibido el','Recebido em:');
+				$b = array('Aceito:','aprobado el','aprovado em','aprovado em:');
+				$c = array('presentado el');
+				$d = array('reapresentado em');
+
+				$ae = array('Received on');
+				$be = array('approved on','accepted for publication on');
+				$ce = array('resubmitted on');
+				$de = array('reapresented on');
+				return(array('DD-MM-YYYY'=>ARRAY($a,$b,$c,$d),'MM-DD-YYYY'=>array($ae,$be,$ce,$de)));
 			}
 
-		function recupera_data($d)
+		function recupera_data($d,$df)
 			{
 				$ano = '0000';
 				$mes = '00';
 				$dia = '00';
-				for ($r=1960;$r < date("Y")+1;$r++)
-				{
-					$xano = (string)$r;
-					$pos = strpos($d,$xano);
-					if ( $pos )
-						{
-							echo '<br>======='.$pos.'-'.substr($d,$pos,10);
-							$ano = $r;
-						} 
+
+					echo '<br>===>'.$d;
+					for ($r=1960;$r < date("Y")+1;$r++)
+					{
+						$xano = (string)$r;
+						$pos = strpos($d,$xano);
+						if ( $pos )
+							{
+								$ano = $r;
+								if ($df == 'DD-MM-YYYY')
+									{
+									$mes = $this->locate_month($d);
+									$dia = $this->locate_day($d);
+									echo '<br>===data==>'.$dia.'-'.$mes.'-'.$ano;
+									}
+								if ($df == 'MM-DD-YYYY')
+									{
+									$mes = $this->locate_month($d);
+									$dia = $this->locate_day($d);
+									echo '<br>===data==>'.$dia.'-'.$mes.'-'.$ano;
+									}									
+							} 
+					}
+					$data = $ano.'-'.$mes.'-'.$dia;
 				}
-				$data = $ano.'-'.$mes.'-'.$dia;
 				if ($data == '0000-00-00') { $data = ''; }
 				return($data);
-			}		
+			}
 
-		function locate($t,$type=1)
+		function locate_day($t)
 			{
-				echo '=============>'.$t;				
-				$d = $this->matrix();
-				if ($type == 'r')
+				$t = troca($t,' ',';');
+				$t = troca($t,'/',';');
+				$tt = splitx(';',$t);
+				print_r($tt);
+				for ($r=0;$r < count($tt);$r++)
 				{
-					$c = $d[0];
+					$dd = round($tt[$r]);
+					if (($dd > 0) and ($dd <= 31))
+					{
+						$dia = strzero($dd,2);
+						return($dia);
+					}
+				}
+				return('00');
+			}
+
+		function locate_month($t)
+			{
+				$x = array('julio'=>'07','septiembre'=>'09',
+					'janeiro'=>'01','fevereiro'=>'02','março'=>'03','abril'=>'04','maio'=>'05','junho'=>'06',
+					'julho'=>'07','agosto'=>'08','setembro'=>'09','outubro'=>'10','novembro'=>'11',
+					'dezembro'=>'12',
+					/* English */
+					'January'=>'01','February'=>'02','March'=>'03','April'=>'04','May'=>'05','June'=>'06',
+					'July'=>'07','August'=>'08','September'=>'09','October'=>'10','November'=>'11',
+					'December'=>'12',
+
+					/* Number */
+					'/1/'=>'01','/2/'=>'02','/3/'=>'03','/4/'=>'04','/5/'=>'05','/6/'=>'06','/7/'=>'07','/8/'=>'08',
+					'/9/'=>'09','/10/'=>'10','/11/'=>'11','/12/'=>'12',
+					'/01/'=>'01','/02/'=>'02','/03/'=>'03','/04/'=>'04','/05/'=>'05','/06/'=>'06','/07/'=>'07',
+					'/08/'=>'08', '/09/'=>'09',
+
+					'-1-'=>'01','-2-'=>'02','-3-'=>'03','-4-'=>'04','-5-'=>'05','-6-'=>'06','-7-'=>'07','-8-'=>'08',
+					'-9-'=>'09','-10-'=>'10','-11-'=>'11','-12-'=>'12',
+					'-01-'=>'01','-02-'=>'02','-03-'=>'03','-04-'=>'04','-05-'=>'05','-06-'=>'06','-07-'=>'07',
+					'-08-'=>'08', '-09-'=>'09',
+
+				);
+				foreach ($x as $key => $value) {
+					if (strpos($t,$key))
+					{
+						return($value);
+					}
+				}
+				return('00');
+			}
+		function locate($t,$type=1,$fd='DD-MM-YYYY')
+			{
+				$d = $this->matrix();
+				switch ($type)
+				{
+					case 'r':
+						$c = $d[$fd][0];
+						break;
+					case 'a':
+						$c = $d[$fd][1];
+						break;
+					case 'p':
+						$c = $d[$fd][2];
+						break;	
+					case '2':
+						$d = $d[$fd][3];
+						break;					
+					default:
+						$c = $d[$fd][0];
+						break;
+				}
 					for ($r=0;$r < count($c);$r++)
 					{
 						$dr = trim((string)$c[$r]);
-						echo '<br>=search===>'.$dr;
 						$t1 = $t;
 						$it = 0;
 						while (strpos($t1,$dr) > 0)
 						{
 							$it++;
-							$pos = strpos($t1,$dr[$r]);
-							$td = substr($t1,$pos,30);
+							$pos = strpos($t1,$dr);
+							$td = substr($t1,$pos,40);
 							$t1 = substr($t1,$pos+strlen($dr)-1,strlen($t1));
-							echo $it.'. '.$pos.' ['.$td.']'.' - ';
-							echo '{'.$this->recupera_data($td).'}';
-							echo '<hr>';
+							return($this->recupera_data($td,$df));
+							exit;
 						}
 					}
-				}
-				exit;	
+				return("0000-00-00");
 			}
 		function date_method_1($u)
 		{			
@@ -867,10 +991,10 @@ EOD;
 						if (file_exists($file))
 						{
 							$t = file_get_contents($file);
-							$rec = $this->locate($t,'r');
-							echo '<pre>';
-							echo $t;
-							exit;
+							$DT['REC'] = $this->locate($t,'r');
+							$DT['ACT'] = $this->locate($t,'a');
+							$DT['APR'] = $this->locate($t,'p');
+							return($DT);
 						}
 				}
 			}
