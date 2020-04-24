@@ -1,0 +1,17 @@
+00018$sw['analise documental'] = 'Análise_documental';
+00018$sw['analise de dominio'] = 'Analise_de_Domínio';
+00013$sw['bibliometrics'] = 'Bibliometrics';
+00019$sw['analise de conteudo'] = 'Análise_de_conteúdo';
+00012$sw['bibliometria'] = 'Bibliometria';
+00029$sw['academia brasileira de letras'] = 'Academia_Brasileira_de_Letras';
+00041$sw['sistemas de organizacion del conocimiento'] = 'Sistemas_de_Organización_Del_Conocimiento';
+00039$sw['sistemas de organizacao do conhecimento'] = 'Sistemas_de_organização_do_conhecimento';
+00038$sw['sistema de organizacao do conhecimento'] = 'Sistema_de_organização_do_conhecimento';
+00021$sw['cabecalhos de assunto'] = 'Cabeçalhos_de_assunto';
+00006$sw['aacr2r'] = 'AACR2r';
+00006$sw['brasil'] = 'Brasil';
+00003$sw['art'] = 'Artes';
+00004$sw['arte'] = 'Artes';
+00005$sw['artes'] = 'Artes';
+00021$sw['information retrieval'] = 'Recuperação_da_Informação';
+00025$sw['recuperacao da informacao'] = 'Recuperação_da_Informação';

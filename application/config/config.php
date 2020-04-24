@@ -26,7 +26,7 @@ $config['index'] = '';
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = '';
+$config['base_url'] = 'http://localhost/Brapci2.0/';
 
 DEFINE("HTTP","http://[::1]/projeto/Brapci2.0/");
 //DEFINE("HTTP","http://143.54.114.150/Brapci2.0/");

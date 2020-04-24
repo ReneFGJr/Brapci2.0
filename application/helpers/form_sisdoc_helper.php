@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.20.01.07
+ * @version     v0.20.04.09
  */
 
 /* 2020-01-24 function 2 e 3 */
@@ -713,6 +713,9 @@ function ascii($d)
     /* trema */
     $d = (str_replace(array('ä', 'ë', 'ï', 'ö', 'ü', 'Ä', 'Ë', 'Ï', 'Ö', 'Ü'), array('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'), $d));
 
+
+    /* Especiais */
+    $d = (str_replace(array('Å'), array('A'), $d));
     return $d;
 }
 
@@ -731,15 +734,17 @@ function LowerCaseSQL($term) {
     $n = $term;
     $type = mb_detect_encoding($n, "auto");
     $term = mb_strtolower($term);
+    
     $term = troca($term, 'ã', 'a');
     $term = troca($term, 'á', 'a');
     $term = troca($term, 'à', 'a');
     $term = troca($term, 'ä', 'a');
+    $term = troca($term, 'â', 'a');
 
     $term = troca($term, 'é', 'e');
     $term = troca($term, 'è', 'e');
     $term = troca($term, 'ë', 'e');
-    $term = troca($term, 'ê', 'e');
+    $term = troca($term, 'ê', 'e');    
 
     $term = troca($term, 'í', 'i');
     $term = troca($term, 'ì', 'i');

@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+global $lang;
+
 /**
  * CodeIgniter RDF Helpers
  *
@@ -66,6 +68,8 @@ class rdf
 			$prop = get("prop");
 			$r2 = get("resource");
 			$this->set_propriety($r1, $prop, $r2);
+			sleep(1);
+			echo '<script> wclose(); </script>';
 			break;
 
 
@@ -607,6 +611,20 @@ class rdf
 		return($rs);
 	}
 
+	function extract_content($dt,$class,$id=0)
+	{
+		$rs = array();
+		for ($r=0;$r < count($dt);$r++)
+		{
+			$prop = $dt[$r]['c_class'];
+			if ($prop == $class)
+			{
+				array_push($rs,$dt[$r]['n_name']);
+			}
+		}
+		return($rs);
+	}	
+
 	function show_data($r) {
 		$CI = &get_instance();
 		if (strlen($r) == 0) {
@@ -629,8 +647,9 @@ class rdf
 		{
 			$fcn = '$sx .= '.$fcn.'($line);';
 			eval($fcn);
-		} else {
+		} else {			
 			$sx .= $this->show($dt);
+			$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
 		}
 		$sx .= '</div>';
 		$sx .= '</div>';
@@ -638,7 +657,8 @@ class rdf
 		$sx .= '<div class="container">';
 		$sx .= '<div class="row">';
 
-		$sx .= '<div>class: ' . $line['c_class'] . '</div>';
+		$sx .= '<div class="col-10">class: ' . $line['c_class'] . '</div>';
+		$sx .= '<div  class="col-2 text-right">'.$this->link($line['cc_origin']).'</div>';
 
 
 		/*************************** Editar classe */
@@ -651,9 +671,6 @@ class rdf
 		}
 
 		$sx .= '</div>';
-
-		$sx .= '<div class="col-12"><h1>'.$fcn.'</h1></div>';
-
 
 		$sx .= '</div>';
 		$sx .= '</div>';
@@ -1169,6 +1186,55 @@ class rdf
 		}
 		return (true);
 	}
+
+	function set_propriety_update($r1, $prop, $r2, $lit = 0) {
+		if (($r1 == 0) or (($r2 == 0) and ($lit == 0))) { return(False); }
+		$CI = &get_instance();
+		$rdf = new rdf;
+		/****************************** Literal ************/
+		if ((strlen($lit) > 0) AND ($lit != sonumero($lit)))
+		{
+			$lit = $rdf->frbr_name($lit, 'pt_BR');
+		}
+
+		/********* propriedade com o prefixo ***************/
+		if (strpos($prop, ':')) {
+			$prop = substr($prop, strpos($prop, ':') + 1, strlen($prop));
+		}
+		/*********************** recupera propriedade ID ***/
+		if (!(sonumero($prop) == $prop))
+		{
+			$pr = $this -> find_class($prop);	
+		} else {
+			$pr = $prop;
+		}
+
+		$sql = "select * from rdf_data
+				WHERE (d_p = $pr ) and (d_r1 = $r1)";
+		$rlt = $CI -> db -> query($sql);
+		$rlt = $rlt -> result_array();
+		if (count($rlt) == 0) {
+			$sql = "insert into rdf_data
+			(d_r1, d_p, d_r2, d_literal)
+			values
+			('$r1','$pr','$r2',$lit)";
+			$rlt = $CI -> db -> query($sql);
+		} else {
+			$line = $rlt[0];
+			if ($line['d_r2'] != $r2 or ($line['d_literal'] != $lit))
+			{
+				$sql = "update rdf_data set
+				d_r2 = '$r2',
+				d_literal = '$lit'
+				where id_d = ".$rlt[0]['id_d'];
+				$rlt = $CI -> db -> query($sql);					
+			} else {
+
+			}
+		}
+		return (true);
+	}
+
 	/*****************************************************************  RDF CONCEPT **/
 	function rdf_concept_create($class, $term, $orign = '', $lang = 'pt_BR')
 	{
@@ -1277,7 +1343,6 @@ class rdf
 					}
 				}
 				); 
-				wclose();				
 			}
 			);
 
@@ -2773,27 +2838,45 @@ class rdf
 			return($sx);
 		}
 		function text_edit($id)
+		{
+			$cp = array();
+			array_push($cp,array('$H8','id_n','',false,false));
+			array_push($cp,array('$T80:6','n_name',msg('text'),true,true));
+			$op = 'pt_BR:Portugues';
+			$op .= '&en:Inglês';
+			$op .= '&es:Espanhol';
+			$op .= '&un:Multilingue';
+			array_push($cp,array('$O '.$op,'n_lang',msg('language'),true,true));
+
+			$table = 'rdf_name';
+			$form = new form;
+			$form->id = $id;
+			$sx = $form->editar($cp,$table);
+
+			if ($form->saved > 0)
 			{
-				$cp = array();
-				array_push($cp,array('$H8','id_n','',false,false));
-				array_push($cp,array('$T80:6','n_name',msg('text'),true,true));
-				$op = 'pt_BR:Portugues';
-				$op .= '&en:Inglês';
-				$op .= '&es:Espanhol';
-				$op .= '&un:Multilingue';
-				array_push($cp,array('$O '.$op,'n_lang',msg('language'),true,true));
-
-				$table = 'rdf_name';
-				$form = new form;
-				$form->id = $id;
-				$sx = $form->editar($cp,$table);
-
-				if ($form->saved > 0)
-				{
-					$sx = '<script> wclose(); </script>';
-				}
-				return($sx);				
+				$sx = '<script> wclose(); </script>';
 			}
+			return($sx);				
+		}
+		function link($c)
+		{
+			$s = $c;
+			if (strpos($s,':'))
+			{
+				$pre = substr($s,0,strpos($s,':'));
+				switch($pre)
+				{
+					case 'thesa':
+					$lk = 'http://ufrgs.br/tesauros/index.php/thesa/c/'.sonumero($c);
+					$s = '<a href="'.$lk.'" target="_new">'.$s.'</a>';
+					break;
+					default:
+					$s = $s;
+				}
+			}
+			return($s);
+		}
 
 	}
 	?>

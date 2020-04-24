@@ -1,5 +1,12 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+
+		/********************************* XML to ARRAY ***************************/
+		/*
+		$xml = simplexml_load_file($file, "SimpleXMLElement", LIBXML_NOCDATA);
+		$json = json_encode($xml);
+		$cv = json_decode($json,TRUE);
+		*/
 /* 
 	**********************************************************
 	Usage

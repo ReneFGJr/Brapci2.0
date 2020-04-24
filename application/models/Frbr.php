@@ -381,6 +381,7 @@ class frbr extends CI_model {
         $dados['doi'] = $rdf->recupera($data,'hasRegisterId');
         $dados['altmetrics'] = $this->altmets->altmetrics($dados['doi']);
         $dados['plum'] = $this->altmets->plum($dados['doi']);
+        $dados['ia'] = $this->ias->status($id);
 
         $article = $dados['article'] = $data;
         $dados['social'] = $this -> nets -> twitter($data);
@@ -391,7 +392,6 @@ class frbr extends CI_model {
 
         $dados['cited'] = $this -> nets -> howcited($data);
         $this->handle->hdl_register($id,'http://www.brapci.inf.br/index.php/res/v/'.$id);
-
         $tela .= $this -> load -> view('brapci/view/article', $dados, true);
 
         //$tela .= $this -> frbr_core -> view_data($id);
