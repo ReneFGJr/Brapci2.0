@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.20.04.09
+ * @version     v0.20.04.26
  */
 
 /* 2020-01-24 function 2 e 3 */
@@ -483,9 +483,9 @@ function reload($tipo = 'J') {
 }
 
 /* Recupera IP
- * @author Rene F. Gabriel Junior <renefgj@gmail.com>
- * @versao v0.15.23
- */
+* @author Rene F. Gabriel Junior <renefgj@gmail.com>
+* @versao v0.15.23
+*/
 function ip() {
     $ip = trim($_SERVER['REMOTE_ADDR']);
     if ($ip == '::1') { $ip = '127.0.0.1';
@@ -494,8 +494,8 @@ return ($ip);
 }
 
 /*
- * http://www.kathirvel.com/php-convert-or-cast-array-to-object-object-to-array/
- */
+* http://www.kathirvel.com/php-convert-or-cast-array-to-object-object-to-array/
+*/
 function array_to_object($array) {
     return (object)$array;
 }
@@ -505,8 +505,8 @@ function object_to_array($object) {
 }
 
 /*
- * Rene
- */
+* Rene
+*/
 
 function cr() {
     /* retorna um Nova linha e Retorno de Carro */
@@ -783,11 +783,11 @@ function file_save_post($dir, $name, $file) {
 
 // ------------------------------------------------------------------------
 /* FORM CLASS
- *
- *
- *
- *
- */
+*
+*
+*
+*
+*/
 class form {
     var $id = 0;
     var $cp = array();
@@ -1023,16 +1023,36 @@ return ($sx);
 }
 
 /* Funcao troca */
-if (!function_exists('troca')) {
-    function troca($qutf, $qc, $qt) {
-        if (is_array($qutf)) {
-            return ($qutf);
-            return ('erro - funcao ja existe "erro"');
+function troca($qutf, $qc, $qt) 
+{
+    if (!is_array($qc))
+        {
+            $qc = array($qc);
         }
-        return (str_replace(array($qc), array($qt), $qutf));
+    if (!is_array($qt))
+        {
+            $qt = array($qt);
+        }        
+    return (str_replace($qc, $qt, $qutf));
+}
+
+############################################### CHECSUM
+function checksum($tz)
+    {
+        $t=0;
+        for ($r=0;$r < strlen($tz);$r++)
+            {
+                $o = ord($tz[$r]);
+                $t = $t + $o;
+            }
+        $t = dechex($t);
+        while (strlen($t) < 12)
+            {
+                $t = '0'.$t;
+            }
+        return($t);
     }
 
-}
 
 if (!function_exists('splitx')) {
     function splitx($in, $string) {
@@ -1052,11 +1072,11 @@ if (!function_exists('splitx')) {
 
 if (!function_exists('form_edit')) {
     /* Form Edit
-     * @parameter $cp - campos de edicao
-     * @parameter $tabela - nome da tabela que le/insere/atualiza registro
-     * @paramrter $id - chave primaria do registro
-     * @parameter $data - Dados do post inserir no controler: $data = $this->input->post();
-     */
+    * @parameter $cp - campos de edicao
+    * @parameter $tabela - nome da tabela que le/insere/atualiza registro
+    * @paramrter $id - chave primaria do registro
+    * @parameter $data - Dados do post inserir no controler: $data = $this->input->post();
+    */
 
     function row($obj, $pag = 1) {
         $page = page();
@@ -1159,14 +1179,14 @@ if (strlen(get('acao')) > 0) {
 /* Memoria */
 $termo = $term;
         /*
-         echo '<br>page: '.$page;
-         echo '<br>text: '.$termo;
-         echo '<br>field: '.$field;
-         echo '<br>pag: '.$npag;
-         echo '<hr>';
-         */
-         /* Where */
-         if (strlen($term) > 0) {
+        echo '<br>page: '.$page;
+        echo '<br>text: '.$termo;
+        echo '<br>field: '.$field;
+        echo '<br>pag: '.$npag;
+        echo '<hr>';
+        */
+        /* Where */
+        if (strlen($term) > 0) {
             if (strlen(get('dd5')) > 0) {
                 $field = get('dd5');
             } else {
@@ -1478,9 +1498,9 @@ function checkpost($id, $chk1) {
 }
 
     /*
-     *
-     * Le dados do banco
-     */
+    *
+    * Le dados do banco
+    */
     function le_dados($obj) {
         $id = $obj -> id;
         $tabela = $obj -> tabela;
