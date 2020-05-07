@@ -319,7 +319,7 @@ class res extends CI_Controller {
         $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('sources');
-        $this -> load -> model('socials');
+        $socials = new socials;
         $usr = $socials -> token($token);
         if (count($usr) == 0) {
             //$sx .= msg('token_invalid') . cr();

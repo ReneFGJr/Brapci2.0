@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category    Helpers
  * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
  * @link        http://www.sisdoc.com.br/CodIgniter
- * @version     v0.20.03.26
+ * @version     v0.20.05.06
  */
 
 
@@ -293,11 +293,19 @@ function menu_user() {
     if (isset($_SESSION['user']) and (strlen($_SESSION['user']) > 0)) {
         $name = $_SESSION['user'];
         $sx = '
-        <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
+                
+        ';
+        $sx = '
+        <li class="nav-item dropdown ml-auto">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>        
+
+        <div class="dropdown-menu ml-auto" aria-labelledby="navbarDropdownMenuLink" style="right: 0px;">
         <a class="dropdown-item" href="' . base_url(PATH.'social/perfil') . '">' . msg('user_perfil') . '</a>
         <a class="dropdown-item" href="' . base_url(PATH.'social/logout') . '">' . msg('user_logout') . '</a>
-        </div>                
+        </div>
+
+        </li>       
         ';
     } else {
         $sx = '<A href="#" class="nav-link" data-toggle="modal" data-target="#exampleModalLong">' . msg('sign_in') . '</a>';
@@ -968,7 +976,7 @@ function token($t)
     $CI = &get_instance();
     $t = troca($t,"'",'´');
     $sql = "select * from users where us_password = '$t' ";
-    $rlt = $this->db->query($sql);
+    $rlt = $CI->db->query($sql);
     $rlt = $rlt->result_array();
     if (count($rlt) == 1)
     {

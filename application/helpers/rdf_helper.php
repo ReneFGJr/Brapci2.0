@@ -48,6 +48,16 @@ class rdf
 		$sx = '';
 		switch($path)
 		{
+			case 'id':
+				$this->rdf_export($id);
+				exit;
+			break;			
+
+			case 'xml':
+				$this->rdf_export($id);
+				exit;
+			break;		
+
 			case 'text':
 			$sx = $this->text_edit($id);
 			break;
@@ -643,6 +653,10 @@ class rdf
 		/**************************************************** show **/
 		$line = $dt;
 		$fcn = 'rdf_show_'.$line['c_class'];
+		/* exportação */
+		$sx .= 'Export: ';
+		$sx .= '<a href="'.base_url(PATH.'rdf/xml/'.$r).'">RDF</a>';
+
 		if (function_exists($fcn))
 		{
 			$fcn = '$sx .= '.$fcn.'($line);';
@@ -2878,5 +2892,102 @@ class rdf
 			return($s);
 		}
 
+		function rdf_export($id,$out=1)
+			{
+				/******* converte em Array ****/
+				if (!is_array($id))
+					{
+						$id = array($id);
+					}
+				/* Coleta dados */
+				$rdf = new rdf;
+				$sx = '';
+				for ($r=0;$r < count($id);$r++)
+				{
+					$file = '_c/'.$id[$r].'.xml';
+					if (file_exists($file))
+					{
+						$sx .= file_get_contents($file);
+					} else {
+						$this->rdf_register($id[$r]);
+						$sx .= file_get_contents($file);
+					}
+					
+				}
+				if ($out == 0)
+				{
+					/* gerar arquivo de exportação */
+					header('Content-Type: application/xml; charset=utf-8');
+					echo $this->rdf_header();
+					echo $sx;
+					echo $this->rdf_footer();
+				} else {
+					return($sx);
+				}
+			}
+		function rdf_header()
+			{
+				/*********** Header do RDF ************/
+				$sx = '<rdf:RDF ';
+				$sx .= 'xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" ';
+				$sx .= 'xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" ';
+				$sx .= 'xmlns:lattes="http://www.w3.org/2000/01/rdf-schema#" ';				
+				$sx .= 'xmlns:redd="'.base_url(PATH.'rdf/xml/').'" ';
+				$sx .= 'xmlns:skos="http://www.w3.org/2000/01/skos" ';
+				$sx .= 'xmlns:owl=http://www.w3.org/2002/07/owl# ';
+				$sx .= '>'.cr();
+				return($sx);
+			}
+
+		function rdf_footer()
+			{
+
+				/*********** Finalizar o RDF ************/
+				$sx = '</rdf:RDF>';
+				return($sx);
+			}
+
+		function rdf_register($id)
+			{				
+				global $ids;
+
+				$hd = $this->le($id);
+				$dt = $this->le_data($id);
+
+				$sx = '<lattes:curriculolattes rdf:about="'.base_url(PATH.'rdf/id/'.$hd['id_cc']).'">'.cr();
+				$sx .= '<owl:Class>'.trim($hd['c_class']).'</owl:Class>'.cr();
+				$sx .= '<lattes:id>'.trim($hd['n_name']).'</lattes:id>'.cr();
+				$sx .= '<lattes:published>'.trim($hd['n_name']).'</lattes:published>'.cr();
+				
+				for ($r=0;$r < count($dt);$r++)
+				{
+					$pref = trim($dt[$r]['prefix_ref']);
+					if (strlen($pref) == 0) { $pref = 'lattes'; }
+					$class = trim($dt[$r]['c_class']);
+					$lang = trim($dt[$r]['n_lang']);
+					if ($dt[$r]['d_r2'] > 0)
+						{
+							$idr = $dt[$r]['d_r2'];
+							if ($idr == $id) { $idr = $dt[$r]['d_r1']; }
+							$vlr = base_url(PATH.'rdf/id/'.$idr);
+							$vlr = 'redd:'.$idr;
+							$sx .= '<'.$pref.':'.$class.' resource="'.$vlr.'"/>'.cr();
+							if (!isset($ids[$idr]))
+								{
+									$ids[$idr] = 0;
+								}
+						} else {
+							$vlr =$dt[$r]['n_name'];
+							$sx .= '<'.$pref.':'.$class.'>'.$vlr.'</'.$pref.':'.$class.'>'.cr();
+						}				
+				}
+				$sx .= '</lattes:curriculolattes>'.cr();
+				$file = '_c';
+				dircheck($file);
+				$file .= '/'.$hd['id_cc'].'.xml';
+				file_put_contents($file,$sx);
+
+			return($sx);
+			}
 	}
 	?>
