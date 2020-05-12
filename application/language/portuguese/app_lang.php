@@ -236,7 +236,8 @@ $lang['collection_JA'] = 'Revistas Brasileiras';
 $lang['collection_JE'] = 'Revistas Internacionais';
 $lang['config_event'] = 'Eventos Científicos';
 $lang['csv_to_matrix_ocorrencia'] = "Converte .CSV para Matriz de Correlação única";		
-
-
 $lang['change_password'] = 'Mudar senha';
+
+
+
 ?>

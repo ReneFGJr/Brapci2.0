@@ -1,21 +1,19 @@
 <?php
-// This file is part of the ProEthos Software.
-//
-// Copyright 2013, PAHO. All rights reserved. You can redistribute it and/or modify
-// ProEthos under the terms of the ProEthos License as published by PAHO, which
-// restricts commercial use of the Software.
-//
-// ProEthos is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-// PARTICULAR PURPOSE. See the ProEthos License for more details.
-//
-// You should have received a copy of the ProEthos License along with the ProEthos
-// Software. If not, see
-// https://raw.githubusercontent.com/bireme/proethos/master/LICENSE.txt
+/**
+* CodeIgniter Form Helpers
+*
+* @package     CodeIgniter
+* @subpackage  EMAIL
+* @category    Helpers
+* @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+* @link        http://www.sisdoc.com.br/CodIgniter
+* @version     v0.20.05.12
+*/
 
-/*
- * Sistema de e-mail
- */
+/* GMAIL
+https://myaccount.google.com/u/1/security?hl=pt-BR
+Acesso APP menos seguro
+*/
 
 function email($para,$assunto,$texto,$de=1)
 {
@@ -26,7 +24,10 @@ function email($para,$assunto,$texto,$de=1)
     $rlt = $rlt -> result_array();
     $line = $rlt[0];
 
+    echo '<h1>Credenciais</h1>';
+    echo '<pre>';
     print_r($line);
+    echo '</pre>';
 
     $CI->load->library('email');
     $config = array();
@@ -42,15 +43,19 @@ function email($para,$assunto,$texto,$de=1)
     $CI->email->initialize($config);
     $CI->email->set_newline("\r\n");
 
-    $CI->email->from($line['m_email'], 'Meu E-mail');
-    $CI->email->subject("Assunto do e-mail");
+    $CI->email->from($line['m_email'], $line['m_descricao']);
+    $CI->email->subject($assunto);
     $CI->email->reply_to($line['m_email']);
     $CI->email->to($para); 
     //$this->email->cc('email_copia@dominio.com');
     //$this->email->bcc('email_copia_oculta@dominio.com');
-    $CI->email->message("Aqui vai a mensagem ao seu destinatário");
+    $CI->email->message($texto);
     $CI->email->send();
+
+    echo '<h1>Dados do retorno</h1>';
+    echo '<pre>';
     print_r($CI->email);
+    echo '</pre>';
 }
 
 function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {

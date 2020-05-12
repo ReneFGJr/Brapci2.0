@@ -22,7 +22,6 @@ versão 0.20.04.20
 			<form method="post" action="<?php echo base_url(PATH.'social/login_local');?>">
 				<span class="form_title"> <?php echo LIBRARY_NAME;?> </span>
 				<br/>
-
 				<br/>
 				<center>
                 <h2><?php echo msg('SignIn');?></h2>
