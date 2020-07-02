@@ -2643,7 +2643,9 @@ class form {
                     } else {
                         $read = 'CURL';
                     }
-                    $read = 'file';
+                    //$read = 'file';
+                    //echo '<h1>'.$read.'</h1>';
+                    //exit;
                     switch ($read) {
                         case 'file' :
                             if (substr($url,0,4) == 'http')
