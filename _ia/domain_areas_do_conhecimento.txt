@@ -38,4 +38,3 @@
 00012$sw['6.07.00.00-9'] = 'Pão';
 00003$sw['pao'] = 'Pão';
 00012$sw['6.00.00.00-7'] = 'Ciências_Sociais_Aplicadas';
-00026$sw['ciencias sociais aplicadas'] = 'Ciências_Sociais_Aplicadas';

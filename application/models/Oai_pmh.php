@@ -28,7 +28,30 @@ class oai_pmh extends CI_model {
     var $new = 0;
     var $del = 0;
     var $ref = 'null';
+
+    var $url = '';
     
+
+    function erros($erro)
+        {
+            switch ($erro)
+                {
+                    case '404':
+                    return(msg('oai_page_not_found'));
+                    break;
+
+                    case '510':
+                    return(msg('oai_no_registers'));
+                    break;
+
+                    case '200':
+                    return(msg('oai_harvesting_ok'));
+                }
+            /*
+            404 - Page not found
+            510 - Documento em branco OAI
+            */
+        }
     function log_oai($id_jnl,$cmd,$data=array())
         {
             $c = substr($cmd,0,1);
@@ -213,6 +236,14 @@ class oai_pmh extends CI_model {
 
         $id = $line['id_li'];
         $this -> cache_alter_status($id, 2);
+
+        /* Atualiza total de registros */
+        $this->new = $this->LisIdentifiesToHarvesting($id_jnl);       
+        $sql = "update source_source set
+                    jnl_oai_to_harvesting = ".$this->new."
+                    where id_jnl = $id_jnl";
+        $rlt = $this -> db -> query($sql); 
+
         return ($id);
     }
 
@@ -891,6 +922,7 @@ class oai_pmh extends CI_model {
         {
             $sql = "select * from source_source
                         where jnl_url_oai <> '' and jnl_active = 1
+                        and jnl_historic = 0
                         order by jnl_oai_last_harvesting 
                         limit 1";
             $rlt = $this -> db -> query($sql);
@@ -917,9 +949,12 @@ class oai_pmh extends CI_model {
         $ref = $this->log_oai($id,'ILIS');
         
         $sx = $this->ListIdentifiers_harvesting($id);
+        $this->new = $this->LisIdentifiesToHarvesting($id);
         
         $sql = "update source_source set
-                    jnl_oai_last_harvesting = '".date("Y-m-d H:i:s")."'
+                    jnl_oai_last_harvesting = '".date("Y-m-d H:i:s")."', 
+                    jnl_oai_status = ".$this->erro.",
+                    jnl_oai_to_harvesting = ".$this->new."
                     where id_jnl = $id";
         $rlt = $this -> db -> query($sql);                    
         
@@ -929,13 +964,36 @@ class oai_pmh extends CI_model {
         return($sx);
         }        
 
+    public function LisIdentifiesToHarvesting($id)
+        {
+            $sql = "SELECT count(*) as total, li_s 
+                    FROM source_listidentifier  
+                    where li_jnl = $id and li_s = 1
+                    group by li_s ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) == 0)
+                {
+                    $tot = 0;
+                } else {
+                    $tot = $rlt[0]['total'];
+                }
+            $this->new = $tot;
+            return($tot);
+        }
     public function ListIdentifiers_harvesting($id) {
         //$this -> getListSets($id);
         
         $data = $this -> sources -> le($id);
         $url = $this -> oai_url($data, 'ListIdentifiers');
-
+        $this->url = $url;
         $cnt = $this -> readfile($url);
+        if (strlen(trim($cnt)) == 0)
+            {
+                $this->erro = 510;
+                return("");
+            }
+
         $xml = simplexml_load_string($cnt);     
 
         $LI = $this -> xml_values_array($xml -> ListIdentifiers -> header);
@@ -955,6 +1013,7 @@ class oai_pmh extends CI_model {
         if (strlen($token) > 0) {
             $sx .= $this -> ListIdentifiers_harvesting($id);
         }
+        $this->erro = 200;
         return ($sx);
 
     }
@@ -1021,6 +1080,9 @@ class oai_pmh extends CI_model {
 
     public function xml_values_array($x) {
         $v = array();
+
+        if (strlen($x) == 0) { return(array()); }
+        
         for ($r = 0; $r < count($x); $r++) {
             $xx = $x[$r];
             $rg = array();
@@ -1042,6 +1104,7 @@ class oai_pmh extends CI_model {
     }
 
     public function xml_values($x) {
+        if (strlen($x) == 0) { return(array()); }
         $v = array();
         foreach ($x as $key => $value) {
             array_push($v, (string)$value);
@@ -1050,25 +1113,32 @@ class oai_pmh extends CI_model {
     }
 
     public function xml_value($x) {
+        if (strlen($x) == 0) { return(""); }
         foreach ($x as $key => $value) {
             return ((string)$value);
         }
     }
 
     public function readfile($url) {
-        if (substr($url, 0, 5) == 'https') {
+        $url = trim($url);
+        if (substr($url, 0, 4) == 'http') {
             $data = load_page($url);
             $data = $data['content'];
             return ($data);
         }
         try {
+            if (file_exists($url))
+            {
             $cnt = file_get_contents($url);
+            } else {
+                $this->erro = '404';
+                $cnt = '';
+            }
         } catch(Exception $e) {
             $this -> erro = -1;
             $this -> erro_msg = $e -> getMessage();
             $cnt = '';
         }
-
         return ($cnt);
     }
 

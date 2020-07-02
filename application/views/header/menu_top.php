@@ -71,7 +71,7 @@
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/saved'); ?>"><?php echo msg('basket_saved'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/inport'); ?>"><?php echo msg('basket_inport'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'bibliometric'); ?>"><?php echo msg('bibliometric_tools'); ?></a>
-                        <a class="dropdown-item" href="<?php echo base_url(PATH . 'ai'); ?>"><?php echo msg('artificial_inteligence'); ?></a>
+                        <a class="dropdown-item" href="<?php echo base_url(PATH . 'ia'); ?>"><?php echo msg('artificial_inteligence'); ?></a>
                     </div>
                 </li>
                 <?php } ?>

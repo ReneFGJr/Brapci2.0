@@ -20,6 +20,12 @@ class bibliometrics extends CI_model {
         $sx .= msg('csv_to_net');
         $sx .= '</a>';
         $sx .= '</li>';
+
+        $sx .= '<li>';
+        $sx .= '<a href="'.base_url(PATH.'bibliometric/net_to_gephi').'">';
+        $sx .= msg('net_to_gephi');
+        $sx .= '</a>';
+        $sx .= '</li>';        
         
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix').'">';
@@ -173,6 +179,80 @@ class bibliometrics extends CI_model {
         }
         return($tx);
     }
+
+    function net_to_gephi($txt)
+    {
+        $sx = '';
+            $sx .= '<pre>';
+            $sx .= $txt;
+            $sx .= '</pre>';
+
+            $ln = troca($txt,chr(13),'#');
+            $ln = splitx('#',$ln);
+
+            $nodes = array();
+            $edges = array();
+            $n = 0;
+            $e = 0;
+            for ($r=0;$r < count($ln);$r++)
+                {
+                    $cmd = substr($ln[$r],0,2);
+                    if (($n == 1) and ($cmd != '*E'))
+                        {
+                            $nr = substr($ln[$r],0,strpos($ln[$r],' '));
+                            $name = substr($ln[$r],strlen($nr)+2,1000);
+                            $char = ' ';
+                            if (strpos($name,'"') > 0) { $char = '"'; }
+                            $name = substr($name,0,strpos($name,$char));
+                            array_push($nodes,array($nr,$name));
+                        }
+
+                   if ($e == 1)
+                        {
+                            $ll = troca($ln[$r],' ',';'); 
+                            $lla = splitx(';',$ll);
+                            if (count($lla) == 3)
+                                {
+                                    array_push($edges,$lla);
+                                }
+                        }
+                    if ($cmd == '*V')
+                        {
+                            $n = 1;
+                            $e = 0;
+                        }
+                    if ($cmd == '*E')
+                        {
+                            $n = 0;
+                            $e = 1;
+                        }                    
+                }
+            $sx = '';            
+            $sx .= 'graph'.cr();
+            $sx .= '['.cr();
+            $sx .= '    Creator "Brapci '.date("Y-m-d H:i:s").'"'.cr();
+            for ($r=0;$r < count($nodes);$r++)
+                {
+                    $sx .= '    node'.cr();
+                    $sx .= '    ['.cr();
+                    $sx .= '        id '.$nodes[$r][0].cr();
+                    $sx .= '        label "'.$nodes[$r][1].'"'.cr();
+                    $sx .= '    ]'.cr();
+                }
+            $sx .= '********** FILE2 ************'.cr();
+            $sx .= 'Source,Target,Type,Weight'.cr();
+            for ($r=0;$r < count($edges);$r++)
+                {
+                    $sx .= '    edge'.cr();
+                    $sx .= '    ['.cr();
+                    $sx .= "        source ".$edges[$r][0].cr();
+                    $sx .= "        target ".$edges[$r][1].cr();
+                    $sx .= "        value ".$edges[$r][2].cr();
+                    $sx .= '    ]'.cr();
+                }
+        $this -> bibliometrics -> download_file($sx, '.gml');
+        return($sx);
+    }    
     
     function csv_to_net($txt)
     {

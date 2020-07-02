@@ -602,6 +602,22 @@ function show($dt)
 	return($sx);
 }
 
+function show_values($s)
+	{
+		if (is_array($s))
+			{
+				$sx = '';
+				for ($r=0;$r < count($s);$r++)
+					{
+						if (strlen($sx) > 0) { $sx .= '; '; }
+						$sx .= $s[$r];						
+					}
+					$sx .= '.';
+			} else {
+				return($s);
+			}
+	}
+
 function extract_id($dt,$class,$id=0)
 {
 	$rs = array();
@@ -618,6 +634,10 @@ function extract_id($dt,$class,$id=0)
 			array_push($rs,$idr);
 		}
 	}
+	if (count($rs) == 1)
+		{
+			$rs = $rs[0];
+		}	
 	return($rs);
 }
 
@@ -632,8 +652,13 @@ function extract_content($dt,$class,$id=0)
 			array_push($rs,$dt[$r]['n_name']);
 		}
 	}
+	if (count($rs) == 1)
+		{
+			$rs = $rs[0];
+		}
 	return($rs);
 }	
+
 
 function show_data($r) {
 	$CI = &get_instance();
@@ -646,7 +671,7 @@ function show_data($r) {
 	$sx = '';
 	$sx .= '<div class="container">';
 	$sx .= '<div class="row">';
-	$dt = $this->le($r);
+	$dt = $this->le($r);	
 	$class = $dt['c_class'];
 	
 	/****************************************** return if empty */
@@ -655,7 +680,8 @@ function show_data($r) {
 	}
 	/**************************************************** show **/
 	$line = $dt;
-	$fcn = 'rdf_show_'.$line['c_class'];
+	
+	$fcn = 'rdf_show_'.trim(lowercasesql($line['c_class']));
 	/* exportação */
 	$sx .= '<div class="col-md-12">';
 	$sx .= 'Export: ';
@@ -664,6 +690,7 @@ function show_data($r) {
 	
 	if (function_exists($fcn))
 	{
+		
 		$fcn = '$sx .= '.$fcn.'($line);';
 		eval($fcn);
 	} else {			
@@ -791,6 +818,23 @@ function prefix($pre)
 	{
 		return(0);
 	}
+
+	if (sonumero($pre) == $pre)
+		{
+			$sql = "select * from rdf_prefix where id_prefix = '$pre' ";
+			$rlt = $CI -> db -> query($sql);
+			$rlt = $rlt -> result_array();
+			if (count($rlt) == 0)
+				{
+					return('[?'.$pre.']');
+				} else {
+					$line = $rlt[0];
+					$uri = trim($line['prefix_url']);
+					return($line['prefix_ref']);	
+				}
+
+		}
+
 	$sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
@@ -2937,6 +2981,7 @@ function export_json($id)
 		for ($r=0;$r < count($id);$r++)
 		{
 			$file = '_c/'.$id[$r].'.xml';
+			echo $file.'<br>';
 			if (file_exists($file))
 			{
 				$sx .= file_get_contents($file);

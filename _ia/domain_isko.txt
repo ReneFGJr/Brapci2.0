@@ -14,4 +14,3 @@
 00004$sw['arte'] = 'Artes';
 00005$sw['artes'] = 'Artes';
 00021$sw['information retrieval'] = 'Recuperação_da_Informação';
-00025$sw['recuperacao da informacao'] = 'Recuperação_da_Informação';

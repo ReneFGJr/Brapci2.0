@@ -1,3 +1,7 @@
+00004$sw['paho'] = 'Pan_American_Health_Organization';
+00004$sw['opas'] = 'Pan_American_Health_Organization';
+00032$sw['pan american health organization'] = 'Pan_American_Health_Organization';
+00034$sw['organizacao pan-americana da saude'] = 'Organização_Pan-Americana_da_Saúde';
 00035$sw['advances in knowledsge organziation'] = 'Advances_in_Knowledsge_Organziation';
 00026$sw['society for classification'] = 'Society_for_Classification';
 00044$sw['organizacao nacional de normas de informacao'] = 'National_Information_Standards_Organization';
@@ -43,4 +47,3 @@
 00033$sw['biblioteca do congresso americano'] = 'Library_of_Congress';
 00058$sw['biblioteca do congresso dos estados unidos da america (lc)'] = 'Library_of_Congress';
 00019$sw['library of congress'] = 'Library_of_Congress';
-00027$sw['the web information company'] = 'The_Web_Information_Company';

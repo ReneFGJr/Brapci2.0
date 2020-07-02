@@ -7,7 +7,6 @@ class res extends CI_Controller {
     function __construct() {
         
         parent::__construct();
-        $this -> lang -> load("app", "portuguese");
         $this -> load -> database();
         $this -> load -> helper('url');
         $this -> load -> library('session');
@@ -23,6 +22,12 @@ class res extends CI_Controller {
         $this -> load -> helper('rdf');
         //$this -> load -> helper('email');
         $this -> load -> helper('bootstrap');
+        
+        /* Language */
+        $this -> load -> helper('language');
+        $language = new language;
+        $this -> lang -> load("brapci", $language->language());
+        
         date_default_timezone_set('America/Sao_Paulo');
     }
     
@@ -202,20 +207,38 @@ public function article_new($id) {
     
 }
 
-public function ia($id=0)
+public function ia($act='',$id1='',$id2='',$id3='')
 {
+    $this->load->model("ias");
+    $this->cab();
+    
+    $data['content'] = $this->ias->index($act,$id1,$id2,$id3);
+    $data['title'] = '';
+    $this->load->view('content',$data);
+    
+    $this->footer();
+    
+    /*    
     $this -> load -> model('ias');
     $this -> load -> model('frbr');
     $this -> load -> model('frbr_core');  
     
     $this->cab();
-    $vv = $this -> frbr_core -> le_data($id);
     
-    $data['content'] = $this->ias->v($vv);
-    $data['title'] = '';
-    
-    $this -> load -> view('show', $data);
-    $this->footer();
+    if ($id == 0)
+    {
+        
+    } else {
+        $vv = $this -> frbr_core -> le_data($id);
+        echo '<pre>';
+        print_r($vv);
+        exit;    
+        $data['content'] = $this->ias->v($vv);
+        $data['title'] = '';
+        
+        $this -> load -> view('show', $data);
+    }
+    */
 }
 
 public function v($id,$fmt='') {
@@ -313,8 +336,11 @@ public function v($id,$fmt='') {
         }
     }
     
+    /**********************************************
+    * Funções de coleta das dados - Harvesting
+    */
     public function cron($act = '', $token = '', $id = '') {
-        $sx = date("Y-m-d H:i:s") . ' ';
+        $sx = '<pre>'.cr();
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
@@ -328,17 +354,21 @@ public function v($id,$fmt='') {
         if (strlen($id) == 0) {
             $id = 'journal';
         }
+        $sx .= '================================================'.cr();
         $sx .= date("Y-m-d H:i:s") . ' ACT:' . $id . cr();
         switch($id) {
             case 'journal' :
                 $data = $this -> oai_pmh -> NextHarvesting();
                 if (count($data) > 0) {
                     $sx .= 'Harvesting OAI-PMH Journal' . cr();
-                    $sx .= $data['jnl_name'] . cr();
+                    $sx .= 'Journal: '.$data['jnl_name'] . cr();
                     $idx = $data['id_jnl'];
                     $sr = $this -> oai_pmh -> ListIdentifiers($idx);
-                    $sr = troca($sr, '</li>', '</LI>' . cr());
+                    $sr = troca($sr, '</li>', '</li>' . cr());
                     $sr = strip_tags($sr);
+                    $sx .= 'Status: '.$this->oai_pmh->erro.cr();
+                    $sx .= 'New registers: '.$this->oai_pmh->new.cr();
+                    $sx .= 'URL :'.$this -> oai_pmh-> oai_url($data, 'ListIdentifiers');
                     //$sx .= $sr;
                 } else {
                     $sx .= msg('not_journal_to_harvesting') . cr();
@@ -350,15 +380,11 @@ public function v($id,$fmt='') {
         
         /* save log */
         $filename = '/var/www/html/Brapci2.0/script/cron.oai.html';
-        if (file_exists($filename)) {
-            $t = readfile($filename);
-        } else {
-            $t = '';
-        }
-        $t .= date('Y-m-d H:i:s') . $sx . cr();
+        $t = date('Y-m-d H:i:s') . $sx . cr();
         $fld = fopen($filename, 'w+');
         fwrite($fld, $sx);
         fclose($fld);
+        $sx .= cr().'</pre>';
         echo $sx;
     }
     
@@ -370,17 +396,15 @@ public function v($id,$fmt='') {
         $this -> cab();
         $html = '';
         $data = array();
-        $data['content'] = '';
+        $data['content'] = '<style> div { border: 1px solid #000000; } </style>';
         
         if (strlen($act) == 0) {
             
-            $data['content'] = '';
+            //$data['content'] = '';
             if (perfil("#ADM")) {
-                $data['content'] .= '<div class="col-md-12">' . cr();
                 $data['content'] .= $this -> sources -> button_new_sources();
                 $data['content'] .= $this -> sources -> button_harvesting_all();
                 $data['content'] .= $this -> sources -> button_harvesting_status();
-                $data['content'] .= '</div>' . cr();
             }
             $data['content'] .= $this -> sources -> list_sources();
             $data['title'] = msg('journals');
@@ -550,6 +574,7 @@ public function v($id,$fmt='') {
         $this -> load -> model('Elasticsearch_brapci20');
         $this -> cab();
         $data['title'] = 'OAI';
+        $url = '';
         
         switch($verb) {
             case 'GetRecordScielo' :
@@ -574,6 +599,7 @@ public function v($id,$fmt='') {
                 //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
             break;
+            
             case 'GetRecord' :
                 $dt = array();
                 $idc = $this -> oai_pmh -> getRecord($id);
@@ -594,13 +620,17 @@ public function v($id,$fmt='') {
                 //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
                 //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
             break;
+            
             case 'ListIdentifiers' :
                 $html = $this -> sources -> info($id);
                 $html .= '<div class="row"><div class="col-12">' . $this -> oai_pmh -> ListIdentifiers($id) . '</div></div>';
+                $url = $this->oai_pmh->url;
             break;
+            
             case 'info' :
                 $html = $this -> sources -> info($id);
             break;
+            
             case 'cache' :
                 $html = $this -> sources -> info($id);
                 $html .= '<div class="col-2">';
@@ -624,6 +654,15 @@ public function v($id,$fmt='') {
             default :
             $html = $this -> oai_pmh -> repository_list($id);
         }
+        
+        /* Status */
+        $html .= '<div class="col-md-12">';
+        $html .= '<pre>';
+        $html .= 'Status: '.$this->oai_pmh->erro.cr();
+        $html .= 'Verb: '.$verb.cr();
+        $html .= 'URL: '.$url.cr();
+        $html .= '</pre>';
+        $html .= '</div>';
         
         $data['content'] = $html;
         $this -> load -> view("show", $data);
@@ -1494,6 +1533,15 @@ function bibliometric($ac = '') {
                 return ('');
             }
         break;
+        case 'net_to_gephi' :
+            if (!(isset($_FILES['userfile']['tmp_name']))) {
+                $tela .= $this -> bibliometrics -> form_file(msg($ac));
+            } else {
+                $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                $rst = $this -> bibliometrics -> net_to_gephi($txt);                
+                return ('');
+            }
+        break;        
         case 'csv_to_matrix' :
             if (!(isset($_FILES['userfile']['tmp_name']))) {
                 $tela .= $this -> bibliometrics -> form_file(msg($ac));
@@ -1628,14 +1676,6 @@ function api($act='',$token='')
     $this->api_brapci->index($act,$token);
 }
 
-function ai($act='',$id1='',$id2='',$id3='')
-{
-    $this->load->model("ias");
-    $this->cab();
-    $data['content'] = $this->ias->index($act,$id1,$id2,$id3);
-    $data['title'] = '';
-    $this->load->view('content',$data);
-    $this->footer();
-}
+
 
 }

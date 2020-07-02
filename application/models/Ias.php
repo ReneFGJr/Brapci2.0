@@ -1,282 +1,371 @@
 <?php
+/*
+* Inteligencê Artificial
+*
+*/
 class Ias extends CI_model
 {
-	var $version_nlp = '0.1';
-
+	var $version_nlp = '0.2';
+	
 	function check($f=0)
 	{
+		if ((file_exists('_ia/stopword.txt')) and ($f==0))
+		{
+			$f = 0;
+		}
+		$sx = '<ul>';
 		dircheck('_ia');
 		if ($f==1)
 		{
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/69/txt';
-			$file = '_ia/stopword.txt';
+			$file = '_ia/domain_stopword.txt';
 			$this->import_thesa($url,$file);
-
+			$sx .= '<li>Stopwords  <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/64/txt';
 			$file = '_ia/domain_ci.txt';
 			$this->import_thesa($url,$file);
-
+			$sx .= '<li>Informacition Science Domain  <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/243/txt';
 			$file = '_ia/domain_methodology.txt';
 			$this->import_thesa($url,$file);	
-
+			$sx .= '<li>Informacition Science Methodology Domain  <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/232/txt';
 			$file = '_ia/domain_isko.txt';
 			$this->import_thesa($url,$file);
-
+			$sx .= '<li>Knowledge Organization Domain <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/262/txt';
 			$file = '_ia/domain_instituicoes.txt';
 			$this->import_thesa($url,$file);	
-
+			$sx .= '<li>Corporate Board Authority <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/8/txt';
 			$file = '_ia/domain_universidades.txt';
 			$this->import_thesa($url,$file);
-
+			$sx .= '<li>Universities Authority <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/9/txt';
 			$file = '_ia/domain_areas_do_conhecimento.txt';
 			$this->import_thesa($url,$file);	
-
+			$sx .= '<li>Knowledge Domain <span style="color: green"><b>Update</b></span></li>';
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/10/txt';
 			$file = '_ia/domain_datas.txt';
-			$this->import_thesa($url,$file);														
-		}
-	}	
+			$this->import_thesa($url,$file);
+			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';			
 
-	function index($act='',$d1='',$d2='',$d3='')
-	{
-		$sx = '';
-		switch($act)
-		{
-			case 'nlp':
-			$this->check(1);
-			$sx = '<h1>'.msg("NLP").' <sup>v.'.$this->version_nlp.'</sup></h1>';
-			$sx .= $this->nlp($d1,$d2,$d3);
-			break;
-
-			default:
-			$sx = $this->services();
-			break;
+			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';			
+			$file = '_ia/domain_datas_g.txt';
+			$this->gerate_dates($file);
 		}
 		return($sx);
 	}
 
-	function nlp($d1='',$d2='',$d3='')
-	{
-		$sx = '';
-		switch($d1)
+	function gerate_dates($file='')
 		{
-			case 'run':
-			$sx .= $this->nlp_form();
-			$txt = $this->nlp_process(get("dd1"));
-			$sx .= $this->nlp_words($txt);
-			break;
-
-			default:
-			$sx .= '<ul>';
-			$sx .= '<li>'.'<a href="'.base_url(PATH.'ai/nlp/run').'">'.msg("Processing Teste").'</a>';
-			$sx .= '</ul>';
+			$sx = '';
+			$i = mktime(0,0,0,0,1,0);
+			$d = mktime(0,0,0,1,1,1950);
+			//00007$sw['anos 80'] = 'Década_1980';
+			for($r=0;$r < 365;$r++)
+			{
+			$sa = date("d/m/Y",$d);
+			$sx = date("Ymd",$d);
+			$sx .= strzero(strlen($sx),5).'$sx[\''.$sa.'\'] = \'[D'.$sx.']\';'.cr();
+			$d = $d + 60*60*24;
+			echo $sx.'<br>';
+			}
 		}
-		return($sx);
-	}
-
-	function nlp_process($t)
-	{
-		$sx = '';
-		if (strlen($t) == 0)
-		{
-			return("");
-		}
-		$t = $this->text_get($t);
-		return($t);
-	}
-
-	function nlp_form()
-	{
-		$form = new form;
-		$cp = array();
-		array_push($cp,array('$H8','','',false,false));
-		array_push($cp,array('$T80:15','',msg('text'),True,True));
-		array_push($cp,array('$B8','',msg('run'),false,false));
-
-		$sx = $form->editar($cp,'');
-		return($sx);
-	}
-
+	
 	function services()
 	{
 		$sx = '<div class="row">';
-		$sx .= '<a href="'.base_url(PATH.'ai/nlp').'">';
-		$sx .= '<div class="col-md-2" class="btn-primary btn">';			
-		$sx .= 'NLP '.$this->version_nlp;
+		$sx .= '<div class="col-md-12">';
+		$sx .= '<h1>Services</h1>';
 		$sx .= '</div>';
+		
+		$sx .= '<div class="col-md-2 btn btn-outline-primary">';
+		$sx .= '<a href="'.base_url(PATH.'ia/nlp').'">';	
+		$sx .= 'NLP '.$this->version_nlp;
 		$sx .= '</a>';
 		$sx .= '</div>';
+		
+		$sx .= '<div class="col-md-2 btn btn-outline-secondary">';
+		$sx .= '<a href="'.base_url(PATH.'ia/thesa').'">';	
+		$sx .= 'Atualiza vocabulários';
+		$sx .= '</a>';
+		$sx .= '</div>';		
+		
+		$sx .= '</div>';
 		return($sx);
+	}		
+	
+	function index($act='',$d1='',$d2='',$d3='')
+	{
+		$sx = '';
+		$this->load->model('frbr_core');
+		switch($act)
+		{
+			case 'thesa':
+				$sx = $this->check(1);
+				$sx .= '<a href="'.base_url(PATH.'ia').'" class="btn btn-outline-primary">'.msg('return').'</a>';
+			break;
+			
+			case 'nlp':
+				switch($d1)
+				{
+					case 'analyse':
+						$vv = $this -> frbr_core -> le_data($d2);
+						$sx = $this->ias->v($vv);					
+					break;
+					
+					default:
+					$sx = '<h1>'.msg("NLP").' <sup>v.'.$this->version_nlp.'</sup></h1>';
+					$sx .= $this->nlp($d1,$d2,$d3);
+					
+				}
+			break;
+			
+			default:
+			$sx = $this->services();
+		break;
+	}
+	return($sx);
+}
+
+function nlp($d1='',$d2='',$d3='')
+{
+	$sx = '';
+	switch($d1)
+	{
+		case 'run':
+			$sx .= $this->nlp_form();
+			$txt = $this->nlp_process(get("dd1"));
+			$sx .= $this->nlp_words($txt);
+		break;
+		
+		default:
+		$sx .= '<ul>';
+		$sx .= '<li>'.'<a href="'.base_url(PATH.'ia/nlp/run').'">'.msg("Processing Teste").'</a>';
+		$sx .= '</ul>';
+	}
+	return($sx);
+}
+
+function submit_accept($txt)
+	{
+		$this->gerate_dates();
+
+		/* IA POR REGRAS */
+		$w = array('Aceito:');
+		$r = 0;
+		while (strpos($txt,$w[$r]) > 0)
+			{
+				$i = strpos($txt,$w[$r]);
+				$f = trim(substr($txt,$i,30));
+				$f = substr($f,0,strpos($f,' '));
+				echo '=>'.$i.'-'.$f;
+				$txt = '';
+			}
 	}
 
-	function import_thesa($url,$file)
+function nlp_process($t)
+{
+	/************/
+	$sx = $this->submit_accept($t);
+	return($sx);
+	$sx = '';
+	if (strlen($t) == 0)
 	{
-		$rsp = file($url);
-		$s = array();
-		foreach ($rsp as $line_num => $line) {
-			//echo "Linha #<b>{$line_num}</b> : " .$line . "<br>\n";
-			$line = troca($line,'>','');
-			$ln = splitx('=',$line);
-			if (count($ln) == 2)
+		return("");
+	}
+	$t = $this->text_get($t);
+	return($t);
+}
+
+function nlp_form()
+{
+	$form = new form;
+	$cp = array();
+	array_push($cp,array('$H8','','',false,false));
+	array_push($cp,array('$T80:15','',msg('text'),True,True));
+	array_push($cp,array('$B8','',msg('run'),false,false));
+	
+	$sx = $form->editar($cp,'');
+	return($sx);
+}
+
+
+
+function import_thesa($url,$file)
+{
+	$rsp = file($url);
+	$s = array();
+	foreach ($rsp as $line_num => $line) {
+		//echo "Linha #<b>{$line_num}</b> : " .$line . "<br>\n";
+		$line = troca($line,'>','');
+		$ln = splitx('=',$line);
+		if (count($ln) == 2)
+		{
+			$t = trim(LowerCaseSql($ln[0]));
+			if (strlen($t) > 0)
 			{
-				$t = LowerCaseSql($ln[0]);
 				$te = troca($ln[1],' ','_');				
 				$w = strzero(strlen($t),5).'$sw[\''.$t.'\'] = ';
 				$w .= "'".$te."';";
 				array_push($s,$w);
 			}
 		}
-		$w = '';
-		/* Salvando arquivo invertido */
-		for($r=(count($s)-1);$r >= 0;$r--)
+	}
+	$w = '';
+	/* Salvando arquivo invertido */
+	for($r=(count($s)-1);$r >= 0;$r--)
+	{
+		$key = $s[$r];
+		//$w .= substr($key,5,strlen($key)).cr();
+		$w .= $key.cr();
+	}
+	file_put_contents($file, $w);
+	return(1);	
+}
+
+function file_get($file)
+{
+	$l = array();
+	$rsp = file($file);
+	$w = '';
+	foreach ($rsp as $line_num => $line) {
+		//echo "Linha #<b>{$line_num}</b> : " .$line . "<br>\n";
+		$line = trim($line);
+		if (sonumero($line) == $line)
 		{
-			$key = $s[$r];
-			//$w .= substr($key,5,strlen($key)).cr();
-			$w .= $key.cr();
+			$line = '';
 		}
-		file_put_contents($file, $w);
-		return(1);	
-	}
-
-	function file_get($file)
-	{
-		$l = array();
-		$rsp = file($file);
-		$w = '';
-		foreach ($rsp as $line_num => $line) {
-			//echo "Linha #<b>{$line_num}</b> : " .$line . "<br>\n";
-			$line = trim($line);
-			if (sonumero($line) == $line)
-			{
-				$line = '';
-			}
-
-			if (isset($l[$line]))
-			{
-				$l[$line] = $l[$line]+1;
-			} else {
-				$l[$line] = 1;
-			}
-		}
-		$txt = $this->file_get_prepare($l);
-		return($txt);		
-	}
-
-	function text_get($t)
-	{
-		$l = array();
-		$t = troca($t,chr(13),';');
-		$ln = splitx(';',$t);
-		$w = '';
-		for ($r=0;$r < count($ln);$r++)
+		
+		if (isset($l[$line]))
 		{
-			$line = $ln[$r];
-			$line = trim($line);
-			if (sonumero($line) == $line)
-			{
-				$line = '';
-			}
-
-			if (isset($l[$line]))
-			{
-				$l[$line] = $l[$line]+1;
-			} else {
-				$l[$line] = 1;
-			}
-		}
-		$txt = $this->file_get_prepare($l);
-		return($txt);		
-	}
-
-	function file_get_prepare($l)
-	{
-		$txt = '';
-		foreach ($l as $ln => $f) {
-			if ($f <= 1)
-			{
-				$ln = '> '.trim($ln);
-				if (strlen($ln) > 3) 
-				{
-					for ($a = 64; $a <= 90;$a++)
-					{
-						$ln = troca($ln,'. '.chr($a),'.> '.chr($a));
-					}
-					
-					$ln = troca($ln,'“','');
-					$ln = troca($ln,'”','');
-					$ln = troca($ln,'"','');
-					$ln = trim($ln);
-					while (strpos($ln,'  ')>0)
-					{
-						$ln = ' '.	trim(troca($ln,'  ',' '));
-					}
-
-					$final = substr($ln,strlen($ln)-1,1);
-					$txt .= $ln;
-					switch($final)
-					{
-						case '.':
-						$txt .= '>'.cr();
-						break;
-
-						default:
-						$txt .= ' ';
-						break;
-					}
-				}
-			}
-		}
-		$txt = troca($txt,' > ',' ');
-		return($txt);
-	}
-
-	function v($d)
-	{
-		$this->check();
-		$rdf = new rdf;
-		$vv = $rdf->extract_content($d,'hasFileStorage');
-		$file = troca($vv[0],'.pdf','.txt');
-		if (file_exists($file))
-		{
-			$txt = $this->file_get($file);
-			$txt = '<tt>'.$txt.'</tt>';
-
-			$txt = $this->nlp_words($txt).cr().$txt;
+			$l[$line] = $l[$line]+1;
 		} else {
-			$txt = message(1,msg('File not found'));
+			$l[$line] = 1;
 		}
-		return($txt);
 	}
+	$txt = $this->file_get_prepare($l);
+	return($txt);		
+}
 
-	function status($id)
+function text_get($t)
+{
+	$l = array();
+	$t = troca($t,chr(13),';');
+	$ln = splitx(';',$t);
+	$w = '';
+	for ($r=0;$r < count($ln);$r++)
 	{
-		$sx = $this->icone('PNL',1,$id);
-		return($sx);
-	}
-
-	function icone($i,$v=0,$id)	
-	{
-		switch($i)
+		$line = $ln[$r];
+		$line = trim($line);
+		if (sonumero($line) == $line)
 		{
-			case 'PNL':
+			$line = '';
+		}
+		
+		if (isset($l[$line]))
+		{
+			$l[$line] = $l[$line]+1;
+		} else {
+			$l[$line] = 1;
+		}
+	}
+	$txt = $this->file_get_prepare($l);
+	return($txt);		
+}
+
+function file_get_prepare($l)
+{
+	$txt = '';
+	foreach ($l as $ln => $f) {
+		if ($f <= 1)
+		{
+			$ln = '> '.trim($ln);
+			if (strlen($ln) > 3) 
+			{
+				for ($a = 64; $a <= 90;$a++)
+				{
+					$ln = troca($ln,'. '.chr($a),'.> '.chr($a));
+				}
+				
+				$ln = troca($ln,'“','');
+				$ln = troca($ln,'”','');
+				$ln = troca($ln,'"','');
+				$ln = trim($ln);
+				while (strpos($ln,'  ')>0)
+				{
+					$ln = ' '.	trim(troca($ln,'  ',' '));
+				}
+				
+				$final = substr($ln,strlen($ln)-1,1);
+				$txt .= $ln;
+				switch($final)
+				{
+					case '.':
+						$txt .= '>'.cr();
+					break;
+					
+					default:
+					$txt .= ' ';
+				break;
+			}
+		}
+	}
+}
+$txt = troca($txt,' > ',' ');
+return($txt);
+}
+
+function v($d)
+{
+	$this->check();
+	$rdf = new rdf;
+	$vv = $rdf->extract_content($d,'hasFileStorage');
+	$file = troca($vv[0],'.pdf','.txt');
+	if (file_exists($file))
+	{
+		$txt = $this->file_get($file);
+		$txt = '<tt>'.$txt.'</tt>';
+		
+		$txt = $this->nlp_words($txt).cr().$txt;
+	} else {
+		$txt = message(1,msg('File not found'));
+	}
+	return($txt);
+}
+
+function status($id)
+{
+	$sx = $this->icone('PNL',1,$id);
+	return($sx);
+}
+
+function icone($i,$v=0,$id)	
+{
+	switch($i)
+	{
+		case 'PNL':
 			$t = 'NLP';
 			$ver = $this->version_nlp;
-			$link = '<a href="'.base_url(PATH.'ia/'.$id).'">';
+			$link = '<a href="'.base_url(PATH.'ia/nlp/analyse/'.$id).'">';
 			$linka = '</a>';
 		}
-
+		
 		$div = '<div class="infobox" style="width: 100px;">';
 		$div .= '<div class="infobox_name" style="background-color: #e0e0ff; float: left; width: 70%; padding: 0px 5px;">'.$t.'</div>';
 		$div .= '<div class="infobox_version" style="float: left; background-color: #e0ffe0; width: 30%; padding: 0px 2px; text-align: right;">'.$link.$ver.$linka.'</div>';
 		$div .= '</div>';
 		return($div);
 	}
-
+	
 	function limpa_text($t)
 	{
 		$ts = array('...','..','. ',' .',';.','“','”',',',':','>','<','?','"','/','\\','!','|','[',']','–','(',')');
@@ -295,7 +384,7 @@ class Ias extends CI_model
 		}
 		return(' '.$t.' ');	
 	}
-
+	
 	function nlp_words($txt)
 	{
 		$t = $txt;
@@ -312,7 +401,7 @@ class Ias extends CI_model
 		$ts .= file_get_contents('_ia/domain_datas.txt');
 		$ts = splitx(';',$ts);
 		sort($ts);
-
+		
 		$domains = '';
 		for($r=(count($ts)-1);$r >= 0;$r--)
 		{
@@ -323,10 +412,10 @@ class Ias extends CI_model
 		file_put_contents('_ia/domain.txt', $domains);
 		$sw = array();
 		eval($domains);
-
+		
 		/* Realiza trocas nos domínios */
 		$t = $this->change_array($t,$sw);
-
+		
 		/************************** Substitui no texto ***********/
 		$t1 = LowerCaseSql($txt);
 		$t1 = troca($t1,'','');
@@ -343,7 +432,7 @@ class Ias extends CI_model
 		$t1 = troca($t1,'‘'," ' ");
 		$t1 = troca($t1,'’'," ' ");
 		//echo '<tt style="color: green;">'.$t1.'</tt>';
-
+		
 		foreach ($sw as $key => $value) {
 			$t1 = troca($t1,' '.$key.' ',' ['.$value.'] ');
 			/*
@@ -355,16 +444,16 @@ class Ias extends CI_model
 			*/
 		}
 		$t1 = troca($t1,' . ','.');
-
+		
 		//echo '<tt style="color: red;">'.$txt.'</tt>';
-
+		
 		/* Separa as palavras */
 		$t = $this->limpa_text($t1);
 		$t = troca($t,' ',';');
 		$w = splitx(';',$t);
-
+		
 		/******************************************* STOP WORDS */
-
+		
 		/* recupera stop words */
 		$ic_stopword = file_get_contents('_ia/stopword.txt');
 		for ($r=0;$r <=9;$r++)
@@ -372,7 +461,7 @@ class Ias extends CI_model
 			$ic_stopword = troca($ic_stopword,$r,'');
 		}
 		eval($ic_stopword);
-
+		
 		/* Gera lista de palavras */
 		$wd = array();
 		for ($r=0;$r < count($w);$r++)
@@ -388,11 +477,11 @@ class Ias extends CI_model
 				}
 			}
 		}
-
-
+		
+		
 		echo '<tt style="color: green;">'.$t1.'</tt>';
-
-
+		
+		
 		/************************************************/
 		$qt = array();
 		foreach ($wd as $key => $value) {
@@ -400,13 +489,13 @@ class Ias extends CI_model
 		}
 		sort($qt);
 		$min = 2;
-
+		
 		$sx = '';
 		for ($r=(count($qt)-1);$r >= 0;$r--)
 		{
 			$value = round(substr($qt[$r],0,5));
 			$key = substr($qt[$r],5,strlen($qt[$r]));
-
+			
 			if ($value > $min)
 			{
 				$sx .= '<br>'.$key.' - '.$value;
@@ -415,7 +504,7 @@ class Ias extends CI_model
 		//$qt = $this->quartil($qt,2,1,2);
 		return($sx);
 	}
-
+	
 	function change_array($t,$w)
 	{
 		foreach ($w as $key => $v) {
@@ -423,10 +512,10 @@ class Ias extends CI_model
 		}
 		return($t);
 	}
-
+	
 	function nlp_phases($txt)
 	{
-
+		
 	}
 }
 ?>

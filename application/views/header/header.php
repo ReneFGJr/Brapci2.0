@@ -85,8 +85,8 @@ if (isset($title))
 		<META HTTP-EQUIV="Content-Language" CONTENT="pt_BR">
 		<meta name="google-site-verification" content="VZpzNVBfl5kOEtr9Upjmed96smfsO9p4N79DZT38toA" />
 
-		<link rel="icon" href="<?php echo $HTTP.'img/favicon.png';?>" type="image/x-icon" />
-		<link rel="shortcut icon" href="<?php echo $HTTP.'img/favicon.png';?>" type="image/x-icon" />    
+		<link rel="icon" href="<?php echo base_url('img/favicon.png');?>" type="image/x-icon" />
+		<link rel="shortcut icon" href="<?php echo base_url('img/favicon.png');?>" type="image/x-icon" />    
 
 		<!--- CSS --->
 		<link href="<?php echo base_url('css/bootstrap.min.css?v4.0'); ?>" rel="stylesheet">
@@ -99,13 +99,6 @@ if (isset($title))
 		<script src="<?php echo base_url('js/jquery-ui.js?v1.12.1'); ?>"></script>
 		<script src="<?php echo base_url('js/sisdoc_form.js?v1.1.1'); ?>"></script>
 
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-		<script>
-			(adsbygoogle = window.adsbygoogle || []).push({
-				google_ad_client: "ca-pub-4492401449039504",
-				enable_page_level_ads: true
-			});
-		</script> 
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

@@ -1,1 +1,0 @@
-curl "http://www.brapci.inf.br/index.php/roboti/cron/" --max-time 60

@@ -9,7 +9,7 @@
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/CodIgniter
-* @version     v0.20.05.06
+* @version     v0.20.05.21
 */
 
 /* 2020-01-24 function 2 e 3 */
@@ -2252,11 +2252,11 @@ class form {
                                 
                                 /* label */
                                 if (strlen($label) > 0) {
-                                    $tela .= $tdl . $label . ' ';
+                                    $tela .= '<td colspan="2">' . $label . '</td>';
                                 }
                                 if ($required == 1) { $tela .= ' <font color="red">*</font> ';
                                 }
-                                $tela .= '<TD>';
+                                $tela .= '<tr><td></td><TD>';
                                 //$tela .= form_radio($dados, $options, $vlr);
                                 $tela .= $form;
                             break;

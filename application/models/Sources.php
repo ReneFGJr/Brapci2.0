@@ -165,16 +165,16 @@ class sources extends CI_Model {
     }
 
     function button_harvesting_status() {
-        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting/999999') . '" class="btn btn-outline-secondary">';
+        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting/999999') . '">';
         $sx .= msg('button_harvesting_status');
-        $sx .= '</a>';
+        $sx .= '</a>&nbsp;|&nbsp;';
         return ($sx);
     }
 
     function button_harvesting_all() {
-        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting') . '" class="btn btn-outline-secondary">';
+        $sx = '&nbsp;<a href="' . base_url(PATH . 'journals/harvesting') . '" >';
         $sx .= msg('harvesting_all');
-        $sx .= '</a>';
+        $sx .= '</a>&nbsp;|&nbsp;';
         return ($sx);
     }
 
@@ -183,6 +183,7 @@ class sources extends CI_Model {
         array_push($cp, array('$H8', 'id_jnl', '', False, True));
         array_push($cp, array('$S100', 'jnl_name', msg('jnl_name'), False, True));
         array_push($cp, array('$S30', 'jnl_name_abrev', msg('jnl_name_abrev'), False, True));
+        array_push($cp, array('$O 0:No&1:Yes', 'jnl_historic', msg('jnl_historic'), True, True));
 
         array_push($cp, array('$A', '', msg('jnl_oai_title'), False, True));
         array_push($cp, array('$S100', 'jnl_url', msg('jnl_url'), False, True));
@@ -206,7 +207,9 @@ class sources extends CI_Model {
         $op .= '&2:' . msg('yes, without OAI');
         $op .= '&3:' . msg('No, finished');
         $op .= '&0:' . msg('canceled');
-        array_push($cp, array('$O 1:Yes', 'jnl_active', msg('active'), True, True));
+        array_push($cp, array('$O 1:Yes&0:No', 'jnl_active', msg('active'), True, True));
+        
+        
 
         return ($cp);
     }
@@ -261,27 +264,19 @@ class sources extends CI_Model {
     }    
 
     function button_new_issue($id = '') {
-        $sx = '';
-        $sx .= '<div class="row">';
-        $sx .= '<div class="col-1">';
-        $sx .= '<a href="#" class="btn btn-secondary" onclick="newwin(\''.base_url(PATH.'issue/new/'.$id).'\',800,600);">' . msg("new_issue") . '</a>';
-        $sx .= '</div>';
-        $sx .= '</div>' . CR;
+        $sx = ' | ';
+        $sx .= '<a href="#" onclick="newwin(\''.base_url(PATH.'issue/new/'.$id).'\',800,600);">' . msg("new_issue") . '</a> | ';
         return ($sx);
     }
 
     function button_new_sources($id = '') {
-        $sx = '';
-        $sx .= '<div class="row">';
-        $sx .= '<div class="col-1">';
+        $sx = ' | ';
         if (strlen($id) == 0) {
-            $sx .= '<a href="' . base_url(PATH . 'jnl_edit') . '" class="btn btn-secondary">' . msg("new_source") . '</a>';
+            $sx .= '&nbsp;<a href="' . base_url(PATH . 'jnl_edit') . '">' . msg("new_source") . '</a>&nbsp;|&nbsp;';
         } else {
-            $sx .= '<a href="' . base_url(PATH . 'jnl_edit/' . $id) . '" class="btn btn-secondary">' . msg("edit_source") . '</a>';
+            $sx .= '&nbsp;<a href="' . base_url(PATH . 'jnl_edit/' . $id) . '">' . msg("edit_source") . '</a>&nbsp;|&nbsp;';
         }
 
-        $sx .= '</div>';
-        $sx .= '</div>' . CR;
         return ($sx);
     }
 
@@ -295,27 +290,69 @@ class sources extends CI_Model {
         /**************************** MOUNT HTML ***********/
         $xlt = '';
         $xtp = '';
+        $it = 0;
+        $ii = 0;
         $sx = '<div class="col-12">' . CR;
-        $sx .= '<ol class="journals">';
+        $sx .= '<table style="width: 100%">';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $tp = $line['jnl_collection'];
             if ($tp != $xtp)
             {
-                $sx .= '</ol>';
+                $sx .= '<tr><th colspan=5><br/>';
                 $sx .= '<h1>'.msg('collection_'.$tp).'</h1>';
-                $sx .= '<ol class="journals">';
+                $sx .= '</th></tr>';
                 $xtp = $tp;
+                $ii = 0;
             }
             $lt = substr(UpperCaseSql($line['jnl_name']),0,1);
             if ($lt != $xlt)
             {
                 $xlt = $lt;
-                $sx .= '<h5>-'.$lt.'-</h5>';
+                $sx .= '<tr><th>';
+                $sx .= '<h5>'.$lt.'</h5>';
+                $sx .= '</th></tr>';
             }
-            $sx .= '<li>' . $this -> jnl_name($line) .'</li>';
+            $it++;
+            $sx .= '<tr style="border-top: 1px solid #ccc;">';
+            $sx .= '<td></td>';
+            $sx .= '<td>'.(++$ii).'.</td>';
+            $sx .= '<td>' . $this -> jnl_name($line) .'</td>';
+            $sx .= '<td>'.stodbr($line['jnl_oai_last_harvesting']).'</td>';
+
+            /*************** Status da Coleta */
+            $code = $line['jnl_oai_status'];
+            if ($code > 200)
+                {
+                    $status = '<span style="color: red" title="'.$this->oai_pmh->erros($code).'"><b>ERRO</b></span>';
+                } else {
+                    $status = '<span style="color: green"><b>OK</b></span>';
+                }
+
+            $hist = $line['jnl_historic'];
+            if ($hist == 1)
+                {
+                    $status = '<span style="color: blue"><b>Histórica</b></span>';
+                }
+
+            $sx .= '<td align="center">'.$status.'</td>';
+
+            /******************************/
+            $to = $line['jnl_oai_to_harvesting'];
+            $link = '<a href="'.base_url(PATH.'jnl/'.$line['id_jnl']).'">';
+            $linka = '</a>';
+            if ($to > 0)
+                {
+                    
+                    $sx .= '<td align="center"><span style="color: red">'.$link.'+'.$to.$linka.'</span></td>';
+                } else {
+                    $sx .= '<td align="center">'.$link.'-'.$linka.'</td>';
+                }
+            
+            
+            $sx .= '</tr>';
         }
-        $sx .= '</ol>';
+        $sx .= '</table>';
         $sx .= '</div>' . CR;
         return ($sx);
     }

@@ -96,4 +96,3 @@
 00005$sw['nvivo'] = 'NVivo';
 00014$sw['construtivista'] = 'Pesquisa_construtivista';
 00023$sw['pesquisa construtivista'] = 'Pesquisa_construtivista';
-00020$sw['pesquisa qualitativa'] = 'Pesquisa_qualitativa';

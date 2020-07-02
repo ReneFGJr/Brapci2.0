@@ -180,7 +180,7 @@ function check_dir($dir) {
     if (is_dir($dir)) {
         return (1);
     } else {
-        mkdir($dir);
+        mkdir($dir, 0777, true);
         $rlt = fopen($dir . '/index.php', 'w+');
         fwrite($rlt, '<TT>Acesso negado</tt>');
         fclose($rlt);

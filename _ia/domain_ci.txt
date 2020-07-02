@@ -1,3 +1,4 @@
+00011$sw['sociometria'] = 'Sociometria';
 00022$sw['experiencia de usuario'] = 'Experiência_do_usuário';
 00023$sw['experiencia de usuarios'] = 'Experiência_do_usuário';
 00025$sw['experiencias dos usuarios'] = 'Experiência_do_usuário';
@@ -1573,4 +1574,3 @@
 00005$sw['aacr1'] = 'Código_de_Catalogação_Anglo-Americano';
 00006$sw['aacr2.'] = 'Código_de_Catalogação_Anglo-Americano';
 00006$sw['aacr2r'] = 'Código_de_Catalogação_Anglo-Americano';
-00037$sw['codigo de catalogacao anglo-americano'] = 'Código_de_Catalogação_Anglo-Americano';
