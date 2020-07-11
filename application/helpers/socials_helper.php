@@ -222,7 +222,12 @@ class socials {
         $CI = &get_instance();
         if (strlen($id) == 0)
         {
-            $id = round($_SESSION['id']);
+            if (isset($_SESSION['id']))
+            {
+                $id = round($_SESSION['id']);
+            } else {
+                $id = 0;
+            }
         }
         $dt = $this->le($id);
         if (count($dt) == 0)
@@ -1015,13 +1020,16 @@ class socials {
             $dt = $this->le($dt);
         }
         $sx = '<div class="row">';
-        $sx .= '<div class="col-2">';
-        $sx .= '</div>';
+        $sx .= '<div class="col-2"></div>';
         $sx .= '<div class="col-8">';
         $sx .= '<h2>'.$dt['us_nome'].'</h2>';
         $sx .= '<h6>'.msg('login').': <b>'.$dt['us_login'].'</b></h6>';
-        $sx .= '<cnt/>';
         $sx .= '</div>';
+        
+        if (strlen($dt['us_perfil_check']) == 0)
+        {
+            $this->update_perfil_check($dt);
+        }
         
         $sx .= '<div class="col-2">';
         if ($dt['us_ativo'] == 1)
@@ -1029,7 +1037,13 @@ class socials {
             $sx .= '<span class="btn btn-success fluid">'.msg('active').'</span>';
         }
         $sx .= '</div>';
+        /***************** */
+        $sx .= '<div class="col-2"></div>';
+        $sx .= '<div class="col-8">';
+        $sx .= 'API Access: <tt><span style="color: blue; weigth: bold;">'.md5($dt['us_perfil_check']).'</span></tt>';
         $sx .= '</div>';
+        
+        $sx .= '</div>';        
         return($sx);
     }
     
@@ -1040,18 +1054,18 @@ class socials {
         $CI = &get_instance();
         $sx = '';
         $sx .= '<li><a href="'.base_url(PATH.'social/email/test/confirm').'">'.msg('email_test_confirm').'</a></li>';
-
+        
         switch ($d1)
-            {
-                case 'confirm':
+        {
+            case 'confirm':
                 $CI->load->helper('email');
                 $para = 'renefgj@gmail.com';
                 $assunto = 'e-mail de teste';
                 $texto = 'teste de e-mail';
                 $de = 1;
                 echo email($para, $assunto, $texto, $de);
-                break;
-            }
+            break;
+        }
         return($sx);
     }
 }

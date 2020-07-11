@@ -7,6 +7,11 @@ class Api_brapci extends CI_model
 			$dt['error'] = 0;
 			switch($act)
 			{
+				case 'dialogflow':
+				$this->load->model('GoogleDialogFlow');
+				$dt = $this->GoogleDialogFlow->run($token);
+				break;
+
 				case 'genere':
 				$q = nbr_autor($q,7);
 				$this->load->model("Genero");

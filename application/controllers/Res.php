@@ -40,9 +40,12 @@ class res extends CI_Controller {
     }
     
     private function footer($data = array()) {
+        $this->load->model('GoogleDialogFlow');
         if ($data == 0) {
             $data = array('simple' => true);
         }
+        /* Google DialogFlow - IA - ChatBot*/
+        $data['complement'] = $this->GoogleDialogFlow->bot();
         $this -> load -> view('header/footer.php', $data);
     }
     
@@ -250,6 +253,9 @@ public function v($id,$fmt='') {
     $this -> load -> model('frad');
     $this -> load -> model('handle');
     $this -> load -> model('altmets');
+    $this -> load -> model('clicks');
+    
+    $this->clicks->click($id);
     
     $vv = $this -> frbr_core -> le_data($id);
     $data['meta'] = $vv;
@@ -396,7 +402,7 @@ public function v($id,$fmt='') {
         $this -> cab();
         $html = '';
         $data = array();
-        $data['content'] = '<style> div { border: 1px solid #000000; } </style>';
+        $data['content'] = '';
         
         if (strlen($act) == 0) {
             
@@ -1676,6 +1682,26 @@ function api($act='',$token='')
     $this->api_brapci->index($act,$token);
 }
 
+function bot()
+{ 
+    $this->cab();
 
+    
+    $this->load->model('GoogleDialogFlow');
 
+    /* Google DialogFlow - IA - ChatBot*/    
+    $data['content'] = '<h1>DialogFlow Brapci Bot</h1>';
+    $data['content'] .= $this->GoogleDialogFlow->bot();   
+    $data['content'] .= '<iframe
+    allow="microphone;"
+    width="350"
+    height="550"
+    src="https://console.dialogflow.com/api-client/demo/embedded/31e54c28-4130-4c99-9712-d3b330327b0a">
+</iframe>';
+    $data['title'] = '';
+    $this->load->view('content',$data); 
+
+    /* Footer */
+    $this->footer();
+}
 }

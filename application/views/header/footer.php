@@ -67,3 +67,10 @@
 
 </div>
 </div>
+
+<?php
+if (isset($complement))
+	{
+		echo $complement;
+	}
+?>

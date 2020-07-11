@@ -1545,11 +1545,11 @@ class oai_pmh extends CI_model {
         }
         if (strpos($s, 'No ')) { $nr = substr($s, strpos($s, 'No ') + 3, strlen($s));
         }
+        if (strpos($s, 'No. ')) { $nr = substr($s, strpos($s, 'No. ') + 4, strlen($s));
+        }
         if (strpos($s, 'Núm. ')) { $nr = substr($s, strpos($s, 'Núm. ') + 4, strlen($s));
         }
         if (strpos($s, 'NÚM. ')) { $nr = substr($s, strpos($s, 'NÚM. ') + 4, strlen($s));
-        }
-        if (strpos($s, 'No. ')) { $nr = substr($s, strpos($s, 'No. ') + 4, strlen($s));
         }
         if (strlen($nr) > 0) {
             if (strpos($nr, ',') > 0) { $nr = substr($nr, 0, strpos($nr, ','));
