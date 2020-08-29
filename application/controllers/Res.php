@@ -1327,8 +1327,9 @@ public function config($tools = '', $ac = '',$i1='',$i2='',$i3='') {
             case 'email' :
                 $tela .= '<h1>e-mail</h1>';
                 $this -> load -> helper('email');
-                enviaremail('renefgj@gmail.com', 'teste', 'teste');
-                
+                $email = 'renefgj@gmail.com';
+                echo 'Enviando para '.$email;
+                enviaremail($email, 'teste', 'teste');                
                 echo '===>' . $this -> email -> send();
             break;
             case 'class_export' :
@@ -1513,95 +1514,10 @@ function patent($ac = '', $pg = 0) {
 
 function bibliometric($ac = '') {
     $this -> load -> model("bibliometrics");
-    $dd1 = get("dd1");
-    $dd2 = get("dd2");
     $tela = '';
     $tela .= '<div class="row">';
     $tela .= '<div class="col-md-12">';
-    switch($ac) {
-        case 'cited_analyse':
-            if (strlen($dd1) == 0) {
-                $tela .= $this -> bibliometrics -> form_1();
-            } else {
-                $rst = $this -> bibliometrics -> cited_analyse($dd1);
-                $tela .= $this -> bibliometrics -> form_1();
-                $tela .= '<h4>' . msg('result') . '</h4>';
-                $tela .= $rst;
-            }            
-        break;
-        case 'csv_to_net' :
-            if (!(isset($_FILES['userfile']['tmp_name']))) {
-                $tela .= $this -> bibliometrics -> form_file(msg($ac));
-            } else {
-                $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
-                $rst = $this -> bibliometrics -> csv_to_net($txt);
-                $this -> bibliometrics -> download_file($rst, '.net');
-                return ('');
-            }
-        break;
-        case 'net_to_gephi' :
-            if (!(isset($_FILES['userfile']['tmp_name']))) {
-                $tela .= $this -> bibliometrics -> form_file(msg($ac));
-            } else {
-                $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
-                $rst = $this -> bibliometrics -> net_to_gephi($txt);                
-                return ('');
-            }
-        break;        
-        case 'csv_to_matrix' :
-            if (!(isset($_FILES['userfile']['tmp_name']))) {
-                $tela .= $this -> bibliometrics -> form_file(msg($ac));
-            } else {
-                $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
-                $rst = $this -> bibliometrics -> csv_to_matrix($txt);
-                $this -> bibliometrics -> download_file($rst);
-                return ('');
-            }
-        break;
-        case 'csv_to_matrix_ocorrencia' :
-            if (!(isset($_FILES['userfile']['tmp_name']))) {
-                $tela .= $this -> bibliometrics -> form_file(msg($ac));
-            } else {
-                $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
-                $rst = $this -> bibliometrics -> csv_to_matrix_ocorrencia($txt);
-                $this -> bibliometrics -> download_file($rst);
-                return ('');
-            }
-        break;                
-        case 'semicolon_to_list' :
-            if (strlen($dd1) == 0) {
-                $tela .= $this -> bibliometrics -> form_1();
-            } else {
-                $rst = $this -> bibliometrics -> semicolon_to_list($dd1);
-                $tela .= $this -> bibliometrics -> form_1();
-                $tela .= '<h4>' . msg('result') . '</h4>';
-                $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
-            }
-        break;
-        case 'remove_tags':
-            if ((strlen($dd1) == 0) or (strlen($dd1) == 0)) {
-                $tela .= $this -> bibliometrics -> form_1();
-            } else {
-                $rst = $this -> bibliometrics -> remove_tags($dd1, $dd2);
-                $tela .= $this -> bibliometrics -> form_1();
-                $tela .= '<h4>' . msg('result') . '</h4>';
-                $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
-            }            
-        break;
-        case 'change_to' :
-            if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
-                $tela .= $this -> bibliometrics -> form_2();
-            } else {
-                $rst = $this -> bibliometrics -> change_text_to($dd1, $dd2);
-                $tela .= $this -> bibliometrics -> form_2();
-                $tela .= '<h4>' . msg('result') . '</h4>';
-                $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
-            }
-        break;
-        
-        default :
-        $tela = $this -> bibliometrics -> tools_menu();
-    }
+    $tela .= $this->bibliometrics->index($ac);
     $this -> cab();
     $tela .= '</div>';
     $tela .= '</div>';

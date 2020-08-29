@@ -153,10 +153,10 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
             $real_sender = '-f brapcici@gmail.com';
 
             mail($to, $subject, $message, $headers, $real_sender);
-            break;              
+            break; 
+
             default:
             return($CI -> email -> send());
-            break;
         }
         return (1);
     } else {
@@ -165,22 +165,4 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
     }
 }
 
-
-function enviaremail_xx($para='') {
-
-    $this->load->library('email');
-    
-    $config = Array('protocol' => 'smtp', 'smtp_host' => 'ssl://smtp.googlemail.com', 'smtp_port' => 465, 'smtp_user' => 'brapcici@gmail.com', 'smtp_pass' => '448545ct', 'mailtype' => 'html', 'charset' => 'iso-8859-1');
-
-    $this -> load -> library('email', $config);
-    $this -> email -> from('brapcici@gmail.com', 'Brapci2.0');
-    $this -> email -> to('rene.gabriel@ufrgs.br');
-    $this -> email -> subject('Brapci 2.0');
-    $this -> email -> message("Mensagem");
-    if ($this -> email -> send()) {
-        $this -> load -> view('sucesso_envia_contato');
-    } else {
-        print_r($this -> email -> print_debugger());
-    }
-}
 ?>

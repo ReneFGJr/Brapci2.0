@@ -23,7 +23,7 @@ class article extends CI_Controller {
 
 		$db_public = 'brapc607_public.';
 		parent::__construct();
-		$this -> lang -> load("app", "portuguese");
+		$this -> lang -> load("brapci", "pt_br");
 		$this -> load -> library('form_validation');
 		$this -> load -> database();
 		$this -> load -> helper('form');

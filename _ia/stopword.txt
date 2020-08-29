@@ -70,6 +70,8 @@
 00003$sw['das'] = '[sw]';
 00003$sw['com'] = '[sw]';
 00003$sw['aos'] = '[sw]';
+00004$sw['seis'] = '[sw]';
+00004$sw['dois'] = '[sw]';
 00004$sw['that'] = '[sw]';
 00004$sw['with'] = '[sw]';
 00004$sw['what'] = '[sw]';
@@ -115,6 +117,9 @@
 00004$sw['dela'] = '[sw]';
 00004$sw['como'] = '[sw]';
 00003$sw['ate'] = '[sw]';
+00004$sw['tres'] = '[sw]';
+00005$sw['cinco'] = '[sw]';
+00005$sw['nesta'] = '[sw]';
 00005$sw['desta'] = '[sw]';
 00005$sw['dessa'] = '[sw]';
 00005$sw['assim'] = '[sw]';
@@ -171,6 +176,7 @@
 00005$sw['entre'] = '[sw]';
 00005$sw['deles'] = '[sw]';
 00005$sw['delas'] = '[sw]';
+00006$sw['quatro'] = '[sw]';
 00006$sw['within'] = '[sw]';
 00006$sw['embora'] = '[sw]';
 00006$sw['quadro'] = '[sw]';
@@ -225,6 +231,7 @@
 00006$sw['eramos'] = '[sw]';
 00007$sw['aqueles'] = '[sw]';
 00007$sw['aquelas'] = '[sw]';
+00007$sw['propria'] = '[sw]';
 00008$sw['consiste'] = '[sw]';
 00007$sw['atraves'] = '[sw]';
 00008$sw['anything'] = '[sw]';
@@ -278,4 +285,3 @@
 00014$sw['reconhecimento'] = '[sw]';
 00013$sw['consequencias'] = '[sw]';
 00014$sw['agradecimentos'] = '[sw]';
-00004$sw['[sw]'] = '[sw]';

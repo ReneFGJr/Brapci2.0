@@ -6,7 +6,7 @@ class clicks extends CI_Model
 
         function ip_locate($ip)
             {
-                $url = 'https://tools.keycdn.com/geo?host='$ip;
+                $url = 'https://tools.keycdn.com/geo?host='.$ip;
                 $url = 'https://tools.keycdn.com/geo.json?host=94.130.9.183';
                 $rsp = file_open($url);
 

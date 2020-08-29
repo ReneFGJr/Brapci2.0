@@ -281,6 +281,7 @@ class sources extends CI_Model {
     }
 
     function list_sources() {
+        $this->load->model("oai_pmh");
         $sql = "select * from " . $this -> table . " 
                             where jnl_active = 1
                             order by jnl_collection, jnl_name

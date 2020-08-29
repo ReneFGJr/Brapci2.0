@@ -170,8 +170,8 @@ $lang['mes_12'] = 'dez.';
 
 $lang['bibliometric_menu'] = 'Utilitários Bibliométricos e Tratamento de Texto';
 $lang['semicolon_to_list'] = 'Troca ponto e virgula (;) por Enter (CR)';
-$lang['csv_to_net'] = 'Converte .CSV para .NET (Pajek)';
-$lang['csv_to_matrix'] = 'Converte .CSV para Matriz de Correlação';
+$lang['csv_to_net'] = 'Converte .TXT para .NET (Pajek)';
+$lang['csv_to_matrix'] = 'Converte .TXT para Matriz de Correlação';
 
 $lang['bibliometric_tools'] = 'Ferramentas bibliometricas';
 $lang['hasAuthoresInfo'] = 'Separe um autor por linha, ou utilize o "ponto e virgula"';
@@ -204,3 +204,12 @@ $lang['summary_remissive'] = 'Remissivas do sistema';
 $lang['summary_oai'] = 'Coleta dos periódicos';
 
 $lang['artificial_inteligence'] = 'Inteligência Artificial';
+$lang['half_live'] = 'Meia vida';
+$lang['citation_index'] = 'Indicadores de citação';
+$lang['cited_analyse'] = 'Análise de citação (beta test)';
+$lang['Years'] = 'Anos';
+$lang['Not identify'] = 'Não identificado';
+$lang['text_to_process'] = 'Texto para processar';
+$lang['half_live_info'] = 'Insira aqui as referências para serem analisadas';
+$lang['result'] = 'Resultados';
+$lang['Not Identify'] = 'Não identificado';

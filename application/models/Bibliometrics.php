@@ -1,6 +1,111 @@
 <?php
 class bibliometrics extends CI_model {
     var $file_name = '';    
+    function index($ac)
+    {
+        $tela = '<h3>'.msg($ac).'</h3>';
+        $tela .= '<p>'.msg($ac.'_info').'</p>';
+        $dd1 = get("dd1");
+        $dd2 = get("dd2");
+        switch($ac) {
+            case 'half_live':
+                if (strlen($dd1) == 0) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> half_live($dd1);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= $rst;
+                }            
+            break;            
+            case 'cited_analyse':
+                if (strlen($dd1) == 0) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> cited_analyse($dd1);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= $rst;
+                }            
+            break;
+            case 'csv_to_net' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                    $rst = $this -> bibliometrics -> csv_to_net($txt);
+                    $this -> bibliometrics -> download_file($rst, '.net');
+                    exit;
+                    return ('');
+                }
+            break;
+            case 'net_to_gephi' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                    $rst = $this -> bibliometrics -> net_to_gephi($txt);   
+                    exit;             
+                    return ('');
+                }
+            break;        
+            case 'csv_to_matrix' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                    $rst = $this -> bibliometrics -> csv_to_matrix_ocorrencia($txt);
+                    $this -> bibliometrics -> download_file($rst);
+                    exit;
+                    return ('');
+                }
+            break;
+            case 'csv_to_matrix_ocorrencia' :
+                if (!(isset($_FILES['userfile']['tmp_name']))) {
+                    $tela .= $this -> bibliometrics -> form_file(msg($ac));
+                } else {
+                    $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
+                    $rst = $this -> bibliometrics -> csv_to_matrix_ocorrencia($txt);
+                    $this -> bibliometrics -> download_file($rst);
+                    return ('');
+                }
+            break;                
+            case 'semicolon_to_list' :
+                if (strlen($dd1) == 0) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> semicolon_to_list($dd1);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }
+            break;
+            case 'remove_tags':
+                if ((strlen($dd1) == 0) or (strlen($dd1) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> remove_tags($dd1, $dd2);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }            
+            break;
+            case 'change_to' :
+                if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_2();
+                } else {
+                    $rst = $this -> bibliometrics -> change_text_to($dd1, $dd2);
+                    $tela .= $this -> bibliometrics -> form_2();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }
+            break;
+            
+            default :
+            $tela = $this -> bibliometrics -> tools_menu();
+        }
+        return($tela);            
+    }
     function tools_menu()
     {
         $sx = '';
@@ -20,7 +125,7 @@ class bibliometrics extends CI_model {
         $sx .= msg('csv_to_net');
         $sx .= '</a>';
         $sx .= '</li>';
-
+        
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/net_to_gephi').'">';
         $sx .= msg('net_to_gephi');
@@ -52,15 +157,68 @@ class bibliometrics extends CI_model {
         $sx .= '</li>';  
         
         $sx .= '<li>';
+        $sx .= '<b>'.msg('citation_index').'</b>';
+        $sx .= '<ul>';
+        $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/cited_analyse').'">';
         $sx .= msg('cited_analyse');
         $sx .= '</a>';
+        $sx .= '</li>';
+        /* Half Live */
+        $sx .= '<li>';
+        $sx .= '<a href="'.base_url(PATH.'bibliometric/half_live').'">';
+        $sx .= msg('half_live');
+        $sx .= '</a>';
+        $sx .= '</li>';
+        
+        $sx .= '</ul>';
         $sx .= '</li>';                       
         
         $sx .= '</ul>';
         $sx .= '</div>';
         $sx .= '</div>';
         return($sx);
+    }
+    function half_live($d1)
+    {
+        $sx = troca($d1,';','.,');
+        $sx = troca($sx,chr(13),';');
+        $sx = troca($sx,chr(10),';');
+        $ln = splitx(';',$sx);
+        $rst = '';
+        $mr = '';
+        for ($y=1900;$y < date("Y")+1;$y++)
+        {
+            for ($r=0;$r < count($ln);$r++)
+            {
+                $lns = $ln[$r];
+                if (strpos($lns,(string)$y) > 0)
+                {
+                    $ln[$r] = "";
+                    $rst .= $y.cr();
+                    if (strlen($mr) > 0) { $mr .= ', '; }
+                    $mr .= ''.$y.'';
+                }                            
+            }
+        }
+        $rsn = '';
+        for ($r=0;$r < count($ln);$r++)
+        {
+            if (strlen($ln[$r]) > 0)
+                {
+                    $rsn .= $ln[$r].cr();
+                }
+        }
+        $rt = '<table class="table">'.cr();
+        $rt .= '<tr><td width="20%">'.msg('Years').'</td>
+        <td><textarea style="widtH: 100%; height: 400px;" name="year" id="years">'.$rst.'</textarea></td></tr>';
+        $rt .= '<tr><td width="20%">'.msg('R Script').'</td>';
+        $rt .= '<td>years <- c('.$mr.')</td>';
+        $rt .= '</tr>';
+        $rt .= '<tr><td width="20%">'.msg('Not Identify').'</td>
+        <td><textarea style="widtH: 100%; height: 400px;" name="year" id="years">'.$rsn.'</textarea></td></tr>';
+        $rt .= '</table>';
+        return($rt);
     }
     function remove_tags($d1)
     {
@@ -92,7 +250,7 @@ class bibliometrics extends CI_model {
         $cp = array();
         array_push($cp,array('$H8','','',False,False));
         array_push($cp,array('$T80:10','',msg('text_to_process'),True,True));
-        array_push($cp,array('$B8','',msg('process'),False,True));
+        array_push($cp,array('$B8','',msg('process'),False,True));        
         $sx = $form->editar($cp,'');
         return($sx);
     }
@@ -179,84 +337,86 @@ class bibliometrics extends CI_model {
         }
         return($tx);
     }
-
+    
     function net_to_gephi($txt)
     {
         $sx = '';
-            $sx .= '<pre>';
-            $sx .= $txt;
-            $sx .= '</pre>';
-
-            $ln = troca($txt,chr(13),'#');
-            $ln = splitx('#',$ln);
-
-            $nodes = array();
-            $edges = array();
-            $n = 0;
-            $e = 0;
-            for ($r=0;$r < count($ln);$r++)
+        $sx .= '<pre>';
+        $sx .= $txt;
+        $sx .= '</pre>';
+        
+        $ln = troca($txt,chr(13),'#');
+        $ln = splitx('#',$ln);
+        
+        $nodes = array();
+        $edges = array();
+        $n = 0;
+        $e = 0;
+        for ($r=0;$r < count($ln);$r++)
+        {
+            $cmd = substr($ln[$r],0,2);
+            if (($n == 1) and ($cmd != '*E'))
+            {
+                $nr = substr($ln[$r],0,strpos($ln[$r],' '));
+                $name = substr($ln[$r],strlen($nr)+2,1000);
+                $char = ' ';
+                if (strpos($name,'"') > 0) { $char = '"'; }
+                $name = substr($name,0,strpos($name,$char));
+                array_push($nodes,array($nr,$name));
+            }
+            
+            if ($e == 1)
+            {
+                $ll = troca($ln[$r],' ',';'); 
+                $lla = splitx(';',$ll);
+                if (count($lla) == 3)
                 {
-                    $cmd = substr($ln[$r],0,2);
-                    if (($n == 1) and ($cmd != '*E'))
-                        {
-                            $nr = substr($ln[$r],0,strpos($ln[$r],' '));
-                            $name = substr($ln[$r],strlen($nr)+2,1000);
-                            $char = ' ';
-                            if (strpos($name,'"') > 0) { $char = '"'; }
-                            $name = substr($name,0,strpos($name,$char));
-                            array_push($nodes,array($nr,$name));
-                        }
-
-                   if ($e == 1)
-                        {
-                            $ll = troca($ln[$r],' ',';'); 
-                            $lla = splitx(';',$ll);
-                            if (count($lla) == 3)
-                                {
-                                    array_push($edges,$lla);
-                                }
-                        }
-                    if ($cmd == '*V')
-                        {
-                            $n = 1;
-                            $e = 0;
-                        }
-                    if ($cmd == '*E')
-                        {
-                            $n = 0;
-                            $e = 1;
-                        }                    
+                    array_push($edges,$lla);
                 }
-            $sx = '';            
-            $sx .= 'graph'.cr();
-            $sx .= '['.cr();
-            $sx .= '    Creator "Brapci '.date("Y-m-d H:i:s").'"'.cr();
-            for ($r=0;$r < count($nodes);$r++)
-                {
-                    $sx .= '    node'.cr();
-                    $sx .= '    ['.cr();
-                    $sx .= '        id '.$nodes[$r][0].cr();
-                    $sx .= '        label "'.$nodes[$r][1].'"'.cr();
-                    $sx .= '    ]'.cr();
-                }
-            $sx .= '********** FILE2 ************'.cr();
-            $sx .= 'Source,Target,Type,Weight'.cr();
-            for ($r=0;$r < count($edges);$r++)
-                {
-                    $sx .= '    edge'.cr();
-                    $sx .= '    ['.cr();
-                    $sx .= "        source ".$edges[$r][0].cr();
-                    $sx .= "        target ".$edges[$r][1].cr();
-                    $sx .= "        value ".$edges[$r][2].cr();
-                    $sx .= '    ]'.cr();
-                }
+            }
+            if ($cmd == '*V')
+            {
+                $n = 1;
+                $e = 0;
+            }
+            if ($cmd == '*E')
+            {
+                $n = 0;
+                $e = 1;
+            }                    
+        }
+        $sx = '';            
+        $sx .= 'graph'.cr();
+        $sx .= '['.cr();
+        $sx .= '    Creator "Brapci '.date("Y-m-d H:i:s").'"'.cr();
+        for ($r=0;$r < count($nodes);$r++)
+        {
+            $sx .= '    node'.cr();
+            $sx .= '    ['.cr();
+            $sx .= '        id '.$nodes[$r][0].cr();
+            $sx .= '        label "'.$nodes[$r][1].'"'.cr();
+            $sx .= '    ]'.cr();
+        }
+        $sx .= '********** FILE2 ************'.cr();
+        $sx .= 'Source,Target,Type,Weight'.cr();
+        for ($r=0;$r < count($edges);$r++)
+        {
+            $sx .= '    edge'.cr();
+            $sx .= '    ['.cr();
+            $sx .= "        source ".$edges[$r][0].cr();
+            $sx .= "        target ".$edges[$r][1].cr();
+            $sx .= "        value ".$edges[$r][2].cr();
+            $sx .= '    ]'.cr();
+        }
         $this -> bibliometrics -> download_file($sx, '.gml');
         return($sx);
     }    
     
     function csv_to_net($txt)
     {
+        set_time_limit(3600);
         $txt = $this->trata($txt);
+        $txt = troca($txt,'.,',';');
         $txt = troca($txt,';','£');
         $txt = troca($txt,chr(10),';');
         $txt = troca($txt,chr(13),';');
@@ -371,6 +531,7 @@ class bibliometrics extends CI_model {
     function csv_to_matrix_ocorrencia($txt)
     {
         $txt = $this->trata($txt);
+        $txt = troca($txt,'.,',';');
         $txt = troca($txt,';','£');
         $txt = troca($txt,chr(10),';');
         $txt = troca($txt,chr(13),';');
@@ -551,7 +712,7 @@ class bibliometrics extends CI_model {
         }
         return(';'.$sx);
     }
-
+    
     function trata($txt)
     {
         $txt = troca($txt,'; ',';');
@@ -673,7 +834,7 @@ class bibliometrics extends CI_model {
         
         /***************** Half Live *****************/        
         $sa .= '<div class="col-md-2 text-center">';
-        $sa .= msg('Half Live').'<br>';
+        $sa .= msg('Half Live').'-'.date("Y").'<br>';
         $sa .= '<span style="font-size: 250%">'.$this->halflive($years).'</span>';
         $sa .= '<br/><span class="font-size: 70%;">anos</span>';
         $sa .= '</div>';
@@ -734,7 +895,7 @@ class bibliometrics extends CI_model {
     
     function is_proceedings($txt)
     {
-        $bc = array('Anais...','Actas...');
+        $bc = array('Anais...','Actas...','Proceedings...','Proceedings [...]');
         $ct = 0;
         for ($r=0;$r < count($bc);$r++)
         {
@@ -753,7 +914,7 @@ class bibliometrics extends CI_model {
     
     function is_tese_dissertacao($txt)
     {
-        $bc = array(' Tese',' Dissertação');
+        $bc = array(' Tese',' Dissertação','Tesis','(Doctorado)');
         $ct = 0;
         for ($r=0;$r < count($bc);$r++)
         {
@@ -829,7 +990,7 @@ class bibliometrics extends CI_model {
     
     function recover_year($txt)
     {
-        $bc = array('Acesso em','Disponível em','DOI:');
+        $bc = array('Acesso em','Disponível em','DOI:','Disponible en:','Acceso en:');
         for ($r=0;$r < count($bc);$r++)
         {
             if (strpos($txt,$bc[$r]))
@@ -854,7 +1015,7 @@ class bibliometrics extends CI_model {
         $nr = '<span class="alert">ERRO</span>';
         return($nr);
     }     
-
+    
     /******************************** Painel Bibliometrico */       
     function metrics_basket()
     {
