@@ -319,6 +319,11 @@ function message($l,$t=0)
 {    
     $sx = '';
     $cl = array('success','primary','secondary','danger','warning','info','light','dark');
+    if (!isset($cl[$t]))
+        {
+            $t = 3;
+            $l = 'General Fail';
+        }
     $class = "alert-".$cl[$t];
     $sx .= '</br>
     <div class="alert '.$class.'" role="alert">

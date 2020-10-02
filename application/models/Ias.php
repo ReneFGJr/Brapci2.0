@@ -56,29 +56,61 @@ class Ias extends CI_model
 			$file = '_ia/domain_datas.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';			
-
+			
 			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';			
 			$file = '_ia/domain_datas_g.txt';
 			$this->gerate_dates($file);
 		}
+		$this->create_domain();
 		return($sx);
 	}
-
-	function gerate_dates($file='')
+	
+	function create_domain()
+	{
+		$fl = fls('_ia');
+		$term = array();
+		
+		for ($r=0;$r < count($fl);$r++)
 		{
-			$sx = '';
-			$i = mktime(0,0,0,0,1,0);
-			$d = mktime(0,0,0,1,1,1950);
-			//00007$sw['anos 80'] = 'Década_1980';
-			for($r=0;$r < 365;$r++)
+			$ft = $fl[$r][2];
+			$ext = substr($ft,strlen($ft)-4,4);
+			if ($ext == '.txt')
 			{
+				$file = $fl[$r][2];
+				$handle = fopen($file, "r");
+				if ($handle) {
+					while (($line = fgets($handle)) !== false) {
+						array_push($term,$line);
+					}					
+					fclose($handle);
+				}				
+			}
+		}
+		sort($term);
+		$txt = '';
+		for($r=(count($term)-1);$r >= 0;$r--)
+		{
+			$t = $term[$r];
+			$t = substr($t,5,strlen($t));
+			$txt .= $t.chr(10);
+		}
+		file_put_contents('_ia/domain.sw',$txt);
+	}
+	
+	function gerate_dates($file='')
+	{
+		$sx = '';
+		$i = mktime(0,0,0,0,1,0);
+		$d = mktime(0,0,0,1,1,1950);
+		//00007$sw['anos 80'] = 'Década_1980';
+		for($r=0;$r < 365;$r++)
+		{
 			$sa = date("d/m/Y",$d);
 			$sx = date("Ymd",$d);
 			$sx .= strzero(strlen($sx),5).'$sx[\''.$sa.'\'] = \'[D'.$sx.']\';'.cr();
 			$d = $d + 60*60*24;
-			echo $sx.'<br>';
-			}
 		}
+	}
 	
 	function services()
 	{
@@ -119,7 +151,7 @@ class Ias extends CI_model
 				{
 					case 'analyse':
 						$vv = $this -> frbr_core -> le_data($d2);
-						$sx = $this->ias->v($vv);					
+						$sx = $this->ias->nlp_v($vv);					
 					break;
 					
 					default:
@@ -156,21 +188,21 @@ function nlp($d1='',$d2='',$d3='')
 }
 
 function submit_accept($txt)
+{
+	$this->gerate_dates();
+	
+	/* IA POR REGRAS */
+	$w = array('Aceito:');
+	$r = 0;
+	while (strpos($txt,$w[$r]) > 0)
 	{
-		$this->gerate_dates();
-
-		/* IA POR REGRAS */
-		$w = array('Aceito:');
-		$r = 0;
-		while (strpos($txt,$w[$r]) > 0)
-			{
-				$i = strpos($txt,$w[$r]);
-				$f = trim(substr($txt,$i,30));
-				$f = substr($f,0,strpos($f,' '));
-				echo '=>'.$i.'-'.$f;
-				$txt = '';
-			}
+		$i = strpos($txt,$w[$r]);
+		$f = trim(substr($txt,$i,30));
+		$f = substr($f,0,strpos($f,' '));
+		echo '=>'.$i.'-'.$f;
+		$txt = '';
 	}
+}
 
 function nlp_process($t)
 {
@@ -324,7 +356,7 @@ $txt = troca($txt,' > ',' ');
 return($txt);
 }
 
-function v($d)
+function nlp_v($d)
 {
 	$this->check();
 	$rdf = new rdf;
@@ -332,12 +364,11 @@ function v($d)
 	$file = troca($vv[0],'.pdf','.txt');
 	if (file_exists($file))
 	{
-		$txt = $this->file_get($file);
-		$txt = '<tt>'.$txt.'</tt>';
-		
-		$txt = $this->nlp_words($txt).cr().$txt;
+		$txtf = $this->file_get($file);
+		//$txt = '<tt>'.$txtf.'</tt>';		
+		$txt = $this->nlp_words($txtf).cr();
 	} else {
-		$txt = message(1,msg('File not found'));
+		$txt = message(msg('File not found').' '.$file,3);
 	}
 	return($txt);
 }
@@ -391,25 +422,7 @@ function icone($i,$v=0,$id)
 		
 		/************************************ Busca termos **************/		
 		/* recupera Domínio da CI */
-		$ts = '';
-		$ts .= file_get_contents('_ia/domain_universidades.txt');
-		$ts .= file_get_contents('_ia/domain_instituicoes.txt');
-		$ts .= file_get_contents('_ia/domain_areas_do_conhecimento.txt');
-		$ts .= file_get_contents('_ia/domain_ci.txt');
-		$ts .= file_get_contents('_ia/domain_methodology.txt');
-		$ts .= file_get_contents('_ia/domain_isko.txt');
-		$ts .= file_get_contents('_ia/domain_datas.txt');
-		$ts = splitx(';',$ts);
-		sort($ts);
-		
-		$domains = '';
-		for($r=(count($ts)-1);$r >= 0;$r--)
-		{
-			$key = $ts[$r];
-			$domains .= substr($key,5,strlen($key)).';'.cr();
-			//$w .= $key.';'.cr();
-		}
-		file_put_contents('_ia/domain.txt', $domains);
+		$domains = file_get_contents('_ia/domain.sw');
 		$sw = array();
 		eval($domains);
 		
@@ -431,58 +444,23 @@ function icone($i,$v=0,$id)
 		$t1 = troca($t1,'*',' * ');
 		$t1 = troca($t1,'‘'," ' ");
 		$t1 = troca($t1,'’'," ' ");
+		$t1 = LowerCaseSQL($t1);
 		//echo '<tt style="color: green;">'.$t1.'</tt>';
 		
 		foreach ($sw as $key => $value) {
-			$t1 = troca($t1,' '.$key.' ',' ['.$value.'] ');
-			/*
-			while (strpos($t1,$key.' ') > 0)
-			{
-				$pos = strpos($t1,$key.' ');
-				$t1 = substr($t1,0,$pos).'['.$value.']'.substr($t1,$pos+strlen($key),strlen($t1));
-			}
-			*/
+			//$t1 = troca($t1,' '.$key.' ',' ['.$value.'] ');
+			$t1 = str_replace(array(' '.$key.' '),array(' ['.$value.'] '),$t1);
 		}
 		$t1 = troca($t1,' . ','.');
 		
-		//echo '<tt style="color: red;">'.$txt.'</tt>';
+		echo '<tt style="color: red;">'.$t1.'</tt>';
 		
 		/* Separa as palavras */
 		$t = $this->limpa_text($t1);
 		$t = troca($t,' ',';');
-		$w = splitx(';',$t);
+		$wd = splitx(';',$t);
 		
 		/******************************************* STOP WORDS */
-		
-		/* recupera stop words */
-		$ic_stopword = file_get_contents('_ia/stopword.txt');
-		for ($r=0;$r <=9;$r++)
-		{
-			$ic_stopword = troca($ic_stopword,$r,'');
-		}
-		eval($ic_stopword);
-		
-		/* Gera lista de palavras */
-		$wd = array();
-		for ($r=0;$r < count($w);$r++)
-		{
-			$key = $w[$r];			
-			if (!isset($sw[$key]) and (strlen($key) > 1))
-			{
-				if (isset($wd[$key]))
-				{
-					$wd[$key] = 1 + $wd[$key];
-				} else {
-					$wd[$key] = 1;
-				}
-			}
-		}
-		
-		
-		echo '<tt style="color: green;">'.$t1.'</tt>';
-		
-		
-		/************************************************/
 		$qt = array();
 		foreach ($wd as $key => $value) {
 			array_push($qt,strzero($value,5).$key);

@@ -71,4 +71,32 @@ function png2jpg($originalFile, $outputFile, $quality) {
 	imagejpeg($image, $outputFile, $quality);
 	imagedestroy($image);
 }
+
+function fls($dir,$tp='')
+{
+    $files = scandir($dir);
+    $f = array();
+    foreach($files as $id => $file)
+    {
+        $fls = $dir.'/'.$file;
+        if (is_dir($fls))
+        {
+            if (($tp == '') or ($tp == 'D'))
+            {
+                array_push($f,array($dir,$file,$fls,'D'));
+            }
+        } else {
+            if (file_exists($fls))
+            {
+                if (($tp == '') or ($tp == 'F'))
+                {
+                    array_push($f,array($dir,$file,$fls,'F'));
+                }
+            } else {
+                echo "OPS ".$fls;
+            }    
+        }
+    }
+    return($f);
+}
 ?>

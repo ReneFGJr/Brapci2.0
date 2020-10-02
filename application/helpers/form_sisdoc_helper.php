@@ -9,7 +9,7 @@
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/CodIgniter
-* @version     v0.20.05.21
+* @version     v0.20.09.24
 */
 
 /* 2020-01-24 function 2 e 3 */
