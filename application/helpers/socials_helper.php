@@ -1010,7 +1010,13 @@ class socials
         $sx .= '<th>Atribuído</th>';
         $sx .= '<th>Ação</th>';
         $sx .= '</tr>';
-        $nivel = $_SESSION['nivel'];
+        if (isset($_SESSION['nivel']))
+        {
+            $nivel = $_SESSION['nivel'];
+        } else {
+            $_SESSION['nivel'] = 0;
+            $nivel = 0;
+        }
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $sx .= '<tr>';

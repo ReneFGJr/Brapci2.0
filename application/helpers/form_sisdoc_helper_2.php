@@ -501,6 +501,7 @@ function row2($par=array())
         $where 
         $order
         $limit ";
+        
 
         /************************* EXECUTA QUERY *************/
         $rlt = $CI->db->query($sql);
