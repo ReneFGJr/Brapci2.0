@@ -922,14 +922,21 @@ class articles extends CI_model {
 	}
 
 	function pdf_register($id, $type) {
-		$session = $_SESSION['bp_session'];
+		if (isset($_SESSION['bp_session']))
+			{
+				$session = $_SESSION['bp_session'];
+			} else {
+				$session = date("YmdHis");
+				$_SESSION['bp_session'] = $session;
+			}
+		
 		$ip = ip();
 		$sql = "insert into pdf_download 
 						(
 						pdf_ip, pdf_id, pdf_session, pdf_session_type
 						) values (
 						'$ip','$id','$session','$type')	";
-		$this -> db -> query($sql);
+		//$this -> db -> query($sql);
 	}
     function retrieve_keywords($id, $idioma = 'pt_BR') {
         $sql = "select * from brapc607_base.brapci_article_keyword

@@ -32,6 +32,11 @@ class article extends CI_Controller {
 		$this -> load -> helper('url');
 		$this -> load -> library('session');
 
+        /* Language */
+        $this -> load -> helper('language');
+        $language = new language;
+        $this -> lang -> load("brapci", $language->language());		
+
 		date_default_timezone_set('America/Sao_Paulo');
 	}
 
