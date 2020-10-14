@@ -725,39 +725,8 @@ function LowerCase($term) {
 }
 
 function LowerCaseSQL($term) {
-    $n = $term;
-    $type = mb_detect_encoding($n, "auto");
-    $term = mb_strtolower($term);
-    
-    $term = troca($term, 'ã', 'a');
-    $term = troca($term, 'á', 'a');
-    $term = troca($term, 'à', 'a');
-    $term = troca($term, 'ä', 'a');
-    $term = troca($term, 'â', 'a');
-    
-    $term = troca($term, 'é', 'e');
-    $term = troca($term, 'è', 'e');
-    $term = troca($term, 'ë', 'e');
-    $term = troca($term, 'ê', 'e');    
-    
-    $term = troca($term, 'í', 'i');
-    $term = troca($term, 'ì', 'i');
-    $term = troca($term, 'ï', 'i');
-    $term = troca($term, 'î', 'i');
-    
-    $term = troca($term, 'õ', 'o');
-    $term = troca($term, 'ó', 'o');
-    $term = troca($term, 'ò', 'o');
-    $term = troca($term, 'ö', 'o');
-    $term = troca($term, 'ô', 'o');
-    
-    $term = troca($term, 'ú', 'u');
-    $term = troca($term, 'ù', 'u');
-    $term = troca($term, 'ü', 'u');
-    $term = troca($term, 'û', 'u');
-    
-    $term = troca($term, 'ç', 'c');
-    
+    $term = ascii($term);
+    $term = mb_strtolower($term);    
     return ($term);
 }
 

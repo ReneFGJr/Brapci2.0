@@ -1,3 +1,4 @@
+00017$sw['teoria dos grafos'] = 'Teoria_dos_grafos';
 00012$sw['quali-quanti'] = 'Quali-quantitativa';
 00017$sw['qualiquantitativa'] = 'Quali-quantitativa';
 00018$sw['quali-quantitativa'] = 'Quali-quantitativa';
@@ -96,3 +97,4 @@
 00005$sw['nvivo'] = 'NVivo';
 00014$sw['construtivista'] = 'Pesquisa_construtivista';
 00023$sw['pesquisa construtivista'] = 'Pesquisa_construtivista';
+00020$sw['pesquisa qualitativa'] = 'Pesquisa_qualitativa';

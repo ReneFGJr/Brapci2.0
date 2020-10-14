@@ -1,7 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-global $lang;
-
 /**
 * CodeIgniter RDF Helpers
 *
@@ -20,6 +18,7 @@ ALTER TABLE `rdf_form_class` ADD `sc_gropup` VARCHAR(20) NOT NULL AFTER `sc_ativ
 class rdf
 {
 	var $limit = 10;
+	var $image_dir = '_repository/img/';
 	function __construct()
 	{
 		global $msg;
@@ -40,52 +39,21 @@ class rdf
 		$msg['check_form'] = 'Checar formulário';
 		$msg['form_text'] = 'Informe o texto';
 	}
-
-	function name_standardization($name)
-		{
-			$n1 = strtolower($name);
-			$n = '';
-			$cp = 1;
-			for ($r=0;$r < strlen($n1);$r++)
-				{
-					$c = substr($n1,$r,1);
-					switch($c)
-						{
-							case '-':
-								$c= '';
-								$cp = 2;
-								break;
-							case '':
-								$c= '';
-								$cp = 2;
-								break;								
-						}
-					if ($cp == 1) { $c = strtoupper($c); }
-					$cp--;						
-					$n .= $c;
-				}
-			return($n);
-		}
 	
-	function index($link,$path,$id,$id2,$id3)
+	function index($link='',$path='',$id='',$id2='',$id3='')
 	{        
 		
 		$dt = array();
 		$sx = '';
 		switch($path)
 		{
-			case 'id':
-				$this->rdf_export($id);
-				exit;
-			break;			
-			
-			case 'xml':
-				$this->rdf_export($id);
-				exit;
-			break;		
-			
 			case 'text':
 				$sx = $this->text_edit($id);
+			break;
+			
+			case 'image_upload':
+				$sx  = $this->image_save($id,$id2);
+				return($sx);
 			break;
 			
 			case 'form':
@@ -628,22 +596,6 @@ function show($dt)
 	return($sx);
 }
 
-function show_values($s)
-	{
-		if (is_array($s))
-			{
-				$sx = '';
-				for ($r=0;$r < count($s);$r++)
-					{
-						if (strlen($sx) > 0) { $sx .= '; '; }
-						$sx .= $s[$r];						
-					}
-					$sx .= '.';
-			} else {
-				return($s);
-			}
-	}
-
 function extract_id($dt,$class,$id=0)
 {
 	$rs = array();
@@ -660,10 +612,6 @@ function extract_id($dt,$class,$id=0)
 			array_push($rs,$idr);
 		}
 	}
-	if (count($rs) == 1)
-		{
-			$rs = $rs[0];
-		}	
 	return($rs);
 }
 
@@ -678,26 +626,18 @@ function extract_content($dt,$class,$id=0)
 			array_push($rs,$dt[$r]['n_name']);
 		}
 	}
-	if (count($rs) == 1)
-		{
-			$rs = $rs[0];
-		}
 	return($rs);
 }	
-
 
 function show_data($r) {
 	$CI = &get_instance();
 	if (strlen($r) == 0) {
 		return ('');
 	}
-	/* Monitoramento */
-	$sx = '<style>div {border: 1px solid green;}</style>'.cr();
-	/* normal */
 	$sx = '';
 	$sx .= '<div class="container">';
 	$sx .= '<div class="row">';
-	$dt = $this->le($r);	
+	$dt = $this->le($r);
 	$class = $dt['c_class'];
 	
 	/****************************************** return if empty */
@@ -706,17 +646,9 @@ function show_data($r) {
 	}
 	/**************************************************** show **/
 	$line = $dt;
-	
-	$fcn = 'rdf_show_'.trim(lowercasesql($line['c_class']));
-	/* exportação */
-	$sx .= '<div class="col-md-12">';
-	$sx .= 'Export: ';
-	$sx .= '<a href="'.base_url(PATH.'rdf/xml/'.$r).'">RDF</a>';
-	$sx .= '</div>';
-	
+	$fcn = 'rdf_show_'.$line['c_class'];
 	if (function_exists($fcn))
 	{
-		
 		$fcn = '$sx .= '.$fcn.'($line);';
 		eval($fcn);
 	} else {			
@@ -734,7 +666,7 @@ function show_data($r) {
 	
 	
 	/*************************** Editar classe */
-	if (perfil("#ADM") > 0)
+	if (perfil("#ADM"))
 	{
 		$sx .= '<div class="col-md-12 small">';
 		$sx .= '| <a href="'.base_url(PATH).'">'.msg('return').' </a>';
@@ -844,23 +776,6 @@ function prefix($pre)
 	{
 		return(0);
 	}
-
-	if (sonumero($pre) == $pre)
-		{
-			$sql = "select * from rdf_prefix where id_prefix = '$pre' ";
-			$rlt = $CI -> db -> query($sql);
-			$rlt = $rlt -> result_array();
-			if (count($rlt) == 0)
-				{
-					return('[?'.$pre.']');
-				} else {
-					$line = $rlt[0];
-					$uri = trim($line['prefix_url']);
-					return($line['prefix_ref']);	
-				}
-
-		}
-
 	$sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
@@ -1524,9 +1439,6 @@ function form_check($class=0)
 		/* complementos */
 		switch($class) {
 			default :
-			/****
-			 * SQL Parte I
-			 */
 			$cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
 			$sqla = "select $cp from rdf_data as rdata
 			INNER JOIN rdf_class as prop ON d_p = prop.id_c 
@@ -1539,15 +1451,13 @@ function form_check($class=0)
 			LEFT JOIN rdf_concept as cpt ON d_r2 = id_cc 
 			LEFT JOIN rdf_name on d_literal = id_n
 			WHERE d_r1 = $id and d_r2 = 0";
-			/****
-			 * SQL Parte II
-			 */
+			/*****************/
 			$sql = "select * from rdf_form_class
 			INNER JOIN rdf_class as t0 ON id_c = sc_propriety
 			LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
 			LEFT JOIN rdf_class as t2 ON sc_propriety = t2.id_c
-			where sc_class = $class and sc_ativo = 1 
-			order by sc_ord, t0.c_order, id_sc ";		
+			where sc_class = $class 
+			order by sc_ord, id_sc, t0.c_order";
 			
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
@@ -1560,15 +1470,11 @@ function form_check($class=0)
 				$grp = $line['sc_group'];
 				if ($xgrp != $grp)
 				{
-					if ($r > 0)
-					{
-						$sx .= '</table></td></tr>';
-					}
-					$sx .= '<tr style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">';
-					$sx .= '<td colspan=3 class="top"  align="left" width="10%">';
+					$sx .= '<tr>';
+					$sx .= '<td colspan=3 class="middle" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;" align="center">';
 					$sx .= msg($grp);
 					$sx .= '</td>';
-					$sx .= '<td width="90%"><table>';
+					$sx .= '</tr>';
 					$xgrp = $grp;
 				}
 				
@@ -1586,20 +1492,20 @@ function form_check($class=0)
 				onclick="newxy(\''.$furl.'\',800,400);">';
 				$linka = '</a>';
 				$sx .= '<tr>';
-				$sx .= '<td width="25%" align="right" valign="top" style="padding: 10px;">';
+				$sx .= '<td width="25%" align="right" valign="top">';
 				
 				if ($xcap != $cap) {
 					$sx .= '<nobr><i>' . msg($line['c_class']) . '</i></nobr>';
-					$sx .= '<td width="1%" valign="top" style="padding: 10px;">' . $link . '[+]' . $linka . '</td>';
+					$sx .= '<td width="1%" valign="top">' . $link . '[+]' . $linka . '</td>';
 					$xcap = $cap;
 				} else {
 					$sx .= '&nbsp;';
-					$sx .= '<td style="padding: 10px;">&nbsp;</td>';
+					$sx .= '<td>-</td>';
 				}
 				$sx .= '</td>';
 				
 				/***************** Editar campo *******************************************/
-				$sx .= '<td style="padding: 10px;">';
+				$sx .= '<td style="border-bottom: 1px solid #808080;">';
 				if (strlen($line['n_name']) > 0) {
 					$linkc = '<a href="' . base_url(PATH . 'v/' . $line['idcc']) . '" class="middle">';
 					$linkca = '</a>';
@@ -1632,7 +1538,6 @@ function form_check($class=0)
 				$sx .= '</td>';
 				$sx .= '</tr>';				
 			}
-			$sx .= '</table></td></tr>';
 			$sx .= '</table>';
 		break;
 	}		
@@ -2219,7 +2124,7 @@ function class_view_form($id='')
 	$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc,
 	t1.c_class as c_class, t2.prefix_ref as prefix_ref,
 	t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref,
-	sc_group, sc_library, sc_ativo, sc_global
+	sc_group, sc_library
 	FROM rdf_form_class
 	INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
 	LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
@@ -2231,32 +2136,23 @@ function class_view_form($id='')
 	AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
 	order by sc_ord";
 	
+	echo $sql;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();	
 	$sx = '<div class="col-md-12">';
 	$sx .= '<h4>'.msg("Form").'</h4>';
 	$sx .= '<table class="table">';
-	$sx .= '<tr><th width="4%">order</th>';
-	$sx .= '<th width="42%">'.msg('propriety').'</th>';
-	$sx .= '<th width="37%">'.msg('range').'</th>';
+	$sx .= '<tr><th width="4%">#</th>';
+	$sx .= '<th width="47%">'.msg('propriety').'</th>';
+	$sx .= '<th width="42%">'.msg('range').'</th>';
 	$sx .= '<th width="5%">'.msg('group').'</th>';
-	$sx .= '<th width="5%">'.msg('active').'</th>';
-	$sx .= '<th width="5%">'.msg('global').'</th>';
 	$sx .= '</tr>';
 	for ($r=0;$r < count($rlt);$r++)			
 	{
 		$line = $rlt[$r];
-		$ac = $line['sc_ativo'];
-		
-		if ($ac == 0) 
-		{ 
-			$sty = 'color: #ccc'; 
-		} else {
-			$sty = 'color: #000;'; 
-		}
-		$link = '<a href="#"  style="'.$sty.'" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
+		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
 		$linka = '</a>';
-		$sx .= '<tr style="'.$sty.'">';
+		$sx .= '<tr>';
 		
 		$sx .= '<td align="center">';
 		$sx .= $line['sc_ord'];
@@ -2283,14 +2179,6 @@ function class_view_form($id='')
 		$sx .= '<td>';
 		$sx .= $line['sc_group'];
 		$sx .= '</td>';
-		
-		$sx .= '<td align="center">';
-		$sx .= sn($line['sc_ativo']);
-		$sx .= '</td>';				
-
-		$sx .= '<td align="center">';
-		$sx .= sn(!($line['sc_global']));
-		$sx .= '</td>';			
 		
 		$sx .= '</tr>';
 	}
@@ -2994,103 +2882,106 @@ function export_json($id)
 		return($s);
 	}
 	
-	function rdf_export($id,$out=1)
+	function image_save($id,$class)
 	{
-		/******* converte em Array ****/
-		if (!is_array($id))
-		{
-			$id = array($id);
-		}
-		/* Coleta dados */
 		$rdf = new rdf;
-		$sx = '';
-		for ($r=0;$r < count($id);$r++)
+		$d = $_FILES;
+		if (isset($_FILES))
 		{
-			$file = '_c/'.$id[$r].'.xml';
-			echo $file.'<br>';
-			if (file_exists($file))
+			$file = $d['file']['tmp_name'];
+			$type = $d['file']['type'];
+			$uploadfile = $this->image_dir.$id.'.jpg';
+			if ($type == 'image/jpeg')
 			{
-				$sx .= file_get_contents($file);
-			} else {
-				$this->rdf_register($id[$r]);
-				$sx .= file_get_contents($file);
-			}
-			
-		}
-		if ($out == 0)
-		{
-			/* gerar arquivo de exportação */
-			header('Content-Type: application/xml; charset=utf-8');
-			echo $this->rdf_header();
-			echo $sx;
-			echo $this->rdf_footer();
-		} else {
-			return($sx);
-		}
-	}
-	function rdf_header()
-	{
-		/*********** Header do RDF ************/
-		$sx = '<rdf:RDF ';
-		$sx .= 'xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" ';
-		$sx .= 'xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" ';
-		$sx .= 'xmlns:lattes="http://www.w3.org/2000/01/rdf-schema#" ';				
-		$sx .= 'xmlns:redd="'.base_url(PATH.'rdf/xml/').'" ';
-		$sx .= 'xmlns:skos="http://www.w3.org/2000/01/skos" ';
-		$sx .= 'xmlns:owl=http://www.w3.org/2002/07/owl# ';
-		$sx .= '>'.cr();
-		return($sx);
-	}
-	
-	function rdf_footer()
-	{
-		
-		/*********** Finalizar o RDF ************/
-		$sx = '</rdf:RDF>';
-		return($sx);
-	}
-	
-	function rdf_register($id)
-	{				
-		global $ids;
-		
-		$hd = $this->le($id);
-		$dt = $this->le_data($id);
-		
-		$sx = '<lattes:curriculolattes rdf:about="'.base_url(PATH.'rdf/id/'.$hd['id_cc']).'">'.cr();
-		$sx .= '<owl:Class>'.trim($hd['c_class']).'</owl:Class>'.cr();
-		$sx .= '<lattes:id>'.trim($hd['n_name']).'</lattes:id>'.cr();
-		$sx .= '<lattes:published>'.trim($hd['n_name']).'</lattes:published>'.cr();
-		
-		for ($r=0;$r < count($dt);$r++)
-		{
-			$pref = trim($dt[$r]['prefix_ref']);
-			if (strlen($pref) == 0) { $pref = 'lattes'; }
-			$class = trim($dt[$r]['c_class']);
-			$lang = trim($dt[$r]['n_lang']);
-			if ($dt[$r]['d_r2'] > 0)
-			{
-				$idr = $dt[$r]['d_r2'];
-				if ($idr == $id) { $idr = $dt[$r]['d_r1']; }
-				$vlr = base_url(PATH.'rdf/id/'.$idr);
-				$vlr = 'redd:'.$idr;
-				$sx .= '<'.$pref.':'.$class.' resource="'.$vlr.'"/>'.cr();
-				if (!isset($ids[$idr]))
+				$sx = message(msg('Saved'),1);
+				if (move_uploaded_file($file, $uploadfile)) 
 				{
-					$ids[$idr] = 0;
+					
+					$idn = $rdf->rdf_name(base_url($uploadfile));
+					$prop = 'Person:hasPicture';
+					$rdf->set_propriety($id, $prop, 0, $idn);		
+
+					$sx .= '</>';
+					$sx .= '<meta http-equiv="refresh" content="0">';
 				}
 			} else {
-				$vlr =$dt[$r]['n_name'];
-				$sx .= '<'.$pref.':'.$class.'>'.$vlr.'</'.$pref.':'.$class.'>'.cr();
-			}				
+				$sx = message(msg('invalid_format'),3);
+				$sx .= $this->image_form();
+			}
+		} else {
+			$sx = message(msg('file_not_anexed'),3);
+			$sx .= $this->image_form();
 		}
-		$sx .= '</lattes:curriculolattes>'.cr();
-		$file = '_c';
-		dircheck($file);
-		$file .= '/'.$hd['id_cc'].'.xml';
-		file_put_contents($file,$sx);
-		
 		return($sx);
+	}
+	function image($w)
+	{
+		$imgf = $this->image_dir.'/'.$w.'.jpg';
+		if (file_exists($imgf))
+		{
+			$img = '<img src="' . base_url($imgf) . '" class="img-fluid" style="border: 1px solid #000000; border-radius: 5px;">';
+		} else {
+			$img = '<img src="' . base_url('img/no_image.png') . '" class="img-fluid">';
+		}
+		return($img);
+	}
+	function image_form()
+	{
+		$sx = '<input id="sortpicture" type="file" name="sortpic" />';
+		return($sx);
+	}
+	function image_upload($id=0,$prop='')
+	{
+		$sx = '<a href="#" type="button" data-toggle="modal" data-target="#uploadModal" class="small">'.msg('upload').'</a>';
+		$sx .= '</a>'.cr();
+		$sx .= '
+		<!-- Modal -->
+		<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title" id="uploadModalLabel">Upload Imagem</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+		</button>
+		</div>
+		<div class="modal-body" id="ajax_upload_body">
+		'.$this->image_form().'
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">'.msg('close').'</button>
+		<button type="button" id="btn_submit_upload" class="btn btn-primary">'.msg('send_file').'</button>
+		</div>
+		</div>
+		</div>
+		</div>';
+		
+		$sx .= '
+		<script>
+		$("#btn_submit_upload").click(function () { enviarconsulta_upload(); }); 
+		
+		function enviarconsulta_upload() 
+		{ 
+			var file_data = $("#sortpicture").prop("files")[0];   
+			var form_data = new FormData();
+			form_data.append("file", file_data);
+			$.ajax(
+				{
+					url: "'.base_url(PATH.'ajax/rdf/image_upload/'.$id.'/'.$prop).'",
+					dataType: "script",
+					cache: false,
+					contentType: false,
+					processData: false,
+					data: form_data,
+					type: "post",
+					success: function(data){ 
+						jQuery("#ajax_upload_body").html(data);
+					}
+				}
+			);
+		}
+		</script>';		
+		return($sx);				
 	}
 }
 ?>

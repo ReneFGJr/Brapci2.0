@@ -28,7 +28,7 @@
 00035$sw['classification research group (crg)'] = 'Classification_Research_Group';
 00029$sw['classification research group'] = 'Classification_Research_Group';
 00011$sw['isko-france'] = 'Isko-France';
-00012$sw['isko-españa'] = 'Isko-España';
+00011$sw['isko-espana'] = 'Isko-España';
 00054$sw['encontro nacional de pesquisa em ciencia da informacao'] = 'Enancib';
 00064$sw['encontro nacional de pesquisa em ciencia da informacao (enancib)'] = 'Enancib';
 00007$sw['enancib'] = 'Enancib';
@@ -47,3 +47,4 @@
 00033$sw['biblioteca do congresso americano'] = 'Library_of_Congress';
 00058$sw['biblioteca do congresso dos estados unidos da america (lc)'] = 'Library_of_Congress';
 00019$sw['library of congress'] = 'Library_of_Congress';
+00027$sw['the web information company'] = 'The_Web_Information_Company';

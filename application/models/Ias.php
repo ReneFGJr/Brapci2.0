@@ -5,7 +5,7 @@
 */
 class Ias extends CI_model
 {
-	var $version_nlp = '0.2';
+	var $version_nlp = '0.21';
 	
 	function check($f=0)
 	{
@@ -17,42 +17,47 @@ class Ias extends CI_model
 		dircheck('_ia');
 		if ($f==1)
 		{
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/69/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/69/txtb';
 			$file = '_ia/domain_stopword.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Stopwords  <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/64/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/64/txtb';
 			$file = '_ia/domain_ci.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Informacition Science Domain  <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/243/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/243/txtb';
 			$file = '_ia/domain_methodology.txt';
 			$this->import_thesa($url,$file);	
 			$sx .= '<li>Informacition Science Methodology Domain  <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/232/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/232/txtb';
 			$file = '_ia/domain_isko.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Knowledge Organization Domain <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/262/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/106/txtb';
+			$file = '_ia/domain_paises.txt';
+			$this->import_thesa($url,$file);
+			$sx .= '<li>Knowledge Organization Domain <span style="color: green"><b>Update</b></span></li>';			
+			
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/262/txtb';
 			$file = '_ia/domain_instituicoes.txt';
 			$this->import_thesa($url,$file);	
 			$sx .= '<li>Corporate Board Authority <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/8/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/8/txtb';
 			$file = '_ia/domain_universidades.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Universities Authority <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/9/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/9/txtb';
 			$file = '_ia/domain_areas_do_conhecimento.txt';
 			$this->import_thesa($url,$file);	
 			$sx .= '<li>Knowledge Domain <span style="color: green"><b>Update</b></span></li>';
 			
-			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/10/txt';
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/10/txtb';
 			$file = '_ia/domain_datas.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';			
@@ -103,7 +108,7 @@ class Ias extends CI_model
 		$i = mktime(0,0,0,0,1,0);
 		$d = mktime(0,0,0,1,1,1950);
 		//00007$sw['anos 80'] = 'Década_1980';
-		for($r=0;$r < 365;$r++)
+		for($r=0;$r <= 365;$r++)
 		{
 			$sa = date("d/m/Y",$d);
 			$sx = date("Ymd",$d);
@@ -207,8 +212,8 @@ function submit_accept($txt)
 function nlp_process($t)
 {
 	/************/
+	//???
 	$sx = $this->submit_accept($t);
-	return($sx);
 	$sx = '';
 	if (strlen($t) == 0)
 	{
@@ -317,7 +322,8 @@ function text_get($t)
 function file_get_prepare($l)
 {
 	$txt = '';
-	foreach ($l as $ln => $f) {
+	foreach ($l as $ln => $f) 
+	{
 		if ($f <= 1)
 		{
 			$ln = '> '.trim($ln);
@@ -350,8 +356,8 @@ function file_get_prepare($l)
 				break;
 			}
 		}
-	}
-}
+	}	
+}	
 $txt = troca($txt,' > ',' ');
 return($txt);
 }
@@ -397,9 +403,14 @@ function icone($i,$v=0,$id)
 		return($div);
 	}
 	
-	function limpa_text($t)
+	function limpa_text($t,$all=1)
 	{
-		$ts = array('...','..','. ',' .',';.','“','”',',',':','>','<','?','"','/','\\','!','|','[',']','–','(',')');
+		$ts = array('...','..','. ',' .',';.','“','”',',',':','>','<','?','"','/','\\','!','|','–','(',')');
+		if ($all == 1)
+		{
+			array_push($ts,'[');
+			array_push($ts,']');
+		}
 		for ($r=0;$r < count($ts);$r++)
 		{
 			$t = troca($t,$ts[$r],' ');
@@ -426,11 +437,18 @@ function icone($i,$v=0,$id)
 		$sw = array();
 		eval($domains);
 		
-		/* Realiza trocas nos domínios */
-		$t = $this->change_array($t,$sw);
+		/* REDE DE NEURONIO */
+		$t1 = $t;
+		$tx = neuro_referencias($t1);
+		$refs = $tx[1];
+		$t1 = $tx[0];
+		
+		$t1 = neuro_link($t1);
 		
 		/************************** Substitui no texto ***********/
-		$t1 = LowerCaseSql($txt);
+		$t1 = LowerCaseSql($t1);
+		
+		
 		$t1 = troca($t1,'','');
 		$t1 = troca($t1,'.',' [.] ');
 		$t1 = troca($t1,';',' ; ');
@@ -444,31 +462,50 @@ function icone($i,$v=0,$id)
 		$t1 = troca($t1,'*',' * ');
 		$t1 = troca($t1,'‘'," ' ");
 		$t1 = troca($t1,'’'," ' ");
-		$t1 = LowerCaseSQL($t1);
+		$t1 = ascii($t1);
+		$t1 = strtolower($t1);
 		//echo '<tt style="color: green;">'.$t1.'</tt>';
 		
 		foreach ($sw as $key => $value) {
-			//$t1 = troca($t1,' '.$key.' ',' ['.$value.'] ');
+			
+			$key = LowerCaseSQL($key);
+			//echo '<br>==><tt>'.$key.'=='.$value.'</tt>';
 			$t1 = str_replace(array(' '.$key.' '),array(' ['.$value.'] '),$t1);
 		}
 		$t1 = troca($t1,' . ','.');
 		
-		echo '<tt style="color: red;">'.$t1.'</tt>';
+		//echo '<tt style="color: red;">'.$t1.'</tt>';
 		
 		/* Separa as palavras */
-		$t = $this->limpa_text($t1);
+		$t = $this->limpa_text($t1,0);
+		
 		$t = troca($t,' ',';');
 		$wd = splitx(';',$t);
 		
+		/******************************************* Quantifica frequencia dos termos */
+		$tm = array();
+		for ($r=0;$r < count($wd);$r++)
+		{
+			$term = $wd[$r];
+			if (isset($tm[$term]))
+			{
+				$tm[$term] = $tm[$term] + 1;
+			} else {
+				$tm[$term] = 1;
+			}
+		}
+		
 		/******************************************* STOP WORDS */
 		$qt = array();
-		foreach ($wd as $key => $value) {
+		foreach ($tm as $key => $value) {
 			array_push($qt,strzero($value,5).$key);
 		}
 		sort($qt);
 		$min = 2;
 		
 		$sx = '';
+		$col1 = '';
+		$col2 = '';
 		for ($r=(count($qt)-1);$r >= 0;$r--)
 		{
 			$value = round(substr($qt[$r],0,5));
@@ -476,11 +513,44 @@ function icone($i,$v=0,$id)
 			
 			if ($value > $min)
 			{
-				$sx .= '<br>'.$key.' - '.$value;
+				if (substr($key,0,1) == '[')
+				{
+					$tz = $this->show_conecpt($key);
+					$t0 = $tz[0];
+					$t1 = $tz[1];
+					if (($t0 != '[[sw]]') and ($t0 != '[.]'))
+					{
+						$col1 .= '<br>'.$t1.' - '.$value;
+					}
+				} else {
+					$col2 .= '<br>'.$key.' - '.$value;
+				}				
 			}
 		}
-		//$qt = $this->quartil($qt,2,1,2);
+		$sx = '<table width="100%"><tr valign="top"><td width="50%">'.$col1.'</td><td>'.$col2.'</td></tr></table>';
+		$tq = troca($t,';',' ');
+		$tq = troca($tq,'[[sw]]',' ');
+		$tq = troca($tq,' [.]','.<br>');
+		$sx .= '<hr>texto<hr><div class="text-justify">'.$tq.'</div>';
+		$sx .= '<hr>Referencias<hr>'.$refs;
 		return($sx);
+	}
+	
+	function show_conecpt($key='')
+	{
+		$domain = array('#thesa');
+		$link = '';
+		for ($r=0;$r < count($domain);$r++)
+		{
+			if (strpos($key,$domain[$r]) > 0)
+			{
+				$link = substr($key,strpos($key,$domain[$r]),strlen($key));
+				$key = trim(substr($key,0,strpos($key,$domain[$r]))).']';
+				$link = '<a href="https://www.ufrgs.br/tesauros/index.php/thesa/c/'.sonumero($link).'" target="_new">'.$key.'</a>';
+			}
+		}
+		$key = trim($key);
+		return(array($key,$link));
 	}
 	
 	function change_array($t,$w)
@@ -495,5 +565,49 @@ function icone($i,$v=0,$id)
 	{
 		
 	}
+}
+
+/************************************************** NEURONIOS */
+function neuro_link($t)
+{
+	$loop = 0;
+	$t .= ' ';
+	while ((($pos = strpos($t,'https:')) or ($pos = strpos($t,'http:'))) and ($loop < 500))
+	{
+		$s = substr($t,$pos,strlen($t));
+		//echo substr($s,0,100).'<br>';
+		$lk = substr($s,0,strpos($s,' '));
+		/**************************************************************/
+		$c = '>';
+		if (strpos($lk,$c)) { $lk = substr($lk,0,strpos($lk,$c)); }
+		if (substr($lk,strlen($lk)-1,1) == '.') { $lk = substr($lk,0,strlen($lk)-1); }
+		
+		$lku = troca($lk,'https','URLs');
+		$lku = troca($lk,'http','URL');
+		$t = troca($t,$lk,'[{'.$lku.'}]');
+		$loop++;
+	}
+	return($t);
+}
+
+function neuro_referencias($t)
+{
+	$a = array('Referências','REFERÊNCIAS','referencias');
+	for ($r=0;$r < count($a);$r++)
+	{
+		$pos = strpos($t,'> '.$a[$r]);
+		if ($pos > 0)
+		{
+			$ref = substr($t,$pos,strlen($t));
+			$text = substr($t,0,$pos);
+			return(array($text,$ref));
+		}
+	}
+	return(array($t,''));
+}
+
+function neuro_email($t)
+{
+	
 }
 ?>

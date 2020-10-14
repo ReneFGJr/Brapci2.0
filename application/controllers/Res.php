@@ -353,9 +353,15 @@ public function v($id,$fmt='') {
         $this -> load -> model('sources');
         $socials = new socials;
         $usr = $socials -> token($token);
+        
         if (count($usr) == 0) {
-            //$sx .= msg('token_invalid') . cr();
-            $id = '';
+            if ($token == 'free')
+                {
+
+                } else {
+                    $sx .= msg('token_invalid') . cr();
+                    $id = '';
+                }
         }
         if (strlen($id) == 0) {
             $id = 'journal';
@@ -363,6 +369,11 @@ public function v($id,$fmt='') {
         $sx .= '================================================'.cr();
         $sx .= date("Y-m-d H:i:s") . ' ACT:' . $id . cr();
         switch($id) {
+            case 'affiliation':
+                $sx .= 'CROM Affiliation'.cr();
+                $this->load->model('api_brapci');
+                $sx .= $this->api_brapci->affiliation_cron();
+            break;
             case 'journal' :
                 $data = $this -> oai_pmh -> NextHarvesting();
                 if (count($data) > 0) {
@@ -381,7 +392,8 @@ public function v($id,$fmt='') {
                 }
             break;
             default :
-            $sx .= msg('not_action') . cr();
+            $sx .= msg('not_action') . ' '.$id. cr();
+            echo "ACT:$act<br>Token:$token<br>id = $id";
         }
         
         /* save log */
@@ -833,6 +845,12 @@ public function v($id,$fmt='') {
         $this -> load -> model('frbr_core');
         $q = get("q");
         switch($id) {
+            case 'rdf':
+            $rdf = new rdf;
+            $sx = $rdf->index($id,$id2,$id3,$id3);
+            echo $sx;        
+            break;
+
             case 'inport' :
                 $cl = $this -> frbr_core -> le_class($id2);
                 if (count($cl) == 0) {
@@ -846,378 +864,380 @@ public function v($id,$fmt='') {
                 $rlt = $this -> db -> query($sql);
                 $sx = '';
             break;
-        break;
-        case 'exclude' :
-            $idc = $id2;
-            $this -> frbr_core -> data_exclude($idc);
-            $sx = '<div class="alert alert-success" role="alert">
-            <strong>Sucesso!</strong> Item excluído da base.
-            </div>';
-            $sx .= '<meta http-equiv="refresh" content="1">';
-            echo $sx;
-        break;
-        case 'ajax2' :
-            echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
-            echo $this -> frbr_core -> ajax2($id2, $id3, $id4);
-        break;
-        case 'ajax3' :
-            echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
-            $this -> load -> model('frbr_core');
-            $val = get("q");
-            $this -> frbr_core -> set_propriety($id3, $id2, $val, 0);
-            echo '<meta http-equiv="refresh" content="0;">';
-        break;
-        
-        case 'thesa' :
-            $this -> load -> model('thesa_api');
-            $this -> load -> model('frbr_core');
-            $this -> thesa_api -> ajax($id2);
-        break;
-        
-        default :
-        if (strlen($q) > 0) {
-            echo $this -> searchs -> ajax_q($q);
-        } else {
-            //$type = $id2;
-            $this -> load -> model('frbr_core');
-            echo $this -> frbr_core -> model($id, $id2, '');
+            
+            case 'exclude' :
+                $idc = $id2;
+                $this -> frbr_core -> data_exclude($idc);
+                $sx = '<div class="alert alert-success" role="alert">
+                <strong>Sucesso!</strong> Item excluído da base.
+                </div>';
+                $sx .= '<meta http-equiv="refresh" content="1">';
+                echo $sx;
+            break;
+
+            case 'ajax2' :
+                echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
+                echo $this -> frbr_core -> ajax2($id2, $id3, $id4);
+            break;
+
+            case 'ajax3' :
+                echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
+                $this -> load -> model('frbr_core');
+                $val = get("q");
+                $this -> frbr_core -> set_propriety($id3, $id2, $val, 0);
+                echo '<meta http-equiv="refresh" content="0;">';
+            break;
+            
+            case 'thesa' :
+                $this -> load -> model('thesa_api');
+                $this -> load -> model('frbr_core');
+                $this -> thesa_api -> ajax($id2);
+            break;
+            
+            default :
+            if (strlen($q) > 0) {
+                echo $this -> searchs -> ajax_q($q);
+            } else {
+                //$type = $id2;
+                $this -> load -> model('frbr_core');
+                echo $this -> frbr_core -> model($id, $id2, '');
+            }
         }
     }
-}
-
-function event($act = '',$id='') {
-    $this -> load -> model('events');
-    if ($id != '')
-    {
-        $this->events->click($id);
-        exit;
-    }
-    $this -> cab();
-    $data['content'] = '<div class="row">';
-    $data['content'] .= '<div class="col-md-12">';
-    $data['content'] .= '<h1>' . msg('event') . '</h1>' . '<p>Para registrar um evento, envie um e-mail para brapcici@gmail.com com o assunto [Evento]<p>';
-    $data['content'] .= $this -> events -> events_actives(1);
-    $data['content'] .= '</div>';
-    $data['content'] .= '</div>';
-    $this -> load -> view('show', $data);
     
-    $this -> footer();
-}
-
-function export($tp = '', $pg = 0) {
-    $this -> load -> model('export');
-    $this -> load -> model('genero');
-    $this -> load -> model('frbr_core');
-    $this -> load -> model('elasticsearch');
-    
-    $this -> cab();
-    
-    switch($tp) {
-        case 'genere' :
-            $tela = $this -> genero -> export();
-        break;            
-        case 'all_xls' :
-            $this -> export -> all_xls();
-        break;
-        case 'issue' :
-            $tela = $this -> export -> export_Issue($pg);
-            if (strlen($tela) <= 25) {
-                redirect(base_url(PATH . '/export'));
-            }
-        break;
-        case 'article' :
-            $tela = $this -> export -> export_Article($pg);
-        break;
-        case 'subject' :
-            if ($pg == 0) {
-                $pg = 65;
-            }
-            $tela = $this -> export -> export_subject_index_list($pg);
-        break;
-        case 'subject_reverse' :
-            $tela = $this -> export -> export_subject_reverse($pg);
-        break;
-        case 'index_authors' :
-            if ($pg == 0) {
-                $pg = 65;
-            }
-            $tela = $this -> export -> export_author_index_list($pg);
-        break;
-        case 'collections_form' :
-            $tela = $this -> export -> collections_form();
-        break;
-        default :
-        $tela = '<h1>' . msg('export') . '</h1>';
-        $tela .= '<ul>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/issue') . '">' . msg('export_issue') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/article') . '">' . msg('export_article') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/subject') . '">' . msg('export_subject') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
-        $tela .= '<li><a href="' . base_url(PATH . 'export/genere') . '">' . msg('export_genere') . '</a></li>' . cr();
-        $tela .= '</ul>' . cr();
+    function event($act = '',$id='') {
+        $this -> load -> model('events');
+        if ($id != '')
+        {
+            $this->events->click($id);
+            exit;
+        }
+        $this -> cab();
+        $data['content'] = '<div class="row">';
+        $data['content'] .= '<div class="col-md-12">';
+        $data['content'] .= '<h1>' . msg('event') . '</h1>' . '<p>Para registrar um evento, envie um e-mail para brapcici@gmail.com com o assunto [Evento]<p>';
+        $data['content'] .= $this -> events -> events_actives(1);
+        $data['content'] .= '</div>';
+        $data['content'] .= '</div>';
+        $this -> load -> view('show', $data);
+        
+        $this -> footer();
     }
     
-    $data['content'] = $tela;
+    function export($tp = '', $pg = 0) {
+        $this -> load -> model('export');
+        $this -> load -> model('genero');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('elasticsearch');
+        
+        $this -> cab();
+        
+        switch($tp) {
+            case 'genere' :
+                $tela = $this -> genero -> export();
+            break;            
+            case 'all_xls' :
+                $this -> export -> all_xls();
+            break;
+            case 'issue' :
+                $tela = $this -> export -> export_Issue($pg);
+                if (strlen($tela) <= 25) {
+                    redirect(base_url(PATH . '/export'));
+                }
+            break;
+            case 'article' :
+                $tela = $this -> export -> export_Article($pg);
+            break;
+            case 'subject' :
+                if ($pg == 0) {
+                    $pg = 65;
+                }
+                $tela = $this -> export -> export_subject_index_list($pg);
+            break;
+            case 'subject_reverse' :
+                $tela = $this -> export -> export_subject_reverse($pg);
+            break;
+            case 'index_authors' :
+                if ($pg == 0) {
+                    $pg = 65;
+                }
+                $tela = $this -> export -> export_author_index_list($pg);
+            break;
+            case 'collections_form' :
+                $tela = $this -> export -> collections_form();
+            break;
+            default :
+            $tela = '<h1>' . msg('export') . '</h1>';
+            $tela .= '<ul>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/issue') . '">' . msg('export_issue') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/article') . '">' . msg('export_article') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/subject') . '">' . msg('export_subject') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/subject_reverse') . '">' . msg('export_subject_reverse') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/index_authors') . '">' . msg('export_index_authors') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
+            $tela .= '<li><a href="' . base_url(PATH . 'export/genere') . '">' . msg('export_genere') . '</a></li>' . cr();
+            $tela .= '</ul>' . cr();
+        }
+        
+        $data['content'] = $tela;
+        $data['title'] = '';
+        $this -> load -> view('show', $data);
+        
+        $this -> footer();
+    }
+    
+    function concept_del($id = '', $chk = '') {
+        $this -> load -> model('frbr');
+        if (checkpost_link($id . 'Concept') == $chk) {
+            $this -> frbr -> remove_concept($id);
+        } else {
+            echo "Erro de Post";
+        }
+        
+    }
+    
+    function download($d1 = '') {
+        $d1 = round($d1);
+        $this -> load -> model('pdfs');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> pdfs -> download($d1);
+    }
+    
+    function txt($d1 = '') {
+        $d1 = round($d1);
+        $this -> load -> model('pdfs');
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> pdfs -> txt($d1);
+    }    
+    
+    function pdf_download($d1 = '', $d2 = '') {
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('pdfs');
+        $this -> pdfs -> harvesting_pdf($d1);
+        echo '===>'.$d1.'-'.$d2;
+        exit ;
+        $this -> load -> library('Pdfmerger');
+        $pdf = new PDFMerger;
+        
+        $pdf -> addPDF('d:/lixo/pdf/one.pdf', '1, 3, 4') -> addPDF('d:/lixo/pdf/two.pdf', '1-2') -> addPDF('d:/lixo/pdf/three.pdf', 'all');
+        $pdf -> merge('file', 'd:/lixo/pdf/TEST3.pdf');
+        echo "FIM";
+    }
+    
+    function pdf_upload($d1 = '', $d2 = '') {
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        $this -> load -> model('pdfs');
+        $data['nocab'] = true;
+        $this -> cab($data);
+        $data['content'] = $this -> pdfs -> upload($d1);
+        $this -> load -> view('show', $data);
+    }
+    
+    /* LOGIN */
+    function social($act = '',$id='',$chk='') {
+        $this -> cab();
+        $socials = new socials;        
+        $data['content'] = $socials->social($act,$id,$chk);
+        if (strlen($data['content']) > 0)
+        {
+            $this->load->view('content',$data);
+        }
+        return('');
+    }
+    
+    
+    function tools($p = '', $id = '0', $id2 = '') {
+        $this -> cab();
+        
+        switch($p) {
+            case '' :
+                $data['title'] = msg('Tools');
+                $txt = '<div class="col-md-12">';
+                $txt .= '<h1>' . msg('tools_title') . '</h1>';
+                $txt .= '</div>';
+                
+                $txt .= '<div class="col-md-12">';
+                $txt .= '<ul>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_import') . '">' . msg('tools_pdf_import') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/oai_import') . '">' . msg('tools_oai_import') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'journals/harvesting') . '">' . msg('harvesting_all') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/dates') . '">' . msg('harvesting_all_dates') . '</a>';
+                $txt .= '</ul>';
+                
+                $txt .= '<h4>' . msg('tools_title_check') . '</h4>';
+                $txt .= '<ul>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check') . '">' . msg('tools_pdf_check') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check_article') . '">' . msg('tools_pdf_check_article') . '</a>';
+                $txt .= '</ul>';
+                
+                $txt .= '<h4>' . msg('tools_remissive') . '</h4>';
+                $txt .= '<ul>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/remissive') . '">' . msg('tools_remissive_check') . '</a>';
+                $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/genere') . '">' . msg('tools_genre') . '</a>';
+                $txt .= '</ul>';
+                
+                $txt .= '</div>';
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+            break;
+            case 'pdf_check_article':
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $this -> load -> model("pdfs");
+                $sx = '<h1>PDF Check</h1>';
+                $sx .= '<br><p>Localizar artigos sem PDF</p>';
+                $data['content'] = $sx.$this->pdfs->journals_files();
+                $this -> load -> view('show', $data);                
+            break;
+            case 'genere':
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $this -> load -> model("Genero");
+                $sx = $this -> Genero -> author_check($p, $id);
+                $data['content'] = $sx;
+                $this -> load -> view('show', $data);
+            break;
+            case 'oai_import' :
+                $data['title'] = msg('Tools');
+                $txt = '<div class="col-md-12">';
+                $txt .= '<h1>' . msg('tools_oai_harvesting') . '</h1>';
+                $txt .= '</div>';
+                //$txt .= $this -> pdfs -> harvestinf_next($id);
+                
+                /* Coleta */
+                $this -> load -> model('sources');
+                $this -> load -> model('searchs');
+                $this -> load -> model('oai_pmh');
+                $this -> load -> model('export');
+                $this -> load -> model('frbr');
+                $this -> load -> model('frbr_core');
+                $this -> load -> model('Elasticsearch');
+                $this -> load -> model('Elasticsearch_brapci20');
+                $dt = array();
+                $idc = $this -> oai_pmh -> getRecord(0);
+                if ($idc > 0) {
+                    //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
+                    $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
+                    $dt['idc'] = $idc;
+                    //$txt = $this -> sources -> info($id);
+                    $txt .= $this -> oai_pmh -> process($dt);
+                    $txt .= '<meta http-equiv="Refresh" content="5">';
+                } else {
+                    $txt = $this -> sources -> info($id);
+                    $txt .= '<h3>Fim da coleta</h3>';
+                    $txt .= '<br>' . date("d/m/Y H:i:s");
+                }
+                /***************************************************/
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+                
+                //$html = '';
+                //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
+                //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
+                
+            break;
+            case 'remissive' :
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                $sx = $this -> frbr -> author_check_remissive($p, $id);
+                $data['content'] = $sx;
+                $this -> load -> view('show', $data);
+            break;
+            case 'pdf_check' :
+                $this -> load -> model("pdfs");
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                
+                $this -> cab();
+                $data['content'] = $this -> pdfs -> check_pdf();
+                $this -> load -> view('show', $data);
+            break;
+            case 'pdf_import' :
+                $this -> load -> model("pdfs");
+                $this -> load -> model("frbr");
+                $this -> load -> model("frbr_core");
+                
+                $data['title'] = msg('Tools');
+                $txt = '<div class="col-md-12">';
+                $txt .= '<h1>' . msg('tools_harvesting') . '</h1>';
+                $txt .= '</div>';
+                $txt .= $this -> pdfs -> harvesting_next($id);
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+            break;
+            case 'dates' :
+                $this -> load -> model("pdfs");
+                $this -> load -> model("frbr");                
+                $this -> load -> model("frbr_core");
+                
+                $data['title'] = msg('Tools');
+                $txt = '<div class="col-md-12">';
+                $txt .= '<h1>' . msg('harvesting_all_dates') . '</h1>';
+                $txt .= '</div>';
+                $txt .= $this -> pdfs -> harvesting_dates($id);
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+            break;                
+        }
+        $this -> footer(0);
+    }
+    
+    function a($id = '') {
+        $this -> load -> model('frbr');
+        $this -> load -> model('frbr_core');
+        
+        $data = $this -> frbr_core -> le($id);
+        
+        $this -> cab();
+        
+        //$tela = $this -> frbr -> show($id);
+        $tela = '';
+        $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="middle">';
+        $linkca = '</a>';
+        
+        if (strlen($data['n_name']) > 0) {
+            $tela .= '<h2>' . $linkc . $data['n_name'] . $linkca . '</h2>';
+        }
+        $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="btn btn-secondary">';
+        $linkca = '</a>';
+        
+        $tela .= '
+        <div class="row">
+        <div class="col-md-11">
+        <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
+        </div>
+        <div class="col-md-1 text-right">
+        ' . $linkc . msg('return') . $linkca . '
+        </div>
+        </div>';
+        
+        //$tela .= $this -> frbr -> form($id, $data);
+        $tela .= $this -> frbr_core -> form($id, $data);
+        
+        switch($data['c_class']) {
+            case 'Person' :
+                $tela .= $this -> frbr_core -> show($id);
+            break;
+            case 'Family' :
+                $tela .= $this -> frfrbr_corebr -> show($id);
+            break;
+            case 'CorporateBody' :
+                $tela .= $this -> frbr_core -> show($id);
+            break;
+            default :
+        break;
+    }
+    
     $data['title'] = '';
-    $this -> load -> view('show', $data);
+    $data['content'] = $tela;
     
+    $this -> load -> view('show', $data);
     $this -> footer();
-}
-
-function concept_del($id = '', $chk = '') {
-    $this -> load -> model('frbr');
-    if (checkpost_link($id . 'Concept') == $chk) {
-        $this -> frbr -> remove_concept($id);
-    } else {
-        echo "Erro de Post";
-    }
-    
-}
-
-function download($d1 = '') {
-    $d1 = round($d1);
-    $this -> load -> model('pdfs');
-    $this -> load -> model('frbr');
-    $this -> load -> model('frbr_core');
-    $this -> pdfs -> download($d1);
-}
-
-function txt($d1 = '') {
-    $d1 = round($d1);
-    $this -> load -> model('pdfs');
-    $this -> load -> model('frbr');
-    $this -> load -> model('frbr_core');
-    $this -> pdfs -> txt($d1);
-}    
-
-function pdf_download($d1 = '', $d2 = '') {
-    $this -> load -> model('frbr');
-    $this -> load -> model('frbr_core');
-    $this -> load -> model('pdfs');
-    $this -> pdfs -> harvesting_pdf($d1);
-    echo '===>'.$d1.'-'.$d2;
-    exit ;
-    $this -> load -> library('Pdfmerger');
-    $pdf = new PDFMerger;
-    
-    $pdf -> addPDF('d:/lixo/pdf/one.pdf', '1, 3, 4') -> addPDF('d:/lixo/pdf/two.pdf', '1-2') -> addPDF('d:/lixo/pdf/three.pdf', 'all');
-    $pdf -> merge('file', 'd:/lixo/pdf/TEST3.pdf');
-    echo "FIM";
-}
-
-function pdf_upload($d1 = '', $d2 = '') {
-    $this -> load -> model('frbr');
-    $this -> load -> model('frbr_core');
-    $this -> load -> model('pdfs');
-    $data['nocab'] = true;
-    $this -> cab($data);
-    $data['content'] = $this -> pdfs -> upload($d1);
-    $this -> load -> view('show', $data);
-}
-
-/* LOGIN */
-function social($act = '',$id='',$chk='') {
-    $this -> cab();
-    $socials = new socials;        
-    $data['content'] = $socials->social($act,$id,$chk);
-    if (strlen($data['content']) > 0)
-    {
-        $this->load->view('content',$data);
-    }
-    return('');
-}
-
-
-function tools($p = '', $id = '0', $id2 = '') {
-    $this -> cab();
-    
-    switch($p) {
-        case '' :
-            $data['title'] = msg('Tools');
-            $txt = '<div class="col-md-12">';
-            $txt .= '<h1>' . msg('tools_title') . '</h1>';
-            $txt .= '</div>';
-            
-            $txt .= '<div class="col-md-12">';
-            $txt .= '<ul>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_import') . '">' . msg('tools_pdf_import') . '</a>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/oai_import') . '">' . msg('tools_oai_import') . '</a>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'journals/harvesting') . '">' . msg('harvesting_all') . '</a>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/dates') . '">' . msg('harvesting_all_dates') . '</a>';
-            $txt .= '</ul>';
-            
-            $txt .= '<h4>' . msg('tools_title_check') . '</h4>';
-            $txt .= '<ul>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check') . '">' . msg('tools_pdf_check') . '</a>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/pdf_check_article') . '">' . msg('tools_pdf_check_article') . '</a>';
-            $txt .= '</ul>';
-            
-            $txt .= '<h4>' . msg('tools_remissive') . '</h4>';
-            $txt .= '<ul>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/remissive') . '">' . msg('tools_remissive_check') . '</a>';
-            $txt .= '<li>' . '<a href="' . base_url(PATH . 'tools/genere') . '">' . msg('tools_genre') . '</a>';
-            $txt .= '</ul>';
-            
-            $txt .= '</div>';
-            $data['content'] = $txt;
-            $this -> load -> view('show', $data);
-        break;
-        case 'pdf_check_article':
-            $this -> load -> model("frbr");
-            $this -> load -> model("frbr_core");
-            $this -> load -> model("pdfs");
-            $sx = '<h1>PDF Check</h1>';
-            $sx .= '<br><p>Localizar artigos sem PDF</p>';
-            $data['content'] = $sx.$this->pdfs->journals_files();
-            $this -> load -> view('show', $data);                
-        break;
-        case 'genere':
-            $this -> load -> model("frbr");
-            $this -> load -> model("frbr_core");
-            $this -> load -> model("Genero");
-            $sx = $this -> Genero -> author_check($p, $id);
-            $data['content'] = $sx;
-            $this -> load -> view('show', $data);
-        break;
-        case 'oai_import' :
-            $data['title'] = msg('Tools');
-            $txt = '<div class="col-md-12">';
-            $txt .= '<h1>' . msg('tools_oai_harvesting') . '</h1>';
-            $txt .= '</div>';
-            //$txt .= $this -> pdfs -> harvestinf_next($id);
-            
-            /* Coleta */
-            $this -> load -> model('sources');
-            $this -> load -> model('searchs');
-            $this -> load -> model('oai_pmh');
-            $this -> load -> model('export');
-            $this -> load -> model('frbr');
-            $this -> load -> model('frbr_core');
-            $this -> load -> model('Elasticsearch');
-            $this -> load -> model('Elasticsearch_brapci20');
-            $dt = array();
-            $idc = $this -> oai_pmh -> getRecord(0);
-            if ($idc > 0) {
-                //$dt = $this -> oai_pmh -> getRecordNlM($idc, $dt);
-                $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
-                $dt['idc'] = $idc;
-                //$txt = $this -> sources -> info($id);
-                $txt .= $this -> oai_pmh -> process($dt);
-                $txt .= '<meta http-equiv="Refresh" content="5">';
-            } else {
-                $txt = $this -> sources -> info($id);
-                $txt .= '<h3>Fim da coleta</h3>';
-                $txt .= '<br>' . date("d/m/Y H:i:s");
-            }
-            /***************************************************/
-            $data['content'] = $txt;
-            $this -> load -> view('show', $data);
-            
-            //$html = '';
-            //http://www.viaf.org/viaf/AutoSuggest?query=Zen, Ana Maria
-            //http://www.viaf.org/processed/search/processed?query=local.personalName+all+"ZEN, Ana Maria Dalla"
-            
-        break;
-        case 'remissive' :
-            $this -> load -> model("frbr");
-            $this -> load -> model("frbr_core");
-            $sx = $this -> frbr -> author_check_remissive($p, $id);
-            $data['content'] = $sx;
-            $this -> load -> view('show', $data);
-        break;
-        case 'pdf_check' :
-            $this -> load -> model("pdfs");
-            $this -> load -> model("frbr");
-            $this -> load -> model("frbr_core");
-            
-            $this -> cab();
-            $data['content'] = $this -> pdfs -> check_pdf();
-            $this -> load -> view('show', $data);
-        break;
-        case 'pdf_import' :
-            $this -> load -> model("pdfs");
-            $this -> load -> model("frbr");
-            $this -> load -> model("frbr_core");
-            
-            $data['title'] = msg('Tools');
-            $txt = '<div class="col-md-12">';
-            $txt .= '<h1>' . msg('tools_harvesting') . '</h1>';
-            $txt .= '</div>';
-            $txt .= $this -> pdfs -> harvesting_next($id);
-            $data['content'] = $txt;
-            $this -> load -> view('show', $data);
-        break;
-        case 'dates' :
-            $this -> load -> model("pdfs");
-            $this -> load -> model("frbr");                
-            $this -> load -> model("frbr_core");
-            
-            $data['title'] = msg('Tools');
-            $txt = '<div class="col-md-12">';
-            $txt .= '<h1>' . msg('harvesting_all_dates') . '</h1>';
-            $txt .= '</div>';
-            $txt .= $this -> pdfs -> harvesting_dates($id);
-            $data['content'] = $txt;
-            $this -> load -> view('show', $data);
-        break;                
-    }
-    $this -> footer(0);
-}
-
-function a($id = '') {
-    $this -> load -> model('frbr');
-    $this -> load -> model('frbr_core');
-    
-    $data = $this -> frbr_core -> le($id);
-    
-    $this -> cab();
-    
-    //$tela = $this -> frbr -> show($id);
-    $tela = '';
-    $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="middle">';
-    $linkca = '</a>';
-    
-    if (strlen($data['n_name']) > 0) {
-        $tela .= '<h2>' . $linkc . $data['n_name'] . $linkca . '</h2>';
-    }
-    $linkc = '<a href="' . base_url(PATH . 'v/' . $id) . '" class="btn btn-secondary">';
-    $linkca = '</a>';
-    
-    $tela .= '
-    <div class="row">
-    <div class="col-md-11">
-    <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
-    </div>
-    <div class="col-md-1 text-right">
-    ' . $linkc . msg('return') . $linkca . '
-    </div>
-    </div>';
-    
-    //$tela .= $this -> frbr -> form($id, $data);
-    $tela .= $this -> frbr_core -> form($id, $data);
-    
-    switch($data['c_class']) {
-        case 'Person' :
-            $tela .= $this -> frbr_core -> show($id);
-        break;
-        case 'Family' :
-            $tela .= $this -> frfrbr_corebr -> show($id);
-        break;
-        case 'CorporateBody' :
-            $tela .= $this -> frbr_core -> show($id);
-        break;
-        default :
-    break;
-}
-
-$data['title'] = '';
-$data['content'] = $tela;
-
-$this -> load -> view('show', $data);
-$this -> footer();
 }
 
 function vocabulary_ed($id = '') {
@@ -1601,10 +1621,10 @@ function api($act='',$token='')
 function bot()
 { 
     $this->cab();
-
+    
     
     $this->load->model('GoogleDialogFlow');
-
+    
     /* Google DialogFlow - IA - ChatBot*/    
     $data['content'] = '<h1>DialogFlow Brapci Bot</h1>';
     $data['content'] .= $this->GoogleDialogFlow->bot();   
@@ -1613,10 +1633,10 @@ function bot()
     width="350"
     height="550"
     src="https://console.dialogflow.com/api-client/demo/embedded/31e54c28-4130-4c99-9712-d3b330327b0a">
-</iframe>';
+    </iframe>';
     $data['title'] = '';
     $this->load->view('content',$data); 
-
+    
     /* Footer */
     $this->footer();
 }
