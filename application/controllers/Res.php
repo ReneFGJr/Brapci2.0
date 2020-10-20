@@ -1640,4 +1640,17 @@ function bot()
     /* Footer */
     $this->footer();
 }
+function pq($d1='',$d2='',$d3='',$d4='')
+    {
+        $this->cab();
+        $this->load->model("pqs");
+
+        $data['title'] = '';
+        $data['content'] = $this->pqs->index($d1,$d2,$d3,$d4);
+        $this->load->view('content',$data); 
+
+        /* Footer */
+        $this->footer();
+
+    }
 }

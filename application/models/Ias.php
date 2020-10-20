@@ -599,6 +599,11 @@ function neuro_referencias($t)
 		if ($pos > 0)
 		{
 			$ref = substr($t,$pos,strlen($t));
+			for ($a='A';$a <= 'Z'; $a++)
+			{
+				$ref = troca($ref,'> '.chr($a),'<br>');
+			}
+			
 			$text = substr($t,0,$pos);
 			return(array($text,$ref));
 		}
