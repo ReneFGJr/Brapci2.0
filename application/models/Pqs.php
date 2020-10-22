@@ -3,12 +3,29 @@ class pqs extends CI_Model  {
     var $table = 'brapci_pq.bolsistas';
     var $table_bolsas = 'brapci_pq.bolsas';
     var $table_bolsas_tipo = 'brapci_pq.modalidades';
-    
+    function import()
+        {
+            $file = "_temp/process.csv";
+            if (file_exists($file))
+                {
+                    $ds = read_csv($file,';');
+                    echo '<pre>';
+                    print_r($ds);
+                    echo '</pre>';
+                } else {
+                    echo "Arquivo não localizado";
+                    exit;                    
+                }
+        }
     function index($d1,$d2,$d3,$d4)
     {
         $sx = '<h1>'.msg("BasePQ").'</h1>';
         switch($d1)
         {
+            case 'import':
+                $sx .= 'Importação';
+                $this->import();
+                break;
             default: 
             $sx = $this->row_pq($d2,$d3);
         }

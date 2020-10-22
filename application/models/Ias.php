@@ -598,18 +598,66 @@ function neuro_referencias($t)
 		$pos = strpos($t,'> '.$a[$r]);
 		if ($pos > 0)
 		{
-			$ref = substr($t,$pos,strlen($t));
-			for ($a='A';$a <= 'Z'; $a++)
-			{
-				$ref = troca($ref,'> '.chr($a),'<br>');
-			}
+			$ref = trim(substr($t,$pos+strlen($a[$r])+2,strlen($t)));
+			$ref = troca($ref,'>',(chr(13)));
+			$ref = troca($ref,'','');
 			
+			$ref = troca($ref,chr(13),chr(10));
+			$ln = explode(chr(10),$ref);
+
+			$lst = '';
+			echo '<tt>';
+			for ($r=0;$r < count($ln);$r++)
+				{
+					$n2 = caixa_alta($ln[$r]);
+					$rf = trim($lst.' '.trim($ln[$r]));	
+									
+					$n1 = tem_ano($rf);
+					if ($n1 == 0)
+						{ 
+							$lst = $rf;
+						} else {
+							$lst = '';
+							echo '<hr><b>'.$rf.'</b>';
+							echo 'Neuronio #1:'.$n1.'<br>';
+						}
+				}
 			$text = substr($t,0,$pos);
 			return(array($text,$ref));
 		}
 	}
 	return(array($t,''));
 }
+
+#validador 1
+function tem_ano($lz)
+	{
+		for ($r=(date("Y")+2);$r > 1900;$r--)
+			{
+				$ano = (string)$r;
+				$pos = strpos($lz,$ano);
+				if ($pos > 0) 
+					{ 						
+						return(1); 
+					}
+			}
+		return(0);
+
+	}
+#validador 2
+function caixa_alta($lz)
+	{
+		$lzr = str_replace(array(',',';','.','!','?'),array(' '),$lz);
+		$lzr = trim(substr($lzr,0,strpos($lzr,' ')));
+		$lzru = UpperCaseSQL($lzr);
+
+		if ($lzru == $lzr)
+			{
+				return(1);
+			}
+		echo $lz.'<br>'.$lzr;
+		exit;
+	}
 
 function neuro_email($t)
 {

@@ -150,7 +150,23 @@ function menu($m)
 	return($sx);
 }
 
-function read_csv($file='')
+function read_csv($file,$delim=';')
+	{
+		$row = 0;
+		$ds = array();
+		if (($handle = fopen($file, "r")) !== FALSE) {
+			while (($data = fgetcsv($handle, 1000, $delim)) !== FALSE) {
+				$num = count($data);
+				$row++;
+				for ($c=0; $c < $num; $c++) {
+					$ds[$row][$c] = utf8_encode($data[$c]);
+				}
+			}
+			fclose($handle);
+		}
+		return($ds);		
+	}
+function read_csv_old($file='')
 {
     $sht = array();
     $row = 0;
