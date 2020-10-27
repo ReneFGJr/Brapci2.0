@@ -356,12 +356,12 @@ public function v($id,$fmt='') {
         
         if (count($usr) == 0) {
             if ($token == 'free')
-                {
-
-                } else {
-                    $sx .= msg('token_invalid') . cr();
-                    $id = '';
-                }
+            {
+                
+            } else {
+                $sx .= msg('token_invalid') . cr();
+                $id = '';
+            }
         }
         if (strlen($id) == 0) {
             $id = 'journal';
@@ -846,11 +846,11 @@ public function v($id,$fmt='') {
         $q = get("q");
         switch($id) {
             case 'rdf':
-            $rdf = new rdf;
-            $sx = $rdf->index($id,$id2,$id3,$id3);
-            echo $sx;        
+                $rdf = new rdf;
+                $sx = $rdf->index($id,$id2,$id3,$id3);
+                echo $sx;        
             break;
-
+            
             case 'inport' :
                 $cl = $this -> frbr_core -> le_class($id2);
                 if (count($cl) == 0) {
@@ -874,12 +874,12 @@ public function v($id,$fmt='') {
                 $sx .= '<meta http-equiv="refresh" content="1">';
                 echo $sx;
             break;
-
+            
             case 'ajax2' :
                 echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
                 echo $this -> frbr_core -> ajax2($id2, $id3, $id4);
             break;
-
+            
             case 'ajax3' :
                 echo 'dd1=' . $id . '=dd2=' . $id2 . '=dd3=' . $id3 . '==' . $id4;
                 $this -> load -> model('frbr_core');
@@ -1084,6 +1084,53 @@ public function v($id,$fmt='') {
                 $txt .= '</div>';
                 $data['content'] = $txt;
                 $this -> load -> view('show', $data);
+            break;
+            case 'import_issue':
+                $this->load->model('oai_pmh');
+                $this->load->model('frbr');
+                $this->load->model('export');
+                $this->load->model('frbr_core');
+                $this->load->model('indexer');
+            $this -> load -> model('genero');
+            $this -> load -> model('frad');
+
+                $txt = '<div class="row"><div class="col-12">';
+                $txt .= '<h1>Import DC Articles</h1>';
+                $form = new form;
+                $cp = array();
+                array_push($cp,array('$FILE','','Arquivo CSV',true,true));
+                $txt .= $form->editar($cp,'');
+                $txt .= '</div></div>';
+                $txt .= '<ol>';
+                if (isset($_FILES['fileToUpload']))
+                {
+                    $flv = $_FILES['fileToUpload'];
+                    $flv = $flv['tmp_name'];
+                    $csv = read_csv($flv);
+                    $rdf = new rdf;
+                    for ($r=2;$r < count($csv);$r++)
+                    {
+                        $ln = $csv[$r];    
+                        /* Title */
+                        $_POST['dd5'] = $ln[0];
+                        $_POST['dd10'] = '';
+                        $_POST['dd2'] = $ln[6].chr(13).$ln[7].chr(13).$ln[8].chr(13).$ln[9].chr(13).$ln[10].chr(13).$ln[11].chr(13).$ln[12].chr(13).$ln[13].chr(13).$ln[14];
+                        $_POST['dd8'] = 'pt-BR';
+                        $_POST['dd15'] = $ln[2];
+                        $_POST['dd16'] = $ln[3];
+                        $_POST['dd17'] = $ln[5];
+                        if (strlen(trim($ln[0]))==0)
+                            {
+                                $r = 99999999;
+                            } else {
+                                $txt .= '<li>'. $ln['0'].' ['.$this -> frbr -> form_article_save($id).']</>';
+                            }
+                    }
+                }
+                $txt .= '</ol>';
+                $data['content'] = $txt;
+                $this -> load -> view('show', $data);
+                break;
             break;
             case 'pdf_check_article':
                 $this -> load -> model("frbr");
@@ -1641,16 +1688,16 @@ function bot()
     $this->footer();
 }
 function pq($d1='',$d2='',$d3='',$d4='')
-    {
-        $this->cab();
-        $this->load->model("pqs");
-
-        $data['title'] = '';
-        $data['content'] = $this->pqs->index($d1,$d2,$d3,$d4);
-        $this->load->view('content',$data); 
-
-        /* Footer */
-        $this->footer();
-
-    }
+{
+    $this->cab();
+    $this->load->model("pqs");
+    
+    $data['title'] = '';
+    $data['content'] = $this->pqs->index($d1,$d2,$d3,$d4);
+    $this->load->view('content',$data); 
+    
+    /* Footer */
+    $this->footer();
+    
+}
 }

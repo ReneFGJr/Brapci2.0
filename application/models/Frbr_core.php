@@ -530,6 +530,11 @@ class frbr_core extends CI_model {
 
     function vv($id) {
         $data = $this -> le($id);
+        if ($data['cc_use'] > 0)
+            {
+                redirect(base_url(PATH.'/'.$data['cc_use']));
+                exit;
+            }
         $tela = '';
         if (count($data) == 0) {
             $this -> load -> view('error', $data);
@@ -570,7 +575,8 @@ class frbr_core extends CI_model {
                     $tela .= $this -> view_data($id);
                     break;
                 case 'Issue' :
-                    $tela .= $this -> frbr -> show_issue($id);;
+                    $tela .= $this -> frbr -> import_csv_issue($id);;
+                    $tela .= $this -> frbr -> show_issue($id);
                     $tela .= $this -> view_data($id);
                     break;
                 case 'Subject' :

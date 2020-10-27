@@ -163,7 +163,7 @@ class oai_pmh extends CI_model {
                 $article_id = $this -> frbr -> article_create($dt);
                 if ($article_id == 0)
                 {
-                    return("<h3 >Trabalho já indexado</h3>");
+                    return("<h3>Trabalho já indexado</h3>");
                 }
                 
                 /*********************************** AUTHORS **************************************/

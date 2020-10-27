@@ -195,171 +195,175 @@ function form_article($id)
     
     if ($form->saved > 0)
     {
-        $ida = 0;
-        $title = LowerCase(get("dd5"));
-        $title = Uppercase(substr($title,0,1)).substr($title,1,strlen($title));
-        $title2 = LowerCase(get("dd10"));
-        $title2 = Uppercase(substr($title2,0,1)).substr($title2,1,strlen($title2));
-        
-        $aut = troca(get("dd2"),chr(13),';');
-        $aut = troca($aut,chr(10),';');
-        $aut = troca($aut,'  ',' ');
-        $aut = splitx(';',$aut);
-        for ($r=0;$r < count($aut);$r++)
-        {
-            $aut[$r] = nbr_autor($aut[$r],1);
-        }                                      
-        
-        /* ABSTRACT */
-        $abs1 = troca(get("dd6"),chr(10),'');
-        $abs1 = troca($abs1,chr(13),' ');
-        $abs1 = troca($abs1,'  ',' ');
-        $key1 = get("dd7");
-        $lng1 = get("dd8");
-        
-        $abs2 = troca(get("dd11"),chr(10),'');
-        $abs2 = troca($abs2,chr(13),' ');
-        $abs2 = troca($abs2,'  ',' ');
-        $key2 = get("dd12");
-        $lng2 = get("dd13");    
-        
-        /* KEYWORD */                
-        $pagi = get("dd15");
-        $pagf = get("dd16");
-        $session = get("dd17");
-        
-        /*********************ok **********/
-        
-        $artid = 'issue:'.$id.'-'.date("Ymdhis");   
-        //$artid = 'issue:'.$id.'-'.date("Ymdh"); /* remover depois do teste */
-        
-        $ida = $this->frbr_core->rdf_concept_create('Article',$artid);
-        
-        $prop = 'hasId';
-        $idan = $this->frbr_core->frbr_name($artid);
-        $this->frbr_core->set_propriety($ida,$prop,0,$idan);                
-        
-        /********* Issue ***************************/
-        $prop = 'hasIssueOf';
-        $this->frbr_core->set_propriety($ida,$prop,$id,0);
-        
-        /*******************************************/
-        $prop = 'isPubishIn';
-        
-        /* Session **********************************/
-        $session = get("dd17");
-        
-        /********** Section *************************/                           
-        $class = 'ArticleSection'; 
-        $ids = $this->frbr_core->rdf_concept_create($class,$session);
-        
-        $prop = 'hasSectionOf';                     
-        $this->frbr_core->set_propriety($ida,$prop,$ids,0);
-        
-        /* SOURCE */
-        $prop = 'hasSource';
-        $dt = $this->frbr_core->le_data($id);
-        $source = 'não localizado - '.$pagi.'-'.$pagf;
-        $source_id = 0;
-        for ($r=0;$r < count($dt);$r++)
-        {
-            if ($dt[$r]['c_class']=='altLabel')
-            {
-                $source = $dt[$r]['n_name'].'; '.$pagi.'-'.$pagf;                
-            }
-            if ($dt[$r]['c_class']=='hasIssue')
-            {
-                $source_id = $dt[$r]['d_r2'];                
-            }                                
-        }
-        $prop = 'hasSource';
-        $idan = $this->frbr_core->frbr_name($source);
-        $this->frbr_core->set_propriety($ida,$prop,0,$idan);
-        
-        if ($source_id > 0)
-        {
-            $prop = 'isPubishIn';
-            $this->frbr_core->set_propriety($ida,$prop,$source_id,0);                
-        }
-        
-        
-        
-        /********* Abstract 1 **********************/
-        if (strlen($title) > 0)
-        {
-            $prop = 'hasTitle';
-            $idan = $this->frbr_core->frbr_name($title,$lng1);
-            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
-        }
-        if (strlen($title2) > 0)
-        {
-            $prop = 'hasTitleAlternative';
-            $idan = $this->frbr_core->frbr_name($title2,$lng2);
-            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
-        }                    
-        
-        /********* Abstract 1 **********************/
-        if (strlen($abs1) > 0)
-        {
-            $prop = 'hasAbstract';
-            $idan = $this->frbr_core->frbr_name($abs1,$lng1);
-            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
-        }
-        if (strlen($abs2) > 0)
-        {
-            $prop = 'hasAbstract';
-            $idan = $this->frbr_core->frbr_name($abs2,$lng2);
-            $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
-        } 
-        /******** Pages ******************************/
-        if (strlen($pagi) > 0)
-        {
-            $prop = 'hasPageStart';
-            $idp = $this->frbr_core->rdf_concept_create('Number',$pagi);
-            $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
-        }
-        if (strlen($pagf) > 0)
-        {
-            $prop = 'hasPageEnd';
-            $idp = $this->frbr_core->rdf_concept_create('Number',$pagf);
-            $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
-        }                                                               
-        /****** Key words *********************************/
-        $prop = 'hasSubject';
-        $kys = $key1;
-        $lng = $lng1;
-        $kys = troca($kys,'.',';');';';
-        $kys = troca($kys,',',';');';';
-        $kys = splitx(';',$kys);
-        for ($r=0;$r < count($kys);$r++)
-        {
-            $keyw = $kys[$r];
-            $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
-            $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
-        }
-        $prop = 'hasSubject';
-        $kys = $key2;
-        $lng = $lng2;
-        $kys = troca($kys,'.',';');';';
-        $kys = troca($kys,',',';');';';
-        $kys = splitx(';',$kys);
-        for ($r=0;$r < count($kys);$r++)
-        {
-            $keyw = $kys[$r];
-            $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
-            $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
-        }                            
-        /****** Author *********************************/
-        $prop = 'hasAuthor';
-        for ($r=0;$r < count($aut);$r++)
-        {
-            $author = $aut[$r];
-            $idp = $this->frbr_core->rdf_concept_create('Person',$author); 
-            $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
-        }           
-        redirect(base_url(PATH.'a/'.$ida));                    
+        $ida = $this-form_article_save($id);
+        redirect(base_url(PATH.'a/'.$ida));
     }
-    return($tela);
+}
+function form_article_save($id)
+{
+    $ida = 0;
+    $title = LowerCase(get("dd5"));
+    $title = Uppercase(substr($title,0,1)).substr($title,1,strlen($title));
+    $title2 = LowerCase(get("dd10"));
+    $title2 = Uppercase(substr($title2,0,1)).substr($title2,1,strlen($title2));
+    
+    $aut = troca(get("dd2"),chr(13),';');
+    $aut = troca($aut,chr(10),';');
+    $aut = troca($aut,'  ',' ');
+    $aut = splitx(';',$aut);
+    for ($r=0;$r < count($aut);$r++)
+    {
+        $aut[$r] = nbr_autor($aut[$r],1);
+    }                                      
+    
+    /* ABSTRACT */
+    $abs1 = troca(get("dd6"),chr(10),'');
+    $abs1 = troca($abs1,chr(13),' ');
+    $abs1 = troca($abs1,'  ',' ');
+    $key1 = get("dd7");
+    $lng1 = get("dd8");
+    
+    $abs2 = troca(get("dd11"),chr(10),'');
+    $abs2 = troca($abs2,chr(13),' ');
+    $abs2 = troca($abs2,'  ',' ');
+    $key2 = get("dd12");
+    $lng2 = get("dd13");    
+    
+    /* KEYWORD */                
+    $pagi = get("dd15");
+    $pagf = get("dd16");
+    $session = get("dd17");
+    
+    /*********************ok **********/
+    
+    $artid = 'article:'.$id.'-'.md5($title);
+    //$artid = 'issue:'.$id.'-'.date("Ymdh"); /* remover depois do teste */
+    
+    $ida = $this->frbr_core->rdf_concept_create('Article',$artid);
+    
+    $prop = 'hasId';
+    $idan = $this->frbr_core->frbr_name($artid);
+    $this->frbr_core->set_propriety($ida,$prop,0,$idan);                
+    
+    /********* Issue ***************************/
+    $prop = 'hasIssueOf';
+    $this->frbr_core->set_propriety($ida,$prop,$id,0);
+    
+    /*******************************************/
+    $prop = 'isPubishIn';
+    
+    /* Session **********************************/
+    $session = get("dd17");
+    
+    /********** Section *************************/                           
+    $class = 'ArticleSection'; 
+    $ids = $this->frbr_core->rdf_concept_create($class,$session);
+    
+    $prop = 'hasSectionOf';                     
+    $this->frbr_core->set_propriety($ida,$prop,$ids,0);
+    
+    /* SOURCE */
+    $prop = 'hasSource';
+    $dt = $this->frbr_core->le_data($id);
+    $source = 'não localizado - '.$pagi.'-'.$pagf;
+    $source_id = 0;
+    for ($r=0;$r < count($dt);$r++)
+    {
+        if ($dt[$r]['c_class']=='altLabel')
+        {
+            $source = $dt[$r]['n_name'].'; '.$pagi.'-'.$pagf;                
+        }
+        if ($dt[$r]['c_class']=='hasIssue')
+        {
+            $source_id = $dt[$r]['d_r2'];                
+        }                                
+    }
+    $prop = 'hasSource';
+    $idan = $this->frbr_core->frbr_name($source);
+    $this->frbr_core->set_propriety($ida,$prop,0,$idan);
+    
+    if ($source_id > 0)
+    {
+        $prop = 'isPubishIn';
+        $this->frbr_core->set_propriety($ida,$prop,$source_id,0);                
+    }
+    
+    
+    
+    /********* Abstract 1 **********************/
+    if (strlen($title) > 0)
+    {
+        $prop = 'hasTitle';
+        $idan = $this->frbr_core->frbr_name($title,$lng1);
+        $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+    }
+    if (strlen($title2) > 0)
+    {
+        $prop = 'hasTitleAlternative';
+        $idan = $this->frbr_core->frbr_name($title2,$lng2);
+        $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+    }                    
+    
+    /********* Abstract 1 **********************/
+    if (strlen($abs1) > 0)
+    {
+        $prop = 'hasAbstract';
+        $idan = $this->frbr_core->frbr_name($abs1,$lng1);
+        $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+    }
+    if (strlen($abs2) > 0)
+    {
+        $prop = 'hasAbstract';
+        $idan = $this->frbr_core->frbr_name($abs2,$lng2);
+        $this->frbr_core->set_propriety($ida,$prop,0,$idan);                            
+    } 
+    /******** Pages ******************************/
+    if (strlen($pagi) > 0)
+    {
+        $prop = 'hasPageStart';
+        $idp = $this->frbr_core->rdf_concept_create('Number',$pagi);
+        $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
+    }
+    if (strlen($pagf) > 0)
+    {
+        $prop = 'hasPageEnd';
+        $idp = $this->frbr_core->rdf_concept_create('Number',$pagf);
+        $this->frbr_core->set_propriety($ida,$prop,$idp,0);                            
+    }                                                               
+    /****** Key words *********************************/
+    $prop = 'hasSubject';
+    $kys = $key1;
+    $lng = $lng1;
+    $kys = troca($kys,'.',';');';';
+    $kys = troca($kys,',',';');';';
+    $kys = splitx(';',$kys);
+    for ($r=0;$r < count($kys);$r++)
+    {
+        $keyw = $kys[$r];
+        $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
+        $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+    }
+    $prop = 'hasSubject';
+    $kys = $key2;
+    $lng = $lng2;
+    $kys = troca($kys,'.',';');';';
+    $kys = troca($kys,',',';');';';
+    $kys = splitx(';',$kys);
+    for ($r=0;$r < count($kys);$r++)
+    {
+        $keyw = $kys[$r];
+        $idp = $this->frbr_core->rdf_concept_create('Subject',$keyw,'',$lng); 
+        $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+    }                            
+    /****** Author *********************************/
+    $prop = 'hasAuthor';
+    for ($r=0;$r < count($aut);$r++)
+    {
+        $author = $aut[$r];
+        $idp = $this->frbr_core->rdf_concept_create('Person',$author); 
+        $this->frbr_core->set_propriety($ida,$prop,$idp,0);  
+    }               
+return($ida);
 }
 
 function show_issue($id)
@@ -371,6 +375,13 @@ function show_issue($id)
     
     //$tela .= $this -> frbr_core -> view_data($id);
     return ($tela);            
+}
+
+function import_csv_issue($id)
+{
+    $tela = '';
+    $sx = '<a href="'.base_url(PATH.'tools/import_issue/'.$id).'">'.msg('import_csv').'</a>';
+    return ($sx);
 }
 
 function show_article($id) {
@@ -414,64 +425,64 @@ function check_article_exist($dt)
     $mm = '';
     $titles = $dt['title'];
     $class = $this->frbr_core->find_class('Article');
-
+    
     /***************************** Recupera artigos com o nome */
     for ($r=0;$r < count($titles);$r++)
+    {
+        $title = trim($titles[$r]['title']);
+        $title = troca($title,"'","´");
+        $mm .= '<b>'.$title.'</b><hr>';
+        
+        /* Identificar trabalhos com o mesmo título */
+        $sql = "select * from rdf_name where n_name = '".$title."'";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $wh = '';
+        if (count($rlt) > 0)
         {
-            $title = trim($titles[$r]['title']);
-            $title = troca($title,"'","´");
-            $mm .= '<b>'.$title.'</b><hr>';
-
-            /* Identificar trabalhos com o mesmo título */
-            $sql = "select * from rdf_name where n_name = '".$title."'";
+            /********* Construir a Query ***/
+            for ($y=0;$y < count($rlt);$y++)
+            {
+                $line = $rlt[$y];
+                if (strlen($wh) > 0) { $wh .= ' OR ';}
+                $wh .= '(d_literal = '.$line['id_n'].')';
+            }
+            $mm .= 'Query: '.$wh.'<hr>';
+            
+            /************************** CHECAR ARTIGOS DA REVISTA - repetições */
+            $sql = "select * from rdf_data where ".$wh;
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            $wh = '';
-            if (count($rlt) > 0)
+            
+            for ($y=0;$y < count($rlt);$y++)
+            {
+                $ln = $rlt[$y];
+                $dta = $this->frbr_core->le_data($ln['d_r1']);
+                for ($z=0;$z < count($dta);$z++)
                 {
-                    /********* Construir a Query ***/
-                    for ($y=0;$y < count($rlt);$y++)
+                    $lz = $dta[$z];
+                    $prop = trim($lz['c_class']);
+                    if ($prop == 'hasIssueOf')
                     {
-                    $line = $rlt[$y];
-                    if (strlen($wh) > 0) { $wh .= ' OR ';}
-                    $wh .= '(d_literal = '.$line['id_n'].')';
-                    }
-                    $mm .= 'Query: '.$wh.'<hr>';
-
-                    /************************** CHECAR ARTIGOS DA REVISTA - repetições */
-                    $sql = "select * from rdf_data where ".$wh;
-                    $rlt = $this->db->query($sql);
-                    $rlt = $rlt->result_array();
-
-                    for ($y=0;$y < count($rlt);$y++)
+                        if ($lz['d_r1'] == $dt['issue']['id'])
                         {
-                            $ln = $rlt[$y];
-                            $dta = $this->frbr_core->le_data($ln['d_r1']);
-                            for ($z=0;$z < count($dta);$z++)
-                                {
-                                    $lz = $dta[$z];
-                                    $prop = trim($lz['c_class']);
-                                    if ($prop == 'hasIssueOf')
-                                        {
-                                            if ($lz['d_r1'] == $dt['issue']['id'])
-                                                {
-                                                    $mm .= '<h3 style="color: green;">Atualizando registro</h3>';
-                                                    $this->msg = $mm;
-                                                    $id = $lz['d_r2'];
-                                                    return($id);
-                                                }
-                                        }
-                                }
-                        }                    
-                }                
-        }
-        $mm .= '<h3 style="color: blue;">Novo registro</h3>';        
-        $this->msg = $mm;
-        return(1);
+                            $mm .= '<h3 style="color: green;">Atualizando registro</h3>';
+                            $this->msg = $mm;
+                            $id = $lz['d_r2'];
+                            return($id);
+                        }
+                    }
+                }
+            }                    
+        }                
+    }
+    $mm .= '<h3 style="color: blue;">Novo registro</h3>';        
+    $this->msg = $mm;
+    return(1);
 }
 
 function article_create($dt) 
-    {
+{
     /************** Registro já existe ********* */
     if ($this->check_article_exist($dt) == 0)
     {    
