@@ -1606,9 +1606,12 @@ function handle($act = '', $token = '') {
                 $this -> load -> model("handle");
                 echo '<pre>' . $this -> handle -> form() . '</pre>';
             break;
+            default:
+            echo 'use: register';
+            break;
         }
     } else {
-        echo "OPS";
+        echo "OPS - Não está logado";
     }
 }
 
