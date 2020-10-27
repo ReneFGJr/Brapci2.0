@@ -6,9 +6,11 @@ $nr = '';
 $vol = '';
 $article = array();
 $art = '';
-
+$nx = '';
 for ($r = 0; $r < count($issue); $r++) {
     $l = $issue[$r];
+    //print_r($l);
+    //echo '<hr>';
     $class = $l['c_class'];
     $value = $l['n_name'];
     $lang = $l['n_lang'];
@@ -41,7 +43,11 @@ for ($r = 0; $r < count($issue); $r++) {
                     $link = '<a href="'.base_url(PATH.'/v/'.$d_r2).'">';
                     $n = $link.$n.'</a>';
                 }
+                if ($nx != $n)
+                {
                 array_push($article, $n);
+                }
+                $nx = $n;
             }
             break;
     }

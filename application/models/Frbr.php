@@ -371,8 +371,7 @@ function show_issue($id)
     $tela = '';
     $data = $this -> frbr_core -> le_data($id);
     $dados['issue'] = $data;
-    $tela .= $this -> load -> view('brapci/view/issue', $dados, true);
-    
+    $tela .= $this -> load -> view('brapci/view/issue', $dados, true);    
     //$tela .= $this -> frbr_core -> view_data($id);
     return ($tela);            
 }
