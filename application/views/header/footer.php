@@ -71,6 +71,6 @@
 <?php
 if (isset($complement))
 	{
-		echo $complement;
+		//echo $complement;
 	}
 ?>

@@ -28,6 +28,8 @@ class oai_pmh extends CI_model {
     var $new = 0;
     var $del = 0;
     var $ref = 'null';
+
+    var $base = '';
     
     var $url = '';
     
@@ -65,7 +67,7 @@ class oai_pmh extends CI_model {
                     $news = $this->new;
                     $delete = $this->del;
                     
-                    $sql = "update source_oai_log set 
+                    $sql = "update ".$this->base."source_oai_log set 
                     log_status = $status,
                     log_new = $news,
                     log_del = $delete,
@@ -76,7 +78,7 @@ class oai_pmh extends CI_model {
                 break;
                 case 'I':
                     $ref = date("YmdHis").'LI';
-                    $sql = "insert into source_oai_log
+                    $sql = "insert into ".$this->base."source_oai_log
                     (log_id_jnl, log_r, log_cmd)
                     values
                     ($id_jnl,'$ref','$cmd')";
@@ -122,7 +124,7 @@ class oai_pmh extends CI_model {
             }
             
             function le_cache($id) {
-                $sql = "select * from source_listidentifier
+                $sql = "select * from ".$this->base."source_listidentifier
                 WHERE id_li = $id";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
@@ -201,7 +203,7 @@ class oai_pmh extends CI_model {
             }
             
             function cache_alter_status($id_jnl, $status) {
-                $sql = "update source_listidentifier
+                $sql = "update ".$this->base."source_listidentifier
                 set li_s = $status
                 WHERE id_li = $id_jnl ";
                 $rlt = $this -> db -> query($sql);
@@ -210,7 +212,7 @@ class oai_pmh extends CI_model {
             
             function leftHarvesting()
             {
-                $sql = "select count(*) as total from source_listidentifier 
+                $sql = "select count(*) as total from ".$this->base."source_listidentifier 
                 where li_status = 'active' and li_s = 1
                 order by li_s, li_u, id_li
                 limit 1";
@@ -228,7 +230,7 @@ class oai_pmh extends CI_model {
                     $wh = '';
                 }
                 
-                $sql = "select * from source_listidentifier 
+                $sql = "select * from ".$this->base."source_listidentifier 
                 where $wh li_status = 'active' and li_s = 1
                 order by li_s, li_u, id_li
                 limit 1";
@@ -252,7 +254,7 @@ class oai_pmh extends CI_model {
             function getRecordNlM($id = 0, $dt,$z,$a) {
                 $this -> load -> model("sources");
                 
-                $sql = "select * from source_listidentifier where id_li = $id";
+                $sql = "select * from ".$this->base."source_listidentifier where id_li = $id";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
                 if (count($rlt) > 0) {
@@ -355,12 +357,19 @@ class oai_pmh extends CI_model {
                 return ($dt);
             }
             
-            function getListSets($id = 0) {
-                
-                if ($id==0) { return(""); }
-                $this -> load -> model("sources");
-                $data = $this -> sources -> le($id);
-                $url = $this -> oai_url($data, 'ListSets');
+            function getListSets($id = 0, $data=array()) {
+                $tp = 0;
+                if (isset($data['jnl_url_oai']))
+                    {
+                        $tp = 1;
+                        $url = $data['jnl_url_oai'];
+                        $url = $this -> oai_url($data, 'ListSets');
+                    } else {
+                        if ($id==0) { return(""); }
+                        $this -> load -> model("sources");
+                        $data = $this -> sources -> le($id);
+                        $url = $this -> oai_url($data, 'ListSets');
+                    }
                 
                 $cnt = $this -> readfile($url);
                 $cnt = troca($cnt, 'oai_dc:', 'oai_');
@@ -368,13 +377,15 @@ class oai_pmh extends CI_model {
                 $cnt = troca($cnt, 'xml:', '');
                 $xml = simplexml_load_string($cnt);
                 
-                echo '<hr>';
                 if (!isset($xml -> ListSets -> set))
                 {
-                    return('');
+                    return(array());
                 }
-                print_r($xml -> ListSets -> set);
-                echo '<hr>';
+
+                if ($tp == 1)
+                    {
+                        return($xml-> ListSets-> set);
+                    }
                 
                 $rcn = $xml -> ListSets -> set;
                 for ($r = 0; $r < count($rcn); $r++) {
@@ -399,7 +410,7 @@ class oai_pmh extends CI_model {
             
             function getRecord_oai_dc($id = 0, $dt) {
                 $this -> load -> model("sources");
-                $sql = "select * from source_listidentifier where id_li = $id";
+                $sql = "select * from ".$this->base."source_listidentifier where id_li = $id";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
                 if (count($rlt) > 0) {
@@ -751,7 +762,7 @@ class oai_pmh extends CI_model {
                     }
                     if (strlen($nr)==0)
                     {
-                        $sql = "select * from source_issue_convert where sc_text like '%$nm%'";
+                        $sql = "select * from ".$this->base."source_issue_convert where sc_text like '%$nm%'";
                         $rlt = $this->db->query($sql);
                         $rlt = $rlt->result_array();
                         if (count($rlt) == 1)
@@ -782,9 +793,21 @@ class oai_pmh extends CI_model {
                 return($d);                
             }
             
-            public function identify($id) {
-                $data = $this -> sources -> le($id);
-                $url = $this -> oai_url($data, 'identify');
+            public function identify($id,$data=array()) {
+                $tp = 0;
+                if (isset($data['jnl_url_oai']))
+                {
+                    $url = $this -> oai_url($data, 'identify');
+                    $tp = 1;
+                } else {
+                    if (round($id) <= 0)
+                    {
+                        echo "ERRO 450 - Journal ID note found";
+                        exit;
+                    }
+                    $data = $this -> sources -> le($id);
+                    $url = $this -> oai_url($data, 'identify');
+                }                
                 $cnt = $this -> readfile($url);
                 $xml = simplexml_load_string($cnt);
                 
@@ -798,8 +821,13 @@ class oai_pmh extends CI_model {
                 $dt['baseURL'] = $this -> xml_value($xml -> Identify -> baseURL);
                 $dt['responseDate'] = $this -> xml_value($xml -> responseDate);
                 $dt = array_merge($data, $dt);
-                $this -> frbr -> journal($dt);
-                $this -> getListSets($id);
+                if ($tp = 0)
+                {
+                    $this -> frbr -> journal($dt);
+                    $this -> getListSets($id);
+                } else {
+                    return($dt);
+                }
             }
             
             public function cache_link($line = array()) {
@@ -812,7 +840,7 @@ class oai_pmh extends CI_model {
             public function cache_change_to($id, $id2, $id3 = '') {
                 $sx = '';
                 if (strlen($id3) > 0) {
-                    $sql = "update source_listidentifier
+                    $sql = "update ".$this->base."source_listidentifier
                     set li_s = $id3
                     where li_jnl = $id and li_s = $id2";
                     $rlt = $this -> db -> query($sql);
@@ -836,7 +864,7 @@ class oai_pmh extends CI_model {
             
             function cache_reprocess($id)
             {
-                $sql = "update source_listidentifier
+                $sql = "update ".$this->base."source_listidentifier
                 set li_s = 1
                 where id_li = $id";
                 $rlt = $this -> db -> query($sql);
@@ -850,7 +878,7 @@ class oai_pmh extends CI_model {
                 } else {
                     $wh = " AND (li_s = $id2)";
                 }
-                $sql = "select * from source_listidentifier 
+                $sql = "select * from ".$this->base."source_listidentifier 
                 where li_jnl = $id 
                 $wh
                 ";
@@ -870,7 +898,7 @@ class oai_pmh extends CI_model {
             
             public function cache_resume($id='') {
                 /* Alter status - Deleted registers */
-                $sql = "update source_listidentifier set li_s = 9 where li_status = 'deleted' and li_s <> 9";
+                $sql = "update ".$this->base."source_listidentifier set li_s = 9 where li_status = 'deleted' and li_s <> 9";
                 $rlt = $this -> db -> query($sql);
                 if (strlen($id) > 0)
                 {
@@ -879,7 +907,7 @@ class oai_pmh extends CI_model {
                     
                     /* Counter Registers */
                     $sql = "select count(*) as total, li_s, li_jnl 
-                    FROM source_listidentifier
+                    from ".$this->base."source_listidentifier
                     $wh 
                     ORDER BY li_s ";
                     $rlt = $this -> db -> query($sql);
@@ -898,8 +926,8 @@ class oai_pmh extends CI_model {
                     
                     /* Counter Registers */
                     $sql = "select count(*) as total, li_s, li_jnl, jnl_name 
-                    FROM source_listidentifier
-                    INNER JOIN source_source ON li_jnl = id_jnl
+                    from ".$this->base."source_listidentifier
+                    INNER join ".$this->base."source_source ON li_jnl = id_jnl
                     $wh 
                     ORDER BY jnl_name, li_s ";
                     $rlt = $this -> db -> query($sql);
@@ -925,7 +953,7 @@ class oai_pmh extends CI_model {
             
             public function NextHarvesting()
             {
-                $sql = "select * from source_source
+                $sql = "select * from ".$this->base."source_source
                 where jnl_url_oai <> '' and jnl_active = 1
                 and jnl_historic = 0
                 order by jnl_oai_last_harvesting 
@@ -956,7 +984,7 @@ class oai_pmh extends CI_model {
                 $sx = $this->ListIdentifiers_harvesting($id);
                 $this->new = $this->LisIdentifiesToHarvesting($id);
                 
-                $sql = "update source_source set
+                $sql = "update ".$this->base."source_source set
                 jnl_oai_last_harvesting = '".date("Y-m-d H:i:s")."', 
                 jnl_oai_status = ".$this->erro.",
                 jnl_oai_to_harvesting = ".$this->new."
@@ -971,11 +999,11 @@ class oai_pmh extends CI_model {
             
             public function LisIdentifiesToHarvestingAll()
             {
-                $sql = "update source_source set jnl_oai_to_harvesting = 0 where 1=1";
+                $sql = "update ".$this->base."source_source set jnl_oai_to_harvesting = 0 where 1=1";
                 $rlt = $this->db->query($sql);
                 
                 $sql = "SELECT li_jnl, count(*) as total, li_s 
-                FROM source_listidentifier  
+                from ".$this->base."source_listidentifier  
                 where li_s = 1
                 group by li_s, li_jnl ";
                 $rlt = $this->db->query($sql);
@@ -985,7 +1013,7 @@ class oai_pmh extends CI_model {
                     $tot = $vl['total'];
                     $id = $vl['li_jnl'];
                     
-                    $sql = "update source_source set
+                    $sql = "update ".$this->base."source_source set
                     jnl_oai_to_harvesting = ".$tot."
                     where id_jnl = $id";
                     $rlt = $this->db->query($sql);
@@ -996,7 +1024,7 @@ class oai_pmh extends CI_model {
             public function LisIdentifiesToHarvesting($id)
             {
                 $sql = "SELECT count(*) as total, li_s 
-                FROM source_listidentifier  
+                from ".$this->base."source_listidentifier  
                 where li_jnl = $id and li_s = 1
                 group by li_s ";
                 $rlt = $this->db->query($sql);
@@ -1009,17 +1037,22 @@ class oai_pmh extends CI_model {
                 }
                 $this->new = $tot;
                 
-                $sql = "update source_source set
+                $sql = "update ".$this->base."source_source set
                 jnl_oai_to_harvesting = ".$tot."
                 where id_jnl = $id";
                 $rlt = $this->db->query($sql);
                 
                 return($tot);
             }
-            public function ListIdentifiers_harvesting($id) {
-                //$this -> getListSets($id);
+            public function ListIdentifiers_harvesting($id,$data=array()) {
+                $tp = 0;
+                if (isset($data['jnl_url_oai']))
+                    {
+                        $tp = 1;
+                    } else {
+                       $data = $this -> sources -> le($id);
+                    }
                 
-                $data = $this -> sources -> le($id);
                 $url = $this -> oai_url($data, 'ListIdentifiers');
                 $this->url = $url;
                 $cnt = $this -> readfile($url);
@@ -1046,7 +1079,7 @@ class oai_pmh extends CI_model {
                 }
                 $sx .= '</ul>';
                 if (strlen($token) > 0) {
-                    $sx .= $this -> ListIdentifiers_harvesting($id);
+                    $sx .= $this -> ListIdentifiers_harvesting($id,$data);
                 }
                 $this->erro = 200;
                 
@@ -1058,13 +1091,13 @@ class oai_pmh extends CI_model {
             }
             
             private function update_token($id_jnl, $token) {
-                $sql = "update source_source set jnl_oai_token = '$token' where id_jnl = $id_jnl";
+                $sql = "update ".$this->base."source_source set jnl_oai_token = '$token' where id_jnl = $id_jnl";
                 $rlt = $this -> db -> query($sql);
             }
             
             private function cache($id_jnl, $data) {
                 $identifier = $data['identifier'];
-                $sql = "select * from source_listidentifier 
+                $sql = "select * from ".$this->base."source_listidentifier 
                 where li_identifier = '$identifier'
                 AND li_jnl = $id_jnl ";
                 $rlt = $this -> db -> query($sql);
@@ -1087,10 +1120,10 @@ class oai_pmh extends CI_model {
                     $sqlu .= ", li_setSpec = '" . $data['setSpec'] . "'";
                     $up = 0;
                     if (($data['status'] != $line['li_status']) or ($data['setSpec'] != $line['li_setSpec'])) {
-                        $sqlu .= ", li_update = 1";
+                        $sqlu .= ", li_update ".$this->base."= 1";
                         $up = 1;
                     }
-                    $sql = "update source_listidentifier set " . $sqlu . " where id_li = " . $line['id_li'];
+                    $sql = "update ".$this->base."source_listidentifier set " . $sqlu . " where id_li = " . $line['id_li'];
                     if ($up == 1) { $this -> db -> query($sql);
                     }
                     $sx .= $identifier . ' ' . '<span class="alert-warning">harvested</span>';
@@ -1106,7 +1139,7 @@ class oai_pmh extends CI_model {
                         }
                         $fld2 .= ", '" . $value . "'";
                     }
-                    $sql = "insert into source_listidentifier
+                    $sql = "insert into ".$this->base."source_listidentifier
                     ($fld1)
                     values
                     ($fld2)";
@@ -1225,12 +1258,12 @@ class oai_pmh extends CI_model {
                 
                 if (substr($txt, 0, 4) == 'http') {
                     $data['content'] = '==>' . $txt . '<==';
-                    $sql = "select * from brapci_article_suporte where bs_adress = '$txt' and bs_article = '$idx' ";
+                    $sql = "select * from ".$this->base."brapci_article_suporte where bs_adress = '$txt' and bs_article = '$idx' ";
                     $rlt = $this -> db -> query($sql);
                     $rlt = $rlt -> result_array();
                     if (count($rlt) == 0) {
                         $this -> load -> view('content', $data);
-                        $sql = "insert brapci_article_suporte 
+                        $sql = "insert into ".$this->base."brapci_article_suporte 
                         (
                             bs_status, bs_article, bs_type, 
                             bs_adress, bs_journal_id, bs_update
@@ -1246,7 +1279,7 @@ class oai_pmh extends CI_model {
                     }
                     
                     public function repository_list() {
-                        $sql = "select * from source_source 
+                        $sql = "select * from ".$this->base."source_source 
                         where jnl_active <> 'X'
                         AND jnl_url_oai <> ''	
                         order by jnl_name
@@ -1284,7 +1317,7 @@ class oai_pmh extends CI_model {
                         $jid = $this -> jid;
                         $njid = strzero($jid, 7);
                         
-                        $sql = "select * from oai_cache where cache_oai_id = '$ida' ";
+                        $sql = "select * from ".$this->base."oai_cache where cache_oai_id = '$ida' ";
                         $rlt = $this -> db -> query($sql);
                         $line = $rlt -> result_array();
                         
@@ -1293,11 +1326,11 @@ class oai_pmh extends CI_model {
                             /* já existe */
                         } else {
                             $data = date("Ymd");
-                            $sql = "update brapci_journal set jnl_last_harvesting = '$data', jnl_update = '$data' where id_jnl = $jid ";
+                            $sql = "update ".$this->base."brapci_journal set jnl_last_harvesting = '$data', jnl_update = '$data' where id_jnl = $jid ";
                             $rlt = $this -> db -> query($sql);
                             
                             /* Insere na agenda */
-                            $sql = "insert into oai_cache (
+                            $sql = "insert into ".$this->base."oai_cache (
                                 cache_oai_id, cache_status, cache_journal, 
                                 cache_prioridade, cache_datastamp, cache_setSpec, 
                                 cache_tentativas
@@ -1362,7 +1395,7 @@ class oai_pmh extends CI_model {
                             
                             /** Altera Status **/
                             function altera_status_chache($id, $sta) {
-                                $sql = "update oai_cache set cache_status = '$sta' where id_cache = $id ";
+                                $sql = "update ".$this->base."oai_cache set cache_status = '$sta' where id_cache = $id ";
                                 $this -> db -> query($sql);
                                 return (1);
                             }
@@ -1370,15 +1403,15 @@ class oai_pmh extends CI_model {
                             /* SetSepc */
                             function save_setspec($set, $tema, $jid) {
                                 $jid = strzero($jid, 7);
-                                $sql = "select * from oai_listsets where ls_setspec = '$set' and ls_journal = '$jid' ";
+                                $sql = "select * from ".$this->base."oai_listsets where ls_setspec = '$set' and ls_journal = '$jid' ";
                                 $rlt = db_query($sql);
                                 if ($line = db_read($rlt)) {
-                                    $sql = "update oai_listsets set ls_equal = '$tema' where id_ls = " . round($line['id_ls']);
+                                    $sql = "update ".$this->base."oai_listsets set ls_equal = '$tema' where id_ls = " . round($line['id_ls']);
                                     $this -> db -> query($sql);
                                     return ('');
                                 } else {
                                     $data = date("Ymd");
-                                    $sql = "insert into oai_listsets (
+                                    $sql = "insert into ".$this->base."oai_listsets (
                                         ls_setspec, ls_setname, ls_setdescription,
                                         ls_journal, ls_status, ls_data,
                                         ls_equal, ls_tipo, ls_equal_ed
@@ -1396,7 +1429,7 @@ class oai_pmh extends CI_model {
                                         $wh = ' 1 = 1 ';
                                         if ($jid > 0) { $wh = " cache_journal = '" . strzero($jid, 7) . "' ";
                                         }
-                                        $sql = "select * from oai_cache 
+                                        $sql = "select * from ".$this->base."oai_cache 
                                         where cache_status = 'A'
                                         and $wh
                                         order by cache_tentativas
@@ -1446,7 +1479,7 @@ class oai_pmh extends CI_model {
                                                 $titulo = UpperCaseSql($titulo);
                                                 
                                                 /* Valida se existe article cadastrado */
-                                                $sql = "select * from brapci_article where ar_edition = '" . $article['issue_id'] . "' 
+                                                $sql = "select * from ".$this->base."brapci_article where ar_edition = '" . $article['issue_id'] . "' 
                                                 and 
                                                 (ar_titulo_1 like '$titulo%' or ar_titulo_2 like '$titulo%')
                                                 and 
@@ -1480,7 +1513,7 @@ class oai_pmh extends CI_model {
                                                                 
                                                                 $data['links'] = $article['links'];
                                                                 
-                                                                $sql = "select * from brapci_section order by se_descricao ";
+                                                                $sql = "select * from ".$this->base."brapci_section order by se_descricao ";
                                                                 $rlt = $this -> db -> query($sql);
                                                                 $rlt = $rlt -> result_array();
                                                                 
@@ -1596,7 +1629,7 @@ class oai_pmh extends CI_model {
                                         if (strpos($s, 'NÚM. ')) { $nr = substr($s, strpos($s, 'NÚM. ') + 4, strlen($s));
                                         }
                                         $nr = trim($nr);
-
+                                        
                                         if (strlen($nr) > 0) {
                                             if (strpos($nr, ',') > 0) { $nr = substr($nr, 0, strpos($nr, ','));
                                             }
@@ -1645,7 +1678,7 @@ class oai_pmh extends CI_model {
                                     }
                                     
                                     function recupera_section($sec, $jid) {
-                                        $sql = "select * from oai_listsets where ls_setspec = '$sec' and ls_journal = '$jid'";
+                                        $sql = "select * from ".$this->base."oai_listsets where ls_setspec = '$sec' and ls_journal = '$jid'";
                                         $rlt = db_query($sql);
                                         if ($line = db_read($rlt)) {
                                             $rsec = trim($line['ls_equal']);
@@ -1681,7 +1714,7 @@ class oai_pmh extends CI_model {
                                             /* Trata issue */
                                             $jid = strzero($jid, 7);
                                             
-                                            $sql = "selectx * from brapci_edition where 
+                                            $sql = "selectx * from ".$this->base."brapci_edition where 
                                             ed_vol = '$vol'
                                             and ed_nr = '$nr'
                                             and ed_ano = '$ano' 
@@ -1863,8 +1896,8 @@ class oai_pmh extends CI_model {
                                     
                                     function _deletar_coleta_oai_cache_next($id) {
                                         $jid = strzero($id, 7);
-                                        $sql = "select * from oai_cache
-                                        inner join brapci_journal on jnl_codigo = cache_journal
+                                        $sql = "select * from ".$this->base."oai_cache
+                                        inner join ".$this->base."brapci_journal on jnl_codigo = cache_journal
                                         where cache_journal = '$jid'
                                         and cache_status = '@'
                                         ";
@@ -1878,7 +1911,7 @@ class oai_pmh extends CI_model {
                                             $idr = $line['id_cache'];
                                             
                                             /* Atualiza registro de coleta */
-                                            $sql = "update oai_cache set cache_tentativas = cache_tentativas + 1 where id_cache = " . $id;
+                                            $sql = "update ".$this->base."oai_cache set cache_tentativas = cache_tentativas + 1 where id_cache = " . $id;
                                             $this -> db -> query($sql);
                                             
                                             /* Method 1 */
@@ -1895,7 +1928,7 @@ class oai_pmh extends CI_model {
                                             fwrite($f, $xml);
                                             fclose($f);
                                             
-                                            $sql = "update oai_cache set cache_status='A' where id_cache = " . $idr;
+                                            $sql = "update ".$this->base."oai_cache set cache_status='A' where id_cache = " . $idr;
                                             $this -> db -> query($sql);
                                             
                                             /* Meta refresh */
@@ -1906,8 +1939,8 @@ class oai_pmh extends CI_model {
                                     }
                                     
                                     function oai_resumo_to_harvesing() {
-                                        $sql = "select count(*) as total, cache_journal, jnl_nome from oai_cache 
-                                        inner join brapci_journal on jnl_codigo = cache_journal
+                                        $sql = "select count(*) as total, cache_journal, jnl_nome from ".$this->base."oai_cache 
+                                        inner join ".$this->base."brapci_journal on jnl_codigo = cache_journal
                                         where cache_status = '@'
                                         group by cache_journal, jnl_nome
                                         order by jnl_nome ";
@@ -1923,8 +1956,8 @@ class oai_pmh extends CI_model {
                                     }
                                     
                                     function oai_resumo_to_progress() {
-                                        $sql = "select count(*) as total, cache_journal, jnl_nome from oai_cache 
-                                        inner join brapci_journal on jnl_codigo = cache_journal
+                                        $sql = "select count(*) as total, cache_journal, jnl_nome from ".$this->base."oai_cache 
+                                        inner join ".$this->base."brapci_journal on jnl_codigo = cache_journal
                                         where cache_status = 'A'
                                         group by cache_journal, jnl_nome
                                         order by jnl_nome ";
@@ -1940,7 +1973,7 @@ class oai_pmh extends CI_model {
                                     }
                                     
                                     function oai_resset_cache($id) {
-                                        $sql = "update oai_cache set cache_status = '@' where cache_journal = '" . strzero($id, 7) . "'";
+                                        $sql = "update ".$this->base."oai_cache set cache_status = '@' where cache_journal = '" . strzero($id, 7) . "'";
                                         $rlt = $this -> db -> query($sql);
                                         return (1);
                                     }
@@ -1950,7 +1983,7 @@ class oai_pmh extends CI_model {
                                         if ($jid > 0) { $wh = " cache_journal = '" . strzero($jid, 7) . "' ";
                                         }
                                         
-                                        $sql = "select count(*) as total, cache_status from oai_cache 
+                                        $sql = "select count(*) as total, cache_status from ".$this->base."oai_cache 
                                         where $wh 
                                         group by cache_status ";
                                         $rlt = db_query($sql);
@@ -1986,9 +2019,9 @@ class oai_pmh extends CI_model {
                                 }
                                 
                                 function doublePDFlink() {
-                                    $sql = "select * from (
+                                    $sql = "select * from ".$this->base."(
                                         SELECT bs_adress, count(*) as total, max(id_bs) as id 
-                                        FROM `brapci_article_suporte` 
+                                        from ".$this->base."`brapci_article_suporte` 
                                         WHERE bs_type = 'URL' 
                                         and bs_adress like 'http%'
                                         and (bs_status ='A' or bs_status = '@')
@@ -2004,7 +2037,7 @@ class oai_pmh extends CI_model {
                                                 $line = $rlt[$r];
                                                 $adress = $line['bs_adress'];
                                                 $id = $line['id'];
-                                                $sql = "update brapci_article_suporte 
+                                                $sql = "update ".$this->base."brapci_article_suporte 
                                                 set bs_status = 'D' 
                                                 WHERE bs_adress = '$adress' 
                                                 and id_bs <> $id ";
@@ -2017,9 +2050,9 @@ class oai_pmh extends CI_model {
                                     
                                     function artcle_wifout_file($pag = 0) {
                                         $off = $pag * 350;
-                                        $sql = "select count(*) as total from brapci_article
-                                        LEFT JOIN (
-                                            select count(*) as total, bs_article from brapci_article_suporte 
+                                        $sql = "select count(*) as total from ".$this->base."brapci_article
+                                        LEFT join ".$this->base."(
+                                            select count(*) as total, bs_article from ".$this->base."brapci_article_suporte 
                                             where bs_status <> 'X' and bs_type = 'PDF' 
                                             group by bs_article
                                             ) as tabela ON bs_article = ar_codigo
@@ -2029,14 +2062,14 @@ class oai_pmh extends CI_model {
                                             $rlt = $rlt -> result_array();
                                             $sx = '<h4>' . $rlt[0]['total'] . '</h4>';
                                             
-                                            $sql = "select ar_codigo, ar_titulo_1, jnl_nome from brapci_article
-                                            LEFT JOIN (
-                                                select count(*) as total, bs_article from brapci_article_suporte 
+                                            $sql = "select ar_codigo, ar_titulo_1, jnl_nome from ".$this->base."brapci_article
+                                            LEFT join ".$this->base."(
+                                                select count(*) as total, bs_article from ".$this->base."brapci_article_suporte 
                                                 where bs_status <> 'X' and bs_type = 'PDF' 
                                                 group by bs_article
                                                 ) as tabela
                                                 ON bs_article = ar_codigo
-                                                INNER JOIN brapci_journal ON jnl_codigo = ar_journal_id
+                                                INNER join ".$this->base."brapci_journal ON jnl_codigo = ar_journal_id
                                                 
                                                 WHERE TOTAL is null AND ar_status <> 'X'					
                                                 ORDER BY jnl_nome, ar_codigo";
@@ -2065,7 +2098,7 @@ class oai_pmh extends CI_model {
                                                 $sz = 30;
                                                 $OFFSET = ($pag * 100);
                                                 $data = date("Ymd");
-                                                $sql = "select * from brapci_article_suporte 
+                                                $sql = "select * from ".$this->base."brapci_article_suporte 
                                                 WHERE bs_update <> '$data' 
                                                 and bs_status <> 'X'
                                                 and bs_type = 'PDF'
@@ -2086,7 +2119,7 @@ class oai_pmh extends CI_model {
                                                         $sx .= ' <b><font color="green">OK</font></b>' . cr();
                                                     } else {
                                                         $sx .= ' <b><font color="red">file not found</font></b>' . cr();
-                                                        $sql = "update brapci_article_suporte set bs_status = 'X', bs_update = '" . date("Ymd") . "' where id_bs = " . $line['id_bs'];
+                                                        $sql = "update ".$this->base."brapci_article_suporte set bs_status = 'X', bs_update = '" . date("Ymd") . "' where id_bs = " . $line['id_bs'];
                                                         $rla = $this -> db -> query($sql);
                                                     }
                                                 }
@@ -2097,11 +2130,11 @@ class oai_pmh extends CI_model {
                                             }
                                             
                                             function totalPDFharvesting() {
-                                                $sql = "select count(*) as total from (
-                                                    SELECT `bs_article` as art, count(*) as total FROM `brapci_article_suporte` WHERE bs_type = 'URL' group by bs_article
+                                                $sql = "select count(*) as total (
+                                                    SELECT `bs_article` as art, count(*) as total FROM ".$this->base."brapci_article_suporte WHERE bs_type = 'URL' group by bs_article
                                                     )
                                                     as tebela
-                                                    inner join brapci_article_suporte on art = bs_article
+                                                    inner join ".$this->base."brapci_article_suporte on art = bs_article
                                                     where total = 1 and bs_adress like 'http%'
                                                     and bs_status ='A' or bs_status = '@'
                                                     and art <> '' 
@@ -2117,13 +2150,13 @@ class oai_pmh extends CI_model {
                                                 }
                                                 
                                                 function nextPDFharvesting() {
-                                                    $sql = "select * from (
+                                                    $sql = "select * from ".$this->base."(
                                                         SELECT `bs_article` as art, count(*) as total 
-                                                        FROM `brapci_article_suporte` 
+                                                        FROM ".$this->base."brapci_article_suporte` 
                                                         WHERE bs_type = 'URL' group by bs_article
                                                         )
                                                         as tebela
-                                                        inner join brapci_article_suporte on art = bs_article
+                                                        inner join ".$this->base."brapci_article_suporte on art = bs_article
                                                         where total = 1 and bs_adress like 'http%'
                                                         and bs_status ='A' or bs_status = '@'
                                                         and art <> '' 
@@ -2133,7 +2166,7 @@ class oai_pmh extends CI_model {
                                                         $rlt = $rlt -> result_array();
                                                         if (count($rlt) > 0) {
                                                             $id = $rlt[0]['id_bs'];
-                                                            $sql = "update brapci_article_suporte set bs_status = 'T' where id_bs = " . $id;
+                                                            $sql = "update ".$this->base."brapci_article_suporte set bs_status = 'T' where id_bs = " . $id;
                                                             $this -> db -> query($sql);
                                                             return ($rlt[0]);
                                                         } else {
@@ -2144,14 +2177,14 @@ class oai_pmh extends CI_model {
                                                     
                                                     function nextPDFconvert() {
                                                         $data = date("Ymd");
-                                                        $sql = "select * from brapci_article_suporte where bs_status = 'T'
+                                                        $sql = "select * from ".$this->base."brapci_article_suporte where bs_status = 'T'
                                                         and bs_update <> $data
                                                         limit 1";
                                                         $rlt = $this -> db -> query($sql);
                                                         $rlt = $rlt -> result_array();
                                                         if (count($rlt) > 0) {
                                                             $id = $rlt[0]['id_bs'];
-                                                            $sql = "update brapci_article_suporte set bs_status = 'U', bs_update = $data 
+                                                            $sql = "update ".$this->base."brapci_article_suporte set bs_status = 'U', bs_update = $data 
                                                             where id_bs = " . $id;
                                                             $this -> db -> query($sql);
                                                             return ($rlt[0]);
@@ -2165,7 +2198,7 @@ class oai_pmh extends CI_model {
                                                         $jnl = 16;
                                                         $sx = bs_alert('info',msg("OK"));
                                                         $wh = 'li_jnl = '.$jnl.' and ';
-                                                        $sql = "select * from source_listidentifier 
+                                                        $sql = "select * from ".$this->base."source_listidentifier 
                                                         where $wh li_status = 'active' and li_s = 3
                                                         order by li_s, li_u, id_li
                                                         limit 1 offset ".$id;

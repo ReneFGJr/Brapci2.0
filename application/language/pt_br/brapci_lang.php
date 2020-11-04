@@ -216,4 +216,38 @@ $lang['Not Identify'] = 'Não identificado';
 $lang['hasAbstract'] = 'Resumo';
 $lang['hasFileStorage'] = 'Arquivos/Diretório';
 $lang['Source'] = 'Fonte';
+$lang['journal_evaluation'] = 'Revista - Avaliação';
+$lang['no'] = 'Não';
+$lang['yes'] = 'Sim';
+$lang['scielo_index'] = 'Indexado no Scielo?';
+$lang['journal_url'] = 'Link da Revista';  
+
+$lang['About_journal'] = 'Sobre a Revista';
+$lang['journal_administrator'] = 'Administrador (e-mail)';
+$lang['journal_name'] = 'Nome da revista';
+$lang['protocolVersion'] = 'Versão do protocolo OAI-PMH';
+$lang['deletedRecord'] = 'Exclusão dos registros';
+$lang['persistent'] = 'Persistente';
+$lang['granularity'] = 'Formato da Data';
+$lang['baseURL'] = 'Link OAI';
+$lang['ev_identify_journal'] = 'Informações da revista';
+$lang['select_journal_url'] = 'Definir a URL';
+$lang['ev_sets_journal'] = 'Analisar Seções';
+$lang['ev_listsets_journal'] = 'Situação das seções';
+$lang['source_journal'] = 'Selecione a publicação';
+$lang['or'] = 'ou';
+$lang['jnl_issn'] = 'ISSN';
+
+$lang['jnl_name_abrev'] = 'Abrev.';
+$lang['jnl_name'] = 'Título da Revista';
+$lang['field'] = 'campo';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+
+
+
 

@@ -25,9 +25,9 @@ function nbr_author($xa, $tp)
             $xx = $xx . substr($xa, $qk, 1);
         }
     }
-
+    
     $xa = "";
-
+    
     /////////////////////////////
     $xp1 = "";
     $xp2 = "";
@@ -43,7 +43,7 @@ function nbr_author($xa, $tp)
             $xop = -1;
         } else { 
             $xp2 = trim($xp[$qk] . ' ' . $xp2);
-
+            
             if ($xop == -1) 
             {
                 $xop = 1;
@@ -57,7 +57,7 @@ function nbr_author($xa, $tp)
             }
         }
     }
-
+    
     ////////// 1 e 2
     $xp2a = strtolower($xp2);
     $xa = trim(trim($xp2) . ' ' . trim($xp1));
@@ -75,7 +75,7 @@ function nbr_author($xa, $tp)
         if ($tp == 4) { $xa = UpperCaseSQL($xa);
         }
     }
-
+    
     if (($tp >= 5) or ($tp <= 6)) 
     {
         $xp2a = str_word_count(lowerCaseSQL($xp2), 1);
@@ -109,7 +109,7 @@ function nbr_author($xa, $tp)
             $xa = UpperCaseSQL(trim(trim($xp1) . ', ' . trim($xp2)));
         }
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////////////
     if (($tp == 7) or ($tp == 8)) 
     {
@@ -136,7 +136,7 @@ function nbr_author($xa, $tp)
         $xa = troca($xa, ' Em ', ' e ');
         $xa = troca($xa, ' Para ', ' para ');
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////////////
     if (($tp == 17) or ($tp == 18)) 
     {
@@ -184,10 +184,10 @@ function check_dir($dir) {
         $rlt = fopen($dir . '/index.php', 'w+');
         fwrite($rlt, '<TT>Acesso negado</tt>');
         fclose($rlt);
-
+        
         /* conteudo do arquivo */
         $content = 'deny from all';
-
+        
         /* Bloqueia todo acesso */
         $rlt = fopen($dir . '/.htaccess', 'w');
         fwrite($rlt, $content);
@@ -196,7 +196,7 @@ function check_dir($dir) {
 }
 function redirect2($url,$time=0)
 {
-
+    
     if ($time <= 0)
     {
         redirect($url);
@@ -206,29 +206,28 @@ function redirect2($url,$time=0)
         <script>
         var count = '.$time.';
         var countdown = setInterval(
-        function() { 
-            html = "'.msg('return_in').'";
-            $("#countdown").html(html + " " + count + "s");
-            if (count == 1) 
-            {
-              clearInterval(countdown);
-              window.open(\''.$url.'\', "_self");
-          }
-          count--;
-          }, 1000);
-          </script>     
-          ';
-          return($sx);
-      }
-  }
-  function romano($n)
-  {
+            function() 
+            { 
+                html = "'.msg('return_in').'";
+                $("#countdown").html(html + " " + count + "s");
+                if (count == 1) { clearInterval(countdown); window.open(\''.$url.'\', "_self"); }
+                count--;
+            }, 1000
+        );
+        </script>     
+        ';
+        return($sx);
+    }
+}
+
+function romano($n)
+{
     $r = '';
     $u = array('','I','II','III','IV','V','VI','VII','VII','IX');
     $d = array('','X','XX','XXX','XL','L','LX','LXX','LXXX','XC');
     $c = array('','C','CC','CCC','CD','D,','DC','DCC','DCCC','CM');
     $m = array('','M','MM','MMM');
-
+    
     if ($n < 3000)
     {
         $v1 = round(substr($n,strlen($n)-1,1));
@@ -260,16 +259,18 @@ function redirect2($url,$time=0)
 
 function isbn10to13($isbn)
 {
-   $isbn = trim($isbn);
- if(strlen($isbn) == 12){ // if number is UPC just add zero
-   $isbn13 = '0'.$isbn;}
-   else
-   {
-      $isbn2 = substr("978" . trim($isbn), 0, -1);
-      $sum13 = genchksum13($isbn2);
-      $isbn13 = "$isbn2$sum13";
-  }
-  return ($isbn13);
+    $isbn = trim($isbn);
+    if(strlen($isbn) == 12)
+    { // if number is UPC just add zero
+        $isbn13 = '0'.$isbn;
+    }
+    else
+    {
+        $isbn2 = substr("978" . trim($isbn), 0, -1);
+        $sum13 = genchksum13($isbn2);
+        $isbn13 = "$isbn2$sum13";
+    }
+    return ($isbn13);
 }
 
 function isbn13to10($isbn) {
@@ -295,24 +296,24 @@ function isbn13to10($isbn) {
 
 function genchksum13($isbn)
 {
-   $isbn = trim($isbn);
-   $tb = 0;
-   for ($i = 0; $i <= strlen($isbn); $i++)
-   {
-      $tc = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $ta = ($tc*3);
-      $tci = substr($isbn, -1, 1);
-      $isbn = substr($isbn, 0, -1);
-      $tb = $tb + $ta + $tci;
-  }
-
-  $tg = ($tb / 10);
-  $tint = intval($tg);
-  if ($tint == $tg) { return 0; }
-  $ts = substr($tg, -1, 1);
-  $tsum = (10 - $ts);
-  return $tsum;
+    $isbn = trim($isbn);
+    $tb = 0;
+    for ($i = 0; $i <= strlen($isbn); $i++)
+    {
+        $tc = substr($isbn, -1, 1);
+        $isbn = substr($isbn, 0, -1);
+        $ta = ($tc*3);
+        $tci = substr($isbn, -1, 1);
+        $isbn = substr($isbn, 0, -1);
+        $tb = $tb + $ta + $tci;
+    }
+    
+    $tg = ($tb / 10);
+    $tint = intval($tg);
+    if ($tint == $tg) { return 0; }
+    $ts = substr($tg, -1, 1);
+    $tsum = (10 - $ts);
+    return $tsum;
 } 
 
 function message($l,$t=0)
@@ -320,10 +321,10 @@ function message($l,$t=0)
     $sx = '';
     $cl = array('success','primary','secondary','danger','warning','info','light','dark');
     if (!isset($cl[$t]))
-        {
-            $t = 3;
-            $l = 'General Fail';
-        }
+    {
+        $t = 3;
+        $l = 'General Fail';
+    }
     $class = "alert-".$cl[$t];
     $sx .= '</br>
     <div class="alert '.$class.'" role="alert">
@@ -331,6 +332,7 @@ function message($l,$t=0)
     </div>';
     return($sx);
 }
+
 function refresh($url='',$time=0)
 {
     if ($url=='')
@@ -339,7 +341,7 @@ function refresh($url='',$time=0)
     } else {
         $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
     }
-
+    
     return($sx);
 }
 
@@ -350,13 +352,13 @@ function age($data)
     $dia = substr($data,6,2);
     $mes = substr($data,4,2);
     $ano = substr($data,0,4);
-
+    
     // Descobre que dia é hoje e retorna a unix timestamp
     $hoje = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-
+    
     // Descobre a unix timestamp da data de nascimento do fulano
     $nascimento = mktime( 0, 0, 0, $mes, $dia, $ano);
-
+    
     // Depois apenas fazemos o cálculo já citado :)
     $idade = floor((((($hoje - $nascimento) / 60) / 60) / 24) / 365.25);        
     return($idade);
@@ -367,15 +369,15 @@ function view_body($sx,$dt=array())
     $CI = &get_instance();
     $dt['content'] = $sx;
     if (!isset($dt['fluid']))
-        { $dt['fluid'] = ''; }
+    { $dt['fluid'] = ''; }
     if (!isset($dt['title']))
-        { $dt['title'] = ''; }
+    { $dt['title'] = ''; }
     $CI->load->view('screen',$dt);
     return('1');
 }
 
-
-function le($par)
+/************************************************************************************************/
+function le($par,$wh='')
 {
     $CI = &get_instance();
     if (isset($par['id']))
@@ -387,212 +389,57 @@ function le($par)
         {
             return($rlt[0]);
         }        
+    } else {
+        $sql = "select * from ".$par.' where '.$wh." limit 1";
+        $rlt = $CI->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) > 0)
+        {
+            return($rlt[0]);
+        }        
     }
     return(array());
 }
 
-function row2($par=array())
-{
-    $CI = &get_instance();
-    if ((count($par) == 0) or (!is_array($par)))
+function show($d)
     {
-        $sx = '<pre>'.cr();;
-        $sx .= 'table = &lt;nome da tabela&gt;'.cr();
-        $sx .= 'type = &lt;tipo de visualização&gt; ex: 0,1,2,...'.cr();
-        $sx .= 'cp = Array com o campo das tabelas';
-        $sx .= '</pre>'.cr();
-        return($sx);
-    }
-
-    /************************************************** View *********/
-    if (isset($par['id']))
-    {
-        if (!isset($par['order']))
-        {
-            $par['order'] = $par['cp'][0][1];
-        }
-        $sql = "select * from ".$par['table'].' where '.$par['cp'][0][1].' = '.$par['id'];
-        $sql .= ' order by '.$par['order'];
-
-        $rlt = $CI->db->query($sql);
-        $rlt = $rlt->result_array();
-        $sx = '<!-- Classe de produtos -->'.cr();
-        $sx .= '<div class="col-md-12">';
-        $sx .= '<h1>'.msg('Table').': '.$par['table'].'</h1>'.cr();
-        $sx .= '<table id="fields" class="table">'.cr();
-        $sx .= '<tr><th>Field</th></th>Value</th></tr>'.cr();
-        $i = 0;
-        foreach ($rlt[0] as $key => $value) {
-            $i++;
-            $sx .= '<tr>';
-
-            $sx .= '<td align="right">';
-            $sx .= (string)$key;
-            $sx .= '</td>';
-            $sx .= '<td><b>';
-            $sx .= (string)$value;
-            $sx .= '</b></td>';
-            $sx .= '</tr>'.cr();
-        }
-        $sx .= '</table>'.cr();
-        $sx .= '</div>';
-        return($sx);
-    }        
-
-
-    /************************************************** Row **********/
-    if (isset($par['cp']))        
-    {
-        $pag = round(get("pag"));
-        $order = get("order");
-        $filt = get("filter");
-        $filter = '';
-        if ((strlen($order) == 0) and (count($par['cp']) > 0)) 
-        { 
-            $order = 'order by '.(string)$par['cp'][1][1]; 
-        }
-        $cp = $par['cp'];
-        $limit = 'limit 50';
-        $cps = '';
-        foreach ($cp as $key => $value) {
-            if ((strlen($value[5]) > 0) or ($cps == ''))
-            {
-                if (strlen($cps) > 0) 
-                { 
-                    $cps .= ', '; 
-                    if (strlen($filt) > 0) 
-                    { 
-                        $filter .= ' OR '; 
-                    }
-                }
-                $cps .= $value[1];
-                if (strlen($filt) > 0)
-                {
-                    $filter .= '('.$value[1] .' like \'%'.$filt.'%\')';
-                }
-            }
-        }
-        /* Caso a tabela esteja vazia */
-        if (count($cp) == 0)
-        {
-            $cps = '*';
-        }
-        /*************************** QUERY *****************/
-        if (strlen($filter) > 0)
-        { 
-            $where = ' where ('.$filter.')'; 
-        } else {
-            $where = '';
-        }
-
-        if (isset($par['where']))
-        {
-            if (strlen($where) > 0) 
-            {
-                $where .= ' AND ';
-            } else {
-                $where = ' where ';
-            }
-            $where .= ' ('.$par['where'].')';
-        }
-
-        $sql = "select $cps 
-        from ".$par['table']."
-        $where 
-        $order
-        $limit ";
-        
-
-        /************************* EXECUTA QUERY *************/
-        $rlt = $CI->db->query($sql);
-        $rlt = $rlt->result_array();
         $sx = '<table class="table">';
-        /* Filter */
-        $sx .= '<tr>';
-        $sx .= '<td colspan=10><form method="get">
-        <div class="input-group mb-3">
-        <input type="text" name="filter" class="form-control" placeholder="'.msg("name_to_filter").'" aria-label="'.msg("name_to_filter").'" aria-describedby="basic-addon2">
-        <div class="input-group-append">
-        <input type="submit" value="'.msg("bt_filter").'" class="input-group-text" id="basic-addon2">
-        </div>
-
-        <div class="input-group-append">
-        <a href="'.$par['path'].'edit/0'.'"class="input-group-text" id="basic-addon3">Novo Registro</a>
-        </div>
-
-        </div>
-        </form></td>';
-        $sx .= '</tr>';
-        /* header */
-        $sx .= '<tr>';
-        foreach ($cp as $key => $value) {   
-            if ($value[5] == true)                 
-            {
-                $cps = trim((string)$value[1]);
-                $sx .= '<th>'.msg($cps).'</th>';
-            }
-        }
-        $sx .= '</tr>';
-        /* Datas */            
-        for ($r=0;$r < count($rlt);$r++)
-        {
-            $line = $rlt[$r];
-            $link = '<a href="'.$par['path'].'view/'.$line[$cp[0][1]].'">';
-            $linka = '</a>';
-            $sx .= '<tr>';
-
-            foreach ($cp as $key => $value) {   
-                if ($value[5] == true)                 
-                {                    
-                    $value = $line[$value[1]];
-                    $sx .= '<td>'.$link.$value.$linka.'</td>';                   
-                }
-            }
-            $sx .= '</tr>';
-
-        }
-        $sx .= '</table>';
-        return($sx);
-    }
-
-    /************* Sem os campos *******************************************/
-    if (!isset($par['cp']))
-    {
-        $sql = "select * from ".$par['table'].' limit 1';
-        $rlt = $CI->db->query($sql);
-        $rlt = $rlt->result_array();
-        $sx = '<!-- Classe de produtos -->'.cr();
-        $sx .= '<div class="col-md-12">';
-        $sx .= '<h1>'.msg('Table').': '.$par['table'].'</h1>'.cr();
-        $sx .= '<table id="fields" class="table">'.cr();
-        $sx .= '<tr><th>Field</th></th>Value</th></tr>'.cr();
+        $sx .= '<tr>
+                    <th width="30%" class="text-right">'.msg('field').'</th>
+                    <th width="70%">'.msg('value').'</th>
+                </tr>';
+        $id = 0;
         $i = 0;
-        foreach ($rlt[0] as $key => $value) {
-            $i++;
-            $sx .= '<tr>';
-
-            $sx .= '<td>'.$i.'</td>';
-            $sx .= '<td>';
-            $sx .= (string)$key;
-            $sx .= '</td>';
-            $sx .= '<td>';
-            $sx .= (string)$value;
-            $sx .= '</td>';
-
-            $sx .= '<td>';
-
-            if ($i == 1) {
-                $sx .= 'array_push($cp,array(\'$H8\',"'.$key.'","'.msg($key).'",True,True,True)); ';
-            } else {
-                $sx .= 'array_push($cp,array(\'$S100\',"'.$key.'","'.msg($key).'",True,True,True)); ';
+        foreach($d as $key=>$value)
+            {
+                if ($id == 0) { $id = $value; }
+                $sx .= '<tr>';
+                $sx .= '<td align="right" class="small">';
+                $sx .= msg($key);
+                $sx .= '</td>';
+                $sx .= '<td id="row'.$i.'" onclick="editar(\''.$value.'\','.$id.',\'#row'.$i.'\');">';
+                $sx .= $value;
+                $sx .= '</td>';
+                $sx .= '</tr>';
+                $i++;
             }
-            $sx .= '</td>';
+        $sx .= '</table>';
 
-            $sx .= '</tr>'.cr();
-        }
-        $sx .= '</table>'.cr();
-        $sx .= '</div>';
-        return($sx);
+        $js = '
+        <script>
+            function editar($vlr,$id,frame)
+                {
+                    $h = \'<textarea style="width: 100%;" id=ax>\'+$vlr+\'</textarea>\';
+                    $h = $h + "<br>";
+                    $h = $h + \'<a href="#" onclick=cancelar(1,2,"\'+frame+\'"); >cancel</a>\';
+                    $(frame).html($h);
+                }
+            function cancelar($vlr,$id,frame)
+                {                    
+                    alert(frame);
+                    $(frame).html("xx");
+                }
+
+        </script>';
+        return($sx.$js);
     }
-
-} 

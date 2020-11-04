@@ -1,7 +1,7 @@
 <?php
 /*
 * Inteligencê Artificial
-*
+* https://portal.issn.org/resource/ISSN/1982-2014
 */
 class Ias extends CI_model
 {
@@ -60,7 +60,14 @@ class Ias extends CI_model
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/10/txtb';
 			$file = '_ia/domain_datas.txt';
 			$this->import_thesa($url,$file);
-			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';			
+			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';	
+
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/269/txtb';
+			$file = '_ia/domain_companies.txt';
+			$this->import_thesa($url,$file);
+			$sx .= '<li>Companies <span style="color: green"><b>Update</b></span></li>';
+
+			
 			
 			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';			
 			$file = '_ia/domain_datas_g.txt';
@@ -149,6 +156,8 @@ class Ias extends CI_model
 			case 'thesa':
 				$sx = $this->check(1);
 				$sx .= '<a href="'.base_url(PATH.'ia').'" class="btn btn-outline-primary">'.msg('return').'</a>';
+				$sx .= ' &nbsp; ';
+				$sx .= '<a href="'.base_url(PATH.'ia/thesa').'" class="btn btn-outline-primary">'.msg('update').'</a>';
 			break;
 			
 			case 'nlp':
@@ -156,7 +165,8 @@ class Ias extends CI_model
 				{
 					case 'analyse':
 						$vv = $this -> frbr_core -> le_data($d2);
-						$sx = $this->ias->nlp_v($vv);					
+						$sx = '<h3>'.msg("Inteligência Artificial - IA Brapci (Robots)").'</h3>';
+						$sx .= $this->ias->nlp_v($vv);					
 					break;
 					
 					default:
@@ -530,12 +540,16 @@ function icone($i,$v=0,$id)
 		$sx = '<table width="100%"><tr valign="top"><td width="50%">'.$col1.'</td><td>'.$col2.'</td></tr></table>';
 		$tq = troca($t,';',' ');
 		$tq = troca($tq,'[[sw]]',' ');
+		$tq = troca($tq,'[[sw]#thesa-c12285]','');
 		$tq = troca($tq,' [.]','.<br>');
+		$tq = troca($tq,'[','<');
+		$tq = troca($tq,']','>');
 		$sx .= '<hr>texto<hr><div class="text-justify">'.$tq.'</div>';
 		$sx .= '<hr>Referencias<hr>'.$refs;
 		return($sx);
 	}
 	
+	/*********************************************************** Mostra conceito */
 	function show_conecpt($key='')
 	{
 		$domain = array('#thesa');
@@ -592,7 +606,7 @@ function neuro_link($t)
 
 function neuro_referencias($t)
 {
-	$a = array('Referências','REFERÊNCIAS','referencias');
+	$a = array('Referências','REFERÊNCIAS','referencias','REFERÊNCIAS');
 	for ($r=0;$r < count($a);$r++)
 	{
 		$pos = strpos($t,'> '.$a[$r]);
@@ -604,24 +618,24 @@ function neuro_referencias($t)
 			
 			$ref = troca($ref,chr(13),chr(10));
 			$ln = explode(chr(10),$ref);
-
+			
 			$lst = '';
 			echo '<tt>';
 			for ($r=0;$r < count($ln);$r++)
-				{
-					$n2 = caixa_alta($ln[$r]);
-					$rf = trim($lst.' '.trim($ln[$r]));	
-									
-					$n1 = tem_ano($rf);
-					if ($n1 == 0)
-						{ 
-							$lst = $rf;
-						} else {
-							$lst = '';
-							echo '<hr><b>'.$rf.'</b>';
-							echo 'Neuronio #1:'.$n1.'<br>';
-						}
+			{
+				$n2 = caixa_alta($ln[$r]);
+				$rf = trim($lst.' '.trim($ln[$r]));	
+				
+				$n1 = tem_ano($rf);
+				if ($n1 == 0)
+				{ 
+					$lst = $rf;
+				} else {
+					$lst = '';
+					echo '<hr><b>'.$rf.'</b>';
+					echo 'Neuronio #1:'.$n1.'<br>';
 				}
+			}
 			$text = substr($t,0,$pos);
 			return(array($text,$ref));
 		}
@@ -631,33 +645,33 @@ function neuro_referencias($t)
 
 #validador 1
 function tem_ano($lz)
+{
+	for ($r=(date("Y")+2);$r > 1900;$r--)
 	{
-		for ($r=(date("Y")+2);$r > 1900;$r--)
-			{
-				$ano = (string)$r;
-				$pos = strpos($lz,$ano);
-				if ($pos > 0) 
-					{ 						
-						return(1); 
-					}
-			}
-		return(0);
-
+		$ano = (string)$r;
+		$pos = strpos($lz,$ano);
+		if ($pos > 0) 
+		{ 						
+			return(1); 
+		}
 	}
+	return(0);
+	
+}
 #validador 2
 function caixa_alta($lz)
+{
+	$lzr = str_replace(array(',',';','.','!','?'),array(' '),$lz);
+	$lzr = trim(substr($lzr,0,strpos($lzr,' ')));
+	$lzru = UpperCaseSQL($lzr);
+	
+	if ($lzru == $lzr)
 	{
-		$lzr = str_replace(array(',',';','.','!','?'),array(' '),$lz);
-		$lzr = trim(substr($lzr,0,strpos($lzr,' ')));
-		$lzru = UpperCaseSQL($lzr);
-
-		if ($lzru == $lzr)
-			{
-				return(1);
-			}
-		echo $lz.'<br>'.$lzr;
-		exit;
+		return(1);
 	}
+	echo $lz.'<br>'.$lzr;
+	exit;
+}
 
 function neuro_email($t)
 {

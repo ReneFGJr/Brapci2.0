@@ -48,6 +48,15 @@ class res extends CI_Controller {
         $data['complement'] = $this->GoogleDialogFlow->bot();
         $this -> load -> view('header/footer.php', $data);
     }
+
+    function evaluation($d1='',$d2='',$d3='',$d4='')
+        {
+            $this->load->model('journal_evaluations');
+            $this->cab();
+            $data['content'] = $this->journal_evaluations->index($d1,$d2,$d3,$d4);
+            $this->load->view('content',$data);
+            $this->footer();
+        }
     
     function ea($pth = '', $q = '') {
         $this -> load -> model('elasticsearch');

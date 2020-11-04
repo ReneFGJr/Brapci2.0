@@ -39,6 +39,7 @@
 	 */
 	}
 </style>
+<img width="200" height="200" src="https://brapci.inf.br/img/brapci_200x200.png" class="custom-logo" alt="Brapci" srcset="https://brapci.inf.br/img/brapci_200x200.png 150w" sizes="(max-width: 200px) 100vw, 200px" style="display: none;">
 <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
   <a href="<?php echo base_url(PATH); ?>"><img src="<?php echo base_url('img/logo/logo-brapci.png'); ?>" id="logo" class="logo-lg col-lg-0 navbar-brand" border=0></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,6 +72,7 @@
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/saved'); ?>"><?php echo msg('basket_saved'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/inport'); ?>"><?php echo msg('basket_inport'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'bibliometric'); ?>"><?php echo msg('bibliometric_tools'); ?></a>
+						<a class="dropdown-item" href="<?php echo base_url(PATH . 'evaluation'); ?>"><?php echo msg('journal_evaluation'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'ia'); ?>"><?php echo msg('artificial_inteligence'); ?></a>
                     </div>
                 </li>

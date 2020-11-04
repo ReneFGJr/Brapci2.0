@@ -5,10 +5,12 @@ if (!isset($title)) { $title = 'no title';
 $HTTP = 'http://www.brapci.inf.br/';
 
 $title = 'Brapci - Base de Dados em Ciência da Informação';
-$descr = 'Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.';
+$desc = '';
 $url = 'http://www.brapci.inf.br/';
 $sufix = ' #Brapci2.0';
 $author = '';
+$auth = '';
+$descr = '';
 $keys = 'artigos científicos, revistas científicas, ciência da informação, biblioteconomia, arquivologia';
 if (isset($meta))
 {
@@ -46,6 +48,7 @@ if (isset($meta))
 			/*********************************************************************/
 			case 'hasAuthor':
 			$author = '    <META NAME="author" CONTENT="'.$value.'">'.cr();
+			$auth = $value;
 			break;
 
 			/*********************************************************************/
@@ -63,6 +66,16 @@ if (isset($meta))
 		}
 	}
 }
+if (strlen($descr) == 0)
+	{
+		if (strlen($auth) > 0)
+			{
+				$descr = $auth;
+			} else {
+				$descr = 'Base de dados de Periódicos em Ciência da Informação publicadas no Brasil desde 1972.';
+			}		
+	}
+
 if (isset($title))
 	?>
 <head>
@@ -107,26 +120,6 @@ if (isset($title))
 
 			ga('create', 'UA-12713129-1', 'auto');
 			ga('send', 'pageview');
-		</script>
-
-<!---    
-<script>
-	(function(i, s, o, g, r, a, m) {
-		i['GoogleAnalyticsObject'] = r;
-		i[r] = i[r] ||
-		function() {
-			(i[r].q = i[r].q || []).push(arguments)
-		}, i[r].l = 1 * new Date();
-		a = s.createElement(o),
-		m = s.getElementsByTagName(o)[0];
-		a.async = 1;
-		a.src = g;
-		m.parentNode.insertBefore(a, m)
-	})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-	ga('create', 'UA-12713129-1', 'auto');
-	ga('send', 'pageview'); 
-</script>
---->   
+		</script>  
 </head>
 <body>
