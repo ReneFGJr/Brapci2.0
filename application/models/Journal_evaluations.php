@@ -547,7 +547,7 @@ class journal_evaluations extends CI_Model
                 }           
             $data['subject'] = $data;
             $sx .= '<br><br>';
-            $sx .= '<h2>'.msg('report_keywords').' - CLOUDMAP '.$limit.' ('.$dt_ini.'-'.$dt_fim.')</h2>';
+            $sx .= '<h2>'.msg('report_keywords').' - WordCloud '.$limit.' ('.$dt_ini.'-'.$dt_fim.')</h2>';
             $sx .= $this -> load -> view("brapci/cloud_tags_3", $data, true);
             return($sx);
         }   
