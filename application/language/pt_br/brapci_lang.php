@@ -232,8 +232,8 @@ $lang['granularity'] = 'Formato da Data';
 $lang['baseURL'] = 'Link OAI';
 $lang['ev_identify_journal'] = 'Informações da revista';
 $lang['select_journal_url'] = 'Definir a URL';
-$lang['ev_sets_journal'] = 'Analisar Seções';
-$lang['ev_listsets_journal'] = 'Situação das seções';
+$lang['ev_sets_journal'] = 'Harvesting das Seções';
+$lang['ev_listsets_journal'] = 'Harvesting das publicações';
 $lang['source_journal'] = 'Selecione a publicação';
 $lang['or'] = 'ou';
 $lang['jnl_issn'] = 'ISSN';
@@ -241,12 +241,20 @@ $lang['jnl_issn'] = 'ISSN';
 $lang['jnl_name_abrev'] = 'Abrev.';
 $lang['jnl_name'] = 'Título da Revista';
 $lang['field'] = 'campo';
+$lang['ev_politics'] = 'Políticas, instruções para autores e contato';
+$lang['ev_system'] = 'Sobre o sistemas';
+$lang['report_distribution'] = 'Seções com publicações';
+$lang['report_distribution_month'] = 'Data de disponibilização das publicações';
+$lang['report_authors'] = 'Autores que mais publicaram na Revista';
+$lang['report_keywords'] = 'Palavras-Chave mais frequentes';
+$lang['ev_getrecord'] = 'Harvesting - Coletar Registros';
+$lang['report_publications'] = 'Publicações por ano';
+$lang['report_title_language'] = 'Idioma dos títulos';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
-$lang[''] = '';
-$lang[''] = '';
+
 
 
 

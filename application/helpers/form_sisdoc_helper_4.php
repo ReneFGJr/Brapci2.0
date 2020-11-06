@@ -10,6 +10,11 @@
 * @version     v0.20.10.31
 */
 
+function btn_reload()
+    {
+        $sx = '<button class="btn btn-outline-primary" onClick="window.location.reload();">'.msg('Refresh Page').'</button>';
+        return($sx);
+    }
 function row3($p=array())
 {
     $CI = &get_instance();

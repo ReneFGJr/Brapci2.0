@@ -1046,6 +1046,7 @@ class oai_pmh extends CI_model {
             }
             public function ListIdentifiers_harvesting($id,$data=array()) {
                 $tp = 0;
+                if (isset($data['harvesting'])) { $loop = 0;} else {$loop = 1;}
                 if (isset($data['jnl_url_oai']))
                     {
                         $tp = 1;
@@ -1069,17 +1070,27 @@ class oai_pmh extends CI_model {
                 $response = $this -> xml_value($xml -> responseDate);
                 
                 $this -> update_token($id, $token);
-                $sx = '<br><b>Token: ' . $token . '</b>';
+                $sx = '<div class="row"><div class="col-md-12">';
+                $sx .= '<br><b>Token: ' . $token . '</b>';
                 $sx .= '<br><b>Response: ' . $response . '</b>';
-                $sx .= '<ul>';
+                $sx .= '</div></div>';
+                $sx .= '<div class="row"><div class="col-md-12"><ul>';
                 
                 for ($r = 0; $r < count($LI); $r++) {
                     $line = $LI[$r];
                     $sx .= '<li>' . $this -> cache($data['id_jnl'], $line) . '</li>';
                 }
-                $sx .= '</ul>';
+                $sx .= '</ul></div></div>';
                 if (strlen($token) > 0) {
-                    $sx .= $this -> ListIdentifiers_harvesting($id,$data);
+                    if ($loop == 0)
+                        {
+                            $sx .= 'Continua - Token: ' . $token;
+                            $sx = '<div class="row"><div class="col-md-12">'.btn_reload().'</div></div>'.$sx;
+                        } else {
+                            echo "OPS";
+                            exit;
+                            $sx .= $this -> ListIdentifiers_harvesting($id,$data);
+                        }                    
                 }
                 $this->erro = 200;
                 
