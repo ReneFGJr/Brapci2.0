@@ -3,6 +3,7 @@
 * Inteligencê Artificial
 * https://portal.issn.org/resource/ISSN/1982-2014
 */
+
 class Ias extends CI_model
 {
 	var $version_nlp = '0.21';
@@ -193,10 +194,21 @@ function nlp($d1='',$d2='',$d3='')
 			$txt = $this->nlp_process(get("dd1"));
 			$sx .= $this->nlp_words($txt);
 		break;
+
+		case 'singular':
+			$sx .= $this->nlp_form();
+			//$txt = $this->nlp_process(get("dd1"));
+			$txt = get("dd1");
+			
+			$ai = new ia;
+			$sx .= '<h2>Singular</h2>'.$ai->nlp_inflector($txt,'S');
+			$sx .= '<h2>Plural</h2>'.$ai->nlp_inflector($txt,'P');
+		break;		
 		
 		default:
 		$sx .= '<ul>';
 		$sx .= '<li>'.'<a href="'.base_url(PATH.'ia/nlp/run').'">'.msg("Processing Teste").'</a>';
+		$sx .= '<li>'.'<a href="'.base_url(PATH.'ia/nlp/singular').'">'.msg("Processing plural/singular").'</a>';
 		$sx .= '</ul>';
 	}
 	return($sx);
@@ -238,7 +250,7 @@ function nlp_form()
 	$form = new form;
 	$cp = array();
 	array_push($cp,array('$H8','','',false,false));
-	array_push($cp,array('$T80:15','',msg('text'),True,True));
+	array_push($cp,array('$T80:5','',msg('text'),True,True));
 	array_push($cp,array('$B8','',msg('run'),false,false));
 	
 	$sx = $form->editar($cp,'');

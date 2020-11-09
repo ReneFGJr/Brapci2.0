@@ -617,6 +617,17 @@ class oai_pmh extends CI_model {
                         $ano = $r;
                     }
                 }
+
+                if ($ano == '[????]')
+                    {
+                        if (isset($dt['date']))
+                            {
+                                $ano = substr($dt['date'],0,4);
+                            } else {
+                                $aa = (string)$dt->GetRecord->record->header->datestamp;
+                                $ano = substr($aa,0,4);
+                            }
+                    }
                 
                 /************************************************ volume *****************/
                 $n = troca($n,'V.','v.');
@@ -665,6 +676,10 @@ class oai_pmh extends CI_model {
                 $n = troca($n,'Núms.','n.');   
                 $n = troca($n,'número','n.');
                 $n = troca($n,'Número','n.');         
+                $n = troca($n,'no ','n. ');
+                $n = troca($n,'online first','n. online');
+                $n = troca($n,'ahead of print','n. online');
+                
                 if (strpos($n,'n.'))
                 {
                     $nr = trim(substr($n,strpos($n,'n.')+2,strlen($n)));
