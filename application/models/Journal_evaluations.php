@@ -72,7 +72,7 @@ class journal_evaluations extends CI_Model
                 $link = trim($dt['jnl_url']);
                 if (strlen($link) > 0) {
                     $txt = read_link($link);
-                    $sx .= $this->version_software($id,$txt);
+                    $sx .= $this->version_software($id, $txt);
                 }
                 $sx .= '<br>' . $this->back();
                 break;
@@ -121,7 +121,7 @@ class journal_evaluations extends CI_Model
         $sx = '';
         $id = $this->rset();
         $par = $this->parameters();
-        $dt = $this->oai_pmh->ListIdentifiers_harvesting($id,$par);
+        $dt = $this->oai_pmh->ListIdentifiers_harvesting($id, $par);
         $sx .= '<div class="row">';
         $sx .= '<div class="col-12 text-center" style="border-top: 1px solid #000; border-bottom: 1px solid #000;">' . msg("Sections_journal") . '</div>';
         $sx .= $dt;
@@ -153,7 +153,7 @@ class journal_evaluations extends CI_Model
     function update_sets($id, $cod, $setName)
     {
         if (strpos($setName, 'Ã') > 0) {
-            $setName = utf8_decode($setName);
+            //$setName = utf8_decode($setName);
         }
         $sql = "select * from " . $this->base . "source_sets
         where sets_journal = $id and
@@ -405,11 +405,11 @@ class journal_evaluations extends CI_Model
     {
     }
 
-    function version_software($jnl,$txt)
+    function version_software($jnl, $txt)
     {
         $version = $this->recover_metadata($txt, "generator", "content");
-        $this->report_update($jnl,'software',$version);
-        return($version);
+        $this->report_update($jnl, 'software', $version);
+        return ($version);
     }
 
     function recover_metadata($txt, $name, $meta)
@@ -422,6 +422,61 @@ class journal_evaluations extends CI_Model
             return ($t);
         }
         return ('undefined');
+    }
+
+    function report_coauthor($id)
+    {
+        $dt_fim = date("Y") + 1;
+        $dt_ini = $dt_fim - 20;
+
+        /**************************************************** Matriz */
+        $t = array();
+        /* Series */
+        for ($y = 0; $y <= 6; $y++) {
+            /* Anos */
+            for ($r = 0; $r <= ($dt_fim - $dt_ini); $r++) {
+                $t['y'][$y] = $r + $dt_ini;
+                $t['x'][$y][$r] = 0;
+            }
+        }
+        $sql = "select count(*) as total, authors, year
+                    from (
+                    select count(*) as authors, a_article, a_year as year
+                        from " . $this->base . "source_autores
+                        where a_jnl = $id
+                        and (a_year >= $dt_ini and a_year <= $dt_fim)
+                        group by a_article, year
+                    ) as tabela
+                    group by authors, year
+                    order by year, authors
+                    ";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $year = $line['year'] - $dt_ini;
+            $auths = $line['authors'];
+            $total = $line['total'];
+            if ($total > 1) {
+                $label = $auths . ' autores';
+                if ($total >= 5) {
+                    $label = '5+ ' . msg('authors');
+                }
+            } else {
+                $label = $auths . ' autor';
+            }
+
+            if ($auths > 5) {
+                $auths = 5;
+            }
+            $t['x'][$auths][$year] = $t['x'][$auths][$year] + $total;
+            $t['s'][$r] = 'xx'.$label;
+        }
+
+        $hc = new highchart;
+        $sx = $hc->show($t);
+        return ($sx);
     }
 
     function report_update($jnl, $field, $text)
@@ -444,426 +499,394 @@ class journal_evaluations extends CI_Model
         $rlt = $this->db->query($sql);
     }
 
-    function report($id=0)
-        {
-            if ($id==0)
-                {
-                    $id = $this->rset();
-                }            
-            $sx = '';
-            $sx .= $this->report_journal($id);
-            $sx .= $this->report_publications($id);
-            $sx .= $this->report_production($id);
-            $sx .= $this->report_author($id);
-            $sx .= $this->report_keywords($id);
-            return($sx);
+    function report($id = 0)
+    {
+        $this->load->helper("highchart");
+        if ($id == 0) {
+            $id = $this->rset(1);
         }
+        $sx = '';
+        $sx .= $this->report_journal($id);
+        $sx .= $this->report_publications($id);
+        $sx .= $this->report_production($id);
+        $sx .= $this->report_author($id);
+        $sx .= $this->report_coauthor($id);
+        $sx .= $this->report_keywords($id);
+        return ($sx);
+    }
 
     function report_journal($id)
-        {
-            $dt = le($this->sources->table, 'id_jnl=' . $id);
-            $sx = '';
-            $sx .= '<table class="table">';
-            $sx .= '<tr><td width="10%">Publicação</td><td style="font-size: 200%;">'.$dt['jnl_name'].'</td></tr>';
-            $sx .= '<tr><td width="10%">ISSN:</td><td>'.$dt['jnl_issn'].'</td></tr>';
-            $sx .= '<tr><td width="10%">URL:</td><td ><a href="'.$dt['jnl_url'].'" target="_new">'.$dt['jnl_url'].'</a></td></tr>';
-            $sx .= '</table>';
-            return($sx);
-        }
+    {
+        $dt = le($this->sources->table, 'id_jnl=' . $id);
+        $sx = '';
+        $sx .= '<table class="table">';
+        $sx .= '<tr><td width="10%">Publicação</td><td style="font-size: 200%;">' . $dt['jnl_name'] . '</td></tr>';
+        $sx .= '<tr><td width="10%">ISSN:</td><td>' . $dt['jnl_issn'] . '</td></tr>';
+        $sx .= '<tr><td width="10%">URL:</td><td ><a href="' . $dt['jnl_url'] . '" target="_new">' . $dt['jnl_url'] . '</a></td></tr>';
+        $sx .= '</table>';
+        return ($sx);
+    }
 
     function report_author($id)
-        {
-            $dt_fim = date("Y")+1;
-            $dt_ini = $dt_fim-10;
-            $limit = 50;
-            $sql = "select a_name, count(*) as total from ".$this->base."source_autores
+    {
+        $dt_fim = date("Y") + 1;
+        $dt_ini = $dt_fim - 10;
+        $limit = 50;
+        $sql = "select a_name, count(*) as total from " . $this->base . "source_autores
                         where a_jnl = $id
                         and (a_year >= $dt_ini and a_year <= $dt_fim)
                         group by a_name
                         order by total desc
                         limit $limit
                         ";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
 
-            $sx = '<br><br>';
-            $sx .= '<h2>'.msg('report_authors').' - TOP '.$limit.' ('.$dt_ini.'-'.$dt_fim.')</h2>';
-            $sx .= '<div class="row">';
-            $sx .= '<div class="col-md-12" style="column-count: 2;">';
-            $sx .= '<ol>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $sx .= '<li>'.$line['a_name'].' <sup>'.$line['total'].' publicações</sup></li>';
-                }
-            $sx .= '</ol>';
-            $sx .= '</div></div>';
-            return($sx);
+        $sx = '<br><br>';
+        $sx .= '<h2>' . msg('report_authors') . ' - TOP ' . $limit . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
+        $sx .= '<div class="row">';
+        $sx .= '<div class="col-md-12" style="column-count: 2;">';
+        $sx .= '<ol>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $sx .= '<li>' . $line['a_name'] . ' <sup>' . $line['total'] . ' publicações</sup></li>';
         }
+        $sx .= '</ol>';
+        $sx .= '</div></div>';
+        return ($sx);
+    }
 
-        function report_keywords($id)
-        {
-            $dt_fim = date("Y")+1;
-            $dt_ini = $dt_fim-10;
-            $limit = 50;
-            $sql = "select a_name, count(*) as total from ".$this->base."source_subject
+    function report_keywords($id)
+    {
+        $dt_fim = date("Y") + 1;
+        $dt_ini = $dt_fim - 10;
+        $limit = 50;
+        $sql = "select a_name, count(*) as total from " . $this->base . "source_subject
                         where a_jnl = $id
                         and (a_year >= $dt_ini and a_year <= $dt_fim)
                         group by a_name
                         order by total desc
                         limit $limit
                         ";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
 
-            $sx = '<br><br>';
-            $sx .= '<h2>'.msg('report_keywords').' - TOP '.$limit.' ('.$dt_ini.'-'.$dt_fim.')</h2>';
-            $sx .= '<div class="row">';
-            $sx .= '<div class="col-md-12" style="column-count: 2;">';
-            $sx .= '<ol>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $sx .= '<li>'.$line['a_name'].' <sup>'.$line['total'].' publicações</sup></li>';
-                }
-            $sx .= '</ol>';
-            $sx .= '</div></div>';
+        $sx = '<br><br>';
+        $sx .= '<h2>' . msg('report_keywords') . ' - TOP ' . $limit . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
+        $sx .= '<div class="row">';
+        $sx .= '<div class="col-md-12" style="column-count: 2;">';
+        $sx .= '<ol>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $sx .= '<li>' . $line['a_name'] . ' <sup>' . $line['total'] . ' publicações</sup></li>';
+        }
+        $sx .= '</ol>';
+        $sx .= '</div></div>';
 
-            $sql = "select a_name, count(*) as total from ".$this->base."source_subject
+        $sql = "select a_name, count(*) as total from " . $this->base . "source_subject
                         where a_jnl = $id
                         and (a_year >= $dt_ini and a_year <= $dt_fim)
                         group by a_name
                         order by total desc
                         ";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $data = array();
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $name = $line['a_name'];
-                    $name = substr($name,0,strpos($name,'@'));
-                    $data[$name] = $line['total'];
-                }           
-            $data['subject'] = $data;
-            $sx .= '<br><br>';
-            $sx .= '<h2>'.msg('report_keywords').' - WordCloud '.$limit.' ('.$dt_ini.'-'.$dt_fim.')</h2>';
-            $sx .= $this -> load -> view("brapci/cloud_tags_3", $data, true);
-            return($sx);
-        }   
-        
-    function report_publications($id)
-        {
-            $dt_fim = date("Y")+1;
-            $dt_ini = $dt_fim-15;
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $data = array();
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $name = $line['a_name'];
+            $name = substr($name, 0, strpos($name, '@'));
+            $data[$name] = $line['total'];
+        }
+        $data['subject'] = $data;
+        $sx .= '<br><br>';
+        $sx .= '<h2>' . msg('report_keywords') . ' - WordCloud ' . $limit . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
+        $sx .= $this->load->view("brapci/cloud_tags_3", $data, true);
+        return ($sx);
+    }
 
-            $sql = "select ar_year, ar_lang, count(*) as total
-                        from ".$this->base."source_article 
+    function report_publications($id)
+    {
+        $dt_fim = date("Y") + 1;
+        $dt_ini = $dt_fim - 15;
+
+        $sql = "select ar_year, ar_lang, count(*) as total
+                        from " . $this->base . "source_article 
                         where ar_jnl = $id and (ar_year >= $dt_ini and ar_year <= $dt_fim)
                         group by ar_year, ar_lang
                         order by ar_lang";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
 
-            /* Zera os anos */
-            $t = array();
-            $sh = '<th>ano</th>';
-            for ($r=$dt_ini;$r <= $dt_fim;$r++)
-                {
-                    $t[$r] = 0;
-                    $sh .= '<th class="text-center">'.$r.'</th>';
-                }            
-            $lang = array();
-            for ($r=0;$r < count($rlt);$r++)
-            {
-                $line = $rlt[$r];
-                if (!isset($lang[$line['ar_lang']]))
-                    {
-                        $lang[$line['ar_lang']] = $t;
-                    }
-                $lang[$line['ar_lang']][$line['ar_year']] = $lang[$line['ar_lang']][$line['ar_year']] + $line['total'];
+        /* Zera os anos */
+        $t = array();
+        $sh = '<th>ano</th>';
+        for ($r = $dt_ini; $r <= $dt_fim; $r++) {
+            $t[$r] = 0;
+            $sh .= '<th class="text-center">' . $r . '</th>';
+        }
+        $lang = array();
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            if (!isset($lang[$line['ar_lang']])) {
+                $lang[$line['ar_lang']] = $t;
             }
-            $sx ='';
-            $sx .= '<br><br>';
-            $sx .= '<h2>'.msg('report_title_language').' ('.$dt_ini.'-'.$dt_fim.')</h2>';            
-            $sx .= '<table width="100%" border=1>';
-            $sx .= '<tr>'.$sh.'</tr>';
-            foreach($lang as $l=>$totais)
-                {
-                    $sx .= '<tr>';
-                    $sx .= '<td>'.$l.'</td>';
-                    foreach($totais as $year=>$tot)
-                        {
-                            $sx .= '<td align="center">'.$tot.'</td>';
-                        }                    
-                }
-            $sx .= '</table>';
+            $lang[$line['ar_lang']][$line['ar_year']] = $lang[$line['ar_lang']][$line['ar_year']] + $line['total'];
+        }
+        $sx = '';
+        $sx .= '<br><br>';
+        $sx .= '<h2>' . msg('report_title_language') . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
+        $sx .= '<table width="100%" border=1>';
+        $sx .= '<tr>' . $sh . '</tr>';
+        foreach ($lang as $l => $totais) {
+            $sx .= '<tr>';
+            $sx .= '<td>' . $l . '</td>';
+            foreach ($totais as $year => $tot) {
+                $sx .= '<td align="center">' . $tot . '</td>';
+            }
+        }
+        $sx .= '</table>';
 
 
-            $sql = "select count(*) as total, ar_year 
+        $sql = "select count(*) as total, ar_year 
                         from (
                         select ar_article, ar_year 
-                        from ".$this->base."source_article 
+                        from " . $this->base . "source_article 
                         where ar_jnl = $id and
                         (ar_year >= $dt_ini and ar_year <= $dt_fim)
                         group by ar_article, ar_year
                         ) as table1
                         group by ar_year
                         order by ar_year";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx .= '<br><br>';
-            $sx .= '<h2>'.msg('report_publications').' ('.$dt_ini.'-'.$dt_fim.')</h2>';
-            $sx .= '<table>';
-            $sx1 = '';
-            $sx2 = '';
-            $sx3 = '';
-            
-            $max = 10;
-            for ($r=0;$r < count($rlt);$r++)
-                { 
-                    if ($rlt[$r]['total'] > $max) { $max = $rlt[$r]['total']*1.1; }
-                }            
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $sz = round(200 * ($line['total']/$max));
-                    $bar = '<img src="'.base_url('img/point/point_blue.png').'" style="height: '.$sz.'px; width: 100%;">';
-                    $sx1 .= '<td width="5%" valign="bottom">'.$bar.'</td>';
-                    $sx2 .= '<td width="5%" valign="bottom">'.$line['total'].'</td>';
-                    $sx3 .= '<td width="5%">'.$line['ar_year'].'</td>';
-                }
-            $sx .= '<tr>'.$sx1.'</tr>';
-            $sx .= '<tr align="center">'.$sx2.'</tr>';
-            $sx .= '<tr align="center">'.$sx3.'</tr>';
-            $sx .= '</table>';
-            return($sx);
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx .= '<br><br>';
+        $sx .= '<h2>' . msg('report_publications') . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
+        $sx .= '<table>';
+        $sx1 = '';
+        $sx2 = '';
+        $sx3 = '';
+
+        $max = 10;
+        for ($r = 0; $r < count($rlt); $r++) {
+            if ($rlt[$r]['total'] > $max) {
+                $max = $rlt[$r]['total'] * 1.1;
+            }
         }
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $sz = round(200 * ($line['total'] / $max));
+            $bar = '<img src="' . base_url('img/point/point_blue.png') . '" style="height: ' . $sz . 'px; width: 100%;">';
+            $sx1 .= '<td width="5%" valign="bottom">' . $bar . '</td>';
+            $sx2 .= '<td width="5%" valign="bottom">' . $line['total'] . '</td>';
+            $sx3 .= '<td width="5%">' . $line['ar_year'] . '</td>';
+        }
+        $sx .= '<tr>' . $sx1 . '</tr>';
+        $sx .= '<tr align="center">' . $sx2 . '</tr>';
+        $sx .= '<tr align="center">' . $sx3 . '</tr>';
+        $sx .= '</table>';
+        return ($sx);
+    }
 
     function report_production($id)
-        {
-            $dt_fim = date("Y")+1;
-            $dt_ini = $dt_fim-10;
-            $sql = "select sets_name, year(li_datestamp) as year, 
+    {
+        $dt_fim = date("Y") + 1;
+        $dt_ini = $dt_fim - 10;
+        $sql = "select sets_name, year(li_datestamp) as year, 
                         month(li_datestamp) as month,
                         count(*) as total, li_setSpec 
-                        from ".$this->base."source_listidentifier
-                        left join ".$this->base."source_sets ON li_setSpec = sets_session and sets_journal = $id
+                        from " . $this->base . "source_listidentifier
+                        left join " . $this->base . "source_sets ON li_setSpec = sets_session and sets_journal = $id
                         where li_jnl = $id and li_status = 'active'
                         group by sets_name, year, month, li_setSpec
                         order by li_setSpec, year";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
 
-            $t = array();
-            $sec = array();
-            for ($r=$dt_ini;$r <= $dt_fim;$r++)
-                {
-                    for ($y=0;$y <= 12;$y++)
-                    {
-                        $t[$r][$y] = 0;
-                    }
-                    
-                }
-            
-            /*************************************** DATA DE PUBLICAÇÃO NO SISTEMA ***/
-            $max = 10;
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $year = $line['year'];                    
-                    $month = $line['month'];
-                    $section = trim($line['sets_name']).' ['.$line['li_setSpec'].']';
-                    if (($year >= $dt_ini) and ($year < $dt_fim))
-                        {
-                            $t[$year][$month] = $t[$year][$month] + $line['total'];
-                            if ($t[$year][$month] > $max)
-                                {
-                                    $max = ($t[$year][$month]*1.1);
-                                }
-                        }
-
-                    if (isset($sec[$section]))
-                        {
-                            $sec[$section] = $sec[$section] + $line['total'];
-                        } else {
-                            $sec[$section] = $line['total'];
-                        }
-                }
-
-            $sx = '<br><br>';
-            $sx .= '<h2>'.msg('report_distribution').'</h2>';
-            $sx .= '<div class="row">';
-            $sx .= '<div class="col-md-12">';
-            $sx .= '<table width="100%" border=1>';
-            $sx .= '<tr ><th width="6%"class="text-center">Total</th><th class="text-left">Section</th>';
-            asort($sec);
-            $st = '';
-            $tot = 0;
-            foreach($sec as $section=>$total)
-                {
-                    $tot = $tot + $total;
-                    $st = '<tr><td class="text-center">'.$total.'</td><td>&nbsp;'.$section.'</td></tr>'.cr().$st;
-                }
-            $st .= '<tr><th class="text-center">'.$tot.'</th><th>&nbsp;Total</th></tr>'.cr();
-            $st = troca($st,'[','<sup>');
-            $st = troca($st,']','</sup>');
-            $sx .= $st;
-            $sx .= '</table>';
-            $sx .= '</div></div>';
-
-            /***********************************************/
-            $sx .= '<br><br>';
-            $sx .= '<h2>'.msg('report_distribution_month').'</h2>';
-            $sx .= '<table border=1 width="100%">';
-            $sx .= '<tr><th>'.msg('year').'</th>';
-            for ($r=1;$r <= 12;$r++)
-                {
-                    $sx .= '<th class="text-center small">'.meses($r).'</th>';
-                }
-            
-            foreach($t as $year=>$totais)
-                {
-                    $sx .= '<tr>';
-                    $sx .= '<td width="4%">'.$year.'</td>';
-                    for($r=1;$r <= 12;$r++)                    
-                        {
-                            $bg = '';
-                            if ($totais[$r] > 0)
-                                {
-                                    $bg = 'style="background: #ddffdd;"';
-                                }
-                            $sx .= '<td width="8%" align="center" '.$bg.'>'.$totais[$r].'</td>';
-                        }
-                    $sx .= '</tr>';
-                }
-            $sx .= '</table>';
-
-            return($sx);
+        $t = array();
+        $sec = array();
+        for ($r = $dt_ini; $r <= $dt_fim; $r++) {
+            for ($y = 0; $y <= 12; $y++) {
+                $t[$r][$y] = 0;
+            }
         }
-        function getRecord($id=0)
-        {
-            $sx = '';
-            $ds = array();
-            if ($id == 0)
-                {
-                    $id = $this->rset();
+
+        /*************************************** DATA DE PUBLICAÇÃO NO SISTEMA ***/
+        $max = 10;
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $year = $line['year'];
+            $month = $line['month'];
+            $section = trim($line['sets_name']) . ' [' . $line['li_setSpec'] . ']';
+            if (($year >= $dt_ini) and ($year < $dt_fim)) {
+                $t[$year][$month] = $t[$year][$month] + $line['total'];
+                if ($t[$year][$month] > $max) {
+                    $max = ($t[$year][$month] * 1.1);
                 }
-            
-            $data = le($this->sources->table, 'id_jnl=' . $id);
-            $sql = "select * from ".$this->base."source_listidentifier 
+            }
+
+            if (isset($sec[$section])) {
+                $sec[$section] = $sec[$section] + $line['total'];
+            } else {
+                $sec[$section] = $line['total'];
+            }
+        }
+
+        $sx = '<br><br>';
+        $sx .= '<h2>' . msg('report_distribution') . '</h2>';
+        $sx .= '<div class="row">';
+        $sx .= '<div class="col-md-12">';
+        $sx .= '<table width="100%" border=1>';
+        $sx .= '<tr ><th width="6%"class="text-center">Total</th><th class="text-left">Section</th>';
+        asort($sec);
+        $st = '';
+        $tot = 0;
+        foreach ($sec as $section => $total) {
+            $tot = $tot + $total;
+            $st = '<tr><td class="text-center">' . $total . '</td><td>&nbsp;' . $section . '</td></tr>' . cr() . $st;
+        }
+        $st .= '<tr><th class="text-center">' . $tot . '</th><th>&nbsp;Total</th></tr>' . cr();
+        $st = troca($st, '[', '<sup>');
+        $st = troca($st, ']', '</sup>');
+        $sx .= $st;
+        $sx .= '</table>';
+        $sx .= '</div></div>';
+
+        /***********************************************/
+        $sx .= '<br><br>';
+        $sx .= '<h2>' . msg('report_distribution_month') . '</h2>';
+        $sx .= '<table border=1 width="100%">';
+        $sx .= '<tr><th>' . msg('year') . '</th>';
+        for ($r = 1; $r <= 12; $r++) {
+            $sx .= '<th class="text-center small">' . meses($r) . '</th>';
+        }
+
+        foreach ($t as $year => $totais) {
+            $sx .= '<tr>';
+            $sx .= '<td width="4%">' . $year . '</td>';
+            for ($r = 1; $r <= 12; $r++) {
+                $bg = '';
+                if ($totais[$r] > 0) {
+                    $bg = 'style="background: #ddffdd;"';
+                }
+                $sx .= '<td width="8%" align="center" ' . $bg . '>' . $totais[$r] . '</td>';
+            }
+            $sx .= '</tr>';
+        }
+        $sx .= '</table>';
+
+        return ($sx);
+    }
+    function getRecord($id = 0)
+    {
+        $sx = '';
+        $ds = array();
+        if ($id == 0) {
+            $id = $this->rset();
+        }
+
+        $data = le($this->sources->table, 'id_jnl=' . $id);
+        $sql = "select * from " . $this->base . "source_listidentifier 
                     where li_jnl = $id and li_s = 1 and li_status = 'active'
                     order by li_update desc
                     limit 20";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
-            $sx .= '<ol>';
-            for ($r=0;$r < count($rlt);$r++)
-                {
-                    $line = $rlt[$r];
-                    $idh = $line['id_li'];
-                    $ds = $this -> oai_pmh->getRecord_oai_dc($idh,$data);
-                    $sx .= '<li>Process '.$line['li_identifier'].'</li>';
-                    $year = $ds['issue']['year'];
-                    if ($year == '[????]')
-                        {
-                            $year = substr($ds['date'][0],0,4);
-                        }
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $sx .= '<ol>';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $idh = $line['id_li'];
+            $ds = $this->oai_pmh->getRecord_oai_dc($idh, $data);
+            $sx .= '<li>Process ' . $line['li_identifier'] . '</li>';
+            $year = $ds['issue']['year'];
+            if ($year == '[????]') {
+                $year = substr($ds['date'][0], 0, 4);
+            }
 
-                    /* title */
-                    if (isset($ds['title']))
-                        {
-                            for ($y=0;$y < count($ds['title']);$y++)
-                                {
-                                    $name = $ds['title'][$y]['title'];
-                                    $lang = $ds['title'][$y]['lang'];
-                                    $name = troca($name,"'",'´');
-                                    $this->title_update($idh,$name,$lang,$year,$id);
-                                }
-                        }
+            /* title */
+            if (isset($ds['title'])) {
+                for ($y = 0; $y < count($ds['title']); $y++) {
+                    $name = $ds['title'][$y]['title'];
+                    $lang = $ds['title'][$y]['lang'];
+                    $name = troca($name, "'", '´');
+                    $this->title_update($idh, $name, $lang, $year, $id);
+                }
+            }
 
-                    /* Autores */
-                    if (isset($ds['authors']))
-                        {
-                            for ($y=0;$y < count($ds['authors']);$y++)
-                                {
-                                    $name = nbr_author(strtolower($ds['authors'][$y]['name']),7);
-                                    $name = troca($name,"'",'´');
-                                    $this->authors_update($idh,$name,$year,$id);
-                                }
-                        }
+            /* Autores */
+            if (isset($ds['authors'])) {
+                for ($y = 0; $y < count($ds['authors']); $y++) {
+                    $name = nbr_author(strtolower($ds['authors'][$y]['name']), 7);
+                    $name = troca($name, "'", '´');
+                    $this->authors_update($idh, $name, $year, $id);
+                }
+            }
 
-                    /* Subject */
-                    if (isset($ds['subject']))
-                        {
-                            for ($y=0;$y < count($ds['subject']);$y++)
-                                {
-                                    $name = nbr_author(strtolower($ds['subject'][$y]),7);
-                                    $name = troca($name,"'",'´');
-                                    $this->subject_update($idh,$name,$year,$id);
-                                }
-                        }  
-                        $sql = "update ".$this->base."source_listidentifier 
+            /* Subject */
+            if (isset($ds['subject'])) {
+                for ($y = 0; $y < count($ds['subject']); $y++) {
+                    $name = nbr_author(strtolower($ds['subject'][$y]), 7);
+                    $name = troca($name, "'", '´');
+                    $this->subject_update($idh, $name, $year, $id);
+                }
+            }
+            $sql = "update " . $this->base . "source_listidentifier 
                                     set li_s = 2
                                     where id_li = $idh";
-                        $rrr = $this->db->query($sql);
-                } 
-                $sx .= '</ol>';  
-                if (strlen($sx) > 10)
-                    {
-                        $url = base_url(PATH.'evaluation/getrecord');
-                        $sx .= '<meta http-equiv="refresh" content="1; URL='.$url.'"/>';
-                    }                    
-            return($sx);
+            $rrr = $this->db->query($sql);
         }
+        $sx .= '</ol>';
+        if (strlen($sx) > 10) {
+            $url = base_url(PATH . 'evaluation/getrecord');
+            $sx .= '<meta http-equiv="refresh" content="1; URL=' . $url . '"/>';
+        }
+        return ($sx);
+    }
 
-        function authors_update($article,$author,$year,$journal)
-            {
-                $sql = "select * from ".$this->base."source_autores
+    function authors_update($article, $author, $year, $journal)
+    {
+        $sql = "select * from " . $this->base . "source_autores
                             where a_article = $article
                             and a_name = '$author'";
-                $rlt = $this->db->query($sql);
-                $rlt = $rlt->result_array();
-                if (count($rlt) == 0)
-                    {
-                        $sql = "insert into ".$this->base."source_autores
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) == 0) {
+            $sql = "insert into " . $this->base . "source_autores
                             (a_name, a_jnl, a_article, a_year)
                             values
                             ('$author',$journal,$article,$year);";
-                        $rlt = $this->db->query($sql);
-                    }
-            }
-            function subject_update($article,$subject,$year,$journal)
-            {
-                $sql = "select * from ".$this->base."source_subject
+            $rlt = $this->db->query($sql);
+        }
+    }
+    function subject_update($article, $subject, $year, $journal)
+    {
+        $sql = "select * from " . $this->base . "source_subject
                             where a_article = $article
                             and a_name = '$subject'";
-                $rlt = $this->db->query($sql);
-                $rlt = $rlt->result_array();
-                if (count($rlt) == 0)
-                    {
-                        $sql = "insert into ".$this->base."source_subject
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) == 0) {
+            $sql = "insert into " . $this->base . "source_subject
                             (a_name, a_jnl, a_article, a_year)
                             values
                             ('$subject',$journal,$article,$year);";
-                        $rlt = $this->db->query($sql);
-                    }
-            }  
-            function title_update($article,$title,$lang,$year,$journal)
-            {
-                $sql = "select * from ".$this->base."source_article
+            $rlt = $this->db->query($sql);
+        }
+    }
+    function title_update($article, $title, $lang, $year, $journal)
+    {
+        $sql = "select * from " . $this->base . "source_article
                             where ar_article = $article
                             and ar_title = '$title'
                             and ar_lang = '$lang'";
-                $rlt = $this->db->query($sql);
-                $rlt = $rlt->result_array();
-                if (count($rlt) == 0)
-                    {
-                        $sql = "insert into ".$this->base."source_article
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        if (count($rlt) == 0) {
+            $sql = "insert into " . $this->base . "source_article
                             (ar_title, ar_jnl, ar_article, ar_year, ar_lang)
                             values
                             ('$title',$journal,$article,$year,'$lang');";
-                        $rlt = $this->db->query($sql);
-                    }
-            }                      
+            $rlt = $this->db->query($sql);
+        }
+    }
 }
