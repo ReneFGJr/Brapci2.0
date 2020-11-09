@@ -16,6 +16,7 @@ class res extends CI_Controller {
         $this -> load -> helper('form');
         $this -> load -> helper('form_sisdoc');
         $this -> load -> helper('xml');
+        $this -> load -> helper('ai');
         #$this -> load -> helper('xml_dom');
         $this -> load -> helper("socials");
         $this -> load -> model('bs');

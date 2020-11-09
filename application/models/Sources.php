@@ -178,6 +178,20 @@ class sources extends CI_Model {
         return ($sx);
     }
 
+    function edit($id)
+        {
+            $form = new form;
+            $form->id = $id;
+            $cp=$this->cp();
+            $table = $this->table;
+            $sx = $form->editar($cp,$table);
+            if ($form->saved > 0)
+                {
+                    $sx = 'SAVED';
+                }
+            return($sx);
+        }
+
     function cp($id = '') {
         $cp = array();
         array_push($cp, array('$H8', 'id_jnl', '', False, True));
@@ -207,10 +221,7 @@ class sources extends CI_Model {
         $op .= '&2:' . msg('yes, without OAI');
         $op .= '&3:' . msg('No, finished');
         $op .= '&0:' . msg('canceled');
-        array_push($cp, array('$O 1:Yes&0:No', 'jnl_active', msg('active'), True, True));
-        
-        
-
+        array_push($cp, array('$O 1:Yes&0:No', 'jnl_active', msg('active'), True, True));  
         return ($cp);
     }
 
