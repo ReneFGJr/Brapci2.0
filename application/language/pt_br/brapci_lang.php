@@ -250,10 +250,17 @@ $lang['report_keywords'] = 'Palavras-Chave mais frequentes';
 $lang['ev_getrecord'] = 'Harvesting - Coletar Registros';
 $lang['report_publications'] = 'Publicações por ano';
 $lang['report_title_language'] = 'Idioma dos títulos';
+$lang['author_unique'] = 'autoria única';
+$lang['author'] = 'autor';
+$lang['authors'] = 'autores';
+$lang['report'] = 'Relatório Geral';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
+
 
 
 

@@ -4,10 +4,10 @@ class highchart
 {
     function show($data)
     {
-        $sx = '<h1>GRAFICO</h1>';
+        $sx = '';
         $sx .= $this->prepare();
         $sx .= $this->grapho($data);
-        $sx .= $this->dashboard();
+        $sx .= $this->dashboard($data);
         return ($sx);
     }
     function prepare()
@@ -16,16 +16,15 @@ class highchart
         $sx .= '<script src="https://code.highcharts.com/highcharts.js"></script>';
         return ($sx);
     }
-    function dashboard()
+    function dashboard($data)
     {
         $sx = '
             <div class="container">
                 <br/>
-                <h2 class="text-center">Highcharts php mysql json example</h2>
+                <h4 class="text-center">'.$data['title'].'</h4>
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
                         <div class="panel panel-default">
-                            <div class="panel-heading">Dashboard</div>
                             <div class="panel-body">
                                 <div id="container"></div>
                             </div>
@@ -39,9 +38,7 @@ class highchart
     function series($data=array())
         {
             $sx = '';
-            echo '<pre>';
-            print_r($data);
-            for ($r=0;$r < count($data['x']);$r++)
+            for ($r=1;$r <= count($data['x']);$r++)
                 {
                     $serie_name = $data['y'][$r];
                     if (strlen($sx) > 0) { $sx .= ', '; }
@@ -56,26 +53,20 @@ class highchart
             return($sx);
         }    
 
-    function legendas($data=array())
+    function legends($data=array())
         {
             $sx = '';
-            for ($r=0;$r < count($data['x']);$r++)
+            for ($r=0;$r < count($data['s']);$r++)
                 {
-                    $serie_name = $data['s'][$r];
-                    if (strlen($sx) > 0) { $sx .= ', '; }
-                    $sx .= "{name '$serie_name', data [";
-                        for ($y=0;$y < count($data['x'][$r]);$y++)
-                            {
-                                if ($y > 0) { $sx .= ','; }
-                                $sx .= $data['x'][$r][$y];
-                            }
-                    $sx .= "]}".cr();
+                    if ($r > 0) { $sx .= ', '; }
+                    $sx .= "'".$data['s'][$r]."'";
                 }
             return($sx);
         }
     function grapho($data=array(),$type='line')
     {
         $series = $this->series($data);
+        $legend = $this->legends($data);
         /* Type = column, line */
         $sx = '
         <script type="text/javascript">
@@ -86,14 +77,17 @@ class highchart
                     type: \''.$type.'\'
                 },
                 title: {
-                    text: \'Yearly Website Ratio\'
+                    text: \'\'
                 },
                 xAxis: {
-                    categories: [\'2013\',\'2014\',\'2015\', \'2016\']
+                    categories: ['.$legend.'],
+                    title: {
+                        text: \''.$data['eixo_x'].'\'
+                    }
                 },
                 yAxis: {
                     title: {
-                        text: \'Rate\'
+                        text: \''.$data['eixo_y'].'\'
                     }
                 },
                 series: ['.$series.']
