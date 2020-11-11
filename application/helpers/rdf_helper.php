@@ -71,6 +71,8 @@ class rdf
 				$r1 = get("concept");
 				$prop = get("prop");
 				$r2 = get("resource");
+				$text = get("text");
+				echo '=r1='.$r1.'=prop='.$prop.'=r2='.$r2.'=text='.$text;
 				$this->set_propriety($r1, $prop, $r2);
 				sleep(1);
 				echo '<script> wclose(); </script>';
@@ -1287,7 +1289,93 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				break;
 			}
 			return ($lang);
-		}        	
+		} 
+		
+		function screen($line,$tp='',$idx)
+			{
+				$sx = '';
+				$disable = 'disabled';
+				$type = $line['c_class'];
+				$sx .= '<div class="container">';
+				$sx .= '<div class="row">';
+				$sx .= '<div class="col-12">';
+
+				$sx .= '<h1>'.msg($type).'</h1>';
+				switch($tp)
+					{
+						/************** TEXT AREA */
+						case 'TEXT':
+							$sx .= '<textarea name="dd50" id="dd50" class="form-control">'.get("dd50").'</textarea>'.cr();
+							$sx .= '<input type="hidden" id="dd51" value="">'.cr();
+							$disable = '';
+						break;
+
+						case 'URL':
+							$sx .= '<input type="text" name="dd50" id="dd50" class="form-control" value="'.get("dd50").'">'.cr();
+							$sx .= '<input type="hidden" id="dd51" value="">'.cr();
+							$disable = '';
+						break;
+
+						default:
+						print_r($line);
+						$sx .= '<span style="font-size: 75%">filtro do [' . $line['c_class'] . ']</span><br>';
+						$sx .= '<input type="text" id="dd50" name="dd50" class="form-control">'.cr();
+						$sx .= '<span style="font-size: 75%">selecione o [' . $line['c_class'] . ']</span><br>'.cr();
+						$sx .= '<div id="dd51a"><select class="form-control" size=5 name="dd51" id="dd51"></select></div>'.cr();						
+
+						$sx .= '
+						/************ keyup *****************/
+						jQuery("#dd50").keyup(function() 
+						{
+							var $key = jQuery("#dd50").val();
+							$.ajax(
+								{
+									type: "POST",
+									url: "' . base_url(PATH . 'rdf/search/' . $type . '/' . $id.'?nocab=T') . '",
+									data:"q="+$key,
+									success: function(data){
+										$("#dd51a").html(data);
+									}
+								}
+							);
+						});';
+					}
+				$sx .= '
+				<div class="text-right" style="margin-top: 20px;">
+				<input type="hidden" id="dd52" value="'.$line['sc_propriety'].'">
+				<button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">'.msg('cancel').'</button>
+				<button type="button" id="submt" class="btn btn-outline-primary" '.$disable.'>'.msg('save').'</button>
+				</div>
+				<div id="dd51a"></div>
+				';
+
+				$sx .= '</div></div></div>';
+
+				$js = '<script> $("#cancel").click(function() { wclose(); }); </script>'.cr();
+
+				$js .= '<script>
+				$("#submt").click(function() 
+				{ 
+					var $vlr = $("#dd51").val();
+					var $prop = $("#dd52").val();
+					var $text = $("#dd50").val();
+					var $id = '.$idx.';
+					var $data = { concept: $id, text: $text, prop: $prop, $resource: $vlr };
+					
+					$.ajax(
+						{
+							type: "POST",
+							url: "' . base_url(PATH . 'rdf/save') . '",
+							data: $data,
+							success: function(data)
+							{
+								$("#dd51a").html(data);
+							}
+						}); 
+				});
+				</script>';
+				return($sx.$js);
+			}
 		
 		################################################## DATA
 		function form_ajax($idc, $form,$idx) {
@@ -1301,63 +1389,16 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 			
-			/* Tipo do Range */
-			$type = $rlt[0]['c_class'];
+			/* Tipo do Range */			
 			if (count($rlt) > 0) {
+				$type = UpperCase($rlt[0]['c_class']);
 				$line = $rlt[0];
+			} else {
+				echo "OPS - FORM ERRO ".$idc.'='.$idx;
+				exit;
 			}
-			
 			/******************* TIPOS DE FORMULÁRIOS ****************/
-			$dt['type'] = $type;
-			switch($type) {
-				case 'ISBN' :
-				break;
-				
-				/**********************************************/
-				default :
-				$dt['type'] = $type;
-				$dt['label1'] = msg($type);
-				$sx .= '<div class="container">';
-				$sx .= '<div class="row">';
-				$sx .= '<div class="col-12">';
-				$sx .= '<h1>'.msg($type).'</h1>';
-				$sx .= $this -> cas_ajax($type, $idc, $dt);
-				$sx .= '
-				<div class="text-right" style="margin-top: 20px;">
-				<input type="hidden" id="dd52" value="'.$line['sc_propriety'].'">
-				<button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">'.msg('cancel').'</button>
-				<button type="button" id="submt" class="btn btn-outline-primary" disabled>'.msg('save').'</button>
-				</div>
-				
-				<script>
-				$("#cancel").click(function() { wclose(); });
-				
-				$("#submt").click(function() 
-				{ 
-					var $vlr = $("#dd51").val();
-					var $prop = $("#dd52").val();
-					var $id = '.$idx.';
-					$.ajax(
-						{
-							type: "POST",
-							url: "' . base_url(PATH . 'rdf/save') . '",
-							data: "concept="+$id+"&prop="+$prop+"&resource="+$vlr,
-							success: function(data){
-								$("#dd51a").html(data);
-							}
-						}
-					); 
-				}
-			);
-			
-			
-			</script>
-			';
-			$sx .= '</div>';
-			$sx .= '</div>';
-			$sx .= '</div>';
-		break;
-	}
+			$sx .= $this->screen($line,$type,$idc);
 	return ($sx);
 }
 
@@ -1655,7 +1696,7 @@ function cas_exclude($id) {
 	return ($sx);
 }	
 
-function cas_text($id, $prop, $dt = array()) {
+function xxxxxxxxxxxxxxxxxxxxcas_text($id, $prop, $dt = array()) {
 	if (!isset($dt['label1'])) 
 	{ 
 		$dt['label1'] = msg('name');
@@ -2136,7 +2177,6 @@ function class_view_form($id='')
 	AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
 	order by sc_ord";
 	
-	echo $sql;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();	
 	$sx = '<div class="col-md-12">';
