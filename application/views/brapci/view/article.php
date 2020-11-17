@@ -87,6 +87,7 @@ for ($r = 0; $r < count($article); $r++) {
 			break;
 		case 'hasTitle' :
 			array_push($tit, $value);
+			$title = trim($value);
 			break;
 		case 'hasSubject' :
 			$link = '<a href="' . base_url(PATH . 'v/' . $d_r2) . '">';

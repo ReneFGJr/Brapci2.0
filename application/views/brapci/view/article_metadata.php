@@ -24,15 +24,10 @@ echo '<meta name="DC.Format" scheme="IMT" content="application/pdf"/>'.cr();
 echo '<meta name="DC.Identifier" content="'.$id.'"/>'.cr();
 echo '	<meta name="DC.Identifier.pageNumber" content="'.$pg_first.'-'.$pg_last.'"/>'.cr();
 echo '	<meta name="DC.Identifier.DOI" content="'.$doi.'"/>'.cr();
-//<meta name="DC.Identifier.URI" content="http://seer.ufrgs.br/EmQuestao/article/view/74064"/>
 echo '	<meta name="DC.Language" scheme="ISO639-1" content="pt"/>'.cr();
 echo '	<meta name="DC.Rights" content="Direitos autorais reservados a '.$journal.'" />'.cr();
 echo '	<meta name="DC.Rights" content=""/>'.cr();
 echo '	<meta name="DC.Source" content="'.$journal.'"/>'.cr();
-//<meta name="DC.Source.ISSN" content="1808-5245"/>
-//<meta name="DC.Source.Issue" content="2"/>
-//<meta name="DC.Source.URI" content="http://seer.ufrgs.br/EmQuestao"/>
-//<meta name="DC.Source.Volume" content="24"/>
 
 /******************************* KEYWORDS **********************************/
 $keys = ($key);

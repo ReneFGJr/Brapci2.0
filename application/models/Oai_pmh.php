@@ -1102,8 +1102,6 @@ class oai_pmh extends CI_model {
                             $sx .= 'Continua - Token: ' . $token;
                             $sx = '<div class="row"><div class="col-md-12">'.btn_reload().'</div></div>'.$sx;
                         } else {
-                            echo "OPS";
-                            exit;
                             $sx .= $this -> ListIdentifiers_harvesting($id,$data);
                         }                    
                 }

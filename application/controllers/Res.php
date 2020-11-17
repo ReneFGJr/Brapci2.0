@@ -33,7 +33,7 @@ class res extends CI_Controller {
     }
     
     private function cab($data = array()) {
-        $data['title'] = 'Brapci 2.0';
+        $data['title'] = '';
         $this -> load -> view('header/header.php', $data);
         if (!isset($data['nocab'])) {
             $this -> load -> view('header/menu_top.php', $data);
