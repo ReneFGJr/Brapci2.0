@@ -2,6 +2,7 @@
 class searchs extends CI_Model {
     var $sz = 20;
     var $s = '';
+    var $base = 'brapci_search.';
     function __construct() {
         global $MODO;
         if (isset($MODO)) {
@@ -105,7 +106,7 @@ class searchs extends CI_Model {
 
     function historic($limit = 10) {
         $session = $this -> s;
-        $sql = "select * from _search 
+        $sql = "select * from ".$this->base."_search 
                         where s_session = $session 
                         order by s_date desc, s_hour desc 
                         limit $limit ";
@@ -115,19 +116,21 @@ class searchs extends CI_Model {
         $sx .= '<table class="table" width="100%">';
         $sx .= '<tr>
                         <th width="15%">' . msg("s_date_hour") . '</th>
-                        <th width="70%">' . msg("s_query") . '</th>
-                        <th width="10%">' . msg("s_type") . '</th>
+                        <th width="50%">' . msg("s_query") . '</th>
+                        <th width="15%">' . msg("s_type") . '</th>
+                        <th width="15%">' . msg("s_order") . '</th>
                         <th width="5%">' . msg("s_result") . '</th>
                     </tr>';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $q = $line['s_query'];
             $q = troca($q, '"', '¢');
-            $link = '<a href="' . base_url(PATH . '?q=' . $q . '&h=1&type=' . $line['s_type']) . '">';
+            $link = '<a href="' . base_url(PATH . '?q=' . $q . '&h=1&type=' . $line['s_type']) . '&order='.$line['s_order'].'">';
             $sx .= '<tr>';
             $sx .= '<td align="center"><tt>' . $line['s_date'] . ' ' . $line['s_hour'] . '</tt></td>';
             $sx .= '<td><tt>' . $link . $line['s_query'] . '</a>' . '</tt></td>';
             $sx .= '<td><tt>' . msg('search_' . $line['s_type']) . '</tt></td>';
+            $sx .= '<td><tt>' . msg('order_' . $line['s_order']) . '</tt></td>';
             $sx .= '<td align="center"><tt>' . $line['s_total'] . '</tt></td>';
             $sx .= '</tr>';
         }
@@ -155,24 +158,25 @@ class searchs extends CI_Model {
         $q = UpperCase($data['q']);
         $t = round($data['type']);
         if (!isset($data['total'])) { $data['total'] = 0; }
-        $total = round($data['total']['value']);
+        $total = $data['total'];
         $page = round(GET("p"));
+        $order = round('0'.$data['order']);
 
-        $sql = "select * from _search 
+        $sql = "select * from ".$this->base."_search 
 					where s_date = '$date' 
 						and s_hour = '$hour'
 						and s_query = '$q'
 						and s_type = $t
 						and s_user = $user
-						and s_total = $total
+                        and s_total = $total
 						and s_session = s_session";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
         if (count($rlt) == 0) {
             if (strlen($q) > 0) {
-                $sql = "insert into _search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session, s_ip) ";
+                $sql = "insert into ".$this->base."_search (s_date, s_hour, s_query, s_type, s_user, s_total, s_session, s_ip, s_order) ";
                 $sql .= " values ";
-                $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip')";
+                $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip','$order')";
                 $this -> db -> query($sql);
             }
         }
@@ -259,24 +263,31 @@ class searchs extends CI_Model {
 
         $type = 'article';
         $q = $this -> elasticsearch -> query($type, $n, $t);
-        //$q = $this->ElasticSearch->query_all($n);
-        if ((!isset($q['hits']['hits'])) AND (perfil("#ADM"))) {
-            //echo '<pre>';
-            //print_r($q);
-            //echo '</pre>';
-        }
+
         /*************** history ***************/
         $data['q'] = $n;
         $data['type'] = $t;
 
+        if (strlen(get("order")) > 0)
+        {
+            $data['order'] = get("order");
+        } else {
+            if (isset($_SESSION['order']))
+                {
+                    $data['order'] = get("order");
+                } else {
+                    $data['order'] = '0';
+                }
+        }        
+
         if (!isset($q['hits'])) {
             $total = 0;
             $data['total'] = $total;
+
             $this -> save_history($data);
             return ('Not found');
         } else {
             $total = $q['hits']['total']['value'];
-
             /* History */
             $data['total'] = $total;
             $this -> save_history($data);
@@ -307,9 +318,7 @@ class searchs extends CI_Model {
             $year = $rst[$r]['_source']['year'];
             $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
             if (!is_file($img)) {
-                //echo '==>' . $img . '<br>';
                 $img = 'img/cover/cover_issue_0.jpg';
-                //$sx .= '['.$jnl.']';
             }
             $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
             $sx .= '<div class="col-10 " style="margin-bottom: 15px;">';

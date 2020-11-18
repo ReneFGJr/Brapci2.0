@@ -84,9 +84,13 @@ input[type=text]:focus {
                                 <?php echo $this -> searchs -> rage("year_s", "1972", (date("Y") + 1)); ?>
                                 <?php echo $this -> searchs -> rage("year_e", (date("Y") + 1), "1972"); ?>
                                 </nobr>
-                                <!----
+                                
                                 <nobr>
                                     <?php
+                                    if (get("order") != '')
+                                        {
+                                            $_SESSION['order'] = get("order");
+                                        }
                                         $chks = array('','','','','');
                                         if (!isset($_SESSION['order']))
                                             {
@@ -100,9 +104,11 @@ input[type=text]:focus {
                                     ?>
                                     Ordernar: 
                                     <input name="order" value="0" type="radio" <?php echo $chks[0];?>> Relevância
-                                    <input name="order" value="1" type="radio" <?php echo $chks[1];?>> Ano
+                                    <input name="order" value="2" type="radio" <?php echo $chks[2];?>> Mais novos
+                                    <input name="order" value="1" type="radio" <?php echo $chks[1];?>> Mais antigos
+                                    
                                 </nobr>
-                                ---->
+                                
                                 
 						<?php ?>
                             <?php

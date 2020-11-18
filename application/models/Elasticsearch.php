@@ -313,7 +313,7 @@ class elasticsearch extends CI_model {
      * @return type
      */
 
-    public function query($type, $q, $t, $ord = 0,$full=0) {
+    public function query($type, $q, $t, $ord = '0',$full=0) {
         $OR = 0;
         if (strpos($q, ' OR ')) { $OR = 1;
             $q = troca($q, ' OR ', ' ');
@@ -349,17 +349,15 @@ class elasticsearch extends CI_model {
         $_SESSION['order'] = $order;
         switch($order) {
             case '1' :
-                $ord = '"sort": [ { "year" : "desc" } ] ,';
-                $ord = '"sort": [ { "year": { "order": "asc" } } ] , ';
-                $ord = '';
-                //$ord = '"sort": ["_score"] ,';
-                //$ord = ', "sort": ["year"]';
+                $ord = ' "sort": ["year.keyword" , "_score"] ,';
+                break;
+            case '2':
+                $ord = '"sort": [ { "year.keyword": { "order": "desc" } } , "_score" ] , ';
                 break;
             default :
                 $ord = '';
                 break;
-        }
-
+        }        
         switch($t) {
             case '2' :
                 $fld = 'authors';
@@ -434,7 +432,7 @@ class elasticsearch extends CI_model {
                           ' . $qqq . '                          
                         }              
                 ';
-
+                        //echo '<pre>'.$data.'</pre>';
         $rq = $this -> call($type . '/_search?' . $qs, $method, $data);
         return $rq;
     }

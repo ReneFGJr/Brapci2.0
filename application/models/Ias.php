@@ -68,7 +68,10 @@ class Ias extends CI_model
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Companies <span style="color: green"><b>Update</b></span></li>';
 
-			
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/55/txtb';
+			$file = '_ia/domain_places.txt';
+			$this->import_thesa($url,$file);
+			$sx .= '<li>Places <span style="color: green"><b>Update</b></span></li>';				
 			
 			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';			
 			$file = '_ia/domain_datas_g.txt';
@@ -477,6 +480,7 @@ function icone($i,$v=0,$id)
 		$t1 = troca($t1,',',' , ');
 		$t1 = troca($t1,'?',' ? ');
 		$t1 = troca($t1,'!',' ! ');
+		$t1 = troca($t1,'|',' | ');
 		$t1 = troca($t1,':',' : ');
 		$t1 = troca($t1,'/',' / ');
 		$t1 = troca($t1,'(',' ( ');
@@ -632,20 +636,28 @@ function neuro_referencias($t)
 			$ln = explode(chr(10),$ref);
 			
 			$lst = '';
-			echo '<tt>';
 			for ($r=0;$r < count($ln);$r++)
 			{
-				$n2 = caixa_alta($ln[$r]);
 				$rf = trim($lst.' '.trim($ln[$r]));	
-				
 				$n1 = tem_ano($rf);
-				if ($n1 == 0)
+				$n2 = caixa_alta($ln[$r]);
+				$n3 = caixa_alta_palavra($ln[$r]);
+				
+
+				echo $ln[$r].'<hr>';
+				echo '[#1:'.$n1.']';
+				echo '[#2:'.$n2.']';
+				echo '[#3:'.$n3.']';
+				echo '<br>';
+				
+				
+				if (($n1 == 0) or ($n3 == 1))
 				{ 
 					$lst = $rf;
 				} else {
 					$lst = '';
 					echo '<hr><b>'.$rf.'</b>';
-					echo 'Neuronio #1:'.$n1.'<br>';
+
 				}
 			}
 			$text = substr($t,0,$pos);
@@ -681,8 +693,25 @@ function caixa_alta($lz)
 	{
 		return(1);
 	}
-	echo $lz.'<br>'.$lzr;
-	exit;
+	return(0);
+}
+
+function caixa_alta_palavra($lz)
+{
+	$lzr = str_replace(array(' ',',',';','.','!','?'),array(';'),$lz).';';
+	$lzr = trim(substr($lzr,0,strpos($lzr,';')));
+	$lzru = UpperCaseSQL($lzr);
+	
+	if (strlen($lzru) == 0) { return(0); }
+	
+	for ($r=0;$r < strlen($lzr);$r++)
+		{
+			if ($lzru[$r] != $lzr[$r])
+				{
+					return(0);
+				}
+		}
+	return(1);
 }
 
 function neuro_email($t)

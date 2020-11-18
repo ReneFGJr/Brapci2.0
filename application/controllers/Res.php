@@ -254,7 +254,8 @@ public function ia($act='',$id1='',$id2='',$id3='')
     */
 }
 
-public function v($id,$fmt='') {
+public function v($id='',$fmt='') {
+    if (round('0'.$id)==0) { redirect(base_url(PATH)); }
     $this -> load -> model('ias');
     $this -> load -> model('nets');
     $this -> load -> model('frbr');
