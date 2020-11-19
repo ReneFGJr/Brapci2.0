@@ -62,12 +62,12 @@ class Ias extends CI_model
 			$file = '_ia/domain_datas.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Dates <span style="color: green"><b>Update</b></span></li>';	
-
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/269/txtb';
 			$file = '_ia/domain_companies.txt';
 			$this->import_thesa($url,$file);
 			$sx .= '<li>Companies <span style="color: green"><b>Update</b></span></li>';
-
+			
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/55/txtb';
 			$file = '_ia/domain_places.txt';
 			$this->import_thesa($url,$file);
@@ -197,7 +197,7 @@ function nlp($d1='',$d2='',$d3='')
 			$txt = $this->nlp_process(get("dd1"));
 			$sx .= $this->nlp_words($txt);
 		break;
-
+		
 		case 'singular':
 			$sx .= $this->nlp_form();
 			//$txt = $this->nlp_process(get("dd1"));
@@ -392,12 +392,19 @@ function nlp_v($d)
 	$this->check();
 	$rdf = new rdf;
 	$vv = $rdf->extract_content($d,'hasFileStorage');
+	$data = array();
+	$data['title'] = $rdf->extract_content($d,'hasFileStorage');
+	$data['pi'] = $rdf->extract_content($d,'hasPageEnd');
+	$data['pi'] = $data['pi'][0];
+	$data['pf'] = $rdf->extract_content($d,'hasPageStart');
+	$data['pf'] = $data['pf'][0];
+	
 	$file = troca($vv[0],'.pdf','.txt');
 	if (file_exists($file))
 	{
 		$txtf = $this->file_get($file);
 		//$txt = '<tt>'.$txtf.'</tt>';		
-		$txt = $this->nlp_words($txtf).cr();
+		$txt = $this->nlp_words($txtf,$data).cr();
 	} else {
 		$txt = message(msg('File not found').' '.$file,3);
 	}
@@ -452,7 +459,7 @@ function icone($i,$v=0,$id)
 		return(' '.$t.' ');	
 	}
 	
-	function nlp_words($txt)
+	function nlp_words($txt,$data=array())
 	{
 		$t = $txt;
 		
@@ -464,7 +471,7 @@ function icone($i,$v=0,$id)
 		
 		/* REDE DE NEURONIO */
 		$t1 = $t;
-		$tx = neuro_referencias($t1);
+		$tx = neuro_referencias($t1,$data);
 		$refs = $tx[1];
 		$t1 = $tx[0];
 		
@@ -620,8 +627,18 @@ function neuro_link($t)
 	return($t);
 }
 
-function neuro_referencias($t)
+function neuro_referencias($t,$data=array())
 {
+	/********************** Remove o número das paginas */
+	if (isset($data['pi']) and isset($data['pf']))
+	{
+		$pi = $data['pi'];
+		$pf = $pi+200;
+		for ($r=$pi;$r <= $pf;$r++)
+		{
+			$t = troca($t, '| '.$r	,''); /* Em Questão */
+		}
+	}
 	$a = array('Referências','REFERÊNCIAS','referencias','REFERÊNCIAS');
 	for ($r=0;$r < count($a);$r++)
 	{
@@ -636,30 +653,48 @@ function neuro_referencias($t)
 			$ln = explode(chr(10),$ref);
 			
 			$lst = '';
+			
+			$refs = array();
+			$lns = 0;
 			for ($r=0;$r < count($ln);$r++)
 			{
 				$rf = trim($lst.' '.trim($ln[$r]));	
 				$n1 = tem_ano($rf);
-				$n2 = caixa_alta($ln[$r]);
-				$n3 = caixa_alta_palavra($ln[$r]);
-				
-
-				echo $ln[$r].'<hr>';
-				echo '[#1:'.$n1.']';
-				echo '[#2:'.$n2.']';
-				echo '[#3:'.$n3.']';
-				echo '<br>';
-				
-				
-				if (($n1 == 0) or ($n3 == 1))
-				{ 
-					$lst = $rf;
-				} else {
-					$lst = '';
-					echo '<hr><b>'.$rf.'</b>';
-
+				//$n2 = caixa_alta($ln[$r]);
+				$n3 = caixa_alta_palavra(trim($ln[$r]));
+				$lns = trim($ln[$r]);
+				if (strlen($lns) > 0)
+				{					
+					/* Tem ano ?*/
+					if ($n1 == 0) 
+					{ 						
+						if (($lns == 0) and ($n3 == 0))
+						{
+							echo '<br>=y=>['.$n3.']'.$rf.' ';
+							//exit;
+						} else {
+							$lst = $rf;
+							$lns++;
+						}
+					} else {
+						$lst = '';
+						$c = '@';
+						$i = count($refs);
+						if ((substr($rf,0,1) != '#') and ($i > 0))
+						{
+							$i--;
+							$refs[$i] = troca($refs[$i] . '====='. trim($rf),$c,'');
+						} else {
+							$rf = trim(troca($rf,$c,''));
+							array_push($refs,$rf);
+							$lns = 0; /* Linhas acumuladas */
+						}
+					}
 				}
 			}
+			echo '<pre>';
+			print_r($refs);
+			echo '</pre>';
 			$text = substr($t,0,$pos);
 			return(array($text,$ref));
 		}
@@ -685,7 +720,7 @@ function tem_ano($lz)
 #validador 2
 function caixa_alta($lz)
 {
-	$lzr = str_replace(array(',',';','.','!','?'),array(' '),$lz);
+	$lzr = str_replace(array(',',';','.','!','|','?'),array(' '),$lz);
 	$lzr = trim(substr($lzr,0,strpos($lzr,' ')));
 	$lzru = UpperCaseSQL($lzr);
 	
@@ -698,20 +733,20 @@ function caixa_alta($lz)
 
 function caixa_alta_palavra($lz)
 {
-	$lzr = str_replace(array(' ',',',';','.','!','?'),array(';'),$lz).';';
+	$lzr = str_replace(array(' ',',',';','.','!','?','|'),';',$lz).';';
+	$lzr = ascii($lzr);
+	$lzr = trim($lzr);
 	$lzr = trim(substr($lzr,0,strpos($lzr,';')));
+	
 	$lzru = UpperCaseSQL($lzr);
-	
 	if (strlen($lzru) == 0) { return(0); }
+	if ($lzru == $lzr)
+	{
+		return(1);
+	} else {
+		return(0);
+	}
 	
-	for ($r=0;$r < strlen($lzr);$r++)
-		{
-			if ($lzru[$r] != $lzr[$r])
-				{
-					return(0);
-				}
-		}
-	return(1);
 }
 
 function neuro_email($t)
