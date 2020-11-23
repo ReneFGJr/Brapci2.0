@@ -257,7 +257,7 @@ class socials
     }
     
     function menu_user()
-    {
+    {        
         if (isset($_SESSION['user']) and (strlen($_SESSION['user']) > 0)) {
             $name = $_SESSION['user'];
             $sx = '
@@ -298,7 +298,7 @@ class socials
         </button>
         </div>
         <div class="modal-body">
-        <form method="post" action="' . base_url('index.php/social/login') . '">
+        <form method="post" action="' . base_url(PATH.'social/login') . '">
         <span>' . msg("form_user_name") . '</span><br>
         <input type="text" name="user_login" value="' . get("user_login") . '" class="form-control">
         <br>
@@ -316,7 +316,7 @@ class socials
         </div>';
         $data['email_ok'] = '';
         $data['error'] = '';
-        $sx = $CI->load->view('social/login/login.php', $data, true);
+        //$sx = $CI->load->view('social/login/login.php', $data, true);
         return ($sx);
     }
     
@@ -356,13 +356,14 @@ class socials
     
     function view_login_signin($data=array())
     {
+        $sx = '';
         $err = get("err");
         if (strlen($err) > 0)
         {
             $sx .= message(msg($err),3);
         }
         
-        $sx = '
+        $sx .= '
         <!---- Social Login ---->
         <style>
         .box100 {
@@ -375,7 +376,9 @@ class socials
             font-size: 300%;
             line-height: 100%;
         }
-        </style>
+        </style>';
+
+        $sx .= '
         <div class="container" style="margin-top: 100px;">
         <div class="row">
         <div class="col-md-2 col-lg-3 col-sm-1"></div>
@@ -404,20 +407,30 @@ class socials
         <div class="">
         <input type="submit" class="btn btn-primary" style="width: 100%;" value="'.msg('login').'">
         </div>
-        <br/>
+        <br/>';
         
+        if (!isset($data['forgot']))
+        {
+        $sx .= '
         <!--- Forgot Password --->
         <div class="text-center p-t-115">
         <a class="txt2 text-dark" href="'.base_url(PATH.'social/forgot').'"> '.msg('Forgot Password?').' </a>
         </div>
-        <br/>
-        
+        <br/>';
+        }
+
+        if (!isset($data['signup']))
+        {
+        $sx .= '
         <!--- Create a Passwrod --->
         <div class="text-center p-t-115">
         <span class="txt1">'.msg('Don’t have an account?').'</span>                
         <a class="txt2 text-dark" href="'.base_url(PATH.'social/signup').'"> '.msg('SignUp').' </a>
         </div>
-        <br/>
+        <br/>';
+        }
+
+        $sx .= '
         </form>
         </div>
         <div class="col-md-2 col-lg-3 col-sm-1"></div>
