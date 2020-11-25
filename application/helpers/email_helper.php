@@ -39,7 +39,8 @@ function email($para,$assunto,$texto,$de=1)
     $config['validate']  = TRUE;
     $config['mailtype']  = 'html';
     $config['charset']   = 'utf-8';
-    $config['newline']   = "\r\n";        
+    $config['newline']   = "\r\n";   
+         
     $CI->email->initialize($config);
     $CI->email->set_newline("\r\n");
 
@@ -140,7 +141,7 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
         $proto = $CI->email->protocol;
         switch($proto)
         {
-            case 'm':
+            case 't':
             $to      = 'renefgj@gmail.com';
             $subject = 'Assunto sem caracteres especiais';
             $message = 'conteudo do email. 
@@ -153,7 +154,20 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
             $real_sender = '-f brapcici@gmail.com';
 
             mail($to, $subject, $message, $headers, $real_sender);
-            break; 
+            break;
+            
+            case 'm':
+                $message = $email_header . $texto . $email_footer;
+    
+                $headers = 'From: ppgcin@ufrgs.br <cedap@ufrgs.br> ' . "\r\n" .
+                'Reply-To: cedap@ufrgs.br' . "\r\n" .
+                'X-Mailer: PHP/' . phpversion();
+                
+                $e_mail = utf8_decode($e_mail);
+                $subject = "Content-Type:text/html; charset=UTF-8\n";
+    
+                mail($e_mail, $assunto, $message, $headers);
+                break;             
 
             default:
             return($CI -> email -> send());
