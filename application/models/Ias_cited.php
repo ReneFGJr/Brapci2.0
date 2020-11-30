@@ -10,6 +10,7 @@ class ias_cited extends CI_Model
                 'Referências Bibliográficas',
                 'REFERÊNCIAS',
                 'Referências',
+                'References',
             );
             $ref = '';
             $txt = troca($txt,chr(13),chr(10));
@@ -23,7 +24,6 @@ class ias_cited extends CI_Model
                                 $ref = substr($txt,$pos,strlen($txt));
                                 $txt = $ref;
                                 $pos = strpos($txt,$terms[$r].chr(10));
-                                echo '==>'.$pos.'<br>';
                             }
                         }                    
                 }                
@@ -103,7 +103,7 @@ class ias_cited extends CI_Model
                 {
                     $rsp .= cr();
                 }         
-            $t .= troca($t,'.,',';');
+            $t = troca($t,'.,',';');
             $rsp .= troca($t,'.,',';').' ';            
 
             $sx .= '<li>';

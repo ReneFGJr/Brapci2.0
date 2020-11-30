@@ -156,7 +156,17 @@ class Ias extends CI_model
 				$sx .= ' &nbsp; ';
 				$sx .= '<a href="' . base_url(PATH . 'ia/thesa') . '" class="btn btn-outline-primary">' . msg('update') . '</a>';
 				break;
-
+			case 'io':
+				switch($d1)
+					{
+						case 'edit':
+							$sx .= $this->io_edit($d2);
+							break;
+						default:
+							$sx .= 'OPS IO';
+						break;
+					}
+			break;
 			case 'nlp':
 				switch ($d1) {
 					case 'save':
@@ -190,6 +200,39 @@ class Ias extends CI_model
 		}
 		return ($sx);
 	}
+
+	function io_edit($id)
+		{
+			$sx = '';
+			$rdf = new rdf;
+			$d = $this->frbr_core->le_data($id);
+			$file = $rdf->extract_content($d, 'hasFileStorage');
+			$file = $file[0];
+			$file = troca($file,'.pdf','.txt');
+			$sx .= '<h5>'.$file.'</h5>';
+
+			$action = get("action");
+			if (strlen($action) > 0)
+				{
+					echo "SAVED";
+					$txt = get("dd1");
+					file_put_contents($file,$txt);
+					redirect(base_url(PATH.'//v//'.$id));
+					exit;
+				}
+
+			if (file_exists($file))
+				{
+					$txt = file_get_contents($file);
+					$sx .= '<form method="post">';
+					$sx .= '<textarea name="dd1" class="form-control" rows=15>'.$txt.'</textarea>';
+					$sx .= '<input type="submit" name="action" value="'.msg('update').'">';
+					$sx .= '</form>';
+				} else {
+					$sx = message(msg('file_not_found',2));
+				}
+			return($sx);
+		}
 
 	function to_line($t)
 	{
