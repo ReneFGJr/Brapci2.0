@@ -258,6 +258,7 @@ public function v($id='',$fmt='') {
     if (round('0'.$id)==0) { redirect(base_url(PATH)); }
     $this -> load -> model('ias');
     $this -> load -> model('nets');
+    $this -> load -> model('cited');
     $this -> load -> model('frbr');
     $this -> load -> model('frbr_core');
     $this -> load -> model('genero');

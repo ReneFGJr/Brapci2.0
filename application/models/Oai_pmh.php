@@ -1258,11 +1258,11 @@ class oai_pmh extends CI_model {
                     case 'ListIdentifiers' :
                         if (strlen($data['jnl_oai_token']) > 5) {
                             $url .= '?verb=ListIdentifiers&resumptionToken=' . trim($data['jnl_oai_token']);
+                            $url .= $scielo;
                         } else {
                             $url .= '?verb=ListIdentifiers&metadataPrefix=oai_dc';
                             $url .= $scielo;
-                        }
-                        
+                        }                        
                     break;
                     case 'identify' :
                         $url .= '?verb=Identify';

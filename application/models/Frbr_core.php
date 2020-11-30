@@ -532,7 +532,7 @@ class frbr_core extends CI_model {
         $data = $this -> le($id);
         if ($data['cc_use'] > 0)
             {
-                redirect(base_url(PATH.'/'.$data['cc_use']));
+                redirect(base_url(PATH.'//v//'.$data['cc_use']));
                 exit;
             }
         $tela = '';
@@ -573,6 +573,7 @@ class frbr_core extends CI_model {
                 case 'Article' :
                     $tela = $this -> frbr -> show_article($id);
                     $tela .= $this -> view_data($id);
+                    $tela .= $this -> cited->show_ref($id);
                     break;
                 case 'Issue' :
                     if (perfil("#ADM"))

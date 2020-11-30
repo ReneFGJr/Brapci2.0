@@ -60,3 +60,7 @@ application/views/brapci/index/authors_W.php
 application/views/brapci/index/authors_X.php
 application/views/brapci/index/authors_Y.php
 *.rfe
+*.txt
+*.doc
+_repository/47/2020/.htaccess
+_repository/47/2020/04/.htaccess

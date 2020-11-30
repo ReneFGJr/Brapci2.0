@@ -6,7 +6,7 @@
 
 class Ias extends CI_model
 {
-	var $version_nlp = '0.21';
+	var $version_nlp = '0.22';
 
 	function check($f = 0)
 	{
@@ -159,10 +159,23 @@ class Ias extends CI_model
 
 			case 'nlp':
 				switch ($d1) {
+					case 'save':
+						if (perfil("#ADM") > 0)
+						{
+							if ($d2 == 'cited')
+								{
+									$this->load->model("cited");
+									$this->cited->save_ref($d3);
+								}
+							$sx .= 'Save - '.$d2.' - '.$d3;
+						} else {
+							$sx .= message('Acesso negado',3);
+						}
+						break;
 					case 'analyse':
 						$vv = $this->frbr_core->le_data($d2);
 						$sx = '<h3>' . msg("Inteligência Artificial - IA Brapci (Robots)") . '</h3>';
-						$sx .= $this->ias->nlp_v($vv);
+						$sx .= $this->ias->nlp_v($vv,$d2);
 						break;
 
 					default:
@@ -183,7 +196,7 @@ class Ias extends CI_model
 		$t = troca($t, ';', '.,');
 		$t = troca($t, chr(10), ';');
 		$t = troca($t, chr(13), ';');
-		$wd = splitx(';', $t);
+		$wd = splitx(';', $t.';');
 		return ($wd);
 	}
 
@@ -319,25 +332,54 @@ class Ias extends CI_model
 
 	function file_get($file)
 	{
-		$l = array();
-		$rsp = file($file);
-		$w = '';
-		foreach ($rsp as $line_num => $line) {
-			//echo "Linha #<b>{$line_num}</b> : " .$line . "<br>\n";
-			$line = trim($line);
-			if (sonumero($line) == $line) {
-				$line = '';
-			}
-
-			if (isset($l[$line])) {
-				$l[$line] = $l[$line] + 1;
-			} else {
-				$l[$line] = 1;
-			}
+		$txt = '';
+		if (file_exists($file))
+		{
+			$txt = file_get_contents($file);
 		}
-		$txt = $this->file_get_prepare($l);
+		$txt = troca($txt,chr(13),chr(10));
+		$txt = str_replace(array('','|'),'',$txt);
+		$txt = str_replace(array('&'),' and ',$txt);
+		$txt = str_replace(array('  '),' ',$txt);
+		$ln = explode(chr(10),$txt);
+
+		/* Elimina linhas iguais */
+		$l = array();
+		for ($r=0;$r < count($ln);$r++)
+		{
+			if (isset($l[$ln[$r]]))
+				{
+					$l[$ln[$r]] = $l[$ln[$r]] + 1;
+				} else {
+					$l[$ln[$r]] = 1;
+				}
+		}
+		/* Cria texto limpo */
+		$txt = '';
+		foreach($l as $ln => $t)
+			{
+				if ($t < 3)
+					{
+						$txt .= $ln.chr(13).chr(10);
+					}
+			}
 		return ($txt);
 	}
+
+	function split_word($t,$c,$n)
+		{
+			$t = str_replace(array('!','?'),' ',$t);
+			$tn = explode(' ',$t);
+			$txt = '';
+			for ($r=0;$r < count($tn);$r++)
+				{
+					if (($r < count($tn)) and ($r < $n))
+						{
+							$txt .= $tn[$r].' ';
+						}
+				}
+			return($txt);
+		}
 
 	function text_get($t)
 	{
@@ -399,13 +441,16 @@ class Ias extends CI_model
 		return ($txt);
 	}
 
-	function nlp_v($d)
+	function nlp_v($d,$id)
 	{
+		$this->load->model('ias_cited');
 		$this->check();
 		$rdf = new rdf;
 		$vv = $rdf->extract_content($d, 'hasFileStorage');
 		$data = array();
-		$data['title'] = $rdf->extract_content($d, 'hasFileStorage');
+		$data['id'] = $id;
+		$data['title'] = $rdf->extract_content($d, 'hasTitle');
+		$data['file'] = $rdf->extract_content($d, 'hasFileStorage');
 		$data['pi'] = $rdf->extract_content($d, 'hasPageEnd');
 		$data['pi'] = $data['pi'][0];
 		$data['pf'] = $rdf->extract_content($d, 'hasPageStart');
@@ -414,8 +459,15 @@ class Ias extends CI_model
 		$file = troca($vv[0], '.pdf', '.txt');
 		if (file_exists($file)) {
 			$txtf = $this->file_get($file);
-			//$txt = '<tt>'.$txtf.'</tt>';		
-			$txt = $this->nlp_words($txtf, $data) . cr();
+			$txt = '';
+			if (perfil("#ADM") > 0)
+				{
+					$txt .= '<h5>'.$file.'</h5>';
+					$txt .= '<a href="'.base_url(PATH.'ia/io/edit/'.$id).'">edit</a>';
+				}
+			
+			$txt .= $this->ias_cited->neuro_cited($txtf,$data);		
+			//$txt .= $this->nlp_words($txtf, $data) . cr();
 		} else {
 			$txt = message(msg('File not found') . ' ' . $file, 3);
 		}
@@ -467,7 +519,12 @@ class Ias extends CI_model
 
 	function nlp_words($txt, $data = array())
 	{
-		$t = $txt;
+		$this->load->model('ias_cited');
+		$t = ascii($txt);
+		echo '<pre>';
+		echo $t;
+		echo '</pre>';
+		exit;
 
 		/************************************ Busca termos **************/
 		/* recupera Domínio da CI */
@@ -477,11 +534,11 @@ class Ias extends CI_model
 
 		/* REDE DE NEURONIO */
 		$t1 = $t;
-		$tx = neuro_referencias($t1, $data);
+		$tx = $this->ias_cited->neuro_cited($t1, $data);
 		$refs = $tx[1];
 		$t1 = $tx[0];
 
-		$t1 = neuro_link($t1);
+		$t1 = $this->neuro_link($t1);
 
 		/************************** Substitui no texto ***********/
 		$t1 = LowerCaseSql($t1);
@@ -658,11 +715,16 @@ class Ias extends CI_model
 		return (0);
 	}
 	#validador 4
-	function sonumero($t)
+	function sonumero($t,$s=true)
+	/* $s = considera caracteres de pontuacao */
 		{
-			$t = str_replace(array('.',',','!','-','!','?','#','$','%',' '),'',$t);
-			$tn = sonumero($t);
-			if ($t == $tn)
+			if ($s==true)
+			{
+				$t = str_replace(array('.',',','!','-','!','?','#','$','%',' '),'',$t);
+			}
+			$tn = trim((string)sonumero($t));
+			$t = trim((string)$t);
+			if (($t == $tn) and (strlen($t) == strlen($tn)))
 				{
 					return(1);
 				} else {
@@ -689,7 +751,25 @@ class Ias extends CI_model
 			$t = trim($t);
 			$t = substr($t,strlen($t)-4,4);
 			return($this->tem_ano(' '.$t.' '));
-		}		
+		}
+	#validador 3
+	function termina_com_caixa_alta($lz)
+	{
+		$lzr = str_replace(array(',', ';', '.', '!', '|', '?','-','(',')',']','['), '', $lz).' ';
+		$lzr = troca($lzr,' ',';');
+		$wd = splitx(';',$lzr);
+		if (count($wd) > 0)
+			{
+				$lzr = $wd[count($wd)-1];
+				$lzr = ascii($lzr);
+				$lzru = UpperCaseSQL($lzr);
+				if (($lzru == $lzr) and ($lzr != sonumero($lzr)))
+				{
+					return (1);
+				}
+			}
+		return (0);
+	}				
 
 	function neuro_email($t)
 	{
