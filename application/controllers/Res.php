@@ -358,34 +358,36 @@ public function v($id='',$fmt='') {
     * Funções de coleta das dados - Harvesting
     */
     public function cron($act = '', $token = '', $id = '') {
-        $sx = '<pre>'.cr();
+        $sx = cr();
         $this -> load -> model('frbr');
         $this -> load -> model('frbr_core');
         $this -> load -> model('oai_pmh');
         $this -> load -> model('sources');
         $socials = new socials;
         $usr = $socials -> token($token);
-        
         if (count($usr) == 0) {
             if ($token == 'free')
             {
                 
             } else {
-                $sx .= msg('token_invalid') . cr();
+                $sx .= msg('Token not informed') . cr();
                 $id = '';
             }
         }
+
         if (strlen($id) == 0) {
             $id = 'journal';
         }
         $sx .= '================================================'.cr();
         $sx .= date("Y-m-d H:i:s") . ' ACT:' . $id . cr();
+        echo $sx;
         switch($id) {
             case 'affiliation':
                 $sx .= 'CROM Affiliation'.cr();
                 $this->load->model('api_brapci');
                 $sx .= $this->api_brapci->affiliation_cron();
             break;
+
             case 'journal' :
                 $data = $this -> oai_pmh -> NextHarvesting();
                 if (count($data) > 0) {

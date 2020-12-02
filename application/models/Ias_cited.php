@@ -6,11 +6,13 @@ class ias_cited extends CI_Model
         {
             //echo '<pre>'.$txt.'</pre>';
             $terms = array(
+                'REFERÊNCIAS (ESTILO <SECAOSEMNUM>)',
                 'REFERÊNCIAS BIBLIOGRÁFICAS',
                 'Referências Bibliográficas',
                 'REFERÊNCIAS',
                 'Referências',
                 'References',
+                'BIBLIOGRAFIA',
             );
             $ref = '';
             $txt = troca($txt,chr(13),chr(10));
@@ -37,7 +39,30 @@ class ias_cited extends CI_Model
                         {
                             $ref = substr($ref,0,$pos);
                         }
+                }
+            /************************************** Ve se termina com o título em inglês */
+            for ($r=0;$r < count($data['title']);$r++)
+                {
+                    $tit = $data['title'][$r];
+                    $tite = $this->ias->split_word($tit,' ',7);
+                    $pos = strpos($ref,$tite);
+                    if ($pos > 0)
+                        {
+                            $ref = substr($ref,0,$pos);
+                        }
                 }                           
+            /************************************** Ve se termina com abstract */
+            if (
+                ($pos = strpos($ref,'Abstract:')) 
+                or ($pos = strpos($ref,'Abstract'.chr(10))) 
+                or ($pos = strpos($ref,'Resumo:')))
+                {
+                    $ref = substr($ref,0,$pos);
+                    while (substr($ref,strlen($ref)-1,1) != '.')
+                        {
+                            $ref = substr($ref,0,strlen($ref)-1);
+                        }
+                }                
             /********************************* Remove so numero */
             $ref = $this->ias->to_line($ref);
             $txt = '';

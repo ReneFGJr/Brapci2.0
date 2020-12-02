@@ -495,9 +495,18 @@ class Ias extends CI_model
 		$data['title'] = $rdf->extract_content($d, 'hasTitle');
 		$data['file'] = $rdf->extract_content($d, 'hasFileStorage');
 		$data['pi'] = $rdf->extract_content($d, 'hasPageEnd');
-		$data['pi'] = $data['pi'][0];
 		$data['pf'] = $rdf->extract_content($d, 'hasPageStart');
-		$data['pf'] = $data['pf'][0];
+		if (isset($data['pi'][0]))
+			{
+				$data['pi'] = $data['pi'][0];
+				$data['pf'] = $data['pf'][0];
+			} else {
+				$data['pi'] = '0';
+				$data['pf'] = '0';
+			}
+		
+		
+		
 
 		$file = troca($vv[0], '.pdf', '.txt');
 		if (file_exists($file)) {

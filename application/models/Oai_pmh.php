@@ -995,8 +995,9 @@ class oai_pmh extends CI_model {
                     $this->ref = '';
                 }
                 $ref = $this->log_oai($id,'ILIS');
-                
+
                 $sx = $this->ListIdentifiers_harvesting($id);
+                
                 $this->new = $this->LisIdentifiesToHarvesting($id);
                 
                 $sql = "update ".$this->base."source_source set
@@ -1090,7 +1091,7 @@ class oai_pmh extends CI_model {
                 $sx .= '<br><b>Response: ' . $response . '</b>';
                 $sx .= '</div></div>';
                 $sx .= '<div class="row"><div class="col-md-12"><ul>';
-                
+                echo $sx;
                 for ($r = 0; $r < count($LI); $r++) {
                     $line = $LI[$r];
                     $sx .= '<li>' . $this -> cache($data['id_jnl'], $line) . '</li>';
@@ -1102,14 +1103,16 @@ class oai_pmh extends CI_model {
                             $sx .= 'Continua - Token: ' . $token;
                             $sx = '<div class="row"><div class="col-md-12">'.btn_reload().'</div></div>'.$sx;
                         } else {
-                            $sx .= $this -> ListIdentifiers_harvesting($id,$data);
+                            echo $sx;
+                            $sx = $this -> ListIdentifiers_harvesting($id,$data);
                         }                    
                 }
                 $this->erro = 200;
                 
                 /* Atualiza registros para coletar */
+                echo "=1=";
                 $this-> LisIdentifiesToHarvestingAll();
-                
+                echo "=2=";
                 return ($sx);
                 
             }
