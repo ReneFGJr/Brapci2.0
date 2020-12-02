@@ -79,6 +79,7 @@ class ias_cited extends CI_Model
             $ref = $this->process($txt,$data);
             return($ref);
         }
+
     function process($txt,$data)
     {
         $sx = '<ol>';

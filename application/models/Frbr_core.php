@@ -572,8 +572,9 @@ class frbr_core extends CI_model {
                     break;
                 case 'Article' :
                     $tela = $this -> frbr -> show_article($id);
-                    $tela .= $this -> view_data($id);
                     $tela .= $this -> cited->show_ref($id);
+                    $tela .= $this -> view_data($id);
+                    
                     break;
                 case 'Issue' :
                     if (perfil("#ADM"))
