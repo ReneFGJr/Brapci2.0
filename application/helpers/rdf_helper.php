@@ -19,6 +19,7 @@ class rdf
 {
 	var $limit = 10;
 	var $image_dir = '_repository/img/';
+	var $file_dir = '_repository/files/';
 	function __construct()
 	{
 		global $msg;
@@ -55,6 +56,15 @@ class rdf
 				$sx  = $this->image_save($id,$id2);
 				return($sx);
 			break;
+
+			case 'file_upload':
+				$sx  = $this->file_save($id,$id2);
+				return($sx);
+			break;			
+
+			case 'class_change':
+				$sx = $this->change_class($id);
+				return($sx);
 			
 			case 'form':
 				$form = 0;
@@ -277,6 +287,22 @@ function filter($dt,$prop)
 	}
 	return($rst);
 }
+
+function change_class($id)
+	{
+		$form = new form;
+		$form->id = $id;
+		$cp = array();
+		array_push($cp,array('$H8','id_cc','',false,false));
+		$sql = "select * from rdf_class where c_type= 'C' ";
+		array_push($cp,array('$Q:id_c:c_class:'.$sql,'cc_class',msg('class'),true,true));
+		$sx = $form->editar($cp,'rdf_concept');
+		if ($form->saved > 0)
+			{
+				$sx = '<script> wclose(); </script>';
+			}
+		return($sx);
+	}
 
 function find($n, $prop = '', $equal = 1) {
 	$CI = &get_instance();
@@ -1567,7 +1593,9 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						INNER JOIN rdf_class as t0 ON id_c = sc_propriety
 						LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
 						LEFT JOIN rdf_class as t2 ON sc_propriety = t2.id_c
-						where sc_class = $class 
+						where (sc_class = $class) 
+							and ((sc_global = 1) or (sc_library = ".LIBRARY.") or (sc_library = 0)) 
+							and sc_ativo = 1
 						order by sc_ord, id_sc, t0.c_order";
 						
 						$rlt = $CI -> db -> query($sql);
@@ -1600,14 +1628,15 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 							$furl = base_url(PATH.'rdf/form/'.$class.'/'.$line['id_sc'].'/'.$id);
 							
 							$link = '<a href="#" id="action_' . trim($line['c_class']) . '" 
-							onclick="newxy(\''.$furl.'\',800,400);">';
+								onclick="newxy(\''.$furl.'\',800,400);" class="btn-primary br5" 
+								style="text-decoration: none;">';
 							$linka = '</a>';
 							$sx .= '<tr>';
-							$sx .= '<td width="25%" align="right" valign="top">';
+							$sx .= '<td width="25%" align="right" valign="top" class="small">';
 							
 							if ($xcap != $cap) {
 								$sx .= '<nobr><i>' . msg($line['c_class']) . '</i></nobr>';
-								$sx .= '<td width="1%" valign="top">' . $link . '[+]' . $linka . '</td>';
+								$sx .= '<td width="1%" valign="top">' . $link . '&nbsp;+&nbsp;' . $linka . '</td>';
 								$xcap = $cap;
 							} else {
 								$sx .= '&nbsp;';
@@ -1636,15 +1665,15 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 									$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/text/'.$line['d_literal']).'\',600,400);"';
 									$elink = ' <span style="cursor: pointer;" '.$onclick.'>';
 									$elinka = '';
-									$sx .= $elink . '<font style="color: red;" title="Editar texto">[ed]</font>' . $elinka;
+									$sx .= $elink . '<a class="btn-warning br5 text-white small" title="Editar texto">&nbsp;ed&nbsp;</a>' . $elinka;
 									$sx .= '</span>';
 								}
 								
 								/********************* Excluir lancamento */
 								$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';
-								$link = ' <span style="cursor: pointer;" '.$onclick.'>';
-								$sx .= $link . '<font style="color: red;" title="Excluir lancamento">[X]</font>' . $linka;
-								$sx .= '</span>';
+								$link = ' <a style="cursor: pointer;" '.$onclick.'>';
+								$sx .= $link . '<span class="btn-danger br5 text-white small" title="Excluir lancamento">&nbsp;X&nbsp;</span>' . $linka;
+								$sx .= '</a>';
 							}
 							
 							$sx .= '</td>';
@@ -2932,6 +2961,40 @@ function export_json($id)
 		}
 		return($s);
 	}
+
+	function file_save($id,$class)
+	{
+		$rdf = new rdf;
+		$d = $_FILES;
+		if (isset($_FILES))
+		{
+			$file = $d['file']['tmp_name'];
+			$type = $d['file']['type'];
+			$uploadfile = $this->file_dir.$id.'.jpg';
+			if ($type == 'image/jpeg')
+			{
+				$sx = message(msg('Saved'),1);
+				if (move_uploaded_file($file, $uploadfile)) 
+				{
+					
+					$idn = $rdf->rdf_name(base_url($uploadfile));
+					$prop = 'Person:hasPicture';
+					$rdf->set_propriety($id, $prop, 0, $idn);		
+					
+					$sx .= '</>';
+					$sx .= '<meta http-equiv="refresh" content="0">';
+				}
+			} else {
+				$sx = message(msg('invalid_format') . ' - '.$type,3);
+				$sx .= $this->image_form();
+			}
+		} else {
+			$sx = message(msg('file_not_anexed'),3);
+			$sx .= $this->image_form();
+		}
+		return($sx);
+	}
+
 	
 	function image_save($id,$class)
 	{
