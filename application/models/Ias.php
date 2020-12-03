@@ -6,7 +6,7 @@
 
 class Ias extends CI_model
 {
-	var $version_nlp = '0.22';
+	var $version_nlp = '0.23';
 
 	function check($f = 0)
 	{

@@ -392,7 +392,8 @@ function show_article($id) {
     $dados['doi'] = $rdf->recupera($data,'hasRegisterId');
     $dados['altmetrics'] = $this->altmets->altmetrics($dados['doi']);
     $dados['plum'] = $this->altmets->plum($dados['doi']);
-    $dados['ia'] = $this->ias->status($id);
+    $dados['ia'] = $this->cited->show_icone($id);
+    $dados['ia'] .= $this->ias->status($id);
     
     $article = $dados['article'] = $data;
     $dados['social'] = $this -> nets -> twitter($data);
