@@ -1005,7 +1005,7 @@ function form_ed($id,$id2,$cl=0) {
 }	
 
 ####################################### CONCEPT	
-function xxxxxxxxxrdf_concept($term, $class, $orign = '') {
+function rdf_concept($term, $class, $orign = '') {
 	$CI = &get_instance();
 	/**** recupera codigo da classe *******************/
 	$cl = $this -> find_class($class);
@@ -1861,6 +1861,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 	
 	function search($d) 
 	{
+		$CI = &get_instance();
 		if (!isset($d['dd1'])) 
 		{
 			return ('');
@@ -1889,7 +1890,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		INNER JOIN rdf_class ON id_c = cc_class
 		WHERE $wh AND c_find = 1  AND cc_library = " . LIBRARY . "
 		group by $cps";
-		$rlt = $this -> db -> query($sql);
+		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx .= '<div class="container">' . cr();
 		$sx .= '<div class="row">' . cr();
