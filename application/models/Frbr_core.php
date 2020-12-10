@@ -582,7 +582,7 @@ class frbr_core extends CI_model {
                         $tela .= $this -> frbr -> import_csv_issue($id);
                     }
                     $tela .= $this -> frbr -> show_issue($id);
-                    $tela .= $this -> view_data($id);
+                    //$tela .= $this -> view_data($id);
                     break;
                 case 'Subject' :
                     $tela .= $this -> frbr -> show_Subject($id);

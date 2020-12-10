@@ -299,7 +299,6 @@ class pdfs extends CI_model {
 							if (strpos($type, ';') > 0) {
 								$type = substr($type, 0, strpos($type, ';'));
 							}
-							
 							/******************** Tipos de arquivos recebidos ************************/
 							switch($type) {
 								case 'application/pdf' :
@@ -452,6 +451,14 @@ function file_pdf($file, $content, $id, $journal) {
 	
 	$filename = $this -> directories($journal);
 	$filename .= '/' . $file . '.pdf';
+
+	$filename_text = troca($filename,'.pdf','.txt');
+	echo $filename_text;
+	if (file_exists($filename_text))
+		{
+			echo 'Excluindo '.$filename_text;
+			unlink($filename_text);
+		}
 	
 	$fld = fopen($filename, 'w+');
 	fwrite($fld, $content);
@@ -487,7 +494,7 @@ function file_save($file, $content, $id, $type, $journal) {
 	$type = UpperCase($type);
 	$filename = $this -> directories($journal);
 	$filename .= '/' . $file . '.'.lowercase($type);
-	
+
 	$fld = fopen($filename, 'w+');
 	fwrite($fld, $content);
 	fclose($fld);

@@ -143,6 +143,25 @@ class ias_cited extends CI_Model
             $sx .= '</li>';
         }
         $sx .= '</ol>';
+
+        /************************************************** Busca por ____ */
+        if (strpos($rsp,'___') > 0)
+            {
+                $ln = $this->ias->to_line($rsp);   
+                $last = '';
+                $rsp = '';
+                for ($r=0;$r < count($ln);$r++)
+                {                    
+                    $l = trim($ln[$r]);
+                    if (substr($l,0,2) == '__')
+                        {
+                            $ln[$r] = $this->author_citado($ln[$r],$last);
+                        }
+                    $last = $ln[$r];
+                    $rsp .= $ln[$r].cr();
+                }
+
+            }
         $sx = '<hr><b>Referências</b>
                 <form action="'.base_url(PATH.'ia/nlp/save/cited/'.$data['id']).'" method="post">
                 <textarea name="dd1" class="form-control" rows=15>' . $rsp . '</textarea>
@@ -152,6 +171,19 @@ class ias_cited extends CI_Model
                 '. $sx;
         return ($sx);
     }
+
+    function author_citado($n,$l)
+        {
+            $nnl = substr($l,0,strpos($l,'.'));
+
+            $n = troca($n,'_ ','_.');
+            $n = troca($n,'_;','_.');
+            $n = troca($n,'_,','_.');
+
+            $n = troca($n,'__.',$nnl.'.');
+            $n = troca($n,'_','');
+            return($n);
+        }
     function rede_neuro($n)
     {
         $rs = 0;

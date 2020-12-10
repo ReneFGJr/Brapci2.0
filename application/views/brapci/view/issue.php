@@ -33,7 +33,8 @@ for ($r = 0; $r < count($issue); $r++) {
         case 'hasPublicationVolume' :
             $vol = $value;
             break;
-        case 'hasIssueOf' :
+        case 'hasIssueOf' : 
+            
             if ($d_r2 > 0) {
                 $filex = 'c/' . $d_r2 . '/name.nm';
                 $n = $value;
@@ -43,9 +44,21 @@ for ($r = 0; $r < count($issue); $r++) {
                     $link = '<a href="'.base_url(PATH.'/v/'.$d_r2).'">';
                     $n = $link.$n.'</a>';
                 }
+                /* CITED */
+                if (perfil("#ADM#CAT"))
+                {
+                    $file_cited = 'c/'.$d_r2.'/cited.total';
+                    if (file_exists(($file_cited)))
+                    {
+                        $cited = file_get_contents($file_cited);
+                        $n .= ' <span class="btn-secondary" style="border-radius: 5px;">&nbsp;'.$cited.'&nbsp;</span>';
+                    } else {
+                        $n .= ' (sn)';
+                    }
+                }
                 if ($nx != $n)
                 {
-                array_push($article, $n);
+                    array_push($article, $n);
                 }
                 $nx = $n;
             }
@@ -75,8 +88,7 @@ for ($r = 0; $r < count($issue); $r++) {
         <?php
         for ($r = 0; $r < count($article); $r++) {
             $link = '';
-            echo $link.$article[$r] .'<hr>';
-            
+            echo $link.$article[$r] .'<hr>';            
         }
         ?>
         
