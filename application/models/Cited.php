@@ -12,7 +12,7 @@ class Cited extends CI_Model
             $sx = '
             <div class="infobox" style="width: 100px;">
                 <div class="infobox_name" style="background-color: #e0e0ff; float: left; width: 70%; padding: 0px 5px;">
-                Citation
+                '.msg("Refs").'
                 </div>
                 <div class="infobox_version text-center" style="float: left; background-color: #e0ffe0; width: 30%; padding: 0px 2px;">
                 <a href="#CITED">'.$total.'</a>

@@ -6,7 +6,7 @@
 
 class Ias extends CI_model
 {
-	var $version_nlp = '0.24';
+	var $version_nlp = '0.25';
 
 	function check($f = 0)
 	{
@@ -496,6 +496,7 @@ class Ias extends CI_model
 		$data['file'] = $rdf->extract_content($d, 'hasFileStorage');
 		$data['pi'] = $rdf->extract_content($d, 'hasPageEnd');
 		$data['pf'] = $rdf->extract_content($d, 'hasPageStart');
+		$data['author'] = $rdf->extract_content($d, 'hasAuthor');
 		if (isset($data['pi'][0]))
 			{
 				$data['pi'] = $data['pi'][0];
@@ -503,10 +504,7 @@ class Ias extends CI_model
 			} else {
 				$data['pi'] = '0';
 				$data['pf'] = '0';
-			}
-		
-		
-		
+			}	
 
 		$file = troca($vv[0], '.pdf', '.txt');
 		if (file_exists($file)) {
@@ -821,7 +819,49 @@ class Ias extends CI_model
 				}
 			}
 		return (0);
-	}				
+	}
+	#validador 4
+	function termina_com_caracter($t,$c)
+		{
+			$t = trim($t);
+			$tc = substr($t,strlen($t)-1,1);
+			if ($tc == $c) { return(1); }
+			return(0);
+		}	
+	function tem_titulacao($t)
+		{
+			$ar = array(
+			'Mestre','Mestrando','Mestranda',
+			'Doutor',
+			'Professora',
+			'Graduando','Graduada','Graduado','Bacharel',
+			'Bibliotecóloga','Bibliotecária',
+			'DEA',
+			'Recebido em','Aceito em',
+			'Agradecimentos'
+			);
+			for ($r=0;$r < count($ar);$r++)
+				{
+					$tp = substr($t,0,strlen($ar[$r]));
+					if (trim($tp) == $ar[$r])
+						{
+							return(1);
+						}
+				}
+			return(0);			
+		}
+
+	function linha_com_string($t,$ar = array())
+		{
+			for ($r=0;$r < count($ar);$r++)
+				{
+					if (trim($t) == $ar[$r])
+						{
+							return(1);
+						}
+				}
+			return(0);
+		}
 
 	function neuro_email($t)
 	{
