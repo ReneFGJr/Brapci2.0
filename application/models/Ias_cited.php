@@ -55,6 +55,7 @@ class ias_cited extends CI_Model
                                 }
                         }
                 }
+                if ($this->is_link($n)) { return(15); }
 
             if (perfil("#ADM"))
             {
@@ -78,6 +79,17 @@ class ias_cited extends CI_Model
                     }
             }
         }
+        function is_link($n)
+        {
+            if ($n[2] == 1) /* Tem Link Acesso */
+            {
+                if (($n[0]+$n[4]+$n[9]) == 0)
+                    {
+                        return(1);
+                    }
+            }
+            return(0);
+        }        
     function e_uma_lei($txt)
         {
             $a = array(' Lei nº ');
@@ -110,12 +122,12 @@ class ias_cited extends CI_Model
         }
     function disponível_em($txt)
         {
-            $a = array('Disponível em','Disponível:');
+            $a = array('Disponível em','Disponível:','Disponívelem','Acesso em:');
             return($this->locate($txt,$a));
         }
     function tem_dois_pontos($txt)
         {
-            $txt = $this->remove($txt,array('Disponível','Disponivel','Acesso:'));
+            $txt = $this->remove($txt,array('Disponível','Disponivel','Acesso:','Acesso em:'));
             $a = array(': ');
             return($this->locate($txt,$a));
         }
@@ -126,7 +138,7 @@ class ias_cited extends CI_Model
         }
     function e_um_evento($txt)
         {
-            $a = array('Anais...');
+            $a = array('Anais...','Anais…','Proceedings…','Proceedings...','Anais eletrônicos...');
             return($this->locate($txt,$a));
         }
     function tem_cidade($txt)
@@ -143,6 +155,7 @@ class ias_cited extends CI_Model
         $txt = ascii($txt);
         $txt = strtolower($txt);
         $txt = str_replace(array(',','?',':',' :'),'.',$txt);
+        $txt = str_replace(array('['),'',$txt);
         for ($r=0;$r < count($dt);$r++)
             {
                 $city = $dt[$r];
@@ -366,9 +379,7 @@ class ias_cited extends CI_Model
             <form action="'.base_url(PATH.'ia/nlp/save/cited/'.$data['id']).'" method="post">
             <textarea name="dd1" class="form-control" rows=15>' . $rsp . '</textarea>
             <input type="submit" value="salvar referências" name="action">
-            </form>
-            <textarea class="form-control" rows=5>' . $tb . '</textarea>
-            '. $sx;
+            </form>';
             return ($sx);
         }
         

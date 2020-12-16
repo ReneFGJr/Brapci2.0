@@ -113,6 +113,10 @@ class Cited extends CI_Model
                     $sx = '<span class="btn-warning radius5">&nbsp;'.msg('TCC').'&nbsp;</span>';
                     break;
 
+                    case '15':
+                        $sx = '<span class="btn-info radius5">&nbsp;'.msg('LINK').'&nbsp;</span>';
+                        break;                     
+
                     case '20':
                     $sx = '<span class="btn-warning radius5">&nbsp;'.msg('LAW').'&nbsp;</span>';
                     break;                                          

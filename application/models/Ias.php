@@ -488,6 +488,8 @@ class Ias extends CI_model
 	function nlp_v($d,$id)
 	{
 		$this->load->model('ias_cited');
+		$this->load->model('ias_abstract');
+		
 		$this->check();
 		$rdf = new rdf;
 		$vv = $rdf->extract_content($d, 'hasFileStorage');
@@ -517,7 +519,8 @@ class Ias extends CI_model
 					$txt .= '<a href="'.base_url(PATH.'ia/io/edit/'.$id).'">edit</a>';
 				}
 			
-			$txt .= $this->ias_cited->neuro_cited($txtf,$data);		
+			$txt .= $this->ias_abstract->neuro_nlp($txtf,$data);
+			$txt .= $this->ias_cited->neuro_cited($txtf,$data);
 			//$txt .= $this->nlp_words($txtf, $data) . cr();
 		} else {
 			$txt = message(msg('File not found') . ' ' . $file, 3);
@@ -778,10 +781,10 @@ class Ias extends CI_model
 	#validador 3
 	function caixa_alta_palavra($lz)
 	{
-		$lzr = str_replace(array(',', ';', '.', '!', '|', '?','-','(',')'), '', $lz).' ';
+		$lzr = str_replace(array(',', ';', '.', '!', '|', '?','-','(',')',':'), '', $lz).' ';
 		$lzr = ascii(trim(substr($lzr, 0, strpos($lzr, ' '))));
 		$lzru = UpperCaseSQL($lzr);
-		if (($lzru == $lzr) and ($lzr != sonumero($lzr)))
+		if (($lzru == $lzr) and ($lzr != sonumero($lzr)) and ($lzru != 'DOI'))
 		{
 			return (1);
 		}
