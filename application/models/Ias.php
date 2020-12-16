@@ -234,12 +234,18 @@ class Ias extends CI_model
 			return($sx);
 		}
 
-	function to_line($t)
+	function to_line($t,$mth = 1)
 	{
+		if ($mth == 1)
+		{
 		$t = troca($t, ';', '.,');
 		$t = troca($t, chr(10), ';');
 		$t = troca($t, chr(13), ';');
 		$wd = splitx(';', $t.';');
+		} else {
+			$t = troca($t,chr(10),'');
+			$t = explode(chr(10),$t);
+		}
 		return ($wd);
 	}
 

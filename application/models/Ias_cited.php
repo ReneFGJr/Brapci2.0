@@ -138,7 +138,7 @@ class ias_cited extends CI_Model
         }
     function e_um_evento($txt)
         {
-            $a = array('Anais...','Anais…','Proceedings…','Proceedings...','Anais eletrônicos...');
+            $a = array('Anais...','Anais…','Proceedings…','Proceedings...','Anais eletrônicos...','Anais [...]');
             return($this->locate($txt,$a));
         }
     function tem_cidade($txt)
