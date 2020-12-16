@@ -1,61 +1,76 @@
 /****************************************************** article ***********/
-.article_title_0
-    {
-        font: bold 150%/120% 'lucida sans', 'trebuchet MS', 'Tahoma';
-        /* text-transform: uppercase; */
-        text-align: center;    
-    }
-    
-.article_title_1
-    {
-        font: italic 110%/90% 'lucida sans', 'trebuchet MS', 'Tahoma';
-        /* text-transform: uppercase; */
-        text-align: center;    
-    }
-        
+
+.radius5 {
+    border-radius: 5px;
+}
+
+.article_title_0 {
+    font: bold 150%/120% 'lucida sans', 'trebuchet MS', 'Tahoma';
+    /* text-transform: uppercase; */
+    text-align: center;
+}
+
+.article_title_1 {
+    font: italic 110%/90% 'lucida sans', 'trebuchet MS', 'Tahoma';
+    /* text-transform: uppercase; */
+    text-align: center;
+}
+
 .h1 {
     font-size: 26px;
     text-transform: uppercase;
 }
+
 .h2 {
     font-size: 23px;
     text-transform: uppercase;
 }
+
 .h3 {
     font-size: 20px;
     text-transform: uppercase;
 }
+
 .h4 {
     font-size: 16px;
 }
+
 .h5 {
     font-size: 14px;
 }
+
 .h6 {
     font-size: 12px;
 }
+
 .small {
     font-size: 10px;
 }
-.result
-    {
-        color: #303030;
-    }
-.result a
-    {
-        color: #303030;
-    }
-.result a:hover
-    {
-        color: #000000;
-    }
-.ucase
-    {
-        text-transform: uppercase;
-    }
+
+.result {
+    color: #303030;
+}
+
+.result a {
+    color: #303030;
+}
+
+.result a:hover {
+    color: #000000;
+}
+
+.ucase {
+    text-transform: uppercase;
+}
+
+
 /**************************************************** FORM ***************/
+
+
 /* NOTE: The styles were added inline because Prefixfree needs access to your styles and they must be inlined if they are on local disk! */
-.cf:before, .cf:after {
+
+.cf:before,
+.cf:after {
     content: "";
     display: table;
 }
@@ -68,11 +83,14 @@
     zoom: 1;
 }
 
+
 /* Form wrapper styling */
+
 .search-wrapper {
     width: 100%;
     margin: 45px auto 50px auto;
 }
+
 
 /* Form text input */
 
@@ -86,7 +104,7 @@
 .search-wrapper input:focus {
     outline: 0;
     background: #fff;
-    box-shadow: 0 0 2px rgba(0,0,0,.8) inset;
+    box-shadow: 0 0 2px rgba(0, 0, 0, .8) inset;
 }
 
 .search-wrapper input::-webkit-input-placeholder {
@@ -107,7 +125,9 @@
     font-style: italic;
 }
 
+
 /* Form submit button */
+
 .search-wrapper button {
     overflow: visible;
     position: relative;
@@ -129,12 +149,14 @@
     background: #4040e5;
 }
 
-.search-wrapper button:active, .search-wrapper button:focus {
+.search-wrapper button:active,
+.search-wrapper button:focus {
     background: #2f2fc4;
     outline: 0;
 }
 
-.search-wrapper button:before {/* left arrow */
+.search-wrapper button:before {
+    /* left arrow */
     content: '';
     position: absolute;
     border-width: 8px 8px 8px 0;
@@ -148,24 +170,25 @@
     border-right-color: #4040e5;
 }
 
-.search-wrapper button:focus:before, .search-wrapper button:active:before {
+.search-wrapper button:focus:before,
+.search-wrapper button:active:before {
     border-right-color: #2f2fc4;
 }
 
-.search-wrapper button::-moz-focus-inner {/* remove extra button spacing for Mozilla Firefox */
+.search-wrapper button::-moz-focus-inner {
+    /* remove extra button spacing for Mozilla Firefox */
     border: 0;
     padding: 0;
 }
 
-.icone_nets
-    {
-        padding-top: 4px;
-        padding-bottom: 0px;
-        cursor: pointer;
-        padding-right: 4px;
-    }
-.icone_nets:hover
-    {
-        padding-top: 0px;
-        padding-bottom: 4px;
-    }
+.icone_nets {
+    padding-top: 4px;
+    padding-bottom: 0px;
+    cursor: pointer;
+    padding-right: 4px;
+}
+
+.icone_nets:hover {
+    padding-top: 0px;
+    padding-bottom: 4px;
+}

@@ -253,6 +253,7 @@ class Ias extends CI_model
 					case 'T':
 						$sx .= $vl.';';
 					break;
+
 					default:
 					$sx .= $nr.':';
 					if ($vl==1)
@@ -567,6 +568,28 @@ class Ias extends CI_model
 		return (' ' . $t . ' ');
 	}
 
+	function file_get_subdomain($file)
+		{
+			$txt = '';
+			if (file_exists($file))
+				{			
+				$txt = file_get_contents($file);
+				$l = explode(chr(10),$txt);
+				$rst = array();
+				for ($r=0;$r < count($l);$r++)
+					{
+						$t = substr($l[$r],10,strlen($l[$r]));
+						$t = substr($t,0,strpos($t,']')-1);
+						if (strlen($t) > 0)
+						{
+						array_push($rst,$t);
+						}
+					}
+				return($rst);
+				}
+			return(array());
+		}
+
 	function nlp_words($txt, $data = array())
 	{
 		$this->load->model('ias_cited');
@@ -833,9 +856,10 @@ class Ias extends CI_model
 			$ar = array(
 			'Mestre','Mestrando','Mestranda',
 			'Doutor',
-			'Professora',
+			'Professora','Professor',
 			'Graduando','Graduada','Graduado','Bacharel',
 			'Bibliotecóloga','Bibliotecária',
+			'Docente','Licenciado','Profesor',
 			'DEA',
 			'Recebido em','Aceito em',
 			'Agradecimentos'

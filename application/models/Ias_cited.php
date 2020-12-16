@@ -2,6 +2,183 @@
 
 class ias_cited extends CI_Model
 {
+    var $cities = array();
+    function neuro_type_source($txt, $id=0)
+        {
+            $n = array();
+            $n[0] = $this->tem_nr_vl($txt);
+            $n[1] = $this->tem_dois_pontos($txt);
+            $n[2] = $this->disponível_em($txt);
+            $n[3] = $this->e_um_evento($txt);
+            $n[4] = $this->tem_in($txt);
+            $n[5] = $this->tem_organizador($txt);
+            $n[6] = $this->e_uma_tese($txt);
+            $n[7] = $this->e_uma_dissertacao($txt);
+            $n[8] =  $this->e_um_tcc($txt);
+            $n[9] = $this->tem_cidade($txt);
+            $n[10] =  $this->e_uma_lei($txt);
+            
+            $sx = 0;
+
+            /********************************* Regras */
+            /* 1 - Journal
+            /* 5 - Event
+            /* 20 - Lei
+            */
+            /***************** LEI  */
+            if (($n[0] == 0) and ($n[10] == 1))
+                {
+                    return(20);
+                }
+
+            /***************** Analisa outros */
+            if (
+                ($n[0] == 1) /* Tem numero ou volume */
+                and ($n[5] != 1) /* Não tem editor, organizador */
+                )
+                {
+                    /* Journal */
+                    return(1);
+                } else {
+                    if ($n[3] == 1)
+                        { 
+                            /* Evento */
+                            return(5);
+                        } else {       
+                            /****************************** É livro ou capítulo */
+                            $book = $this->is_book($n);                    
+                            if ($book > 0) { return($book); }
+                            /************ Literatura Cinzenta */
+                            if (($n[6] + $n[7] + $n[8]) > 0)
+                                {
+                                    return(6+$n[6] + $n[7]*2 + $n[8]*3);
+                                }
+                        }
+                }
+
+            if (perfil("#ADM"))
+            {
+                echo $txt;
+                echo '<br>';
+                echo $this->ias->show_sensores($n);
+                echo '<hr>';
+            }
+
+            return($sx);
+        }
+    function is_book($n)
+        {
+            if ($n[9] == 1) /* Tem local */
+            {
+                if ($n[4] == 1)
+                    {
+                        return(3);
+                    } else {
+                        return(2);
+                    }
+            }
+        }
+    function e_uma_lei($txt)
+        {
+            $a = array(' Lei nº ');
+            return($this->locate($txt,$a));
+        }        
+    function e_um_tcc($txt)
+        {
+            $a = array(' Trabalho de conclusão de curso ');
+            return($this->locate($txt,$a));
+        }        
+    function e_uma_tese($txt)
+        {
+            $a = array(' Tese ','(Doutorado)',' Thesis ');
+            return($this->locate($txt,$a));
+        }
+    function e_uma_dissertacao($txt)
+        {
+            $a = array(' Dissertação ','(Mestrado)');
+            return($this->locate($txt,$a));
+        }        
+    function tem_in($txt)
+        {
+            $a = array(' In: ');
+            return($this->locate($txt,$a));
+        }
+    function tem_organizador($txt)
+        {
+            $a = array('(Org.)','(Ed.)','(Coord.)');
+            return($this->locate($txt,$a));
+        }
+    function disponível_em($txt)
+        {
+            $a = array('Disponível em','Disponível:');
+            return($this->locate($txt,$a));
+        }
+    function tem_dois_pontos($txt)
+        {
+            $txt = $this->remove($txt,array('Disponível','Disponivel','Acesso:'));
+            $a = array(': ');
+            return($this->locate($txt,$a));
+        }
+    function tem_nr_vl($txt)
+        {
+            $a = array(', v.',', V.',', n.');
+            return($this->locate($txt,$a));
+        }
+    function e_um_evento($txt)
+        {
+            $a = array('Anais...');
+            return($this->locate($txt,$a));
+        }
+    function tem_cidade($txt)
+        {
+        if (count($this->cities) == 0)
+            {        
+                $file = '_ia/domain_places.txt';
+                $dt = $this->ias->file_get_subdomain($file);
+                $this->cities = $dt;
+            }
+        $dt = $this->cities;
+
+        /* recupera arquivo */
+        $txt = ascii($txt);
+        $txt = strtolower($txt);
+        $txt = str_replace(array(',','?',':',' :'),'.',$txt);
+        for ($r=0;$r < count($dt);$r++)
+            {
+                $city = $dt[$r];
+                if (
+                    (strpos($txt,'. '.$dt[$r]))
+                    )
+                    {
+                         return(1);
+                    }
+            }
+        return(0);
+        } 
+
+    function locate($txt,$a)
+        {
+            for ($r=0;$r < count($a);$r++)
+                {
+                    if (strpos($txt,$a[$r]))
+                        {
+                            return(1);
+                        }
+                }
+            return(0);
+        } 
+    function remove($txt,$a)
+        {
+            for ($r=0;$r < count($a);$r++)
+                {
+                    if ($pos = strpos($txt,$a[$r]))
+                        {
+                            $txt = substr($txt,0,$pos);
+                        }
+                }
+            return($txt);
+        }
+    /********************************************************************* */
     function neuro_cited($txt,$data)
     {
         //echo '<pre>'.$txt.'</pre>';
@@ -15,6 +192,8 @@ class ias_cited extends CI_Model
             'Reférences',
             'Referencias',
             'BIBLIOGRAFIA',
+            'Referëncias',
+            'Références',
         );
         $ref = '';
         $txt = troca($txt,chr(13),chr(10));
@@ -56,9 +235,11 @@ class ias_cited extends CI_Model
         }                           
         /************************************** Ve se termina com abstract */
         if (
-            ($pos = strpos($ref,'Abstract:')) 
-            or ($pos = strpos($ref,'Abstract'.chr(10))) 
-            or ($pos = strpos($ref,'Resumo:')))
+            ($pos = strpos($ref,'Abstract:'))         
+            or ($pos = strpos($ref,'Abstract'.chr(10)))
+            or ($pos = strpos($ref,'ABSTRACT'.chr(10)))
+            or ($pos = strpos($ref,'Resumo:'))
+            )
             {
                 $ref = substr($ref,0,$pos);
                 while (substr($ref,strlen($ref)-1,1) != '.')
