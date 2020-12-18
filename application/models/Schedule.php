@@ -362,18 +362,8 @@ class schedule extends CI_model
 	}
 	
 	
-	function no_service()
-	{
-		$data = array('service'=>'500','error'=>'not informed');
-		header('Content-Type: application/json');
-		echo json_encode($data);	
-	}
-	function status_json()
-	{
-		$data = array('status'=>'active');
-		header('Content-Type: application/json');
-		echo json_encode($data);
-	}
+
+
 	
 	function last_task($new=0,$bot='roboti')
 	{

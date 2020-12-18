@@ -1,11 +1,4 @@
 <?php
-if (file_exists("maintenance"))
-	{
-		require("application/views/maintenance.php");
-		exit;
-	}
-	echo "OPS";
-	exit;
 /**
  * CodeIgniter
  *

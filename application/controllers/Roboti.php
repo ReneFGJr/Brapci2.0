@@ -20,31 +20,17 @@ class Roboti extends CI_Controller {
         $this -> load -> helper('language');
         $language = new language;
         $this -> lang -> load("roboti", $language->language());
+        $this -> load -> model('robotis');
+        $this -> load -> model('schedule');
+        
         
         date_default_timezone_set('America/Sao_Paulo');
     }
     
     private function cab($data = array()) {
-        if (count($data) == 0) {
-            //echo "OAI-PMH ROBOT Brapci v2.0a" . cr();
-        } else {
-            $data['title'] = 'Roboti - Program Bots';
-            if (isset($data['meta'])) {
-                for ($r = 0; $r < count($data['meta']); $r++) {
-                    $line = $data['meta'][$r];
-                    $class = trim($line['c_class']);
-                    if (trim($line['c_class']) == 'prefLabel') {
-                        $data['title'] = trim($line['n_name']) . ' :: Roboti 1.1';
-                    }
-                    if (trim($line['c_class']) == 'hasTitle') {
-                        $data['title'] = trim($line['n_name']) . ' :: Roboti 1.1';
-                    }
-                }
-            }
+        $data = array();
             $this -> load -> view('header/header.php', $data);
-            $data['title'] = '';
-        }
-        
+            $data['title'] = '';       
     }
     
     private function footer($data = array()) {
@@ -110,7 +96,7 @@ class Roboti extends CI_Controller {
                 switch($act)
                 {
                     case 'status':
-                        $this->schedule->status_json();
+                        
                     break;
                     
                     case 'config':
@@ -124,7 +110,22 @@ class Roboti extends CI_Controller {
         }      
     }
     
-    public function index() {
+    public function index()
+        {
+            $this -> cab(array('show'=>true));
+            $dt['content'] = '';
+            $dt['content'] .= $this->robotis->version(1);
+            $dt['content'] .= $this->robotis->logo();
+            $dt['content'] .= $this->robotis->help();
+            
+            $this->load->view('show',$dt);                  
+        }
+    function verb($verb='',$cmd='',$id='')
+        {
+            $this->robotis->index($verb,$cmd,$id);
+        }
+
+    public function index2() {
         $verb = get("verb");
         $act = get("act");
         $id = get("id");
@@ -249,21 +250,8 @@ class Roboti extends CI_Controller {
         
         default :
         $this -> load -> model('schedule');
-        $sx = $this->logo();
-        $sx .= '<div class="col-md-12">';
-        $sx .= '<tt>No verb found, use <a href="?verb=help">help</a></tt>';
-        $sx .= '</div>';
-        $sx .= '</div>';
-        $sx .= '</div>';
+
         
-        $sx .= '<div class="container"><div class="row" style="margin-top:50px;">';
-        $sx .= '<div class="col-md-12"><h4>Robots Status</h4></div>';
-        $sx .=  $this->schedule->cron_status('html');
-        $sx .= '</div>';
-        $sx .= '</div>';
-        $dt['content'] = $sx;
-        $dt['title'] = '';
-        $this->load->view('show',$dt);        
     break;
 }
 
@@ -271,16 +259,7 @@ echo strip_tags($html);
 $this -> footer();
 }
 
-private function logo()
-{
-    $sx = '<div class="row"><div class="col-md-12">';
-    $sx .= '<a href="'.base_url(PATH).'">';
-    $sx .= '<img src="'.base_url('img/logo/roboti.png').'">';
-    $sx .= '</a>';
-    $sx .= '</div>';
-    $sx .= '</div>';    
-    return($sx);
-}
+
 
 function bots($act='',$d1='',$d2='',$d3='')
 {

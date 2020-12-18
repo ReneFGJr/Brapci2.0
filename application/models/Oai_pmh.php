@@ -32,6 +32,13 @@ class oai_pmh extends CI_model {
     var $base = '';
     
     var $url = '';
+
+    var $version = '0.20.12.18';
+
+    function version()
+        {
+            return($this->version);
+        }
     
     
     function erros($erro)
@@ -212,7 +219,8 @@ class oai_pmh extends CI_model {
             
             function leftHarvesting()
             {
-                $sql = "select count(*) as total from ".$this->base."source_listidentifier 
+                $sql = "select count(*) as total 
+                from ".$this->base."source_listidentifier 
                 where li_status = 'active' and li_s = 1
                 order by li_s, li_u, id_li
                 limit 1";
@@ -969,10 +977,10 @@ class oai_pmh extends CI_model {
             public function NextHarvesting()
             {
                 $sql = "select * from ".$this->base."source_source
-                where jnl_url_oai <> '' and jnl_active = 1
-                and jnl_historic = 0
-                order by jnl_oai_last_harvesting 
-                limit 1";
+                            where jnl_url_oai <> '' and jnl_active = 1
+                            and jnl_historic = 0
+                            order by jnl_oai_token desc, jnl_oai_last_harvesting 
+                        limit 1";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
                 if (count($rlt) > 0)
@@ -985,7 +993,9 @@ class oai_pmh extends CI_model {
             }
             
             public function ListIdentifiers($id) {
-                $data = array();              
+                $data = array(); 
+                
+                /* */
                 if ($this->check_oai_index($id) == 0)
                 {
                     $this->log_oai($id,'IIDY',$data);
@@ -994,9 +1004,13 @@ class oai_pmh extends CI_model {
                     $this->log_oai($id,'UIDY',$data); 
                     $this->ref = '';
                 }
-                $ref = $this->log_oai($id,'ILIS');
+
+                /************************** Início a Coleta */
+                $this->log_oai($id,'ILIS');
 
                 $sx = $this->ListIdentifiers_harvesting($id);
+                echo '==FIM==';
+                exit;
                 
                 $this->new = $this->LisIdentifiesToHarvesting($id);
                 
