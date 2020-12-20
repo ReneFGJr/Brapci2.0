@@ -514,8 +514,13 @@ class Ias extends CI_model
 				$data['pi'] = '0';
 				$data['pf'] = '0';
 			}	
-
-		$file = troca($vv[0], '.pdf', '.txt');
+		if (isset($vv[0]))
+			{
+				$file = troca($vv[0], '.pdf', '.txt');
+			} else {
+				$file = 'file_not_found.pdf';
+			}
+		
 		if (file_exists($file)) {
 			$txtf = $this->file_get($file);
 			$txt = '';

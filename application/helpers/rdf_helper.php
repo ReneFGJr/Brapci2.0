@@ -111,9 +111,9 @@ class rdf
 			case 'view':
 				$sx = '<div class="row">';
 				$sx .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
-				$sx .= $this->class_view($id);				
-				$sx .= $this->class_view_data($id);
+				$sx .= $this->class_view($id);
 				$sx .= $this->class_view_form($id);
+				$sx .= $this->class_view_data($id);
 				$sx .= '</div>';						
 			break;
 			
@@ -1365,7 +1365,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			{
 				/************** TEXT AREA */
 				case 'TEXT':
-					$sx .= '<textarea name="dd50" id="dd50" class="form-control">'.get("dd50").'</textarea>'.cr();
+					$sx .= '<textarea name="dd50" rows=8 id="dd50" class="form-control">'.get("dd50").'</textarea>'.cr();
 					$sx .= '<input type="hidden" id="dd51" value="">'.cr();
 					$disable = '';
 				break;
@@ -1576,7 +1576,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					/* complementos */
 					switch($class) {
 						default :
-						$cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
+						$cp = 'n_name, n_lang, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
 						$sqla = "select $cp from rdf_data as rdata
 						INNER JOIN rdf_class as prop ON d_p = prop.id_c 
 						INNER JOIN rdf_concept as cpt ON d_r2 = id_cc 
@@ -1656,7 +1656,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 								}
 								
 								$sx .= $linkc . $line['n_name'] . $linkca;
-								
+								$sx .=  ' <sup>('.$line['n_lang'].')</sup>';
 								
 								/********************** Editar caso texto */
 								
@@ -1670,10 +1670,11 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 								}
 								
 								/********************* Excluir lancamento */
-								$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';
+								$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';								
 								$link = ' <a style="cursor: pointer;" '.$onclick.'>';
 								$sx .= $link . '<span class="btn-danger br5 text-white small" title="Excluir lancamento">&nbsp;X&nbsp;</span>' . $linka;
 								$sx .= '</a>';
+								
 							}
 							
 							$sx .= '</td>';
@@ -2272,7 +2273,7 @@ function class_view_data($id = '') {
 	if (strlen($id) == 0) {
 		$sql = "select * from rdf_class 
 		WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
-		ORDER BY c_class ";
+		ORDER BY c_class";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx .= '<ul>';
@@ -2310,7 +2311,8 @@ function data_classes($d) {
 	$sql = "select * from rdf_concept 
 	INNER JOIN rdf_name ON cc_pref_term = id_N
 	WHERE cc_class = $id
-	ORDER BY n_name ";
+	ORDER BY n_name 
+	limit 20";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	return ($rlt);

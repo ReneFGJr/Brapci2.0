@@ -268,9 +268,11 @@ class pdfs extends CI_model {
 				$link = $links[$r];
 				if ((strpos($link, '/view/')) or (strpos($link, '/viewFile/')) or (strpos($link, '/viewArticle/')) or (strpos($link, '/download/'))) {
 					$method = 1;
-				}         
-				
-				if (strpos($link,'scielo.php') > 0)
+				} 
+
+				/*************** ENANCIB e SCIELO */        
+
+				if ((strpos($link,'scielo.php') > 0) or (strpos($link,'enancib')) > 0)
 				{
 					$method=1; 
 					/* Base do Scielo */

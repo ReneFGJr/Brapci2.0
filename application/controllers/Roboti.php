@@ -62,7 +62,8 @@ class Roboti extends CI_Controller {
     function cron($path='',$id='')
     {
         $this->load->model('schedule');
-        $this->schedule->cron($path,$id);
+        $this->load->model('robotis');
+        $this->robotis->cron($path,$id);
     }
     
     function service($verb='',$act='',$token = '')
@@ -117,6 +118,7 @@ class Roboti extends CI_Controller {
             $dt['content'] .= $this->robotis->version(1);
             $dt['content'] .= $this->robotis->logo();
             $dt['content'] .= $this->robotis->help();
+            $dt['content'] .= $this->robotis->log_last_update();
             
             $this->load->view('show',$dt);                  
         }

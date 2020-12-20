@@ -258,6 +258,12 @@ $lang['order_2'] = 'Mais antigos';
 $lang['order_1'] = 'Mais novos';
 $lang['order_0'] = 'Relevância';
 $lang['s_order'] = 'Ordem';
+$lang['edit_article'] = 'Editar';
+$lang['confirm_exclud_article'] = 'Confirma exclusão permanente?';
+$lang['del_article'] = 'Excluir';
+$lang[''] = '';
+$lang[''] = '';
+$lang[''] = '';
 $lang[''] = '';
 $lang[''] = '';
 

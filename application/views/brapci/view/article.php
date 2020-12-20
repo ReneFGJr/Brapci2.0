@@ -128,7 +128,8 @@ for ($r = 0; $r < count($article); $r++) {
 	    <?php
 	       if (perfil("#ADMIN") > 0)
             {
-            echo 'ADMIN Menu | <a href="'.base_url(PATH.'concept_del/'.$id.'/'.checkpost_link($id.'Concept')).'" onClick="return confirm(\''.msg('confirm_exclud_article').'\')" class="btn btn-warning">'.msg('del_article').'</a>';
+            echo 'ADMIN Menu | <a href="'.base_url(PATH.'concept_del/'.$id.'/'.checkpost_link($id.'Concept')).'" onClick="return confirm(\''.msg('confirm_exclud_article').'\')" class="btn btn-danger">'.msg('del_article').'</a>';
+			echo '&nbsp;<a href="'.base_url(PATH.'a/'.$id.'/'.checkpost_link($id.'Concept')).'" class="btn btn-warning">'.msg('edit_article').'</a>';
             }
         ?>
 	    

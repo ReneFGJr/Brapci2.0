@@ -2,6 +2,17 @@
 class sources extends CI_Model {
     var $table = 'source_source';
 
+    function source_status_update($id,$sta)
+        {
+                $date = date("Y-m-d H:m:s");
+                $sql = "update ".$this->table."
+                            set 
+                            jnl_oai_status = '$sta',
+                            jnl_oai_last_harvesting = '$date'
+                            where id_jnl = $id";
+                $rlt = $this -> db -> query($sql);
+        }
+
     function summary($cmd = '') {
 
         /******************** limpa logs ************************/
@@ -292,6 +303,7 @@ class sources extends CI_Model {
     }
 
     function list_sources() {
+        $limit_dias = 10;
         $this->load->model("oai_pmh");
         $sql = "select * from " . $this -> table . " 
                             where jnl_active = 1
@@ -330,18 +342,42 @@ class sources extends CI_Model {
             $sx .= '<td></td>';
             $sx .= '<td>'.(++$ii).'.</td>';
             $sx .= '<td>' . $this -> jnl_name($line) .'</td>';
+            $token = trim($line['jnl_oai_token']);
+            if (strlen($token) > 0)
+                {
+                    $token = '<span title="Token: '.$token.'" class="btn-outline-danger radius5">&nbsp;K&nbsp;</span>';
+                }
+            $sx .= '<td>' . $token .'</td>';
+
+            /**************** Data */
             $sx .= '<td>'.stodbr($line['jnl_oai_last_harvesting']).'</td>';
+            $dias = dataDiff($line['jnl_oai_last_harvesting'],date("Y-m-d"));
+            
 
             /*************** Status da Coleta */
             $code = $line['jnl_oai_status'];
+            $hist = $line['jnl_historic'];
+
+            if ($hist==0)
+                {
+                    $sx .= '<td class="text-center small">'.$dias.'</td>';
+                } else {
+                    $sx .= '<td class="text-center small"></td>';
+                }
+            
+
             if ($code > 200)
                 {
                     $status = '<span style="color: red" title="'.$this->oai_pmh->erros($code).'"><b>ERRO</b></span>';
                 } else {
-                    $status = '<span style="color: green"><b>OK</b></span>';
+                    if ($dias > $limit_dias)
+                    {
+                        $status = '<span style="color: orange"><b>OLD</b></span>';
+                    } else {
+                        $status = '<span style="color: green"><b>OK</b></span>';
+                    }
                 }
-
-            $hist = $line['jnl_historic'];
+            
             if ($hist == 1)
                 {
                     $status = '<span style="color: blue"><b>Histórica</b></span>';
@@ -365,6 +401,11 @@ class sources extends CI_Model {
             $sx .= '</tr>';
         }
         $sx .= '</table>';
+        $sx .= '<br>Legenda:';
+        $sx .= '<br><span style="color: blue"><b>OK</b></span> - Coletado normalmente.';
+        $sx .= '<br><span style="color: orange"><b>OLD</b></span> - Coletado a mais de '.$limit_dias.' dias.';        
+        $sx .= '<br><span style="color: red"><b>ERRO</b></span> - Erro na Coletada.';
+
         $sx .= '</div>' . CR;
         return ($sx);
     }

@@ -1,11 +1,98 @@
 <?php
+/* Cron TAB
+* apt install cron
+* systemctl enable cron
+* Add line in /etc/crontab
+30 *    * * *   root    /var/www/html/Brapci2.0/script/cron
+
+Arquivo 
+/var/www/html/Brapci2.0/script/cron
+
+Conteúdo:
+curl "https://brapci.inf.br/index.php/roboti/cron/" --max-time 60
+
+*/
 class robotis extends CI_Model  
     {
         var $version = '0.20.12.18';
+        var $base = 'brapci_bots.';
+
+        function __construct()
+            {
+                    $this->load->model("frbr");
+                    $this->load->model("frbr_core");
+                    $this->load->model("oai_pmh");                 
+                    $this->load->model("sources");                    
+            }
+
+        function cron($path,$id)
+            {
+                $data = $this->serviceCron(1);                
+                $data['cron'] = $this->version;
+                $data['command'] = 'nextOAI';
+                $data['id'] = $id;
+                $this->cron_execute($data);
+            }
+        function log($s)
+            {
+                $data = date("Y-m-d H:i:s");
+                $sql = "insert into ".$this->base."cron_logs
+                            (log_type,log_data)
+                            value
+                            ('$s','$data')";
+                $rlt = $this->db->query($sql);
+                return(1);
+            }
+
+        function cron_execute($data)
+            {
+                if (!isset($data['cron_exec']))
+                    {                        
+                        echo "ERRO";
+                        exit;
+                    }
+                $type = $data['cron_exec'];
+                $cmd = $data['cron_cmd'];
+                switch($type)
+                    {
+                        case 'php':
+                            $data = eval($cmd);
+                            break;
+                        default:
+                            echo 'OPS, metodo não existe - '.$type;
+                            
+                            exit;
+                    }
+                //echo $this->json($data);
+            }
+        
+        function serviceCron($id)
+            {
+                $sql = "select * from ".$this->base."cron ";
+                if ($id > 0)
+                    {
+                        $sql .= " where id_cron = ".round($id);
+                    }
+                $sql .= " order by cron_prior";
+                
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                if (count($rlt) > 0)
+                    {
+                        $line = $rlt[0];
+                    } else {
+                        $line = array();
+                    }
+                $this->log($line['cron_acron']);
+                return($line);
+            }
         function index($v,$c,$i)
             {
                 switch($v)
                     {
+                        case 'cron':
+                            $this->cron($c,$i);
+                            break;
                         case 'oai':
                             $this->oai($c,$i);
                             break;
@@ -19,10 +106,57 @@ class robotis extends CI_Model
                             echo $this->robotis->verb_not_exists();
                     }
             }
+        function log_last_update()
+            {
+                $sql = "select * from ".$this->base."cron_logs 
+                        order by id_log desc
+                        limit 1";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $sx = '<div class="col-md-12"><tt>';
+                $sx .= 'Server now: '.date("d/m/Y H:m:s");
+                $sx .= '<br/>';
+                if (count($rlt) > 0)
+                    {
+                        $line = $rlt[0];
+                        $sx .= 'Last update: '.stodbr($line['log_data']).' '.substr($line['log_data'],10,6);
+                    } else {
+                        $sx .= 'No logs';
+                    }
+                $sx .= '</tt></div>';
+                return($sx);
+
+            }
+
+        function oai_next()
+            {
+                $dt = $this->oai_pmh->NextHarvesting();
+                $data = $this->oai_ListIdentifiers($dt['id_jnl']);
+                echo $this->json($data);                  
+            }
+
+        function oai_GetRecord()
+            {
+                $dt = array();
+                $id = 0;
+                $idc = $this -> oai_pmh -> getRecord(0);
+                if ($idc > 0) 
+                {
+                    $dt = $this -> oai_pmh -> getRecord_oai_dc($idc, $dt);
+                    $dt['idc'] = $idc;
+                    $src = $this -> sources -> info($id);
+                    $rcn = $this -> oai_pmh -> process($dt);
+                }
+                $data = array();
+                $data['source'] = $id;
+                $data['rcn'] = $rcn;
+                echo $this->json($data); 
+            }
 
         function oai_ListIdentifiers($id)
-            {
+            {                
                 $data = $this->oai_pmh->ListIdentifiers($id);
+                return($data);
             }
         function oai($c,$i)
             {
@@ -33,19 +167,16 @@ class robotis extends CI_Model
                 switch($c)
                     {
                         case 'next':
-                            $dt = $this->oai_pmh->NextHarvesting();
-                            $data = $this->oai_ListIdentifiers($dt['id_jnl']);
-                            $this->json();    
-                            echo json_encode($data);
+                            $this->oai_next();
                         break; 
 
                         default:
-                        $this->json();
+                        
                         $data = array(
                             'oai-pmh'=>'OAI-PMH',
                             'vesrion'=>$this->oai_pmh->version(),
                         );
-                        echo json_encode($data);        
+                        echo $this->json($data);                        
                     }
             }
         function navegador() {
@@ -78,28 +209,27 @@ class robotis extends CI_Model
                 if ($web) echo '</pre>';
             }
 
-        function json()
+        function json($data=array())
             {
                 header('Content-Type: application/json');
+                return json_encode($data);
             }
 
         function status_json()
             {
-                $this->json();
+                
                 $data = array('status'=>'active');
-                echo json_encode($data);
+                echo $this->json($data);
             }
         function verb_not_exists()
             {
                 $data = array('verb'=>'not informed');
-                header('Content-Type: application/json');
-                echo json_encode($data);
+                echo $this->jason($data);
             }            
         function no_service()
             {
                 $data = array('service'=>'500','error'=>'not informed');
-                header('Content-Type: application/json');
-                echo json_encode($data);	
+                echo $this->json($data);	
             }            
 
         function version($container=0)

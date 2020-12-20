@@ -5,27 +5,16 @@ class ias_abstract extends CI_Model
     function neuro_nlp($txtf, $data)
     {
         $sx = '<hr><b>Resumo e Palavras-chave</b>';
-        $ln = $this->ias->to_line($txtf,1);
+        $ln = $this->ias->to_line($txtf);
 
-        $rspt = $this->abstract($ln, 'pt');
-        $rsen = $this->abstract($ln, 'en');
-
-        /*****************************************************/
-        $sx = '<hr>'.$rspt['abstract'];
+        //$rsp = $this->abstract($ln, 'pt');
+        $rsp = $this->abstract($ln, 'en');
+        $sx = $rsp['abstract'];
         $sx .= '<br><b>Palvaras-chave</b>: ';
         $key = '';
-        for ($r=0;$r < count($rspt['keywords']);$r++)
+        for ($r=0;$r < count($rsp['keywords']);$r++)
             {
-                $key .= $rspt['keywords'][$r]. '. ';
-            }
-        $sx .= $key;
-        /****************************************************/
-        $sx .= '<hr>'.$rsen['abstract'];
-        $sx .= '<br><b>Keyword</b>: ';
-        $key = '';
-        for ($r=0;$r < count($rsen['keywords']);$r++)
-            {
-                $key .= $rsen['keywords'][$r]. '. ';
+                $key .= $rsp['keywords'][$r]. '. ';
             }
         $sx .= $key;
         return($sx);
@@ -34,7 +23,6 @@ class ias_abstract extends CI_Model
     function abstract($ln, $lang)
     {
         $lg = array();
-
         switch ($lang) {
             case 'pt':
                 $lg = array('RESUMO','Resumo');
@@ -92,45 +80,18 @@ class ias_abstract extends CI_Model
         $rsp['abstract'] = $txt;
         $rsp['lang'] = $lang;
 
-        /************** Identifica Keywords */
-        $key = '';
-        for ($r=$fim;$r < ($fim+15);$r++)
-            {
-                if (isset($ln[$r]))
-                {
-                $key .= ' '.trim($ln[$r]);
-                }
-            }
-        $key = trim($key);
-
-        /***************************************** Separa as palavras */
-        $key = troca($key,':',';');
+        $key = trim($ln[$fim].' '.$ln[$fim+1]);
+    
+        $key = troca($key,':',' ');
         $key = troca($key,'.',';');
-        $pkeys = splitx(';',$key);
-        $keys = array();
+        $keys = splitx(';',$key);
 
-        for ($r=0;$r < count($pkeys);$r++)
-            {
-                $k = trim($pkeys[$r]);
-                $ok = 1;
-                if (strpos($k,':')) { $ok = 0; }
-                if (strpos($k,'/')) { $ok = 0; }
-                if (strlen($k) > 50) { $ok = 0; }
-                if (strtolower(substr($k,0,8)) == 'recebido') { $ok = 0; }
-                if (strtolower(substr($k,0,8)) == 'originai') { $ok = 0; }
-                
-                if ($ok == 1)
-                    {
-                        echo '<br>---->'.$pkeys[$r];
-                        array_push($keys,$pkeys[$r]);
-                    } else {
-                        
-                        break;
-                        //$r = $r + 1000;
-                    }                
-            }
-        $rsp['keywords'] = $keys;       
+        $rsp['keywords'] = $keys;
 
         return ($rsp);
+    }
+    function keywords($txtf)
+    {
+        $a = array('PALAVRAS-CHAVE', 'KEYWORDS');
     }
 }

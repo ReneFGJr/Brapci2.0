@@ -9,7 +9,7 @@
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/CodIgniter
-* @version     v0.20.10.22
+* @version     v0.20.12.18
 */
 
 /* 2020-01-24 function 2 e 3 */
@@ -195,6 +195,16 @@ function brtosql($dt)
     $dt = substr($dt, 0, 4) . '-' . substr($dt, 4, 2) . '-' . substr($dt, 6, 2);
     return ($dt);
 }
+
+function dataDiff($d1,$d2)
+    {
+    $data_inicio = new DateTime($d1);
+    $data_fim = new DateTime($d2);
+
+    // Resgata diferença entre as datas
+    $dateInterval = $data_inicio->diff($data_fim);
+    return($dateInterval->days);
+    }
 
 function data_completa($data) 
 {
