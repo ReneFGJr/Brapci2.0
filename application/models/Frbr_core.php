@@ -530,9 +530,9 @@ class frbr_core extends CI_model {
 
     function vv($id) {
         $data = $this -> le($id);
-        if ($data['cc_use'] > 0)
+        if (($data['cc_use'] > 0) and (get("redir")==''))
             {
-                redirect(base_url(PATH.'//v//'.$data['cc_use']));
+                redirect(base_url(PATH.'/v/'.$data['cc_use'].'?redir=true'));
                 exit;
             }
         $tela = '';
@@ -599,6 +599,8 @@ class frbr_core extends CI_model {
                     //$tela .= $this -> load -> view("brapci/cloud_tags", $data, true);
 
                     $tela .= $this -> load -> view("brapci/cloud_tags_3", $data, true);
+
+                    $tela .= $this -> load -> view("brapci/timeline_production", $data, true);
 
                     $tela .= '<div class="col-md-8">';
                     $tela .= $this -> view_data($id);
