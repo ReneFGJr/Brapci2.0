@@ -1312,13 +1312,13 @@ class res extends CI_Controller
         $linkda = '</a>';
 
         $tela .= '
-                                                                                                                                                                                                                                                    <div class="container">
-                                                                                                                                                                                                                                                    <div class="row">
-                                                                                                                                                                                                                                                    <div class="col-md-8">
-                                                                                                                                                                                                                                                    <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                    <div class="col-md-4 text-right">';
+            <div class="container">
+            <div class="row">
+            <div class="col-md-8">
+            <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
+            </div>
+            
+            <div class="col-md-4 text-right">';
         if ((perfil("#ADM") > 0)) {
             $tela .= $linkd . msg('delete') . $linkda . ' ';
         }
@@ -1327,7 +1327,7 @@ class res extends CI_Controller
         $tela .= '</div></div>';
         $tela .= $rdf->form($id, $data);
 
-        switch ($data['c_class']) {
+        switch ($data['c_class'].'X') {
             case 'Person':
                 $tela .= $this->frbr->show($id);
                 break;

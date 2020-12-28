@@ -523,15 +523,17 @@ class Ias extends CI_model
 		
 		if (file_exists($file)) {
 			$txtf = $this->file_get($file);
+			$txtf = troca($txtf,'&nbsp;',' ');	
+
 			$txt = '';
 			if (perfil("#ADM") > 0)
 				{
 					$txt .= '<h5>'.$file.'</h5>';
 					$txt .= '<a href="'.base_url(PATH.'ia/io/edit/'.$id).'">edit</a>';
 				}
-			
 			$txt .= $this->ias_abstract->neuro_nlp($txtf,$data);
 			$txt .= $this->ias_cited->neuro_cited($txtf,$data);
+
 			//$txt .= $this->nlp_words($txtf, $data) . cr();
 		} else {
 			$txt = message(msg('File not found') . ' ' . $file, 3);

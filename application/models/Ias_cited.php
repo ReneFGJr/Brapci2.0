@@ -20,9 +20,12 @@ class ias_cited extends CI_Model
             
             $sx = 0;
 
-            /********************************* Regras */
-            /* 1 - Journal
-            /* 5 - Event
+            /********************************* Regras 
+            * 1 - Journal
+            * 5 - Event
+            * 6 - Tese
+            * 7 - Dissetação
+            * 8 - TCC
             /* 20 - Lei
             */
             /***************** LEI  */
@@ -39,20 +42,29 @@ class ias_cited extends CI_Model
                 {
                     /* Journal */
                     return(1);
-                } else {
+                }
+                
+                /************** Outros Tipo ********/
+                else                 
+                {
                     if ($n[3] == 1)
                         { 
                             /* Evento */
                             return(5);
                         } else {       
                             /****************************** É livro ou capítulo */
-                            $book = $this->is_book($n);                    
-                            if ($book > 0) { return($book); }
+                            $book = $this->is_book($n);
+                            $tede = $this->is_tede($n);
+                            if (($book > 0) and ($tede == 0))
+                            { return($book); } 
+                            else 
                             /************ Literatura Cinzenta */
-                            if (($n[6] + $n[7] + $n[8]) > 0)
-                                {
-                                    return(6+$n[6] + $n[7]*2 + $n[8]*3);
-                                }
+                            {
+                                if ($tede)
+                                    {
+                                        return(6+$n[6] + $n[7]*2 + $n[8]*3);
+                                    }
+                            }
                         }
                 }
                 if ($this->is_link($n)) { return(15); }
@@ -64,7 +76,6 @@ class ias_cited extends CI_Model
                 echo $this->ias->show_sensores($n);
                 echo '<hr>';
             }
-
             return($sx);
         }
     function is_book($n)
@@ -79,6 +90,16 @@ class ias_cited extends CI_Model
                     }
             }
         }
+    function is_tede($n)
+        {
+            if (($n[6] == 1)
+                or ($n[7] == 1)
+                or ($n[8] == 1))
+            {
+                return(1);
+            }
+            return(0);
+        }        
         function is_link($n)
         {
             if ($n[2] == 1) /* Tem Link Acesso */
@@ -92,7 +113,7 @@ class ias_cited extends CI_Model
         }        
     function e_uma_lei($txt)
         {
-            $a = array(' Lei nº ');
+            $a = array(' Lei nº ','Decreto nº','. Lei');
             return($this->locate($txt,$a));
         }        
     function e_um_tcc($txt)
@@ -102,12 +123,12 @@ class ias_cited extends CI_Model
         }        
     function e_uma_tese($txt)
         {
-            $a = array(' Tese ','(Doutorado)',' Thesis ');
+            $a = array(' Tese ','(Doutorado',' Thesis ','Tese (Doutorado');
             return($this->locate($txt,$a));
         }
     function e_uma_dissertacao($txt)
         {
-            $a = array(' Dissertação ','(Mestrado)');
+            $a = array(' Dissertação ','(Mestrado');
             return($this->locate($txt,$a));
         }        
     function tem_in($txt)
@@ -122,12 +143,14 @@ class ias_cited extends CI_Model
         }
     function disponível_em($txt)
         {
-            $a = array('Disponível em','Disponível:','Disponívelem','Acesso em:');
+            $a = array('Available:', 'Available in:',
+                        'Disponível em','Disponível:','Disponívelem',
+                        'Acesso em:','Access in:');
             return($this->locate($txt,$a));
         }
     function tem_dois_pontos($txt)
         {
-            $txt = $this->remove($txt,array('Disponível','Disponivel','Acesso:','Acesso em:'));
+            $txt = $this->remove($txt,array('Disponível','Disponivel','Acesso:','Acesso em:','Access in:'));
             $a = array(': ');
             return($this->locate($txt,$a));
         }
@@ -138,7 +161,7 @@ class ias_cited extends CI_Model
         }
     function e_um_evento($txt)
         {
-            $a = array('Anais...','Anais…','Proceedings…','Proceedings...','Anais eletrônicos...','Anais [...]');
+            $a = array('Anais...','Anais…','Proceedings…','Proceedings...','Anais eletrônicos...','Anais [...]','Actas...','Actas…');
             return($this->locate($txt,$a));
         }
     function tem_cidade($txt)
@@ -156,11 +179,13 @@ class ias_cited extends CI_Model
         $txt = strtolower($txt);
         $txt = str_replace(array(',','?',':',' :'),'.',$txt);
         $txt = str_replace(array('['),'',$txt);
+
         for ($r=0;$r < count($dt);$r++)
             {
                 $city = $dt[$r];
+                //echo '<br>==>'.$city.'=>'.strpos($txt,'. '.$city);
                 if (
-                    (strpos($txt,'. '.$dt[$r]))
+                    (strpos($txt,'. '.$city))
                     )
                     {
                          return(1);
@@ -195,11 +220,16 @@ class ias_cited extends CI_Model
     function neuro_cited($txt,$data)
     {
         //echo '<pre>'.$txt.'</pre>';
+
         $terms = array(
             'REFERÊNCIAS (ESTILO <SECAOSEMNUM>)',
             'REFERÊNCIAS BIBLIOGRÁFICAS',
             'Referências Bibliográficas',
+            'Referências Bibliográficas',
+            'Referências bibliográficas',
             'REFERÊNCIAS',
+            'REFERENCIAS',
+            'REFERENCES',
             'Referências',
             'References',
             'Reférences',
@@ -209,6 +239,7 @@ class ias_cited extends CI_Model
             'Références',
         );
         $ref = '';
+
         $txt = troca($txt,chr(13),chr(10));
         for ($r=0;$r < count($terms);$r++)
         {

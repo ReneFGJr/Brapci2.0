@@ -34,7 +34,7 @@ class export extends CI_Model {
         $pagf = '';
         $rwork = 'TY - JOUR' . cr();
         $rwork = 'DB - BRAPCI' . cr();
-        $rwork = 'UR - ' . base_url(PATH . 'v/' . $idx) . cr();
+        $rwork = 'UR - ' . base_url('https://brapci.inf.br/index.php/res/v/' . $idx) . cr();
         $subj = '';
         $source = '';
         $title = '';
@@ -52,7 +52,7 @@ class export extends CI_Model {
             //print_r($l);
             switch($type) {
             	case 'hasFileStorage':
-            		$urld = base_url(PATH.'download/'.trim($l['d_r2']));
+            		$urld = base_url('https://brapci.inf.br/index.php/res/download/'.trim($l['d_r2']));
                     $urlf = trim(troca($l['n_name'],'.pdf','.txt'));
 
                     if (substr($urlf,0,5) == '_repo')

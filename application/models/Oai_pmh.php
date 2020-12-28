@@ -183,12 +183,12 @@ class oai_pmh extends CI_model {
                             }
                         }
                     } else {
-                        echo '<pre>xxxxxxxxxxxxxxxxxxxx';
+                        echo '<pre>';
                         print_r($dt);
                         echo "OPS";
                         exit;
                     }
-                    $link = '<a href="' . base_url(PATH . 'v/' . $article_id) . '" target="_new' . $article_id . '">';
+                    $link = '<a href="' . base_url('https://brapci.inf.br/index.php/res/v/' . $article_id) . '" target="_new' . $article_id . '">';
                     $this -> cache_alter_status($dt['idc'], 3);
                     
                     $dt['article_id'] = $article_id;

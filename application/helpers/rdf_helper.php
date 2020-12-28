@@ -937,9 +937,12 @@ function class_ed($id)
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_find', 'Busca', true, true));
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_vc', 'Vocabulário Controlado', true, true));
 	array_push($cp, array('$S100', 'c_url', 'URL', false, true));
+	$sql = "select * from (select id_c, concat(prefix_ref,c_class) as c_class from rdf_class inner join rdf_prefix ON `c_prefix` = id_prefix where c_type='C' and id_c <> $id) as tabela";
+	array_push($cp, array('$Q id_c:c_class:'.$sql, 'c_equivalent', 'Class Equivalente', false, true));
 	array_push($cp, array('$B8', '', 'Gravar', false, true));
 	$form = new form;
 	$form -> id = $id;
+	if ((get("acao") != '') and (get("dd7") == '')) { $_POST['dd7'] = 0; }
 	$sx = $form -> editar($cp, 'rdf_class');
 	if ($form -> saved > 0) {
 		if ($id > 0)

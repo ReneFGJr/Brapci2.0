@@ -808,7 +808,7 @@ class articles extends CI_model {
 		$r = 0;
 		foreach ($query as $row) {
 			$r++;
-			$link = '<A HREF="' . base_url('index.php/v/a/' . $row -> id_ar . '/' . checkpost_link($row -> id_ar)) . '" target="_new' . $row -> id_ar . '">';
+			$link = '<A HREF="' . base_url('index.php/res/v/a/' . $row -> id_ar . '/' . checkpost_link($row -> id_ar)) . '" target="_new' . $row -> id_ar . '">';
 			//$title = trim($row['ar_titulo_1']);
 			$title = $row -> ar_titulo_1;
 			$journal = $row -> jnl_nome;

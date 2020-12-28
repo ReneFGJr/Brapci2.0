@@ -27,11 +27,12 @@ class robotis extends CI_Model
 
         function cron($path,$id)
             {
-                $data = $this->serviceCron(1);                
+                $data = $this->serviceCron();                
                 $data['cron'] = $this->version;
                 $data['command'] = 'nextOAI';
                 $data['id'] = $id;
                 $this->cron_execute($data);
+                $this->priority();
             }
         function log($s)
             {
@@ -65,8 +66,24 @@ class robotis extends CI_Model
                     }
                 //echo $this->json($data);
             }
+
+        function priority()
+            {
+                $sql = "SELECT li_s FROM source_listidentifier where li_s = 1";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                if (count($rlt) > 0)
+                    {
+                        $sql = "update ".$this->base."cron set cron_prior = 0 where cron_acron = 'ARTIC'";
+                        $rlt = $this->db->query($sql);
+                    } else {
+                        $sql = "update ".$this->base."cron set cron_prior = 120 where cron_acron = 'ARTIC'";
+                        $rlt = $this->db->query($sql);
+                    }
+
+            }
         
-        function serviceCron($id)
+        function serviceCron($id=0)
             {
                 $sql = "select * from ".$this->base."cron ";
                 if ($id > 0)
