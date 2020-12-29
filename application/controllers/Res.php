@@ -94,41 +94,6 @@ class res extends CI_Controller
         //$result = $client->index($params);
     }
 
-    public function zera($pg = '')
-    {
-        if (!perfil("#ADM")) {
-            redirect(PATH);
-        }
-        $this->cab();
-        $this->load->model('elasticsearch');
-        if ($pg == '') {
-            $sql = "TRUNCATE source_listidentifier;";
-            $this->db->query($sql);
-            $sql = "TRUNCATE rdf_concept;";
-            $this->db->query($sql);
-            $sql = "TRUNCATE rdf_data;";
-            $this->db->query($sql);
-            $sql = "TRUNCATE rdf_name;";
-            $this->db->query($sql);
-            $sql = "TRUNCATE source_oai_log;";
-            $this->db->query($sql);
-
-            $rst = $this->elasticsearch->delete_all('article');
-            $sx = '<div class="container">';
-            $sx .= '<div class="row">';
-            $sx .= '<div class="col-md-12">';
-            $sx .= '<h1>' . msg('DELETING DATABASE') . '</h1>';
-            $sx .= '</div>';
-            $sx .= '</div>';
-
-            $sx .= bs_alert("success", msg('all_data_deleted'));
-            $sx .= '</div>';
-            $data['content'] = $sx;
-            $this->load->view('show', $data);
-            $this->footer();
-        }
-    }
-
     public function issue($act, $id)
     {
         $this->load->model('sources');
