@@ -143,22 +143,7 @@ class schedule extends CI_model
 	
 	function bots()
 	{
-		$config = $this->roboti_path.'config';
-		
-		check_dir($config);
-		
-		$directory = dir($config);
-		$bots = array('roboti');
-		
-		while($file = $directory -> read()){
-			if (strpos($file,'.roboti'))
-			{
-				$file = troca($file,'.roboti','') ;
-				array_push($bots,$file);
-			}			
-		}
-		$directory -> close();
-		$this->bots = $bots;
+
 	}
 	
 	/****************************************

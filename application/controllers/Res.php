@@ -1,4 +1,10 @@
 <?php
+$ip = $_SERVER['REMOTE_ADDR'];
+if ((file_exists('maintenance')) and (substr($ip,0,11) != '143.54.144.'))
+    {
+        require("application/views/maintenance.php");
+        exit;
+    }
 defined('BASEPATH') or exit('No direct script access allowed');
 DEFINE("PATH", "index.php/res/");
 DEFINE("LIBRARY_NAME", "Brapci 2.1");
