@@ -135,6 +135,12 @@ class Ias extends CI_model
 		$sx .= '</a>';
 		$sx .= '</div>';
 
+		$sx .= '<div class="col-md-2 btn btn-outline-primary">';
+		$sx .= '<a href="' . base_url(PATH . 'ia/check') . '">';
+		$sx .= 'Checar duplicatas';
+		$sx .= '</a>';
+		$sx .= '</div>';		
+
 		$sx .= '<div class="col-md-2 btn btn-outline-secondary">';
 		$sx .= '<a href="' . base_url(PATH . 'ia/thesa') . '">';
 		$sx .= 'Atualiza vocabulários';
@@ -150,6 +156,10 @@ class Ias extends CI_model
 		$sx = '';
 		$this->load->model('frbr_core');
 		switch ($act) {
+			case 'check':
+				$this->load->model('ias_checks');
+				$sx = $this->ias_checks->article_duplicate();
+				break;
 			case 'thesa':
 				$sx = $this->check(1);
 				$sx .= '<a href="' . base_url(PATH . 'ia') . '" class="btn btn-outline-primary">' . msg('return') . '</a>';

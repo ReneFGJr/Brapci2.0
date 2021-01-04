@@ -279,7 +279,7 @@ function isbn13to10($isbn) {
         $sum = 0;
         $mul = 10;
         for ($i = 0; $i < 9; $i++) {
-            $sum = $sum + ($mul * (int) $sequence{$i});
+            $sum = $sum + ($mul * (int)$sequence[$i]);
             $mul--;
         }
         $mod = 11 - ($sum%11);
