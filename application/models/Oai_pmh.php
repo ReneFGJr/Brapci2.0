@@ -188,7 +188,7 @@ class oai_pmh extends CI_model {
                         echo "OPS";
                         exit;
                     }
-                    $link = '<a href="' . base_url('https://brapci.inf.br/index.php/res/v/' . $article_id) . '" target="_new' . $article_id . '">';
+                    $link = '<a href="' . base_url(PATH.'v/' . $article_id) . '" target="_new' . $article_id . '">';
                     $this -> cache_alter_status($dt['idc'], 3);
                     
                     $dt['article_id'] = $article_id;
@@ -199,8 +199,11 @@ class oai_pmh extends CI_model {
                     $this->export->export_Article_Single($article_id);
                     $this -> elasticsearch -> update($article_id);
                     
-                    $sx = 'Section: '.$dt['issue']['section'];
-                    return ($sx . "<h1>Index Article: " . $link . $article_id . '</a></h1><br>'.$this->frbr->msg.'');
+                    $sx = '<div class="col-md-6">';
+                    $sx .= 'Section: '.$dt['issue']['section'];
+                    $sx .= "<h1>Index Article: " . $link . $article_id . '</a></h1><br>'.$this->frbr->msg;
+                    $sx .= '</div>';
+                    return ($sx);
                 }
                 
                 function author($dt) {

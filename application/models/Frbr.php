@@ -484,12 +484,19 @@ function check_article_exist($dt)
 function article_create($dt) 
 {
     /************** Registro já existe ********* */
-    if ($this->check_article_exist($dt) == 0)
+    $idf = $this->check_article_exist($dt);
+    if ($idf == 0)
     {    
         return(0);
     }
-    $name = $dt['li_identifier'] . '#' . strzero($dt['id_jnl'], 5);
-    $idf = $this -> frbr_core -> rdf_concept_create('Article', $name, '');
+    /********** não existe registro */
+    if ($idf == 1)
+    {
+        $name = $dt['li_identifier'] . '#' . strzero($dt['id_jnl'], 5);
+        $idf = $this -> frbr_core -> rdf_concept_create('Article', $name, '');
+    } else {
+
+    }
     /******************************************************************************/
     $prop = 'hasIssueOf';
     $this -> frbr_core -> set_propriety($dt['issue_uri'], $prop, $idf, 0);

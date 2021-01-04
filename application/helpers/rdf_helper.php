@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/
-* @version     v0.19.10.20
+* @version     v0.03.01.21
 */
 
 /*
@@ -2486,23 +2486,58 @@ function rdf_concept_find_id($r) {
 }
 
 /*************************************** Exclude RDF Data *******************/
+function remove_concept($id) {
+	$CI = &get_instance();
+    $sql = "update rdf_data set
+    d_r1 = ((-1) * d_r1) ,
+    d_r2 = ((-1) * d_r2 ),
+    d_p  = ((-1) * d_p) 
+    where d_r1 = $id or d_r2 = $id";
+    $rlt = $CI -> db -> query($sql);
+    return (True);
+}
+
 function data_exclude($id) {
 	$CI = &get_instance();
 	$sql = "select * from rdf_data where id_d = " . $id;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
+	$date = date("Ymd");
 	if (count($rlt) > 0) {
 		$line = $rlt[0];
 		if ($line['d_r1'] > 0) {
 			$sql = "update rdf_data set
 			d_r1 = " . ((-1) * $line['d_r1']) . " ,
 			d_r2 = " . ((-1) * $line['d_r2']) . " ,
-			d_p  = " . ((-1) * $line['d_p']) . " 
+			d_p  = " . ((-1) * $line['d_p']) . ", 
+			d_literal  = " . ((-1) * $line['d_literal']) . ",
+			d_update = $date
 			where id_d = " . $line['id_d'];
 			$rlt = $CI -> db -> query($sql);
 		}
 	}
-}	
+}
+
+function data_recover($id) {
+	$CI = &get_instance();
+	$sql = "select * from rdf_data where id_d = " . $id;
+	$rlt = $CI -> db -> query($sql);
+	$rlt = $rlt -> result_array();
+	$date = date("Ymd");
+	if (count($rlt) > 0) {
+		$line = $rlt[0];
+		if ($line['d_r1'] < 0) {
+			$sql = "update rdf_data set
+			d_r1 = " . ((-1) * $line['d_r1']) . " ,
+			d_r2 = " . ((-1) * $line['d_r2']) . " ,
+			d_p  = " . ((-1) * $line['d_p']) . ", 
+			d_literal  = " . ((-1) * $line['d_literal']) . ",
+			d_update = $date
+			where id_d = " . $line['id_d'];
+			$rlt = $CI -> db -> query($sql);
+		}
+	}
+}
 
 function exist_prefLabel($id)
 {

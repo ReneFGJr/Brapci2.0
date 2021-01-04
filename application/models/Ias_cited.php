@@ -177,7 +177,7 @@ class ias_cited extends CI_Model
         /* recupera arquivo */
         $txt = ascii($txt);
         $txt = strtolower($txt);
-        $txt = str_replace(array(',','?',':',' :'),'.',$txt);
+        $txt = str_replace(array(',','?',':',' :',' -',' –'),'.',$txt);
         $txt = str_replace(array('['),'',$txt);
 
         for ($r=0;$r < count($dt);$r++)
