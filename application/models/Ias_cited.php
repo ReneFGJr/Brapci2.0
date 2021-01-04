@@ -123,7 +123,7 @@ class ias_cited extends CI_Model
         }        
     function e_uma_tese($txt)
         {
-            $a = array(' Tese ','(Doutorado',' Thesis ','Tese (Doutorado');
+            $a = array(' Tese ','(Doutorado',' Thesis ','Tese (Doutorado','(Tese de doutoramento','(Tese de Doutoramento');
             return($this->locate($txt,$a));
         }
     function e_uma_dissertacao($txt)
