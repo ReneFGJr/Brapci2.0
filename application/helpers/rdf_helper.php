@@ -729,8 +729,8 @@ function find_class($class,$create=1) {
 	}
 	
 	$sql = "select * from rdf_class
-	$inner					
-	WHERE (c_class = '$class') ".$wh;
+			$inner					
+			WHERE (c_class = '$class') ".$wh;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	if (count($rlt) == 0) {
@@ -742,6 +742,11 @@ function find_class($class,$create=1) {
 		} else {
 			return(0);
 		}
+	}
+
+	if (count($rlt) == 0) {
+		echo "ERRO NA CLASSE?<br><tt>$class</tt>";
+		exit;
 	}
 	$line = $rlt[0];
 	return ($line['id_c']);
@@ -3068,6 +3073,33 @@ function export_json($id)
 		}
 		return($sx);
 	}
+
+	function name_standardization($name)
+	{
+		$n1 = strtolower($name);
+		$n = '';
+		$cp = 1;
+		for ($r=0;$r < strlen($n1);$r++)
+			{
+				$c = substr($n1,$r,1);
+				switch($c)
+					{
+						case '-':
+							$c= '';
+							$cp = 2;
+							break;
+						case '':
+							$c= '';
+							$cp = 2;
+							break;								
+					}
+				if ($cp == 1) { $c = strtoupper($c); }
+				$cp--;						
+				$n .= $c;
+			}
+		return($n);
+	}
+		
 	function image($w)
 	{
 		$imgf = $this->image_dir.'/'.$w.'.jpg';
