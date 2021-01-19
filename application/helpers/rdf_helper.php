@@ -2492,11 +2492,14 @@ function rdf_concept_find_id($r) {
 
 /*************************************** Exclude RDF Data *******************/
 function remove_concept($id) {
+	$data = date("Ymd");
 	$CI = &get_instance();
     $sql = "update rdf_data set
     d_r1 = ((-1) * d_r1) ,
     d_r2 = ((-1) * d_r2 ),
-    d_p  = ((-1) * d_p) 
+    d_p  = ((-1) * d_p),
+	d_literal  = ((-1) * d_literal),
+	d_update = '$data'
     where d_r1 = $id or d_r2 = $id";
     $rlt = $CI -> db -> query($sql);
     return (True);

@@ -158,7 +158,7 @@ class Ias extends CI_model
 		switch ($act) {
 			case 'check':
 				$this->load->model('ias_checks');
-				$sx = $this->ias_checks->article_duplicate();
+				$sx = $this->ias_checks->article_duplicate($d1,$d2,$d3);
 				break;
 			case 'thesa':
 				$sx = $this->check(1);
