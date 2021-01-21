@@ -672,20 +672,23 @@ function show_data($r) {
 	$sx .= '<div class="row">';
 	$dt = $this->le($r);
 	$class = $dt['c_class'];
+
 	
 	/****************************************** return if empty */
 	if (count($dt) == 0) {
 		redirect(base_url(PATH));
 	}
 	/**************************************************** show **/
-	$line = $dt;
-	$fcn = 'rdf_show_'.$line['c_class'];
+	$fcn = 'rdf_show_'.$dt['c_class'];
 	if (function_exists($fcn))
 	{
-		$fcn = '$sx .= '.$fcn.'($line);';
+		$fcn = '$sx .= '.$fcn.'($dt);';
 		eval($fcn);
 	} else {			
 		$sx .= $this->show($dt);
+		$sx .= '<div class="col-10">class: ' . $dt['c_class'] . '</div>';
+		$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';	
+	
 		$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
 	}
 	$sx .= '</div>';
@@ -694,8 +697,7 @@ function show_data($r) {
 	$sx .= '<div class="container">';
 	$sx .= '<div class="row">';
 	
-	$sx .= '<div class="col-10">class: ' . $line['c_class'] . '</div>';
-	$sx .= '<div  class="col-2 text-right">'.$this->link($line['cc_origin']).'</div>';
+
 	
 	
 	/*************************** Editar classe */
