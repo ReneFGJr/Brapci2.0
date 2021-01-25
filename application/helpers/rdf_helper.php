@@ -20,6 +20,8 @@ class rdf
 	var $limit = 10;
 	var $image_dir = '_repository/img/';
 	var $file_dir = '_repository/files/';
+	var $base = '';
+
 	function __construct()
 	{
 		global $msg;
@@ -255,10 +257,10 @@ return($sx);
 #################################################### LE CONCEPT
 function le($id) {
 	$CI = &get_instance();
-	$sql = "select * from rdf_concept 
-	INNER JOIN rdf_class ON cc_class = id_c
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix
-	LEFT JOIN rdf_name ON cc_pref_term = id_n
+	$sql = "select * from ".$this->base."rdf_concept 
+	INNER JOIN ".$this->base."rdf_class ON cc_class = id_c
+	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
+	LEFT JOIN ".$this->base."rdf_name ON cc_pref_term = id_n
 	WHERE id_cc = $id";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
@@ -294,7 +296,7 @@ function change_class($id)
 		$form->id = $id;
 		$cp = array();
 		array_push($cp,array('$H8','id_cc','',false,false));
-		$sql = "select * from rdf_class where c_type= 'C' ";
+		$sql = "select * from ".$this->base."rdf_class where c_type= 'C' ";
 		array_push($cp,array('$Q:id_c:c_class:'.$sql,'cc_class',msg('class'),true,true));
 		$sx = $form->editar($cp,'rdf_concept');
 		if ($form->saved > 0)
@@ -324,10 +326,11 @@ function find($n, $prop = '', $equal = 1) {
 		$wh .= '';
 	}
 	
-	$sql = "select d_r1, c_class, d_r2, n_name from rdf_name
-	INNER JOIN rdf_data on d_literal = id_n 
-	INNER JOIN rdf_class ON d_p = id_c
-	INNER JOIN rdf_concept ON id_cc = d_r1
+	$sql = "select d_r1, c_class, d_r2, n_name 
+	from ".$this->base."rdf_name
+	INNER JOIN ".$this->base."rdf_data on d_literal = id_n 
+	INNER JOIN ".$this->base."rdf_class ON d_p = id_c
+	INNER JOIN ".$this->base."rdf_concept ON id_cc = d_r1
 	where $wh";
 	
 	$rlt = $CI -> db -> query($sql);
@@ -343,8 +346,9 @@ function find($n, $prop = '', $equal = 1) {
 function le_dados($id,$tp=0)
 {
 	$CI = &get_instance();
-	$sql = "select * from rdf_data 
-	left join rdf_name ON id_n = d_literal
+	$sql = "select * 
+	from ".$this->base."rdf_data 
+	left join ".$this->base."rdf_name ON id_n = d_literal
 	where id_d = ".round($id);
 	$rrr = $CI -> db -> query($sql);
 	$rrr = $rrr -> result_array();
@@ -361,33 +365,39 @@ function le_data($id, $prop = '') {
 	}
 	$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
 	$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
-	$sql = "select $cp,1 as rule from rdf_data as rdata
-	INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-	INNER JOIN rdf_concept ON d_r2 = id_cc 
-	INNER JOIN rdf_name on cc_pref_term = id_n
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix
+	$sql = "select $cp,1 as rule 
+	from ".$this->base."rdf_data as rdata
+	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
+	INNER JOIN ".$this->base."rdf_concept ON d_r2 = id_cc 
+	LEFT JOIN ".$this->base."rdf_name on cc_pref_term = id_n
+	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	WHERE d_r1 = $id and d_r2 > 0 " . $wh . cr() . cr();
 	$sql .= ' union ' . cr() . cr();
 	/* TRABALHOS */
-	$sql .= "select $cp_reverse,2 as rule from rdf_data as rdata
-	INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-	INNER JOIN rdf_concept ON d_r1 = id_cc 
-	INNER JOIN rdf_name on cc_pref_term = id_n
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix		
+	$sql .= "select $cp_reverse,2 as rule 
+	from ".$this->base."rdf_data as rdata
+	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
+	INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc 
+	LEFT JOIN ".$this->base."rdf_name on cc_pref_term = id_n
+	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix		
 	WHERE d_r2 = $id and d_r1 > 0 " . $wh . cr() . cr();
 	$sql .= ' union ' . cr() . cr();
-	$sql .= "select $cp,3 as rule from rdf_data as rdata
-	LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
-	LEFT JOIN rdf_concept ON d_r2 = id_cc 
-	LEFT JOIN rdf_name on d_literal = id_n
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix
+	$sql .= "select $cp,3 as rule 
+	from ".$this->base."rdf_data as rdata
+	LEFT JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
+	LEFT JOIN ".$this->base."rdf_concept ON d_r2 = id_cc 
+	LEFT JOIN ".$this->base."rdf_name on d_literal = id_n
+	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	WHERE d_r1 = $id and d_r2 = 0 " . $wh . cr() . cr();
 	
 	/* USE */
 	$prop = $this -> find_class("equivalentClass");
-	$sqll = "SELECT * FROM rdf_data where (d_r2 = $id or d_r1 = $id) and d_p = $prop";
+	$sqll = "SELECT * from ".$this->base." rdf_data 
+		where (d_r2 = $id or d_r1 = $id) 
+		and d_p = $prop";
 	
-	//$sqll = "select * from rdf_concept where (cc_use = $id) and (id_cc <> cc_use)";
+	//$sqll = "select * from ".$this->base." rdf_concept 
+	//where (cc_use = $id) and (id_cc <> cc_use)";
 	$rrr = $CI -> db -> query($sqll);
 	$rrr = $rrr -> result_array();
 	for ($r = 0; $r < count($rrr); $r++) {
@@ -397,10 +407,11 @@ function le_data($id, $prop = '') {
 			$iduse = $line['d_r2'];
 		}
 		$sql .= ' union ' . cr() . cr();
-		$sql .= "select $cp_reverse, " . (10 + $r) . " as rule from rdf_data as rdata
-		INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-		INNER JOIN rdf_concept ON d_r1 = id_cc 
-		INNER JOIN rdf_name on cc_pref_term = id_n
+		$sql .= "select $cp_reverse, " . (10 + $r) . " as rule 
+		from ".$this->base."rdf_data as rdata
+		INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
+		INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc 
+		INNER JOIN ".$this->base."rdf_name on cc_pref_term = id_n
 		WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop" . cr() . cr();
 	}
 	$sql .= " order by c_order, c_class, rule, n_lang desc, id_d";
@@ -416,7 +427,9 @@ function rdf_prefix($url = '') {
 	$pre = substr($url, 0, strpos($url, ':'));
 	$pos = substr($url, strpos($url, ':') + 1, strlen($url));
 	$sx = $pre;
-	$sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
+	$sql = "select * 
+	from ".$this->base."rdf_prefix 
+	where prefix_ref = '$pre' ";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$line = $rlt[0];
@@ -479,10 +492,11 @@ function related($id) {
 	$sx = '<div class="container">' . cr();
 	$sx .= '<div class="row">' . cr();
 	
-	$sql = "SELECT dd3.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 
-	left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
-	left JOIN rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 
-	LEFT JOIN rdf_class ON dd2.d_p = id_c
+	$sql = "SELECT dd3.d_r1 as w, count(*) as mn 
+		FROM ".$this->base."rdf_data as dd1 
+	left JOIN ".$this->base."rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
+	left JOIN ".$this->base."rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 
+	LEFT JOIN ".$this->base."rdf_class ON dd2.d_p = id_c
 	where dd1.d_r2 = $id and dd2.d_p = 88 and dd3.d_p = 37
 	group by w";
 	$rlt = $CI -> db -> query($sql);
@@ -506,7 +520,10 @@ function related($id) {
 	
 	/******************************************** by expression ***********/
 	if (count($rlt) == 0) {
-		$sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 LEFT JOIN rdf_class ON dd2.d_p = id_c where dd1.d_r2 = $id and dd2.d_p = 7
+		$sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 
+			left join ".$this->base." rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
+			LEFT join ".$this->base." rdf_class ON dd2.d_p = id_c 
+			where dd1.d_r2 = $id and dd2.d_p = 7
 		group by w ";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -623,9 +640,7 @@ function show($dt)
 	$sx .= 'no show defined';
 	$sx .= '<h1 class="rdf_name">'.$dt['n_name'].'</h1>';
 	$sx .= '</div>';
-	
-	//echo '<pre>';
-	//print_r($dt);
+
 	return($sx);
 }
 
@@ -727,10 +742,10 @@ function find_class($class,$create=1) {
 		$prefix = substr($class,0,strpos($class,':'));
 		$class = substr($class,strpos($class,':')+1,strlen($class));
 		$wh = " AND (prefix_ref = '$prefix') ";
-		$inner = 'inner join rdf_prefix ON c_prefix = id_prefix ';
+		$inner = 'inner join ".$this->base." rdf_prefix ON c_prefix = id_prefix ';
 	}
 	
-	$sql = "select * from rdf_class
+	$sql = "select * from ".$this->base."rdf_class
 			$inner					
 			WHERE (c_class = '$class') ".$wh;
 	$rlt = $CI -> db -> query($sql);
@@ -772,12 +787,12 @@ function class_create($class)
 	} 
 	$pre_id = $this->prefix($pre);
 	
-	$sql = "select * from rdf_class where c_class = '$class' ";
+	$sql = "select * from ".$this->base."rdf_class where c_class = '$class' ";
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
 	if (count($rlt) == 0)
 	{
-		$sqli = "insert into rdf_class
+		$sqli = "insert into ".$this->base."rdf_class
 		(c_prefix, c_class, c_type )
 		values
 		($pre_id,'$class','$type')";
@@ -816,12 +831,12 @@ function prefix($pre)
 	{
 		return(0);
 	}
-	$sql = "select * from rdf_prefix where prefix_ref = '$pre' ";
+	$sql = "select * from ".$this->base."rdf_prefix where prefix_ref = '$pre' ";
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
 	if (count($rlt) == 0)
 	{
-		$sqli = "insert into rdf_prefix
+		$sqli = "insert into ".$this->base."rdf_prefix
 		(prefix_ref,prefix_url,prefix_ativo)
 		values
 		('$pre','http://www.brapci.inf.br/ontology/$pre',1)";
@@ -836,8 +851,8 @@ function prefix($pre)
 function le_class($id)
 {
 	$CI = &get_instance();
-	$sql = "select * from rdf_class 
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix
+	$sql = "select * from ".$this->base."rdf_class 
+	LEFT join ".$this->base." rdf_prefix ON c_prefix = id_prefix
 	where id_c = ".round($id);
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
@@ -853,8 +868,8 @@ function le_class($id)
 function class_row() {
 	$CI = &get_instance();
 	/**************** class *************************/
-	$sql = "select * from rdf_class 
-	LEFT JOIN rdf_prefix ON c_prefix = id_prefix
+	$sql = "select * from ".$this->base."rdf_class 
+	LEFT join ".$this->base." rdf_prefix ON c_prefix = id_prefix
 	where c_type = 'C' 
 	order by prefix_ref, c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
@@ -902,7 +917,7 @@ function class_row() {
 	$sx .= '</div>';
 	
 	/**************** propriety **********************/
-	$sql = "select * from rdf_class where c_type = 'P' order by c_type, c_class";
+	$sql = "select * from ".$this->base."rdf_class where c_type = 'P' order by c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$sx .= '<div class="col-md-1">';
@@ -938,13 +953,13 @@ function class_ed($id)
 {
 	$cp = array();
 	array_push($cp, array('$H8', 'id_c', '', false, true));		
-	array_push($cp, array('$Q id_prefix:prefix_ref:select * from rdf_prefix where prefix_ativo = 1', 'c_prefix', 'Prefix', true, true));
+	array_push($cp, array('$Q id_prefix:prefix_ref:select * from '.$this->base.'rdf_prefix where prefix_ativo = 1', 'c_prefix', 'Prefix', true, true));
 	array_push($cp, array('$S100', 'c_class', 'Classe', true, true));
 	array_push($cp, array('$O : &C:Classe&P:Propriety', 'c_type', 'Tipo', true, true));
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_find', 'Busca', true, true));
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_vc', 'Vocabulário Controlado', true, true));
 	array_push($cp, array('$S100', 'c_url', 'URL', false, true));
-	$sql = "select * from (select id_c, concat(prefix_ref,c_class) as c_class from rdf_class inner join rdf_prefix ON `c_prefix` = id_prefix where c_type='C' and id_c <> $id) as tabela";
+	$sql = "select * from (select id_c, concat(prefix_ref,c_class) as c_class from '.$this->base.'rdf_class inner join ".$this->base." rdf_prefix ON `c_prefix` = id_prefix where c_type='C' and id_c <> $id) as tabela";
 	array_push($cp, array('$Q id_c:c_class:'.$sql, 'c_equivalent', 'Class Equivalente', false, true));
 	array_push($cp, array('$B8', '', 'Gravar', false, true));
 	$form = new form;
@@ -995,14 +1010,14 @@ function form_ed($id,$id2,$cl=0) {
 	$form -> id = $id;
 	$form -> return = base_url(PATH.'class/c/'.$cl);
 	$cp = array();	
-	$sqlc = "select * from rdf_class where c_type = 'C'";
+	$sqlc = "select * from ".$this->base."rdf_class where c_type = 'C'";
 	if (round($id2) > 0) 
 	{ 
 		$sqlc .= ' and id_c = '.$id2; 
 		//$_POST['dd1'] = $id2;
 	}
-	$sqlp = "select * from rdf_class where c_type = 'P'";
-	$sqlc2 = "select * from rdf_class where c_type = 'C'";
+	$sqlp = "select * from ".$this->base." rdf_class where c_type = 'P'";
+	$sqlc2 = "select * from ".$this->base." rdf_class where c_type = 'C'";
 	if ($cl > 0)
 	{
 		$sqlc .= ' AND id_c = '.round($cl);
@@ -1047,15 +1062,15 @@ function rdf_concept($term, $class, $orign = '') {
 	$cl = $this -> find_class($class);
 	$dt = date("Y/m/d H:i:s");
 	if ($term == 0) {
-		$sql = "select * from rdf_concept
+		$sql = "select * from ".$this->base." rdf_concept
 		WHERE cc_class = $cl and cc_created = '$dt'
 		ORDER BY id_cc";
 	} else {
 		if (strlen($orign) > 0) {
-			$sql = "select * from rdf_concept
+			$sql = "select * from ".$this->base." rdf_concept
 			WHERE cc_class = $cl and (cc_pref_term = $term or cc_origin = '$orign')";
 		} else {
-			$sql = "select * from rdf_concept
+			$sql = "select * from ".$this->base." rdf_concept
 			WHERE cc_class = $cl and (cc_pref_term = $term)";
 		}
 	}
@@ -1066,7 +1081,7 @@ function rdf_concept($term, $class, $orign = '') {
 	
 	if (count($rlt) == 0) {
 		
-		$sqli = "insert into rdf_concept
+		$sqli = "insert into ".$this->base."rdf_concept
 		(cc_class, cc_pref_term, cc_created, cc_origin, cc_update)
 		VALUES
 		($cl,$term,'$dt','$orign', '$date')";
@@ -1081,7 +1096,7 @@ function rdf_concept($term, $class, $orign = '') {
 		if ((strlen($orign) > 0) and ((strlen(trim($line['cc_origin'])) == 0) or ($line['cc_origin'] == 'ERRO:'))) {
 			$compl = ", cc_origin = '$orign' ";
 		}
-		$sql = "update rdf_concept set cc_status = 1, cc_update = '$date' $compl where id_cc = " . $line['id_cc'];
+		$sql = "update ".$this->base."rdf_concept set cc_status = 1, cc_update = '$date' $compl where id_cc = " . $line['id_cc'];
 		$rlt = $CI -> db -> query($sql);
 	}
 	return ($id);
@@ -1100,11 +1115,11 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 	
 	$sql = "select n_name, id, count(*) as total, id From (
 		select N1.n_name as n_name, C1.id_cc as id
-		FROM rdf_concept as C1
-		INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
-		LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
-		LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-		INNER JOIN rdf_data ON C1.id_cc = d_r2
+		from ".$this->base." rdf_concept as C1
+		INNER join ".$this->base." rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+		LEFT join ".$this->base." rdf_concept as C2 ON C1.cc_use = C2.id_cc
+		LEFT join ".$this->base." rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+		INNER join ".$this->base." rdf_data ON C1.id_cc = d_r2
 		where C1.cc_class = " . $f . " $wh 
 		) as tabela
 		group by n_name, id
@@ -1128,10 +1143,10 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		
 		$sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
 		N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
-		FROM rdf_concept as C1
-		INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
-		LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
-		LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+		from ".$this->base." rdf_concept as C1
+		INNER join ".$this->base." rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+		LEFT join ".$this->base." rdf_concept as C2 ON C1.cc_use = C2.id_cc
+		LEFT join ".$this->base." rdf_name as N2 ON C2.cc_pref_term = N2.id_n
 		where C1.cc_class = " . $f . " $wh 
 		ORDER BY N1.n_name";
 		
@@ -1204,11 +1219,11 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$dt['title'] = $n;
 		
 		/************ BUSCA NOMES **************************************/
-		$sql = "select * from rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
+		$sql = "select * from ".$this->base." rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		if (count($rlt) == 0) {
-			$sqli = "insert into rdf_name (n_name, n_lang, n_md5) values ('$n','$lang','$md5')";
+			$sqli = "insert into ".$this->base."rdf_name (n_name, n_lang, n_md5) values ('$n','$lang','$md5')";
 			$rlt = $CI -> db -> query($sqli);
 			sleep(0.3);
 			$rlt = $CI -> db -> query($sql);
@@ -1243,14 +1258,14 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		
 		
 		$sql = "select * from (
-			select * from rdf_data 
+			select * from ".$this->base." rdf_data 
 			WHERE (d_p = $pr and d_literal = $lit) ) as table1
 			where ((d_r1 = $r1 AND d_r2 = $r2)
 			OR (d_r1 = $r2 AND d_r2 = $r1))";
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 			if (count($rlt) == 0) {
-				$sql = "insert into rdf_data
+				$sql = "insert into ".$this->base."rdf_data
 				(d_r1, d_p, d_r2, d_literal)
 				values
 				('$r1','$pr','$r2',$lit)";
@@ -1283,12 +1298,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$pr = $prop;
 			}
 			
-			$sql = "select * from rdf_data
+			$sql = "select * from ".$this->base." rdf_data
 			WHERE (d_p = $pr ) and (d_r1 = $r1)";
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 			if (count($rlt) == 0) {
-				$sql = "insert into rdf_data
+				$sql = "insert into ".$this->base."rdf_data
 				(d_r1, d_p, d_r2, d_literal)
 				values
 				('$r1','$pr','$r2',$lit)";
@@ -1297,7 +1312,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$line = $rlt[0];
 				if ($line['d_r2'] != $r2 or ($line['d_literal'] != $lit))
 				{
-					$sql = "update rdf_data set
+					$sql = "update ".$this->base."rdf_data set
 					d_r2 = '$r2',
 					d_literal = '$lit'
 					where id_d = ".$rlt[0]['id_d'];
@@ -1320,13 +1335,13 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			$dt = date("Y/m/d H:i:s");
 			$date = date("Y-m-d");
 			/*********** checar se não existe um termo já iserido *********************/
-			$sql = "select * from rdf_concept 
+			$sql = "select * from ".$this->base." rdf_concept 
 			WHERE 
 			cc_class = $cl AND cc_pref_term = $term ";
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 			if (count($rlt) == 0) {
-				$sqli = "insert into rdf_concept
+				$sqli = "insert into ".$this->base."rdf_concept
 				(cc_class, cc_pref_term, cc_created, cc_origin, cc_update)
 				VALUES
 				($cl, $term,'$dt','$orign','$date')";
@@ -1487,8 +1502,8 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$sx = '';
 				
 				$sql = "select * 
-				from rdf_form_class 
-				INNER JOIN rdf_class ON id_c = sc_range
+				from ".$this->base." rdf_form_class 
+				INNER join ".$this->base." rdf_class ON id_c = sc_range
 				where id_sc = $form";
 				$rlt = $CI -> db -> query($sql);
 				$rlt = $rlt -> result_array();
@@ -1515,14 +1530,14 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			{
 				$CI = &get_instance();
 				$sql = "SELECT * FROM (
-					select d_p, id_c as c from rdf_data 
-					INNER JOIN rdf_concept ON d_r1 = id_cc
-					INNER JOIN rdf_class ON cc_class = id_c
+					select d_p, id_c as c from ".$this->base." rdf_data 
+					INNER join ".$this->base." rdf_concept ON d_r1 = id_cc
+					INNER join ".$this->base." rdf_class ON cc_class = id_c
 					where id_c = $class
 					group by d_p, id_c
 					) as tabela
-					LEFT JOIN rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
-					LEFT JOIN rdf_class as t2 ON sc_propriety = t2.id_c";
+					LEFT join ".$this->base." rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
+					LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c";
 					$rlt = $CI -> db -> query($sql);
 					$rlt = $rlt -> result_array();
 					for ($r=0;$r < count($rlt);$r++)
@@ -1532,7 +1547,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						if ($exist == '')
 						{
 							$prop = $line['d_p'];
-							$sql = "insert into rdf_form_class
+							$sql = "insert into ".$this->base."rdf_form_class
 							(sc_class,sc_propriety,sc_range,sc_library, sc_global, sc_ativo)
 							values
 							($class,$prop,0,".LIBRARY.",0,1)";
@@ -1557,7 +1572,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						$form->id = $id;
 						$cp = array();
 						array_push($cp,array('$H8','id_cc','',false,false));
-						$op = "select * from rdf_class where c_type = 'C'";
+						$op = "select * from ".$this->base." rdf_class where c_type = 'C'";
 						array_push($cp,array('$Q id_c:c_class:'.$op,'cc_class',msg('Classe_name'),true,true));
 						$sx .= $form->editar($cp,'rdf_concept');
 						$sx .= '</div>';
@@ -1587,22 +1602,22 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					switch($class) {
 						default :
 						$cp = 'n_name, n_lang, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
-						$sqla = "select $cp from rdf_data as rdata
-						INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-						INNER JOIN rdf_concept as cpt ON d_r2 = id_cc 
-						INNER JOIN rdf_name on cc_pref_term = id_n
+						$sqla = "select $cp from ".$this->base." rdf_data as rdata
+						INNER join ".$this->base." rdf_class as prop ON d_p = prop.id_c 
+						INNER join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc 
+						INNER join ".$this->base." rdf_name on cc_pref_term = id_n
 						WHERE d_r1 = $id and d_r2 > 0";
 						$sqla .= ' union ';
-						$sqla .= "select $cp from rdf_data as rdata
-						LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
-						LEFT JOIN rdf_concept as cpt ON d_r2 = id_cc 
-						LEFT JOIN rdf_name on d_literal = id_n
+						$sqla .= "select $cp from ".$this->base." rdf_data as rdata
+						LEFT join ".$this->base." rdf_class as prop ON d_p = prop.id_c 
+						LEFT join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc 
+						LEFT join ".$this->base." rdf_name on d_literal = id_n
 						WHERE d_r1 = $id and d_r2 = 0";
 						/*****************/
-						$sql = "select * from rdf_form_class
-						INNER JOIN rdf_class as t0 ON id_c = sc_propriety
+						$sql = "select * from ".$this->base." rdf_form_class
+						INNER join ".$this->base." rdf_class as t0 ON id_c = sc_propriety
 						LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
-						LEFT JOIN rdf_class as t2 ON sc_propriety = t2.id_c
+						LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c
 						where (sc_class = $class) 
 							and ((sc_global = 1) or (sc_library = ".LIBRARY.") or (sc_library = 0)) 
 							and sc_ativo = 1
@@ -1711,7 +1726,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						echo '-->'.$url;
 						$t = read_link($url);
 						$this -> frbr_core -> inport_rdf($t, $id2);
-						$sql = "update rdf_class set c_url_update = '" . date("Y-m-d") . "' where id_c = " . $cl['id_c'];
+						$sql = "update ".$this->base."rdf_class set c_url_update = '" . date("Y-m-d") . "' where id_c = " . $cl['id_c'];
 						$rlt = $this -> db -> query($sql);
 						$sx = '';
 					break;
@@ -1925,9 +1940,9 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			return ('');
 		}
 		$cps = 'c_class, id_c, n_name, id_cc';
-		$sql = "select $cps from rdf_concept
-		INNER JOIN rdf_name ON id_n = cc_pref_term 
-		INNER JOIN rdf_class ON id_c = cc_class
+		$sql = "select $cps from ".$this->base." rdf_concept
+		INNER join ".$this->base." rdf_name ON id_n = cc_pref_term 
+		INNER join ".$this->base." rdf_class ON id_c = cc_class
 		WHERE $wh AND c_find = 1  AND cc_library = " . LIBRARY . "
 		group by $cps";
 		$rlt = $CI -> db -> query($sql);
@@ -2041,8 +2056,8 @@ function index_work($lt = '') {
 	$class = "Work";
 	$f = $this -> find_class($class);
 	
-	$sql = "select * from rdf_concept 
-	INNER JOIN rdf_name ON cc_pref_term = id_n
+	$sql = "select * from ".$this->base." rdf_concept 
+	INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
 	where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
 	ORDER BY n_name";
 	$rlt = $CI -> db -> query($sql);
@@ -2069,8 +2084,8 @@ function index_author($lt = '') {
 	$class = "Person";
 	$f = $this -> find_class($class);
 	
-	$sql = "select * from rdf_concept 
-	INNER JOIN rdf_name ON cc_pref_term = id_n
+	$sql = "select * from ".$this->base." rdf_concept 
+	INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
 	where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
 	ORDER BY n_name";
 	$rlt = $CI -> db -> query($sql);
@@ -2096,9 +2111,9 @@ function index_other($lt = '', $class = 'isPublisher') {
 	$CI = &get_instance();
 	$f = $this -> find_class($class);
 	
-	$sql = "select d_r2, n_name, id_cc from rdf_data
-	LEFT JOIN rdf_concept on d_r2 = id_cc  
-	LEFT JOIN rdf_name ON cc_pref_term = id_n
+	$sql = "select d_r2, n_name, id_cc from ".$this->base." rdf_data
+	LEFT join ".$this->base." rdf_concept on d_r2 = id_cc  
+	LEFT join ".$this->base." rdf_name ON cc_pref_term = id_n
 	where d_P = " . $f . " AND cc_library = " . LIBRARY . "
 	GROUP BY d_r2, n_name, id_cc
 	ORDER BY n_name";
@@ -2208,12 +2223,12 @@ function class_view_form($id='')
 	t1.c_class as c_class, t2.prefix_ref as prefix_ref,
 	t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref,
 	sc_group, sc_library
-	FROM rdf_form_class
-	INNER JOIN rdf_class as t1 ON t1.id_c = sc_propriety
-	LEFT JOIN rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
+	from ".$this->base." rdf_form_class
+	INNER join ".$this->base." rdf_class as t1 ON t1.id_c = sc_propriety
+	LEFT join ".$this->base." rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
 	
-	LEFT JOIN rdf_class as t3 ON t3.id_c = sc_range
-	LEFT JOIN rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
+	LEFT join ".$this->base." rdf_class as t3 ON t3.id_c = sc_range
+	LEFT join ".$this->base." rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
 	
 	where sc_class = $id
 	AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
@@ -2281,7 +2296,7 @@ function class_view_data($id = '') {
 	$sx .= '<h4>Dados</h4>';
 	/********************************************/
 	if (strlen($id) == 0) {
-		$sql = "select * from rdf_class 
+		$sql = "select * from ".$this->base." rdf_class 
 		WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
 		ORDER BY c_class";
 		$rlt = $CI -> db -> query($sql);
@@ -2318,8 +2333,8 @@ function data_classes($d) {
 		$id = $this -> find_class($d);	
 	}
 	
-	$sql = "select * from rdf_concept 
-	INNER JOIN rdf_name ON cc_pref_term = id_N
+	$sql = "select * from ".$this->base." rdf_concept 
+	INNER join ".$this->base." rdf_name ON cc_pref_term = id_N
 	WHERE cc_class = $id
 	ORDER BY n_name 
 	limit 20";
@@ -2330,7 +2345,7 @@ function data_classes($d) {
 function classes_lista() {
 	$CI = &get_instance();
 	/**************** class *************************/
-	$sql = "select * from rdf_class where c_type = 'C' order by c_type, c_class";
+	$sql = "select * from ".$this->base." rdf_class where c_type = 'C' order by c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$sx = '';
@@ -2353,7 +2368,7 @@ function classes_lista() {
 	$sx .= '</div>';
 	
 	/**************** propriety **********************/
-	$sql = "select * from rdf_class where c_type = 'P' order by c_type, c_class";
+	$sql = "select * from ".$this->base." rdf_class where c_type = 'P' order by c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$sx .= '<div class="col-md-1">';
@@ -2429,7 +2444,9 @@ function class_update_data($dta)
 		$t = read_link($url);
 		$class = $cl['c_class'];
 		$this -> inport_rdf($t, $class);
-		$sql = "update rdf_class set c_url_update = '" . date("Y-m-d") . "' where id_c = " . $cl['id_c'];
+		$sql = "update ".$this->base."rdf_class 
+			set c_url_update = '" . date("Y-m-d") . "' 
+			where id_c = " . $cl['id_c'];
 		$rlt = $CI -> db -> query($sql);
 		$sx = '';            		
 	}
@@ -2482,7 +2499,7 @@ function class_update_data($dta)
 function rdf_concept_find_id($r) {
 	$CI = &get_instance();
 	$id = 0;
-	$sql = "select * from rdf_concept where cc_origin = '$r'";
+	$sql = "select * from ".$this->base." rdf_concept where cc_origin = '$r'";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	if (count($rlt) > 0) {
@@ -2496,7 +2513,7 @@ function rdf_concept_find_id($r) {
 function remove_concept($id) {
 	$data = date("Ymd");
 	$CI = &get_instance();
-    $sql = "update rdf_data set
+    $sql = "update ".$this->base."rdf_data set
     d_r1 = ((-1) * d_r1) ,
     d_r2 = ((-1) * d_r2 ),
     d_p  = ((-1) * d_p),
@@ -2509,14 +2526,14 @@ function remove_concept($id) {
 
 function data_exclude($id) {
 	$CI = &get_instance();
-	$sql = "select * from rdf_data where id_d = " . $id;
+	$sql = "select * from ".$this->base." rdf_data where id_d = " . $id;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$date = date("Ymd");
 	if (count($rlt) > 0) {
 		$line = $rlt[0];
 		if ($line['d_r1'] > 0) {
-			$sql = "update rdf_data set
+			$sql = "update ".$this->base."rdf_data set
 			d_r1 = " . ((-1) * $line['d_r1']) . " ,
 			d_r2 = " . ((-1) * $line['d_r2']) . " ,
 			d_p  = " . ((-1) * $line['d_p']) . ", 
@@ -2530,14 +2547,14 @@ function data_exclude($id) {
 
 function data_recover($id) {
 	$CI = &get_instance();
-	$sql = "select * from rdf_data where id_d = " . $id;
+	$sql = "select * from ".$this->base." rdf_data where id_d = " . $id;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	$date = date("Ymd");
 	if (count($rlt) > 0) {
 		$line = $rlt[0];
 		if ($line['d_r1'] < 0) {
-			$sql = "update rdf_data set
+			$sql = "update ".$this->base."rdf_data set
 			d_r1 = " . ((-1) * $line['d_r1']) . " ,
 			d_r2 = " . ((-1) * $line['d_r2']) . " ,
 			d_p  = " . ((-1) * $line['d_p']) . ", 
@@ -2554,7 +2571,7 @@ function exist_prefLabel($id)
 	$CI = &get_instance();
 	$prop = $this->find_class('prefLabel');
 	
-	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+	$sql = "select * from ".$this->base." rdf_data where d_r1 = ".$id." and d_p = ".$prop;
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
 	if (count($rlt) > 0)
@@ -2569,7 +2586,7 @@ function update_prefLabel($id)
 	$CI = &get_instance();
 	$prop = $this->find_class('prefLabel');
 	
-	$sql = "select * from rdf_data where d_r1 = ".$id." and d_p = ".$prop;
+	$sql = "select * from ".$this->base." rdf_data where d_r1 = ".$id." and d_p = ".$prop;
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
 	if (count($rlt) > 0)
@@ -2610,7 +2627,7 @@ function ajax_search($id, $type = '') {
 		$ww = $this -> find_class($type,0);
 		$wh2 = ' (cc_class = ' . $ww . ') ';
 		
-		$sql = "select * FROM rdf_class
+		$sql = "select * from ".$this->base." rdf_class
 		WHERE c_class_main = $ww";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -2626,10 +2643,10 @@ function ajax_search($id, $type = '') {
 	/***********************************************************************/
 	$lst = -1;
 	if (strlen($wh) > 0) {
-		$sql = "select * from rdf_name
-		INNER JOIN rdf_data ON id_n = d_literal
-		INNER JOIN rdf_concept ON d_r1 = id_cc
-		INNER JOIN rdf_class ON id_c = d_p 
+		$sql = "select * from ".$this->base." rdf_name
+		INNER join ".$this->base." rdf_data ON id_n = d_literal
+		INNER join ".$this->base." rdf_concept ON d_r1 = id_cc
+		INNER join ".$this->base." rdf_class ON id_c = d_p 
 		WHERE ($wh) and (n_name <> '') $wh2 
 		LIMIT 50";
 		$rlt = $CI -> db -> query($sql);
@@ -2675,7 +2692,7 @@ function btn_update($id) {
 function person_work($id) {
 	$CI = &get_instance();
 	$r = array();
-	$sql = "select d_r1, d_p, d_r2 from rdf_data 
+	$sql = "select d_r1, d_p, d_r2 from ".$this->base." rdf_data 
 	where (d_r1 = $id or d_r2 = $id)
 	AND NOT (d_r1 = 0 OR d_r2 = 0)
 	ORDER BY d_r1, d_p, d_r2";
@@ -2785,7 +2802,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 	/* expression */
 	$class = "isRealizedThrough";
 	$id_cl = $this -> find_class($class);
-	$sql = "select * from rdf_data 
+	$sql = "select * from ".$this->base." rdf_data 
 	WHERE d_r1 = $id and
 	d_p = $id_cl ";
 	$xrlt = $CI -> db -> query($sql);
@@ -2796,7 +2813,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 		/************************************ manifestation ********/
 		$class = "isEmbodiedIn";
 		$id_cl = $this -> find_class($class);
-		$sql = "select * from rdf_data 
+		$sql = "select * from ".$this->base." rdf_data 
 		WHERE d_r1 = $ide and
 		d_p = $id_cl ";
 		$xrlt = $CI -> db -> query($sql);
