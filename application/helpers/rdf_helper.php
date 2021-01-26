@@ -688,7 +688,6 @@ function show_data($r) {
 	$dt = $this->le($r);
 	$class = $dt['c_class'];
 
-	
 	/****************************************** return if empty */
 	if (count($dt) == 0) {
 		redirect(base_url(PATH));
@@ -705,25 +704,14 @@ function show_data($r) {
 		$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';	
 	
 		$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
+
+		$sx .= $rdf->view_data($r);
 	}
 	$sx .= '</div>';
 	$sx .= '</div>';
 	
 	$sx .= '<div class="container">';
 	$sx .= '<div class="row">';
-	
-
-	
-	
-	/*************************** Editar classe */
-	if (perfil("#ADM"))
-	{
-		$sx .= '<div class="col-md-12 small">';
-		$sx .= '| <a href="'.base_url(PATH).'">'.msg('return').' </a>';
-		$sx .= '| <a href="'.base_url(PATH.'a/'.$r).'">'.msg('edit').'</a> |';
-		$sx .= '</div>';
-	}
-	
 	$sx .= '</div>';
 	
 	$sx .= '</div>';
@@ -959,7 +947,7 @@ function class_ed($id)
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_find', 'Busca', true, true));
 	array_push($cp, array('$O 1:SIM&0:NÃO', 'c_vc', 'Vocabulário Controlado', true, true));
 	array_push($cp, array('$S100', 'c_url', 'URL', false, true));
-	$sql = "select * from (select id_c, concat(prefix_ref,c_class) as c_class from '.$this->base.'rdf_class inner join ".$this->base." rdf_prefix ON `c_prefix` = id_prefix where c_type='C' and id_c <> $id) as tabela";
+	$sql = "select * from (select id_c, concat(prefix_ref,c_class) as c_class from ".$this->base."rdf_class inner join ".$this->base." rdf_prefix ON c_prefix = id_prefix where c_type='C' and id_c <> $id) as tabela";
 	array_push($cp, array('$Q id_c:c_class:'.$sql, 'c_equivalent', 'Class Equivalente', false, true));
 	array_push($cp, array('$B8', '', 'Gravar', false, true));
 	$form = new form;
