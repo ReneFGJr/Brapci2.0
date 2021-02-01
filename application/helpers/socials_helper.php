@@ -83,6 +83,8 @@ class socials
     var $linkedin_key_user = '0f68b98f-4e38-4980-b631-4f64520c9c2e';
     var $linkedin_key_secret = '06fd1eff-0c5b-4d95-bb7b-681deb588919';
     var $linkedin_redirect = 'http://www.brapci.inf.br/oauth_linkedin.php';
+
+    var $user_picture_dir = '_repositorio/users/';
     
     function captcha()
     {
@@ -207,6 +209,42 @@ class socials
         $this->security_logout();
         redirect(base_url(PATH));
     }
+
+	function user_image($id)
+		{
+            if (is_array($id))
+                {
+                    $id = $id['id_us'];
+                }
+            
+            $imgt = $this->user_picture_dir.'/user_'.strzero($id,7).'.jpg';
+            if (file_exists($imgt))
+                {
+                    return($imgt);
+                }
+			$img = 'img/no_image.png';
+			return($img);
+		}    
+
+	function user_tela($dt)
+		{
+			$sx = '';
+			$img = $this->user_image($dt);		
+
+			$sx .= '<div class="'.bscol(8).'">';
+			$sx .= '<span class="small">'.msg('us_nome').'</span><br/>';
+			$sx .= '<span class="large">'.$dt['us_nome'].'</span><br/>';
+
+			$sx .= '<span class="small">'.msg('us_email').'</span><br/>';
+			$sx .= '<span class="large">'.$dt['us_email'].'</span><br/>';
+
+			$sx .= '</div>';
+
+			$sx .= '<div class="'.bscol(4).' small">';
+			$sx .= '<img src="'.base_url($img).'" class="img-fluid">';
+			$sx .= '</div>';
+			return($sx);
+		}    
     
     function ac($id = '')
     {
@@ -298,7 +336,7 @@ class socials
         </button>
         </div>
         <div class="modal-body">
-        <form method="post" action="' . base_url(PATH.'social/login') . '">
+        <form method="post" action="' . base_url(PATH.'social/login_local') . '">
         <span>' . msg("form_user_name") . '</span><br>
         <input type="text" name="user_login" value="' . get("user_login") . '" class="form-control">
         <br>

@@ -1,4 +1,27 @@
 <?php
+/**
+* CodeIgniter Form Helpers
+*
+* @package     CodeIgniter
+* @subpackage  BootStrap
+* @category    Helpers
+* @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+* @link        http://www.sisdoc.com.br/CodIgniter
+* @version     v0.21.01.31
+*/
+function bscol($c)
+    {
+        switch($c)
+            {
+                case '12':
+                    $sx = 'col-md-12';
+                break;
+                default:
+                    $sx = 'col-md-'.$c;
+                break;
+            }
+        return($sx);
+    }
 function bs_pages($ini,$stop,$link='')
     {
         $sx = '';

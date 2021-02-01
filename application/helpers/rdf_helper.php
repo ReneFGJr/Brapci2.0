@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/
-* @version     v0.03.01.21
+* @version     v0.03.01.31
 */
 
 /*
@@ -698,14 +698,21 @@ function show_data($r) {
 	{
 		$fcn = '$sx .= '.$fcn.'($dt);';
 		eval($fcn);
-	} else {			
-		$sx .= $this->show($dt);
-		$sx .= '<div class="col-10">class: ' . $dt['c_class'] . '</div>';
-		$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';	
-	
-		$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
+	} else {
+		$fcn = 'rdf_show_data_generic';
+		if (function_exists($fcn))
+		{
+			$fcn = '$sx .= '.$fcn.'($dt);';
+			eval($fcn);
+		} else {
+			$sx .= $this->show($dt);
+			$sx .= '<div class="col-10">class: ' . $dt['c_class'] . '</div>';
+			$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';	
+		
+			$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
 
-		$sx .= $rdf->view_data($r);
+			$sx .= $this->view_data($r);
+		}
 	}
 	$sx .= '</div>';
 	$sx .= '</div>';

@@ -10,6 +10,17 @@
 * @version     v0.20.10.31
 */
 
+function cep($cep)
+    {
+        $cep = sonumero($cep);
+        while (strlen($cep) < 8) { $cep = '0'.$cep; }
+
+        //https://viacep.com.br/ws/90660900/json/
+        $http = 'https://viacep.com.br/ws/'.$cep.'/json/';
+        $rlt = load_page($http);
+        return($rlt['content']);
+    }
+
 function btn_reload()
     {
         $sx = '<button class="btn btn-outline-primary" onClick="window.location.reload();">'.msg('Refresh Page').'</button>';
