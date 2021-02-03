@@ -80,14 +80,17 @@ class ias_abstract extends CI_Model
         $rsp['abstract'] = $txt;
         $rsp['lang'] = $lang;
 
-        $key = trim($ln[$fim].' '.$ln[$fim+1]);
-    
+        $key = '';
+        if (isset($ln[$fim+1]))
+            {
+                $key = trim($ln[$fim].' '.$ln[$fim+1]);
+            }
+        
         $key = troca($key,':',' ');
         $key = troca($key,'.',';');
         $keys = splitx(';',$key);
 
         $rsp['keywords'] = $keys;
-
         return ($rsp);
     }
     function keywords($txtf)
