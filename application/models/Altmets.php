@@ -72,6 +72,9 @@ class altmets extends CI_model
 	{
 		$data = date("Ym");
 		$txt = troca($txt,"'","´");
+		//$txt = troca($txt,"í","i");
+		$txt = ascii($txt);
+		$txt = html_entity_decode($txt);
 		$sql = "insert into brapci_altmetrics.altmetrics_query
 		(q_doi, q_status, q_result, q_data )
 		values
