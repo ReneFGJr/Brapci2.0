@@ -157,7 +157,7 @@ class socials
             break;
             
             case 'email':
-                return ($this->emails($id, $chk));
+                $sx = $this->emails($id, $chk);
             break;
             
             default:

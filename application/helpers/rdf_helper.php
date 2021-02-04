@@ -2675,7 +2675,6 @@ function ajax_search($id, $type = '') {
 
 function btn_editar($id) {
 	$sx = '<a href="' . base_url(PATH . 'a/' . $id) . '" class="btn btn-secondary">editar</a>';
-	$sx .= ' <a href="' . base_url(PATH . 'authority_cutter/' . $id) . '" class="btn btn-secondary">atualizar Cutter</a>';
 	return ($sx);
 }
 
