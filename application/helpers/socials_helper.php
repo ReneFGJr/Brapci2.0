@@ -156,10 +156,6 @@ class socials
                 $this->change_password($id, $chk);
             break;
             
-            case 'email':
-                $sx = $this->emails($id, $chk);
-            break;
-            
             default:
             if (perfil("#ADMIN")) {
                 $sx = '<h1>Socials Menu</h1>';
@@ -1270,27 +1266,6 @@ class socials
         $sx .= '</div>';
         
         $sx .= '</div>';
-        return ($sx);
-    }
-    
-    
-    
-    function emails($act, $d1)
-    {
-        $CI = &get_instance();
-        $sx = '';
-        $sx .= '<li><a href="' . base_url(PATH . 'social/email/test/confirm') . '">' . msg('email_test_confirm') . '</a></li>';
-        
-        switch ($d1) {
-            case 'confirm':
-                $CI->load->helper('email');
-                $para = 'renefgj@gmail.com';
-                $assunto = 'e-mail de teste';
-                $texto = 'teste de e-mail';
-                $de = 1;
-                echo email($para, $assunto, $texto, $de);
-            break;
-        }
         return ($sx);
     }
 }

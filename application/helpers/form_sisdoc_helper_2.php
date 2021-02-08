@@ -319,7 +319,7 @@ function genchksum13($isbn)
 function message($l,$t=0)
 {    
     $sx = '';
-    $cl = array('success','primary','secondary','danger','warning','info','light','dark');
+    $cl = array('success','success','secondary','danger','warning','info','light','dark');
     if (!isset($cl[$t]))
     {
         $t = 3;

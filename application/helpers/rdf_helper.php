@@ -1423,6 +1423,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			}
 			$sx .= '
 			<div class="text-right" style="margin-top: 20px;">
+			<span id="force" style="left: 0px; padding-right: 20px">'.msg('create_force').'</span>
 			<input type="hidden" id="dd52" value="'.$line['sc_propriety'].'">
 			<button type="button" id="create" class="btn btn-outline-primary" style="display: none;">'.msg('create').'</button>
 			<button type="button" id="submt" class="btn btn-outline-primary" '.$disable.'>'.msg('save').'</button>			
@@ -1436,6 +1437,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			$js = '<script> $("#cancel").click(function() { wclose(); }); </script>'.cr();
 			
 			$js .= '<script>
+			/**************************************************/
+			$("#force").click(function() 
+				{
+					$("#create").show(1);
+					$("#force").hide(1);
+				});
 			/***************************** CREATE *************/
 			$("#create").click(function() 
 			{ 
@@ -2658,9 +2665,9 @@ function ajax_search($id, $type = '') {
 
 	if ($lst ==0)
 		{
-			$sx .= '<script>$("#create").show(1);</script>';
+			$sx .= '<script>$("#create").show(1);$("#force").hide(1);</script>';
 		} else {
-			$sx .= '<script>$("#create").hide(1);</script>';
+			$sx .= '<script>$("#create").hide(1);$("#force").show(1);</script>';
 		}
 	$sx .= '  <script>                 
 	function change()

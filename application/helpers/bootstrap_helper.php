@@ -15,9 +15,67 @@ function bscol($c)
             {
                 case '12':
                     $sx = 'col-md-12';
+                    $sx .= ' col-'.$c;
+                    $sx .= ' col-sm-'.$c;
+                    $sx .= ' col-lg-'.$c;
+                    $sx .= ' col-xl-'.$c;
                 break;
+
+                case '2':
+                    $sx = 'col-md-12';
+                    $sx .= ' col-12';
+                    $sx .= ' col-sm-4';
+                    $sx .= ' col-lg-2';
+                    $sx .= ' col-xl-2';
+                break;   
+
+                case '3':
+                    $sx = 'col-md-6';
+                    $sx .= ' col-6';
+                    $sx .= ' col-sm-6';
+                    $sx .= ' col-lg-2';
+                    $sx .= ' col-xl-2';
+                break;  
+
+                case '5':
+                    $sx = 'col-md-12';
+                    $sx .= ' col-12';
+                    $sx .= ' col-sm-5';
+                    $sx .= ' col-lg-5';
+                    $sx .= ' col-xl-5';
+                break;
+
+                case '7':
+                    $sx = 'col-md-12';
+                    $sx .= ' col-12';
+                    $sx .= ' col-sm-7';
+                    $sx .= ' col-lg-7';
+                    $sx .= ' col-xl-7';
+                break;
+
+                case '6':
+                    $sx = 'col-md-6';
+                    $sx .= ' col-6';
+                    $sx .= ' col-sm-6';
+                    $sx .= ' col-lg-6';
+                    $sx .= ' col-xl-6';
+                break;                                           
+
+                case '10':
+                    $sx = 'col-md-12';
+                    $sx .= ' col-12';
+                    $sx .= ' col-sm-6';
+                    $sx .= ' col-lg-10';
+                    $sx .= ' col-xl-10';
+                break;
+
                 default:
+                    $c = sonumero($c);
                     $sx = 'col-md-'.$c;
+                    $sx .= ' col-'.$c;
+                    $sx .= ' col-sm-'.$c;
+                    $sx .= ' col-lg-'.$c;
+                    $sx .= ' col-xl-'.$c;
                 break;
             }
         return($sx);
