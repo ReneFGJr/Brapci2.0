@@ -422,7 +422,7 @@ class export extends CI_Model {
         $f = $this -> frbr_core -> find_class($class);
         $sql = "select id_cc, cc_use
                         FROM rdf_concept 
-                        where cc_class = " . $f . " 
+                        where cc_class = " . $f . " and cc_status < 10
                         ORDER BY id_cc
                         LIMIT $sz OFFSET " . ($pg * $sz) . "    ";
         $rlt = $this -> db -> query($sql);

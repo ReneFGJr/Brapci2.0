@@ -226,7 +226,7 @@ class elasticsearch extends CI_model {
 
         if ($status == 'N') {
             $rst = $this -> delete($type, $id);
-            $rst = "<font color=red><b>Deleted " . $id . " " . $type . '</b></font>';
+            $rst = "<font color=red><b>Not indexed " . $id . " " . $type . '</b></font>';
         } else {
             $rst = $this -> call($type . '/' . $id, 'PUT', $dt);
             $rst = "<font color=green><b>Update " . $id . " " . $type . '</b></font>';

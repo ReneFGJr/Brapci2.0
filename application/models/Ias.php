@@ -134,18 +134,28 @@ class Ias extends CI_model
 		$sx .= 'NLP ' . $this->version_nlp;
 		$sx .= '</a>';
 		$sx .= '</div>';
+		if (perfil("#ADM"))
+		{
+		$sx .= '<div class="'.bscol(12).'">';
+		$sx .= '<ul>';
 
-		$sx .= '<div class="col-md-2 btn btn-outline-primary">';
-		$sx .= '<a href="' . base_url(PATH . 'ia/check') . '">';
+
+		$sx .= '<li><a href="' . base_url(PATH . 'ia/check') . '">';
 		$sx .= 'Checar duplicatas';
-		$sx .= '</a>';
-		$sx .= '</div>';		
+		$sx .= '</a></li>';
 
-		$sx .= '<div class="col-md-2 btn btn-outline-secondary">';
-		$sx .= '<a href="' . base_url(PATH . 'ia/thesa') . '">';
+		$sx .= '<li><a href="' . base_url(PATH . 'ia/check_abstract') . '">';
+		$sx .= 'Excluir trabalhos da Seção (Resumos de artigos)';
+		$sx .= '</a></li>';		
+
+		$sx .= '<li><a href="' . base_url(PATH . 'ia/thesa') . '">';
 		$sx .= 'Atualiza vocabulários';
-		$sx .= '</a>';
-		$sx .= '</div>';
+		$sx .= '</a></li>';
+
+		$sx .= '</ul>';
+		$sx .= '</div>';		
+		}
+
 
 		$sx .= '</div>';
 		return ($sx);
@@ -156,6 +166,11 @@ class Ias extends CI_model
 		$sx = '';
 		$this->load->model('frbr_core');
 		switch ($act) {
+			case 'check_abstract':
+				$this->load->model('ias_checks');
+				$sx = $this->ias_checks->article_exclude_section($d1,$d2,$d3);
+				break;
+
 			case 'check':
 				$this->load->model('ias_checks');
 				$sx = $this->ias_checks->article_duplicate($d1,$d2,$d3);

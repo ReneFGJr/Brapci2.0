@@ -1,6 +1,47 @@
 <?php
 class ias_checks extends CI_Model
 {
+    function article_exclude_section()
+        {
+            $sx = '';
+            $sx .= '<h1>Removendo a seção "Resumo de Artigos"</h1>';
+            $at = array('Resumo de Artigo Científico');
+
+            for ($q=0;$q < count($at);$q++)
+            {
+                $t = $at[$q];            
+                $rdf = new rdf;
+                $idn = $rdf->rdf_name($t);
+                $sql = "select * from rdf_concept where cc_pref_term = $idn";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+                $idc = $rlt[0]['id_cc'];
+
+                $sql = "select * from rdf_data 
+                            where d_r2 = $idc
+                            limit 20";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+
+                for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $idd = $line['d_r1'];
+                    $sx .= 'Item: '.$line['d_r1'].' removed<br>';
+                    $rdf->remove_concept($idd);
+                }
+                
+            }
+            if (strlen($sx) > 0)
+            {
+                $sx .= '<meta http-equiv="refresh" content="3">';
+            } else {
+                $sx .= 'FIM da verificação';
+            }
+            
+            return($sx);
+        }
+
     function article_duplicate($d1='', $d2='',$d3='')
         {
 
@@ -110,6 +151,12 @@ class ias_checks extends CI_Model
                     $v2 = $this->recupera_dados($fl[1],'AU');
                     $n[1] = ($v1 == $v2);
 
+                    /********************* Sessão */
+                    $v1 = $this->recupera_dados($fl[0],'M3');
+                    $v2 = $this->recupera_dados($fl[1],'M3');
+                    $n[10] = ($v1);
+                    $n[11] = ($v2);
+
                     /********************* Journal ********/
                     $v1 = $this->recupera_dados($fl[0],'T2');
                     $v2 = $this->recupera_dados($fl[1],'T2');
@@ -159,7 +206,9 @@ class ias_checks extends CI_Model
                         break;                        
 
                         default:
-                        $t = '';
+                        $t = substr($txt,strpos($txt,$tp.' - ')+5,strlen($txt));
+                        $t = substr($t,0,strpos($t,chr(10)));
+                        $t = substr($t,0,strpos($t,chr(13)));
                     }
                 return($t);
             }

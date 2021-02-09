@@ -2522,7 +2522,13 @@ function remove_concept($id) {
 	d_literal  = ((-1) * d_literal),
 	d_update = '$data'
     where d_r1 = $id or d_r2 = $id";
-    $rlt = $CI -> db -> query($sql);
+	$rlt = $CI -> db -> query($sql);
+	
+	$sql = "update ".$this->base."rdf_concept 
+			set 
+			cc_status = 99 
+			where id_cc = $id";
+	$rlt = $CI -> db -> query($sql);			
     return (True);
 }
 
