@@ -4,6 +4,19 @@
 * https://portal.issn.org/resource/ISSN/1982-2014
 */
 
+defined("BASEPATH") or exit("No direct script access allowed");
+
+/**
+ * CodeIgniter Form Helpers
+ *
+ * @package     CodeIgniter
+ * @subpackage  IA
+ * @category    IA-Module
+ * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+ * @link        http://www.sisdoc.com.br/CodIgniter
+ * @version     v0.21.02.16
+ */
+
 class Ias extends CI_model
 {
 	var $version_nlp = '0.25';

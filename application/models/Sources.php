@@ -222,6 +222,7 @@ class sources extends CI_Model {
         array_push($cp, array('$[1950-' . date("Y") . ']', 'jnl_ano_inicio', msg('jnl_ano_inicio'), False, True));
         array_push($cp, array('$[1950-' . date("Y") . ']', 'jnl_ano_final', msg('jnl_ano_final'), False, True));
 
+        array_push($cp, array('$S100', 'jnl_oai_token', msg('jnl_oai_token'), False, True));
         array_push($cp, array('$HV', 'jnl_oai_last_harvesting', date("Y-m-d"), True, True));
         array_push($cp, array('$HV', 'jnl_cidade', '0', False, True));
         $op = 'JA:Revista Brasileira';

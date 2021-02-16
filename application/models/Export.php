@@ -774,6 +774,4 @@ class export extends CI_Model {
         $sx .= '</script>' . cr();
         return ($sx);
     }
-
 }
-?>

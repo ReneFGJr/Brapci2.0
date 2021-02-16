@@ -1,4 +1,16 @@
 <?php
+defined("BASEPATH") or exit("No direct script access allowed");
+
+/**
+ * CodeIgniter Form Helpers
+ *
+ * @package     CodeIgniter
+ * @subpackage  IA
+ * @category    IA-Abstract
+ * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+ * @link        http://www.sisdoc.com.br/CodIgniter
+ * @version     v0.21.02.16
+ */
 
 class ias_abstract extends CI_Model
 {

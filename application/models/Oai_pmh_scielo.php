@@ -1,4 +1,17 @@
 <?php
+defined("BASEPATH") OR exit("No direct script access allowed");
+
+/**
+* CodeIgniter Form Helpers
+*
+* @package     CodeIgniter
+* @subpackage  OAI
+* @category    OAI-PHM-SCIELO
+* @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+* @link        http://www.sisdoc.com.br/CodIgniter
+* @version     v0.21.02.16
+*/
+
 class oai_pmh_scielo extends CI_model {
     
     function getRecordScielo_oai_dc($id = 0, $dt) {
@@ -94,7 +107,7 @@ class oai_pmh_scielo extends CI_model {
                     }
                 }
                 $tit = NBR_autor($tit, 1);
-                array_push($author, array('name' => $tit, 'type' => 'author', 'aff' => $aff[$af], 'email' => ''));
+                array_push($author, array('name' => $tit, 'type' => 'author', 'aff' => '', 'email' => ''));
             }
             $dt['authors'] = $author;
 
@@ -202,6 +215,4 @@ class oai_pmh_scielo extends CI_model {
         }
         return ($dt);
     }
-
 }
-?>

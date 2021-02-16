@@ -1,8 +1,39 @@
 <?php
+defined("BASEPATH") or exit("No direct script access allowed");
+
+/**
+ * CodeIgniter Form Helpers
+ *
+ * @package     CodeIgniter
+ * @subpackage  IA
+ * @category    IA-Cited
+ * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
+ * @link        http://www.sisdoc.com.br/CodIgniter
+ * @version     v0.21.02.16
+ */
 
 class ias_cited extends CI_Model
 {
     var $cities = array();
+
+    function neuro_periodical($txt)
+        {
+            $sql = "select * 
+                        from brapci_cited.cited_article 
+                        where ca_tipo = 1
+                        limi 20
+                        ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rtl->result_array();
+
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $ln = $rlt[$r];
+                    print_r($ln);
+                    echo '<hr>';
+                }
+        }
+
     function neuro_type_source($txt, $id=0)
         {
             $n = array();
