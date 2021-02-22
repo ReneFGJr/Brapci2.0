@@ -165,6 +165,11 @@ class Ias extends CI_model
 		$sx .= 'Atualiza vocabulários';
 		$sx .= '</a></li>';
 
+		$sx .= '<li><a href="' . base_url(PATH . 'ia/cited') . '">';
+		$sx .= 'Checar Citações';
+		$sx .= '</a></li>';
+
+
 		$sx .= '</ul>';
 		$sx .= '</div>';		
 		}
@@ -188,6 +193,10 @@ class Ias extends CI_model
 				$this->load->model('ias_checks');
 				$sx = $this->ias_checks->article_duplicate($d1,$d2,$d3);
 				break;
+			case 'cited':
+				$this->load->model("ias_cited");
+				$sx .= $this->ias_cited->index($d1,$d2,$d3);
+				break;				
 			case 'thesa':
 				$sx = $this->check(1);
 				$sx .= '<a href="' . base_url(PATH . 'ia') . '" class="btn btn-outline-primary">' . msg('return') . '</a>';
@@ -224,7 +233,7 @@ class Ias extends CI_model
 						$vv = $this->frbr_core->le_data($d2);
 						$sx = '<h3>' . msg("Inteligência Artificial - IA Brapci (Robots)") . '</h3>';
 						$sx .= $this->ias->nlp_v($vv,$d2);
-						break;
+						break;				
 
 					default:
 						$sx = '<h1>' . msg("NLP") . ' <sup>v.' . $this->version_nlp . '</sup></h1>';

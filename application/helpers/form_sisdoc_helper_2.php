@@ -133,8 +133,13 @@ function nbr_author($xa, $tp)
         $xa = troca($xa, 'Do ', 'do ');
         $xa = troca($xa, ' O ', ' o ');
         $xa = troca($xa, ' E ', ' e ');
-        $xa = troca($xa, ' Em ', ' e ');
+        $xa = troca($xa, ' Em ', ' em ');
         $xa = troca($xa, ' Para ', ' para ');
+        $xa = troca($xa, ' The ', ' the ');
+        $xa = troca($xa, ' And ', ' and ');
+        $xa = troca($xa, ' Of ', ' of ');
+        $xa = troca($xa, ' To ', ' to ');
+        $xa = troca($xa, ' For ', ' for ');
     }
     
     ////////////////////////////////////////////////////////////////////////////////////
