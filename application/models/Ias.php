@@ -84,6 +84,11 @@ class Ias extends CI_model
 			$this->import_thesa($url, $file);
 			$sx .= '<li>Places <span style="color: green"><b>Update</b></span></li>';
 
+			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/309/txtb';
+			$file = '_ia/domain_abrev.txt';
+			$this->import_thesa($url, $file);
+			$sx .= '<li>Abbreviations <span style="color: green"><b>Update</b></span></li>';			
+
 			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';
 			$file = '_ia/domain_datas_g.txt';
 			$this->gerate_dates($file);
@@ -564,6 +569,7 @@ class Ias extends CI_model
 		if (isset($vv[0]))
 			{
 				$file = troca($vv[0], '.pdf', '.txt');
+				$fileo = $vv[0];
 			} else {
 				$file = 'file_not_found.pdf';
 			}
@@ -583,7 +589,12 @@ class Ias extends CI_model
 
 			//$txt .= $this->nlp_words($txtf, $data) . cr();
 		} else {
+			$this->load->model("pdfs");
 			$txt = message(msg('File not found') . ' ' . $file, 3);
+			$cmd = 'pdftotext '.$fileo.' '.$file;
+			$txt .= $cmd;
+			shell_exec($cmd);			
+			$this->pdfs->pdftotext_index_file($file,$id);
 		}
 		return ($txt);
 	}

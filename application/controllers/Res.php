@@ -47,20 +47,23 @@ class res extends CI_Controller
     {
         $data['title'] = '';
         $this->load->view('header/header.php', $data);
-        if (!isset($data['nocab'])) {
+        if ((!isset($data['nocab'])) and (strlen(get("nocab")) == 0)) {
             $this->load->view('header/menu_top.php', $data);
         }
     }
 
     private function footer($data = array())
     {
-        $this->load->model('GoogleDialogFlow');
-        if ($data == 0) {
-            $data = array('simple' => true);
+        if ((!isset($data['nocab'])) and (strlen(get("nocab")) == 0)) {
+            $this->load->model('GoogleDialogFlow');
+            if ($data == 0) {
+                $data = array('simple' => true);
+            }
+            /* Google DialogFlow - IA - ChatBot*/
+            
+            $data['complement'] = $this->GoogleDialogFlow->bot();
+            $this->load->view('header/footer.php', $data);
         }
-        /* Google DialogFlow - IA - ChatBot*/
-        $data['complement'] = $this->GoogleDialogFlow->bot();
-        $this->load->view('header/footer.php', $data);
     }
 
     function evaluation($d1 = '', $d2 = '', $d3 = '', $d4 = '')

@@ -20,6 +20,15 @@ class ias_cited extends CI_Model
     function index($d1, $d2, $d3)
     {
         switch ($d1) {
+            case 'jnl_join':
+                $sx = $this->journal_cited_join($d2);
+                break;
+            case 'jnl_ed':
+                $sx = $this->journal_cited_ed($d2);
+                break;
+            case 'jnl':
+                $sx = $this->journal_cited($d2);
+                break;
             case 'stem':
                 $sx = $this->nlp2();
                 break;
@@ -54,6 +63,146 @@ class ias_cited extends CI_Model
         }
         return ($sx);
     }
+    /******************************************************************/
+    function journal_cited($id)
+        {
+            $sx = '';
+            $line = $this->le_journal_cited($id);
+            $sx .= $this->journal_cited_view($line);
+            $link = '<a href="#" onclick="newxy(\''.base_url(PATH.'ia/cited/jnl_join/'.$line['id_cj'].'?nocab=true').'\',800,600);" class="btn btn-outline-primary">';
+            $link .= msg('JOIN ALIAS').'</a>';            
+            $sx .= $link;
+
+            $sx .= $this->journal_cited_list($id);
+            return($sx);
+        }
+    function journal_cited_join($d1)
+        {
+            $dd1 = get("dd1");
+            $dd2 = get("dd2");
+            if (strlen($dd2) > 0)
+                {
+                    $sql= "update ".$this->base."cited_article 
+                                set ca_journal = $d1
+                                where ca_journal = $dd2
+                                ";
+                    $this->db->query($sql);
+
+                    $sql = "update ".$this->base."cited_journal 
+                            set cj_use = ".$d1." where
+                            id_cj = ".round($dd2)." or cj_use = ".round($dd2);
+                    $this->db->query($sql);
+                    
+                }
+            $dt = $this->le_journal_cited($d1);
+            $sx = $this->journal_cited_view($dt);
+            $sx .= '<form method="post">';
+            $sx .= '<div class="small">'.msg('filter').'</div>';
+            $sx .= '<input type="text" class="form-control" name="dd1" value="'.$dd1.'">';
+            $sx .= '<input type="hidden"  name="nocab" value="true">';            
+
+            $name = get("dd1");
+            if (strlen($name) > 0)
+            {
+                $name = UpperCaseSQL(ASCII($name));
+                $sql = "select * from ".$this->base."cited_journal 
+                        where cj_name_asc like '%".$name."%'
+                        and cj_use = 0 and id_cj <> ".$d1."
+                        order by cj_name";
+                $rlt = $this->db->query($sql);
+                $rlt = $rlt->result_array();
+
+                for ($r=0;$r < count($rlt);$r++)
+                    {
+                        $line = $rlt[$r];
+                        $link = '<input type="radio" name="dd2" value="'.$line['id_cj'].'"> ';
+                        $linka = '';
+                        $sx .= $link.$line['cj_name'].$linka.'<br/>';
+                    }
+                $sx .= '<input type="submit" value="'.msg('register').'">';
+                $sx .= '</form>';
+                $sx .= '<br/><br/>';
+            }
+            return($sx);
+        }        
+    function journal_cited_list($d1)
+        {
+            $sx = '<ul>';
+            $sql = "select * from ".$this->base."cited_article where ca_journal = $d1 order by ca_text";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $sx .= '<li>';
+                    $sx .= $line['ca_text'];
+                    $sx .= '</li>';
+                }
+            $sx .= '</ul>';
+            return($sx);
+        }        
+    function journal_cited_ed($d1)
+        {
+            $cp = array();
+            array_push($cp, array('$H', 'id_cj', '', false, false));
+            array_push($cp, array('$S80', 'cj_name', msg('cj_name'), True, True));
+            //array_push($cp, array('$O ' . $op, 'cj_use', msg('cj_use'), True, True));
+            array_push($cp, array('$HV', 'cj_name_asc', '', False, True));
+
+            $form = new form;
+            $form->id = $d1;
+            $sx = $form->editar($cp, $this->base . 'cited_journal');
+            if ($form->saved > 0) {
+                $this->journal_update();
+                $sx .= '<script>wclose();</script>';
+            }
+            return ($sx);            
+        }
+    function le_journal_cited($id)
+        {
+            $sql = "select * from ".$this->base."cited_journal
+                        where id_cj = $id";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '';
+            $line = $rlt[0];
+
+            $line['alias'] = array();
+
+            $sql = "select * from ".$this->base."cited_journal
+                        where cj_use = $id";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) > 0)
+                {
+                    $line['alias'] = $rlt;
+                }
+            return($line);
+        }
+    function journal_cited_view($dt)
+        {
+            $sx = '';
+            $sx .= '<div class="row">';
+            $sx .= '<div class="'.bscol(8).'"><h3>'.$dt['cj_name'].'</h3></div>';
+            $sx .= '<div class="'.bscol(4).' text-right">'.$dt['cj_issn'].'</div>';
+            $sx .= '</div>';
+
+            $sx .= '<div class="row">';
+            $sx .= '<div class="'.bscol(12).'">';
+            $sx .= '<ul>';
+
+            for ($r=0;$r < count($dt['alias']);$r++)
+                {
+                    $line = $dt['alias'][$r];
+                    $link = '<a href="#" onclick="newxy(\''.base_url(PATH.'ia/cited/jnl_ed/'.$line['id_cj']).'\',800,600);">';
+                    $linka = '</a>';
+                    $sx .= '<li>'.$link.$line['cj_name'].$linka.'</li>';
+                }
+            $sx .= '</ul>';
+            $sx .= '</div>';                
+            $sx .= '</div>';
+            return($sx);
+        }
 
     /******************************************************************/
     function nlp2()
@@ -154,11 +303,11 @@ class ias_cited extends CI_Model
                 
         /******************************************************** Periódicos */
         $sql = "select * from (
-                    select ca_journal, cj_name, count(*) as total 
+                    select ca_journal, cj_name, id_cj, count(*) as total 
                     from " . $this->base . "cited_article
                     inner join " . $this->base . "cited_journal ON ca_journal = id_cj
                     where ca_tipo = 1
-                    group by ca_journal, cj_name
+                    group by ca_journal, cj_name, id_cj
                     ) as tabela
                     order by total desc, cj_name";
         $rlt = $this->db->query($sql);
@@ -167,6 +316,8 @@ class ias_cited extends CI_Model
         $sx .= '<tr class="text-center"><th width="10%">Citações</th><th>Revista</th></tr>';
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
+            $linka = '</a>';
+            $link = '<a href="'.base_url(PATH.'ia/cited/jnl/'.$line['id_cj']).'" target="_new'.$line['id_cj'].'">';
             $sx .= '<tr style="border-bottom: 1px #808080 solid;">';
 
             $sx .= '<td align="center">';
@@ -174,7 +325,8 @@ class ias_cited extends CI_Model
             $sx .= '</td>';
 
             $sx .= '<td>';
-            $sx .= nbr_author($line['cj_name'], 7);
+            $name = LowerCase($line['cj_name']);
+            $sx .= $link.nbr_author($name, 7).$linka;
             $sx .= '</td>';
             $sx .= '</tr>';
         }
@@ -301,6 +453,8 @@ class ias_cited extends CI_Model
         asort($dt);
         $sx = '';
         foreach ($dt as $id => $t) {
+            $t = troca($t,'(','');
+            $t = troca($t,')','');
             $ln = splitx(';', $t);
             $t = ascii($ln[2]);
             $t = lowercase($t);
@@ -380,7 +534,49 @@ class ias_cited extends CI_Model
     {
         $sx = '';
         $jnl = $this->journals();
-        $t = str_replace(array(',', '.', '!', '?','(',')'), ';', $t);
+        $tt['Rev.'] = 'Revista';
+        $tt['rev.'] = 'Revista';
+        $tt['J.'] = 'Journal';
+        $tt['Ci.'] = 'Ciência';
+        $tt['Ciênc.'] = 'Ciência';
+        $tt['Cienc.'] = 'Ciência';
+        $tt['Cont.'] = 'Contabilidade';
+        
+        $tt['Cult.'] = 'Cultura';
+        $tt['Bi.'] = 'Biblioteconomia';
+        $tt['Inf.'] = 'Informação';
+        $tt['Soc.'] = 'Sociedade';
+        $tt['Per.'] = 'Perspectivas';
+        $tt['Perspec.'] = 'Perspectiva';
+        $tt['Esc.'] = 'Escola';
+        $tt['Est.'] = 'Estudos';
+        $tt['Enferm.'] = 'Enfermagem';
+        $tt['educ.'] = 'Educação';
+        $tt['Educ.'] = 'Educação';
+        $tt['Int.'] = 'Internacional';
+        $tt['Eletr.'] = 'Eletrônica';
+        $tt['Enc.'] = 'Encontros';
+        $tt['Fin.'] = 'Finanças';
+        $tt['R.'] = 'Revista';
+        $tt['Cad.'] = 'Cadernos';
+        $tt['Stat.'] = 'Statistical';
+        $tt['Pesq.'] = 'Pesquisa';
+        $tt['Bras.'] = 'Brasileira';
+        $tt['Comun.'] = 'Comunicação';
+        $tt['Desenv.'] = 'Desenvolvimento';
+        $tt['Paran.'] = 'Paranaense';
+        $tt['Tend.'] = 'Tendencia';
+        $tt['Pesqui.'] = 'Pesquisa';
+        $tt['Bibliotecon.'] = 'Biblioteconomia';        
+        foreach($tt as $t1=>$t2)
+            {
+                $t = troca($t,$t1,$t2);
+            }
+        $t = troca($t,'?','.');
+        $t = troca($t,"’",'´');
+        $t = troca($t,'–','-');
+        $t = troca($t,'&','e');
+        $t = str_replace(array(', ', '. ', '!', '?','(',')'), ';', $t);
         $t = splitx(";", $t);
 
         for ($r = (count($t) - 1); $r >= 0; $r--) {
@@ -551,12 +747,12 @@ class ias_cited extends CI_Model
     }
     function tem_nr_vl($txt)
     {
-        $a = array(', v.', ', V.', ', n.');
+        $a = array(', v.', ', V.', ', n.', ', Vol.',', vol.');
         return ($this->locate($txt, $a));
     }
     function e_um_evento($txt)
     {
-        $a = array('Anais...', 'Anais…', 'Proceedings…', 'Proceedings...', 'Anais eletrônicos...', 'Anais [...]', 'Actas...', 'Actas…');
+        $a = array('Anais […]','Anais...', 'Anais…', 'Proceedings…', 'Proceedings...', 'Anais eletrônicos...', 'Anais [...]', 'Actas...', 'Actas…');
         return ($this->locate($txt, $a));
     }
     function tem_cidade($txt)

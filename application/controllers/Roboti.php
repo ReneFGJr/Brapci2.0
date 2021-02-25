@@ -58,6 +58,11 @@ class Roboti extends CI_Controller {
         $this->load->model('frbr_core');
         $this->pdfs->pdf_to_text($jid);
     }
+
+    function v($id)
+        {
+            redirect(base_url('index.php/res/v/'.$id));
+        }
     
     function cron($path='',$id='')
     {
