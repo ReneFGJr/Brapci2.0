@@ -132,16 +132,52 @@ function is_email($email) {
 }
 
 function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
-    global $sem_copia;
-    $CI = &get_instance();
+    global $sem_copia,$sender;
 
+    $CI = &get_instance();
     if (!isset($sem_copia)) { $sem_copia = 0; }
     if (!is_array($para)) { $para = array($para);}    
     
-    /* de */
-    $line = email_le($de);  
+    if (isset($sender)) 
+        {
+            $config = $sender;
+            $email_footer = '';
+            $email_header = '';
+            $e_mail = $sender['smtp_user'];
+            $e_nome = $sender['smtp_user'];
+            $line['smtp_protocol'] = $sender['smtp_protocol'];
+            $line['m_email'] = $sender['smtp_user'];
+            $line['m_descricao'] = $sender['smtp_user'];
+        } else {
+            /* de */
+            $line = email_le($de);
 
-    $config = Array('protocol' => $line['smtp_protocol'], 'smtp_host' => $line['smtp_host'], 'smtp_port' => $line['smtp_port'], 'smtp_user' => $line['smtp_user'], 'smtp_pass' => $line['smtp_pass'], 'mailtype' => 'html', 'charset' => 'iso-8859-1', 'wordwrap' => TRUE);
+            $config = Array('protocol' => $line['smtp_protocol'], 
+                        'smtp_host' => $line['smtp_host'], 
+                        'smtp_port' => $line['smtp_port'], 
+                        'smtp_user' => $line['smtp_user'], 
+                        'smtp_pass' => $line['smtp_pass'], 
+                        'mailtype' => 'html', 
+                        'charset' => 'iso-8859-1', 
+                        'wordwrap' => TRUE);
+
+                /* Header & footer */
+                /***************************************************/
+                $e_mail = trim($line['m_email']);
+                $e_nome = trim($line['m_descricao']);
+
+                /***************** HEADER AND FOOTER */
+                $email_header = $line['m_header'];
+                $email_footer = $line['m_foot'];
+
+                if (strlen($email_header) > 0) {
+                    $email_header = '<table width="550"><tr><td><img src="' . base_url($email_header) . '"></td><tr><tr><td><br><br>';
+                }
+                if (strlen($email_footer) > 0) {
+                    $email_footer = '</td></tr><tr><td><img src="' . base_url($email_footer) . '"></td></tr></table>';
+                }                        
+        }
+    
 
     $CI -> load -> library('email', $config);
     $CI -> email -> subject($assunto);
@@ -151,21 +187,7 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
         $CI -> email -> attach($anexos[$r]);
     }
 
-    /* Header & footer */
-    /***************************************************/
-    $e_mail = trim($line['m_email']);
-    $e_nome = trim($line['m_descricao']);
 
-    /***************** HEADER AND FOOTER */
-    $email_header = $line['m_header'];
-    $email_footer = $line['m_foot'];
-
-    if (strlen($email_header) > 0) {
-        $email_header = '<table width="550"><tr><td><img src="' . base_url($email_header) . '"></td><tr><tr><td><br><br>';
-    }
-    if (strlen($email_footer) > 0) {
-        $email_footer = '</td></tr><tr><td><img src="' . base_url($email_footer) . '"></td></tr></table>';
-    }
 
     $CI -> email -> from($e_mail, $e_nome);
     $CI -> email -> to($para[0]);
@@ -173,7 +195,7 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
     $CI -> email -> message($email_header . $texto . $email_footer);
     $CI -> email -> mailtype = 'html';
     if ($sem_copia != 1) {
-        array_push($para, trim($line['m_email']));
+        array_push($para, trim($e_mail));
         //array_push($para, 'renefgj@gmail.com');
     }
 
@@ -204,36 +226,80 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
     $headers = 'From: '.$line['m_descricao'].' <'.$line['m_email'].'> ' . "\r\n" .
     'Reply-To: '.$line['m_email']. "\r\n" .
     'X-Mailer: PHP/' . phpversion();
-
-
     switch($proto)
         {
             case 'mail':
-            $to      = $para[0];
-            $subject = $assunto;
-            $message = $email_header . $texto . $email_footer;
+                $to      = $para[0];
+                $subject = $assunto;
+                $message = $email_header . $texto . $email_footer;
 
-            $headers = array();
-            $headers[] = 'MIME-Version: 1.0';
-            $headers[] = 'Content-type: text/html; charset=iso-8859-1';   
-            $headers[] = 'To: '.$para[0];
-            $headers[] = 'From: '.$line['m_descricao'].' <'.$line['m_email'].'>'; 
-            $headers = implode("\r\n", $headers);
+                $headers = array();
+                $headers[] = 'MIME-Version: 1.0';
+                $headers[] = 'Content-type: text/html; charset=iso-8859-1';   
+                $headers[] = 'To: '.$para[0];
+                $headers[] = 'From: '.$line['m_descricao'].' <'.$line['m_email'].'>'; 
+                $headers = implode("\r\n", $headers);
 
-            //$real_sender = '-f brapcici@gmail.com';
-            $real_sender = '';
-            $rst = mail($to, $subject, $message, $headers, $real_sender);
-            if ($rst == 1)
-            {
-                $sx .= 'Send to '.$to;
-            } else {
-                $sx = 'Erro ao enviar para '.$to;
-            }            
-            return($sx);
-            break;           
+                //$real_sender = '-f brapcici@gmail.com';
+                $real_sender = '';
+                $rst = mail($to, $subject, $message, $headers, $real_sender);
+                if ($rst == 1)
+                {
+                    $sx .= 'Send to '.$to;
+                } else {
+                    $sx = 'Erro ao enviar para '.$to;
+                }            
+                return($sx);
+            break; 
 
+            case 'PHPMailer':
+                echo 'PHPmailer';
+                //Instantiation and passing `true` enables exceptions
+                require("mail/PHPMailer.php");
+                require("mail/SMTP.php");
+                $mail = new PHPMailer(true);
+                try {
+                    //Server settings
+                    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+                    $mail->isSMTP();                                            //Send using SMTP
+                    $mail->Host       = $sender['smtp_host'];                     //Set the SMTP server to send through
+                    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+                    $mail->Username   = $sender['smtp_user'];                     //SMTP username
+                    $mail->Password   = $sender['smtp_pass'];                               //SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         //Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+                    $mail->Port       = 587;                                    //TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+
+                    //Recipients
+                    $mail->setFrom($sender['smtp_user'], 'Mailer');
+                    $mail->addAddress('renefgj@gmail.com', 'Rene');     //Add a recipient
+                    //$mail->addAddress('ellen@example.com');               //Name is optional
+                    $mail->addReplyTo($line['m_email'], $line['m_descricao']);
+                    //$mail->addCC('cc@example.com');
+                    //$mail->addBCC('bcc@example.com');
+
+                    //Attachments
+                    //$mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+                    //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+                    //Content
+                    $mail->isHTML(true);  
+                    $to      = $para[0];
+                    $subject = $assunto;
+                    $message = $email_header . $texto . $email_footer;                     
+                    $mail->Subject = $subject;
+                    $mail->Body    = $message;
+                    $mail->AltBody = $headers;
+
+                    $sx = $mail->send();
+                    echo 'Message has been sent';
+                } catch (Exception $e) {
+                    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }          
+
+            /************ OUtros protocolos */
             default:
-            return($CI -> email -> send());
+                $CI -> email -> send();
+                return(1);
         }
 
     if (count($line) == 0)

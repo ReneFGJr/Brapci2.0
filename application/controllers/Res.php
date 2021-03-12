@@ -240,6 +240,17 @@ class res extends CI_Controller
                         */
     }
 
+    public function ipccr($d1='',$d2='',$d3='')
+        {
+            $this->load->model("ipccr");
+            $this->cab();
+            $data['content'] = $this->ipccr->index($d1,$d2,$d3);
+            $data['title'] = '';
+            $this->load->view('show', $data);            
+
+            $this->footer();
+        }
+
     public function v($id = '', $fmt = '')
     {
         if (round('0' . $id) == 0) {

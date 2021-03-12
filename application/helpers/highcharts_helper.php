@@ -1,6 +1,7 @@
 <?php
 class highcharts
     {
+    var $load = 0;
     function head()
             {
             $sx = '
@@ -9,18 +10,36 @@ class highcharts
                 <script src="https://code.highcharts.com/modules/exporting.js"></script>
                 <script src="https://code.highcharts.com/modules/export-data.js"></script>
                 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
-                <figure class="highcharts-figure">
-                <div id="container" style="height: 600px;"></div>
-                </figure>            
             ';
+            $this->load = 1;
             return($sx);
             }
 
       function grapho($data=array())
         {
+            global $idg;
+            if (isset($idg)) { $idg = 0; } else { $idg++; }
             $sx = '';
-            $type_bar = 'column'; /* bar */
+            $tps = array('column','bar');
+
+            if ($this->load == 0)
+                {
+                    $sx .= $this->head();
+                } else {
+                    $this->load = $this->load + 1;
+                }
+            $sx .= '
+                <figure class="highcharts-figure">
+                <div id="container'.$idg.'" style="height: 600px;"></div>
+                </figure>';
+
+            if (!isset($data['type']))
+                {
+                    $type_bar = 'bar';
+                } else {
+                    $type_bar = $data['type']; 
+                }
+            
             $subtitle = '';
             $title = 'Title';
             $LABEL_ROTATION = 0;
@@ -49,14 +68,12 @@ class highcharts
                         }
                 }                
 
-            $sx .= $this->head();
-
             $sx .= '
             <script>
             // Set up the chart
-            const chart = new Highcharts.Chart({
+            const chart'.$idg.' = new Highcharts.Chart({
             chart: {
-                renderTo: \'container\',
+                renderTo: \'container'.$idg.'\',
                 type: \''.$type_bar.'\',
                 options3d: {
                 enabled: true,

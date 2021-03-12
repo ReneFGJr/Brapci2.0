@@ -303,6 +303,28 @@ class sources extends CI_Model {
         return ($sx);
     }
 
+    function list_sources_link($url='') 
+    {
+        $sql = "select * from " . $this -> table . " 
+                            where jnl_active = 1
+                            order by jnl_name
+                        ";
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+        $sx = '<ul>';
+        for ($r=0;$r < count($rlt);$r++)
+        {
+            $line = $rlt[$r];
+            $link = '<a href="'.$url.$line['id_jnl'].'">';
+            $linka = '</a>';
+            $sx .= '<li>'.$link.$line['jnl_name'].$linka.'</li>';
+        }
+        
+        $sx .= '</ul>';
+        return($sx);
+    }        
+
+
     function list_sources() {
         $limit_dias = 10;
         $this->load->model("oai_pmh");

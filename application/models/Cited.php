@@ -27,11 +27,21 @@ class Cited extends CI_Model
             $sx .= '<ul>';
             for ($r=0;$r < count($rlt);$r++)
                 {
-                    $l = $rlt[$r];
-                    $sx .= '<li>'.$l['ca_text'];
+                    $l = $rlt[$r];                    
                     if (perfil("#ADM"))
                     {
-                        $sx .= $this->cited_type($l);                    
+                        $st = '';
+                        if ($l['ca_tipo'] == 99) { $st = ' style="color: red;"'; }
+                        $link = '<span onclick="newxy(\''.base_url(PATH.'ia/cited/ed/'.$l['id_ca']).'?nocab=true\',800,600);" style="cursor: pointer;">';
+                        $linka = '</span>';
+                        $txt = trim($l['ca_text']);
+                        if (strlen($txt) == 0)
+                            { $txt = msg('erro'); }
+                        $sx .= '<li '.$st.'>'.$link.$txt.$linka;
+                        $sx .= ' '.$this->cited_type($l);
+                        $sx .= '</li>';        
+                    } else {
+                        $sx .= '<li>'.$l['ca_text'];
                     }
                     $sx .= '</li>';
                 }
@@ -119,7 +129,27 @@ class Cited extends CI_Model
 
                     case '20':
                     $sx = '<span class="btn-warning radius5">&nbsp;'.msg('LAW').'&nbsp;</span>';
-                    break;                                          
+                    break;  
+
+                    case '21':
+                    $sx = '<span class="btn-warning radius5">&nbsp;'.msg('REPORT').'&nbsp;</span>';
+                    break;  
+
+                    case '22':
+                    $sx = '<span class="btn-warning radius5">&nbsp;'.msg('STANDARD').'&nbsp;</span>';
+                    break;                                                                              
+
+                    case '29':
+                    $sx = '<span class="btn-warning radius5">&nbsp;'.msg('INTERVIEW').'&nbsp;</span>';
+                    break;                                                            
+
+                    case '30':
+                    $sx = '<span class="btn-primary radius5">&nbsp;'.msg('SOFTWARE').'&nbsp;</span>';
+                    break;                                                            
+
+                    case '31':
+                    $sx = '<span class="btn-primary radius5">&nbsp;'.msg('PATENT').'&nbsp;</span>';
+                    break;                                                            
 
                     default:
                     $sx = '<span class="btn-secondary radius5">&nbsp;'.msg('none').$type.'&nbsp;</span>';

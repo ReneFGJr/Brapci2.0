@@ -138,6 +138,10 @@ class socials
             case 'login_local':
                 $this->login_local();
             break;
+
+            case 'email':
+                $sx = $this->email($id,$chk);
+            break;
             
             case 'attrib':
                 $this->attributes($id, $chk);
@@ -160,7 +164,7 @@ class socials
             if (perfil("#ADMIN")) {
                 $sx = '<h1>Socials Menu</h1>';
                 $sx .= '<ul>';
-                $sx .= '<li><a href="' . base_url(PATH . 'social/email/test') . '">' . msg('email_test') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'social/email/') . '">' . msg('email_test') . '</a></li>';
                 $sx .= '</ul>';
             } else {
                 $sx = message("Function not found - " . $act, 3);
@@ -168,6 +172,64 @@ class socials
         }
         return ($sx);
     }
+
+    function email($act)
+        {
+            $sx = '';
+            switch($act)
+                {
+                    case 'test_gmail':
+                        $sx .= $this->email_gmail();
+                    break;
+
+                    default:
+                        $sx = '<h1>Socials Menu - email</h1>';
+                        $sx .= '<ul>';
+                        $sx .= '<li><a href="' . base_url(PATH . 'social/email/test') . '">' . msg('email_test') . '</a></li>';
+                        $sx .= '<li><a href="' . base_url(PATH . 'social/email/test_gmail') . '">' . msg('email_test_gmail') . '</a></li>';
+                        $sx .= '</ul>';
+                    break;
+                }
+            return($sx);
+        }
+
+    function email_gmail()
+        {
+            global $sender;
+            $CI = &get_instance();
+            $CI->load->library("email");
+            $form = new form;
+            $cp = array();
+            $_POST['dd3'] = 'smtp.gmail.com';
+            $_POST['dd4'] = '587';
+            array_push($cp, array('$H8','','',false,false));
+            array_push($cp, array('$S100','','e-mail',True,True));
+            array_push($cp, array('$S100','','senha',True,True));
+            array_push($cp, array('$S100','','smtp',True,True));
+            array_push($cp, array('$S20','','post',True,True));
+            array_push($cp, array('$HV','','smtp',True,True));
+            array_push($cp, array('$M','','&nbsp;',False,True));
+            array_push($cp, array('$S100','','enviar para e-mail',True,True));
+
+            $sx = $form->editar($cp,'');
+
+            if ($form->saved > 0)
+                {
+                $CI = &get_instance();
+                $CI->load->helper("email");
+                $sender = Array('smtp_protocol' => 'PHPMailer',
+                        'smtp_host' => get("dd3"), 
+                        'smtp_port' => get("dd4"), 
+                        'smtp_user' => get("dd1"), 
+                        'smtp_pass' => get("dd2"), 
+                        'mailtype' => 'html', 
+                        'charset' => 'iso-8859-1', 
+                        'wordwrap' => TRUE); 
+                $r = enviaremail(get("dd7"),'Teste - '.date("Y-m-d H:i:s"),'<b>HTML</b>teste');
+                print_r($r);
+                }
+            return($sx);
+        }
     
     function npass()
     {
