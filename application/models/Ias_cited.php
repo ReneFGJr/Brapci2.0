@@ -20,6 +20,10 @@ class ias_cited extends CI_Model
     function index($d1, $d2, $d3)
     {
         switch ($d1) {
+            case 'process_year':
+                $sx = $this->process_year($d2,$d3);
+                $sx = $this->process_journal_origem($d2,$d3);
+                break;
             case 'jnl_join':
                 $sx = $this->journal_cited_join($d2);
                 break;
@@ -54,7 +58,10 @@ class ias_cited extends CI_Model
                 $sx = $this->nlp_cited($d1, $d2);
                 break;
             default:
-                $action = array('status_all','status_journal','process','import_journals','stem');
+                $action = array(
+                        'status_all','status_journal',
+                        'process','process_year',
+                        'import_journals','stem');
                 $sx = '';
                 $sx .= '<h2>'.msg("Cited").'</h2>';
                 $sx .= '<ul>';
@@ -107,6 +114,7 @@ class ias_cited extends CI_Model
                     $sx .= '</li>';
                 }
             $sx .= '</ol>';
+            $this->cited_update();
             return($sx);
         }
     function journal_cited($id)
@@ -180,7 +188,8 @@ class ias_cited extends CI_Model
                 {
                     $line = $rlt[$r];
                     $sx .= '<li>';
-                    $sx .= $line['ca_text'];
+                    $sx .= $this->link($line).$line['ca_text'].'</span>';
+                    $sx.= '<a href="'.base_url(PATH.'v/'.$line['ca_rdf']).'">[A]</a>';
                     $sx .= '</li>';
                 }
             $sx .= '</ul>';
@@ -419,10 +428,49 @@ class ias_cited extends CI_Model
         return ($sx);
     }
 
+    function cited_update()
+    {
+        $sql = "select * from " . $this->base . "cited_article 
+                    where 
+                    (ca_text like '%".chr(10)."%') 
+                    or
+                    (ca_text like '%".chr(13)."%') 
+                    limit 100
+                    ";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $up = 0;
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $n = $line['ca_text'];
+            $n = troca($n,chr(13),' ');
+            $n = troca($n,chr(10),' ');
+            $n = troca($n,'  ',' ');
+            $n = troca($n,'  ',' ');
+            $n = troca($n,'  ',' ');
+
+            $idca = $line['id_ca'];
+            $sql = "update " . $this->base . "cited_article ";
+            $sql .= " set ";
+            $sql .= " ca_text = '$n' ";
+            $sql .= " where id_ca = $idca";
+            $this->db->query($sql);
+            $up++;
+        }   
+        if ($up > 0)
+            {
+                echo 'UPdate Cited: '.$up;
+            }
+    }
+
     function journal_update()
     {
         $sql = "select * from " . $this->base . "cited_journal 
-                    where cj_name like '%".chr(10)."%'";
+                    where 
+                    (cj_name like '%".chr(10)."%') 
+                    or
+                    (cj_name like '%".chr(13)."%') 
+                    ";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
         if (count($rlt) > 0)
@@ -643,9 +691,10 @@ class ias_cited extends CI_Model
             $line = $rlt[$r];
             $link = $this->link($line);
             $linka = '</span>';
-
+            $txt = trim($line['ca_text']);
+            //$txt = utf8_decode($txt);
             $t = $link . $line['ca_text'] . $linka . ' - ' . $line['id_ca'];
-            $idj = $this->nlp_jounal($line['ca_text']);
+            $idj = $this->nlp_jounal($txt);
             if ($idj[0] > 0) {
                 $sql = "update " . $this->base . "cited_article set
                                     ca_journal = $idj[0]
@@ -657,6 +706,7 @@ class ias_cited extends CI_Model
                 $cor = '<span style="color: red">';
             }
             $sx .= $t . $cor . $idj[1] . '</span><hr>';
+            $sx .= '<pre>'.hex_dump($txt).'</pre>';
         }
         /* Pula somente se atualizou algum registro */
         if ($lock >= 0) {
@@ -773,6 +823,7 @@ class ias_cited extends CI_Model
         $n[8] =  $this->e_um_tcc($txt);
         $n[9] = $this->tem_cidade($txt);
         $n[10] =  $this->e_uma_lei($txt);
+        $n[11] =  $this->e_uma_norma_tecnica($txt);
 
         $sx = 0;
 
@@ -868,10 +919,18 @@ class ias_cited extends CI_Model
         ' Ley N° ');
         return ($this->locate($txt, $a));
     }
+
+    function e_uma_norma_tecnica($txt)
+    {
+        $a = array('ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS');
+        return ($this->locate($txt, $a));
+    }
+
     function e_um_tcc($txt)
     {
         $a = array(' Trabalho de conclusão de curso ','Monografia (',
-        'Trabalho de Conclusão de Curso (');
+        'Trabalho de Conclusão de Curso (',
+        '. Trabalho de conclusão de curso');
         return ($this->locate($txt, $a));
     }
     function e_uma_entrevista($txt)
@@ -884,10 +943,12 @@ class ias_cited extends CI_Model
         $a = array('PhD Thesis',' Tese ', '(Doutorado', ' Thesis ', 
         'Tese (Doutorado', '(Tese de doutoramento', '(Tese de Doutoramento',
         'Master thesis','Tesis doctoral', 'Tesis (Maestría)',
-        'Tesis (Doctorado', ' Dissertation (Doctor', 'PHD dissertation.'
+        'Tesis (Doctorado', ' Dissertation (Doctor', 'PHD dissertation.',
+        'Thèse (','Tese (Doutorado'
         );
         return ($this->locate($txt, $a));
     }
+    
     function e_uma_dissertacao($txt)
     {
         $a = array(' Dissertação ', 
@@ -922,7 +983,7 @@ class ias_cited extends CI_Model
     }
     function tem_nr_vl($txt)
     {
-        $a = array(', v.', ', V.', ', n.', ', Vol.',', vol.',' n ',' v ');
+        $a = array(', v.', ', V.', ', n.', ', Vol.',', vol.',' n ',' v ',' nº ');
         return ($this->locate($txt, $a));
     }
     function e_um_evento($txt)
@@ -1000,6 +1061,8 @@ class ias_cited extends CI_Model
             'Referëncias',
             'Références',
             'Bibliografía',
+            'BIBLIOGRAFÍA',
+            'REFERENCIAS BIBLIOGRÁFICAS'
         );
         $ref = '';
 
@@ -1187,4 +1250,120 @@ class ias_cited extends CI_Model
         }
         return ($rs);
     }
+
+    function process_year($offset=0)
+        {
+            if (strlen($offset) == 0) { $offset = '0'; }
+            $sql = "select * 
+                        from ".$this->base."cited_article 
+                        where ca_year = 0
+                        limit 100
+                        offset $offset
+                        ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $tot = 0;
+            $sx = '<ul>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $idca = $line['id_ca'];
+                    $ano = $this->ias->year_find($line['ca_text']);
+                    if ($ano != 0)
+                        {
+                            $sx .= '<li><tt>';
+                            if ($ano < 0)
+                                {
+                                    $sx .= '<span style="color: red">';
+                                } else {
+                                    $sx .= '<span>';
+                                }
+                            $sx .= $line['ca_text'].'</tt>';
+                            $sx .= '</span>';
+
+                            $sx .= ' ('.$ano.')';
+                            
+                            
+                            $sql = "update ".$this->base."cited_article
+                                    set ca_year = $ano
+                                    where id_ca = $idca";
+
+                            $sx .= '</li>';
+                            $this->db->query($sql);
+                            $tot++;
+                        }
+                }
+            $sx .= '</ul>';
+            if ($tot > 0)
+                {
+                    $sx .= '<META http-equiv="refresh" content="1;">';
+                }
+            return($sx);
+        }
+    function process_journal_origem($offset=0)
+        {
+            $this->load->model('sources');
+            if (strlen($offset) == 0) { $offset = '0'; }
+            $sql = "select * 
+                        from ".$this->base."cited_article 
+                        where ca_journal_origem = 0
+                        limit 100
+                        offset $offset
+                        ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $tot = 0;
+            $sx = '<ul>';
+            $rdf = new rdf;
+            $jnls = array();         
+
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $idca = $line['id_ca'];
+                    $idr = $line['ca_rdf'];
+                    $dt = $rdf->le_data($idr);
+                    $jnl = $rdf->recupera_id($dt,'isPubishIn');
+                    $iss = $rdf->recupera_id($dt,'hasIssueOf ');
+                    $id_jnl = $jnl['d_r2'];
+                    $issue = $iss['d_r1'];
+                    /***************** Issue */   
+                    $dti = $rdf->le_data($issue);
+                    $ano = $rdf->recupera_id($dti,'dateOfPublication');
+                    if (!is_array($ano))
+                        {
+                                $ano = array();
+                                $ano['n_name'] = 9999;
+                        }
+                    $ano = round($ano['n_name']);
+                    if ($ano < 1950)
+                        {
+                            $ano = 9998;
+                        }
+                    /***************** Journal */
+                    if (!isset($jnls[$id_jnl]))
+                        {
+                            $a = $this->sources->le_frbr($id_jnl);
+                            $idj = $a['id_jnl'];
+                            $jnls[$id_jnl] = $idj;
+                        }
+                    $idj = $jnls[$id_jnl];
+
+                    $sql = "update ".$this->base."cited_article 
+                                set 
+                                ca_journal_origem = $idj,
+                                ca_year_origem = $ano
+                                where id_ca = ".$idca;
+                    $this->db->query($sql);
+                    $sx .= '<li>'.'Update #'.$idca.' => '.$ano.'-'.$idj.'</li>';
+                    $tot++;
+                }
+            $sx .= '</ul>';
+            if ($tot > 0)
+                {
+                    $sx .= '<META http-equiv="refresh" content="1;">';
+                }
+            return($sx);
+        }
+
 }

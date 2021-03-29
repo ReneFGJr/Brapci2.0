@@ -2218,6 +2218,20 @@ function recupera($dt,$prop)
 	return($vlr);
 }
 
+function recupera_id($dt,$prop)
+{
+	$vlr = '';
+	for ($r=0;$r < count($dt);$r++)
+	{
+		$line = $dt[$r];
+		if ($line['c_class'] == $prop)
+		{
+			$vlr = $line;
+		}
+	}
+	return($vlr);
+}
+
 function class_view_form($id='')
 {
 	$CI = &get_instance();

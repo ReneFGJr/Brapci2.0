@@ -961,6 +961,35 @@ class Ias extends CI_model
 				}
 			return(0);
 		}
+	
+	function year_find($c)
+		{
+			$ano = -1;
+			$ini = 1940;
+			$fim = date("Y")+1;
+			$c = ascii($c);
+			$lk = array('Disponível em','http','HTTP','Acesso em');
+			for ($r=0;$r < count($lk);$r++)
+				{
+					if (strpos(' '.$c,$lk[$r]) > 0)
+						{
+							$c = substr($c,0,strpos($c,$lk[$r]));
+						}
+				}
+		
+			$tm = array('.',',','-','!','?');
+			$c = str_replace($tm,' ',$c);
+			$l = explode(' ',$c);
+			for ($r=0;$r < count($l);$r++)
+				{
+					$v = round($l[$r]);
+					if (($v > $ini) and ($v < $fim))
+						{
+							$ano = $v;
+						}
+				}
+			return($ano);
+		}
 
 	function neuro_email($t)
 	{

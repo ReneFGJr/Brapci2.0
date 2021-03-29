@@ -2,11 +2,12 @@
 class ipccr extends CI_Model
 {
     var $base = 'brapci_icr.';
+    var $baseCited = 'brapci_cited.';
     var $jnl = 0;
     var $jnlrdf = 0;
     var $j = array();
 
-    function index($d1, $d2, $d3)
+    function index($d1, $d2, $d3, $d4)
     {
         $sx = '';
         switch ($d1) {
@@ -43,6 +44,20 @@ class ipccr extends CI_Model
                 $data['type'] = 'column';
                 $data['LEG_HOR'] = 'Número de trabalhos publicados por ano';
                 $sx .= $this->show_indicador('year',$d2,$data);
+
+                $data['type'] = 'column';
+                $data['LEG_HOR'] = 'Identidade de Citações';
+                $sx .= $this->show_citation_idententify($d2,$d3,$d4);                    
+
+                $data['type'] = 'column';
+                $data['LEG_HOR'] = 'Identidade de Citações';
+                $sx .= '<textarea class="form-control" style="height: 500px;">';
+                $sx .= $this->acoplamento_citacoes($d2,$d3,$d4);
+                $sx .= '</textarea>';
+
+                $data['type'] = 'column';
+                $data['LEG_HOR'] = 'Citações';
+                $sx .= $this->show_citation($d2);                
                 $sx .= '</div>';
             break;
 
@@ -61,6 +76,165 @@ class ipccr extends CI_Model
         }
         return ($sx);
     }
+
+    function show_citation_types($jnl,$ini,$fim)
+        {
+            $sql = "
+            SELECT count(*) as total, ca_year_origem, ca_tipo, ct_name
+                FROM `cited_article`
+                INNER JOIN cited_type ON ca_tipo = id_ct 
+                where ca_journal_origem = 2 and ca_year_origem > 1900
+                group by ca_year_origem, ca_tipo, ct_name
+                order by ca_year_origem, ca_tipo, ct_name
+                ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+
+        }
+
+    function acoplamento_citacoes($jnl,$ini,$fim)
+        {
+            if (strlen($ini) == 0) { $ini = 2003; }
+            if (strlen($fim) == 0) { $fim = 2020; }
+            $limit = 50;
+            $wh = '';
+            $wh = " AND ((ca_year_origem >= $ini) AND (ca_year_origem <= $fim))";
+            $sql = "select cj_name, ca_rdf
+                        FROM ".$this->baseCited."cited_article
+                        INNER JOIN ".$this->baseCited."cited_journal ON ca_journal = id_cj
+                        where (ca_journal_origem = $jnl)
+                        $wh
+                        group by cj_name, ca_rdf
+                        ";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '';
+            $idx = 0;
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $cj = UpperCaseSql($line['cj_name']);
+                    $id = $line['ca_rdf'];
+                    if ($id != $idx)
+                        {
+                            $sx .= chr(10);
+                            $idx = $id;
+                        }
+                    $sx .= $cj.';';
+                }
+            return($sx);
+        }
+
+    function show_citation_idententify($jnl,$ini,$fim)
+        {
+            if (strlen($ini) == 0) { $ini = 2005; }
+            if (strlen($fim) == 0) { $fim = 2008; }
+            $limit = 50;
+            $wh = '';
+            $wh = " AND ((ca_year_origem >= $ini) AND (ca_year_origem <= $fim))";
+            $sx = '<h1>'.msg('Identidade de Citação').' '.$ini.'-'.$fim.'</h1>';
+            $sql = "select count(*) as total 
+                        FROM ".$this->baseCited."cited_article
+                        INNER JOIN ".$this->baseCited."cited_journal ON ca_journal = id_cj
+                        where (ca_journal_origem = $jnl)
+                        $wh
+                        order by total desc";
+                        echo $sql;
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $gtotal = $rlt[0]['total'];
+            if ($gtotal == 0)
+                {
+                    $sx .= message('Sem dados de citação',3);
+                    return($sx);
+                }
+
+            $sql = "select cj_name, count(*) as total 
+                        FROM ".$this->baseCited."cited_article
+                        INNER JOIN ".$this->baseCited."cited_journal ON ca_journal = id_cj
+                        where ca_journal_origem = $jnl
+                        $wh
+                        GROUP BY cj_name
+                        order by total desc";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx .= '<table width="100%">';
+            $other = 0;
+            $tot = 0;
+            $tot_other = 0;
+            $pos = 0;
+            $xtotal = 0;
+            $show = 1;
+            $perc_acum = 0;            
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $total = $line['total'];
+                    if ($xtotal != $total)
+                        {
+                            $pos++;
+                            $xtotal = $total;
+                            $mpos = $pos;
+                        } else {
+                            $mpos = '';
+                        }
+                    /* Regras */
+                    if ($r >= $limit)
+                        {
+                            if ($mpos != '')
+                                {
+                                    $show = 0;
+                                }
+                        }
+                    if ($show == 1) 
+                    {
+                        $per = $line['total'] / $gtotal;
+                        $perc_acum = $perc_acum + $per;
+                        $sx .= '<tr>';
+                        $sx .= '<td align="center">'.($mpos).'</td>';
+                        $sx .= '<td>'.nbr_author($line['cj_name'],7).'</td>';
+                        $sx .= '<td align="center">'.$line['total'].'</td>';
+                        $sx .= '<td>'.number_format($per * 100,1).'%</td>';
+                        $sx .= '<td>'.number_format($perc_acum * 100,1).'%</td>';
+                        $sx .= '</tr>';
+                    } else {
+                        $other++;
+                        $tot_other = $tot_other + $line['total'];
+                        $per = $line['total'] / $gtotal;
+                        $perc_acum = $perc_acum + $per;
+                    }
+                    $tot = $tot + $line['total'];
+                }
+            $sx .= '<tr><td colspan=2>'.msg('Other_journals').' - '.$other.' '.msg('journals').'</td><td align="center">'.$tot_other.'</td>';
+            $per = $tot_other / $gtotal;
+            $sx .= '<td>'.number_format($per * 100,1).'%</td>';
+            $sx .= '<td>'.number_format($perc_acum * 100,1).'%</td>';
+            $sx .= '</tr>';
+
+            $sx .= '<tr><td colspan=2><b>'.msg('Total').'</b></td><td align="center"><b>'.$tot.'</b></td></tr>';
+            $sx .= '</table>';
+            return($sx);
+        }
+
+    function show_citation($jnl)
+        {
+            $sql = "select * from ".$this->baseCited."cited_article
+                        inner join ".$this->baseCited."cited_journal ON ca_journal = id_cj 
+                        where cj_journal = $jnl
+                        order by ca_year desc, ca_text";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $sx = '';
+            $sx .= '<h3>Total de citações - '.count($rlt).'</h3>';
+            $sx .= '<ul>';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $sx .= '<li>'.$line['ca_text'].'</li>';
+                }
+            $sx .= '</ul>';
+            return($sx);
+        }
 
     function show_indicador($ind,$jnl,$data = array())
         {

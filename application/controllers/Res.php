@@ -240,11 +240,11 @@ class res extends CI_Controller
                         */
     }
 
-    public function ipccr($d1='',$d2='',$d3='')
+    public function ipccr($d1='',$d2='',$d3='',$d4='',$d5='')
         {
             $this->load->model("ipccr");
             $this->cab();
-            $data['content'] = $this->ipccr->index($d1,$d2,$d3);
+            $data['content'] = $this->ipccr->index($d1,$d2,$d3,$d4,$d5);
             $data['title'] = '';
             $this->load->view('show', $data);            
 

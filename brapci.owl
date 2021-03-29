@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https:/brapci.inf.br/ontology/"
+     xml:base="https:/brapci.inf.br/ontology/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:brapci="https:/brapci.inf.br/ontology/owl/">
+    <owl:Ontology rdf:about="https:/brapci.inf.br/ontology/">
+        <owl:versionIRI rdf:resource="https:/brapci.inf.br/ontology/1.0.0/"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/affiliatedWith -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/affiliatedWith"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/altLabel -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/altLabel"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/dateOfPublication -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/dateOfPublication"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasAbstract -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasAbstract"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasAffiliation -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasAffiliation">
+        <rdfs:domain rdf:resource="https:/brapci.inf.br/ontology/Person"/>
+        <rdfs:range rdf:resource="https:/brapci.inf.br/ontology/CorporateBody"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasAuthor -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasAuthor"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasBorn -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasBorn"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasFileStorage -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasFileStorage"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasGender -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasGender">
+        <rdfs:domain rdf:resource="https:/brapci.inf.br/ontology/Gender"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasIssue -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasIssue">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasIssueOf -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasIssueOf"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasPage -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasPage"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasPageEnd -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasPageEnd">
+        <rdfs:subPropertyOf rdf:resource="https:/brapci.inf.br/ontology/hasPage"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasPageStart -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasPageStart">
+        <rdfs:subPropertyOf rdf:resource="https:/brapci.inf.br/ontology/hasPage"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasPublicationNumber -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasPublicationNumber"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasPublicationVolume -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasPublicationVolume"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasTitle -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasTitle"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/hasTitleAlternative -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/hasTitleAlternative">
+        <rdfs:subPropertyOf rdf:resource="https:/brapci.inf.br/ontology/hasTitle"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/prefLabel -->
+
+    <owl:ObjectProperty rdf:about="https:/brapci.inf.br/ontology/prefLabel"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Agent -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Agent"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Article -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Article"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/ArticleSection -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/ArticleSection">
+        <rdfs:subClassOf rdf:resource="https:/brapci.inf.br/ontology/Article"/>
+    </owl:Class>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Concept -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Concept"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/CorporateBody -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/CorporateBody">
+        <rdfs:subClassOf rdf:resource="https:/brapci.inf.br/ontology/Agent"/>
+    </owl:Class>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Country -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Country"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Gender -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Gender"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Journal -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Journal">
+        <rdfs:subClassOf rdf:resource="https:/brapci.inf.br/ontology/Article"/>
+    </owl:Class>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Linguage -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Linguage"/>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Person -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Person">
+        <rdfs:subClassOf rdf:resource="https:/brapci.inf.br/ontology/Agent"/>
+    </owl:Class>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Subject -->
+
+    <owl:Class rdf:about="https:/brapci.inf.br/ontology/Subject">
+        <rdfs:subClassOf rdf:resource="https:/brapci.inf.br/ontology/Article"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Feminino -->
+
+    <owl:NamedIndividual rdf:about="https:/brapci.inf.br/ontology/Feminino">
+        <rdf:type rdf:resource="https:/brapci.inf.br/ontology/Gender"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https:/brapci.inf.br/ontology/Masculino -->
+
+    <owl:NamedIndividual rdf:about="https:/brapci.inf.br/ontology/Masculino">
+        <rdf:type rdf:resource="https:/brapci.inf.br/ontology/Gender"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

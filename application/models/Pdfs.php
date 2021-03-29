@@ -367,7 +367,7 @@ class pdfs extends CI_model {
 	
 	function download($d1) {
 		$data = $this -> frbr_core -> le_data($d1);
-
+		
 		$size = 0;
 		$name = 'File';
 		$type = '';
