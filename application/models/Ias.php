@@ -19,7 +19,7 @@ defined("BASEPATH") or exit("No direct script access allowed");
 
 class Ias extends CI_model
 {
-	var $version_nlp = '0.25';
+	var $version_nlp = '0.26';
 
 	function check($f = 0)
 	{
@@ -174,6 +174,10 @@ class Ias extends CI_model
 		$sx .= 'Checar Citações';
 		$sx .= '</a></li>';
 
+		$sx .= '<li><a href="' . base_url(PATH . 'ia/R') . '">';
+		$sx .= 'Ferramentas R';
+		$sx .= '</a></li>';		
+
 
 		$sx .= '</ul>';
 		$sx .= '</div>';		
@@ -186,6 +190,10 @@ class Ias extends CI_model
 
 	function index($act = '', $d1 = '', $d2 = '', $d3 = '')
 	{
+		if (perfil("#ADM") == 0)
+			{
+				redirect(base_url(PATH));
+			}
 		$sx = '';
 		$this->load->model('frbr_core');
 		switch ($act) {
@@ -201,6 +209,10 @@ class Ias extends CI_model
 			case 'cited':
 				$this->load->model("ias_cited");
 				$sx .= $this->ias_cited->index($d1,$d2,$d3);
+				break;
+			case 'R':
+				$this->load->model("ias_r");
+				$sx .= $this->ias_r->index($d1,$d2,$d3);
 				break;				
 			case 'thesa':
 				$sx = $this->check(1);
@@ -342,6 +354,19 @@ class Ias extends CI_model
 				$sx .= $this->ias_cited->process(get("dd1"));
 				break;
 
+			case 'cited_analyse':
+				$this->load->model('ias_cited');
+				$sx .= 'Process Cited Analyse <sup><i>alfa</i></sup>';
+				$sx .= $this->nlp_form();
+				$au = $this->ias_cited->cited_analyse(get("dd1"));
+				$sx .= '<ul>';
+				for ($r=0;$r < count($au);$r++)
+					{
+						$sx .= '<li>'.$au[$r].'</li>';
+					}
+				$sx .= '</ul>';
+				break;				
+
 			case 'singular':
 				$sx .= $this->nlp_form();
 				//$txt = $this->nlp_process(get("dd1"));
@@ -357,6 +382,7 @@ class Ias extends CI_model
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/run') . '">' . msg("Processing Teste") . '</a>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/singular') . '">' . msg("Processing plural/singular") . '</a>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/cited') . '">' . msg("Processing cited/refs") . '</a>';
+				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/cited_analyse') . '">' . msg("Processing cited_analyse") . '</a>';
 				$sx .= '</ul>';
 		}
 		return ($sx);

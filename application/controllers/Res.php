@@ -242,9 +242,9 @@ class res extends CI_Controller
 
     public function ipccr($d1='',$d2='',$d3='',$d4='',$d5='')
         {
-            $this->load->model("ipccr");
+            $this->load->model("ipccrs");
             $this->cab();
-            $data['content'] = $this->ipccr->index($d1,$d2,$d3,$d4,$d5);
+            $data['content'] = $this->ipccrs->index($d1,$d2,$d3,$d4,$d5);
             $data['title'] = '';
             $this->load->view('show', $data);            
 
@@ -824,6 +824,9 @@ class res extends CI_Controller
                     case 'ris':
                         $this->bs->mark_export_ris();
                         break;
+                    case 'bib':
+                        $this->bs->mark_export_bib();
+                        break;                        
                     default:
                         redirect(base_url(PATH . 'basket'));
                         break;

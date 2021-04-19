@@ -2,12 +2,110 @@
 class Cited extends CI_Model 
 {
     var $base = 'brapci_cited.';
+    var $baseCited = 'brapci_cited.';
 
     function zera()
         {
             $sql = "update ".$this->base."cited_article set ca_status = 0, ca_tipo = 0 WHERE ca_status <> 0";
             $this->db->query($sql);
         }
+
+    function citation_by_author($ida,$type='')
+        {
+                $rdf = new rdf;
+                $dt = $rdf->le_data($ida);
+                $ob = $rdf->extract_id($dt,'hasAuthor',$ida);
+                return($ob);
+        }
+    
+    function api_citation($suba)
+        {
+            $id = get("id");
+            if ($id <= 0)
+                {
+                    return($this->api_brapci->error('id not informed'));
+                }
+            switch($suba)
+                {
+                    case 'author':
+                        $this->load->model('ias');
+                        $this->load->model('ias_cited');
+                        $dt = $this->citation($id,'author');
+                    break;
+
+                    default:
+                        $dt = $this->citation($id,'author');
+                    break;
+                }            
+            return($dt);
+        }        
+
+    function citation($id=0,$type='jnl')
+        {
+            $cp = 'ca_rdf, ca_year, ca_journal, cj_name_asc as cj_name, ';
+            $cp .= 'ca_year_origem, ca_vol, ct_type, ca_tipo, ca_status, id_ca, ';
+            $cp .= 'ca_nr, ca_pag, ';
+            $cp .= ' "" as 1st, "" as 2nd, "" as 3th, ';
+            $cp .= 'ca_text, jnl_name, jnl_name_abrev, ';
+            $cp .= 'concat(\''.base_url(PATH.'v/').'\',jnl_frbr) as jnl_url';
+            //$cp = '*';
+            switch($type)
+                {
+                    case 'author':
+                    $pb = $this->citation_by_author($id);
+                    $wh = '';
+                    for ($r=0;$r < count($pb);$r++)
+                        {
+                            if (strlen($wh) > 0)
+                                {
+                                    $wh .= ' OR ';
+                                }
+                            $wh .= '(ca_rdf = '.$pb[$r].') ';
+                        }
+                        $sql = "select $cp from ".$this->baseCited."cited_article
+                            left join ".$this->baseCited."cited_journal ON ca_journal = id_cj 
+                            left join source_source ON ca_journal_origem = id_jnl 
+                            left join ".$this->baseCited."cited_type ON id_ct = ca_tipo
+                            where ($wh) or (1=2)
+                            order by ca_text, ca_year desc";
+                    break;
+
+                    default:
+                    $sql = "select $cp from ".$this->baseCited."cited_article
+                        inner join ".$this->baseCited."cited_journal ON ca_journal = id_cj 
+                        left join source_source ON ca_journal_origem = id_jnl 
+                        left join ".$this->baseCited."cited_type ON id_ct = ca_tipo
+                        where cj_journal = $jnl
+                        order by ca_year desc, ca_text";
+                    break;
+                }
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $apos = array('1st','2nd','3th');
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $a = array();
+                    $auth = $this->add_authors($line['ca_text'],$a);
+                    $id = 0;
+                    foreach($auth as $name=>$total)
+                        {
+                            if (($id <= 2) and (strlen($name) > 0))
+                                {
+                                    $fld = $apos[$id];
+                                    $line[$fld] = $name;
+                                    $id++;
+                                }
+                        }
+                    $rlt[$r] = $line;
+                    /*
+                    echo '<pre>';
+                    print_r($line);
+                    echo '<br>';
+                    */
+                }
+            return($rlt);
+        }        
 
     function show_ref($id)
         {
@@ -225,5 +323,20 @@ class Cited extends CI_Model
                         0,'$l',0,
                         $item)";
             $rlt = $this->db->query($sql);
+        }        
+    function add_authors($txt,$auth)
+        {
+            $a = $this->ias_cited->cited_analyse($txt);
+            for ($r=0;$r < count($a);$r++)
+                {
+                    $w = $a[$r];
+                    if (isset($auth[$w]))
+                        {
+                            $auth[$w] = $auth[$w] + 1;
+                        } else {
+                            $auth[$w] = 1;
+                        }
+                }
+            return($auth);
         }        
 }

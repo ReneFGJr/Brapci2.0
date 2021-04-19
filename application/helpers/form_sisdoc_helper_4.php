@@ -7,7 +7,7 @@
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/CodIgniter
-* @version     v0.20.10.31
+* @version     v0.21.04.12
 */
 
 function cep($cep)
@@ -672,4 +672,31 @@ function row2($par=array())
         $sx .= '</div>';
         return($sx);
     }
+}
+
+
+function array2csv($rlt,$sep=',',$uft8=true) {
+    $header = '';
+    $csv = '';
+    for ($r=0;$r < count($rlt);$r++)
+    {
+        $line = $rlt[$r];
+        $ln = '';
+        foreach($line as $key => $value) {
+            $sepa = '';
+            if (strlen($ln) > 0)
+                {
+                    $sepa .= $sep;
+                }
+            if ($r==0) { $header .= $sepa.$key; }
+            $ln .= $sepa.'"'.$value.'"';
+        }        
+        $csv .= $ln.cr();
+    }
+    $csv =  $header.cr().$csv;
+    if ($uft8==false)
+        {
+            $csv = utf8_decode($csv);
+        }
+    return($csv);
 }

@@ -11,7 +11,8 @@ class export extends CI_Model {
         $file_xls = 'c/' . $idx . '/name.xls';
         $file_csv = 'c/' . $idx . '/name.csv';
         $file_rdf = 'c/' . $idx . '/name.rdf';
-        $file_full = 'c/' . $idx . 'full.txt';
+        $file_full = 'c/' . $idx . '/full.txt';
+        $file_bib = 'c/' . $idx . '/name.bib';
 
         /************** zera dados ****/
         $sx = '';
@@ -43,6 +44,9 @@ class export extends CI_Model {
         $urlf = '';
         /* Doblin Core */
         $dc = '';
+        $bib = '@ARTICLE{A'.$idx.','.cr();
+        $biba = '';
+        $bibau = '';
 
         /************* recurepa dados ****/
         for ($q = 0; $q < count($dt); $q++) {
@@ -77,6 +81,7 @@ class export extends CI_Model {
                     $rwork .= 'AB - ' . troca($l['n_name'], chr(13), '') . cr();
                     $dc .= '<meta name="DC.Description"  xml:lang="' . troca($l['n_lang'], chr(13), '') . '" content="' . troca($l['n_name'], chr(13), '') . '"/>' . cr();
                     $abstract .= troca($l['n_name'], chr(13), '') . '@' . troca($l['n_lang'], chr(13), '') . cr();
+                    $bib .= 'abstract={'.$l['n_name'].'},'.cr();
                     break;
                 case 'hasSubject' :
                     $rwork .= 'KW - ' . $l['n_name'] . cr();
@@ -85,11 +90,21 @@ class export extends CI_Model {
                     if (strlen($subj) > 0) { $subj .= '; ';
                     }
                     $subj .= trim($l['n_name']);
+
+                    /* BIB */
+                    if (strlen($biba) == 0)
+                        {
+                            $biba .= 'author_keywords={'.$l['n_name'].'},'.cr();
+                        } else {
+                            $biba = troca($biba,'}',';'.$l['n_name'].'}');
+                        }
+                    
                     break;
                 case 'hasSectionOf' :
                     $link_sc = $this -> frbr_core -> link($dt[$q]);
                     $sc = $dt[$q]['n_name'] . '</a>';
                     $rwork .= 'M3 - ' . $dt[$q]['n_name'] . cr();
+                    $bib .= 'document_type={'.$dt[$q]['n_name'].'},'.cr();
                     break;
                 case 'hasIssueOf' :
                     $issue = $l['d_r1'];
@@ -108,9 +123,11 @@ class export extends CI_Model {
                                 $vr .= ', ';
                             }
                             $vr .= trim($di[$y]['n_name']);
+                            $bib .= 'volume={'.troca($vr,', v. ','').'},'.cr();
                         }
                         if ($tq == 'dateOfPublication') {
                             $ano = $di[$y]['n_name'];
+                            $bib .= 'year={'.$ano.'},'.cr();
                         }
                     }
                     $filex = 'c/' . $issue . '/name.rfe';
@@ -124,6 +141,7 @@ class export extends CI_Model {
                         $sor = $link . trim($l['n_name']) . '</a>';
                         $source = trim($l['n_name']);
                         $rwork .= 'T2 - ' . $l['n_name'] . cr();
+                        $bib .= 'journal={'.$l['n_name'].'},'.cr();
                     }
                     break;
                 case 'hasAuthor' :
@@ -136,13 +154,23 @@ class export extends CI_Model {
                     $aut2 .= $link . $l['n_name'] . '</a>';
                     $rwork .= 'AU - ' . $l['n_name'] . cr();
                     $dc .= '<meta name="DC.Creator.PersonalName" content="' . $l['n_name'] . '"/>' . cr();
+                    $na = nbr_author($l['n_name'],5);
+                    if (strlen($bibau) == 0)
+                        {                            
+                            $bibau = 'author={'.$na.'},'.cr();
+                        } else {
+                            $bibau = troca($bibau,'}',';'.$na.'}');
+                        }
                     break;
                 case 'hasTitle' :
-                    if (strlen($tit) == 0) {
+                    if (strlen($tit) == 0) {                        
                         $link = $this -> frbr_core -> link($l);
                         $tit = $link . $l['n_name'] . '</a>';
                         if (strlen($title) > 0) { $title .= cr();
                         }
+                        $bib .= 'title={'.$l['n_name'].'},'.cr();
+                        $bib .= 'language={'.$l['n_lang'].'},'.cr();
+                        $bib .= 'url={'.troca(troca($link,'<a href="',''),'" class="hasTitle">','').'},'.cr();
                         $title .= $l['n_name'] . '@' . $l['n_lang'];
                         $rwork .= 'TI - ' . $l['n_name'] . cr();
                     }
@@ -158,6 +186,12 @@ class export extends CI_Model {
                 $pages = ', p. ' . $pagi;
             }
         }
+
+        $bib .= $bibau;
+        $bib .= $biba;
+        $bib .= 'page_count={'.(round($pagf)-round($pagi)).'},'.cr();
+        $bib .= 'source={Brapci},'.cr();
+        $bib .= '}'.cr().cr();
         $txt = trim(trim($aut) . '. ' . $tit . '. <b>' . $sor . '</b>, ' . $nr . $vr . $pages . ', ' . $ano . '.');
         $sx .= $txt;
         dircheck('c/' . $idx);
@@ -248,6 +282,15 @@ class export extends CI_Model {
             /******************************/
             $f = fopen($file_full, 'w+');
             fwrite($f, $urlf);
+            fclose($f);  
+        }
+
+        if (strlen($bib))
+        {
+            /******************************/
+            $bib = utf8_decode($bib);
+            $f = fopen($file_bib, 'w+');
+            fwrite($f, $bib);
             fclose($f);  
         }
         return ($sx);

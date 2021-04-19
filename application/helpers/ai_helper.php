@@ -11,7 +11,7 @@
 * @link    https://github.com/klawdyo/Inflector-BR/blob/master/src/Inflector.php
 */
 
-class ia
+class ai
 {
     /* execessões */
     var $exceptions = array(
@@ -174,4 +174,115 @@ class ia
             return $word;
         }
     }
+}
+
+/******************************************************************** BUSCADOR */
+Class ia_index
+{
+function export_index($class='',$id='')
+    {
+        $sx = 'Exporta lista de autores';
+        $sx .= $this->index_author($id);
+        return($sx);
+    }
+
+function index_author($id='')
+    {
+        if (strlen($id)==0) { $id = 65; }
+        $rdf = new rdf;
+        $sx = $this->export_author_index_list($id);
+        return($sx);
+    }
+
+    function export_author_index_list($lt = 0, $class = 'Person') {
+        $sx = 'Exporting';
+        $nouse = 0;
+        $dir = 'application/views';
+        dircheck($dir);
+        $dir = 'application/views/index/';
+        dircheck($dir);
+        $dir = 'application/views/index/'.LIBRARY;
+        dircheck($dir);
+        $sx = '';
+        if (($lt >= 65) and ($lt <= 90)) {
+            $ltx = chr(round($lt));
+            $txt = $this -> index_list_style_2($ltx, 'Person', 0);
+            $file = $dir . '/authors_' . $ltx . '.php';
+            $hdl = fopen($file, 'w+');
+            fwrite($hdl, $txt);
+            fclose($hdl);
+            $sx .= bs_alert('success', msg('Export_author') . ' #' . $ltx . '<br>');
+            $sx .= '<meta http-equiv="refresh" content="3;' . base_url(PATH . 'admin/index/author_index/' . ($lt + 1)) . '">';
+            $sx .= $lt;
+        }
+        return ($sx);
+    } 
+
+    function index_list_style_2($lt = 'G', $class = 'Person', $nouse = 0) {
+        $rdf = new rdf;
+        $CI = &get_instance();
+        $f = $rdf -> find_class($class);
+        //$this -> check_language();
+        $wh = '';
+        if ($nouse == 1) {
+            $wh .= " and C1.cc_use = 0 ";
+        }
+        if (strlen($lt) > 0) {
+            $wh .= " and (N1.n_name like '$lt%') ";
+        }
+
+        $sql = "select 
+                    N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                    N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
+                        FROM rdf_concept as C1
+                        INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n 
+                        INNER JOIN rdf_data as RD1 ON RD1.d_r2 = C1.id_cc
+                        INNER JOIN rdf_data as RD2 ON (RD1.d_r1 = RD2.d_r1) and (RD2.d_r2 > 0) and (RD2.d_p = 54) /* Expressao */
+                        INNER JOIN rdf_data as RD3 ON (RD2.d_r2 = RD3.d_r1) and (RD3.d_p = 55) /* Manifestacao */
+                        INNER JOIN find_item ON RD3.d_r2 = i_manitestation
+                        LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                        LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                        WHERE i_library = '".LIBRARY."' AND C1.cc_class = " . $f . " ".$wh."
+                        group by n_name, n_lang, id_cc,n_name_use, n_lang_use, id_cc_use 
+                        order by n_name";
+        $rlt = $CI -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        $l = '';
+        $sx = '';
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $idx = $line['id_cc'];
+            $name_use = trim($line['n_name']);
+
+            $link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '" style="font-size: 85%; color: #505050;">';
+            $linka = '</a>';
+
+            $xl = substr(UpperCaseSql(strip_tags($name_use)), 0, 1);
+            if ($xl != $l) {
+                if ($l != '') {
+                    $sx .= '</ul>';
+                    $sx .= '</div>';
+                    $sx .= '</div>';
+                }
+                $linkx = '<a name="' . $xl . '" tag="' . $xl . '"></a>';
+                $sx .= '<div class="row"><div class="col-md-1 text-right">';
+                $sx .= '<h1 style="font-size: 500%;">' . $xl . '</h1></div>';
+                $sx .= '<div class="col-md-11">';
+                $sx .= '<ul style="list-style: none; columns: 300px 4; column-gap: 0;">';
+                $l = $xl;
+            }
+
+            $name = $link . $name_use . $linka . ' <sup style="font-size: 70%;"></sup>';
+            $sx .= '<li>' . $name . '</li>' . cr();
+        }
+        $sx .= '</ul>';
+        $sx .= '</div></div>';
+
+        if (count($rlt) == 0)
+        {
+            $sx = '';
+        }
+        return ($sx);
+    }       
 }

@@ -15,6 +15,7 @@ class Bs extends CI_model {
         $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
         //$sx .= '<a href="' . base_url(PATH . 'basket/export/rdf') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('rdf_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/bib') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_selected') . '</a>';
         
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
@@ -399,6 +400,32 @@ class Bs extends CI_model {
         }
         echo utf8_decode($sx);
     }
+
+    function mark_export_bib() {
+        $file = 'brapci_bib_' . date("YmdHi") . '.bib';
+        header('Content-Encoding: UTF-8');
+        header('Content-type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename=' . $file);
+        $sx = '';
+        $s = $_SESSION;
+        $tot = 0;
+        
+        foreach ($s as $key => $value) 
+        {
+            if (substr($key, 0, 1) == 'm') 
+            {
+                $tot++;
+                $key = substr($key, 1, strlen($key));
+                $file = 'c/' . $key . '/name.bib';
+                if (file_exists($file)) {
+                    $fr = file_get_contents($file);
+                    $sx .= $fr . cr();
+                }
+            }
+        }
+        echo (utf8_encode($sx));
+    }
+
     function mark_export_xls() {
         $file = 'brapci_' . date("YmdHi") . '.xls';
         header('Content-Encoding: UTF-8');

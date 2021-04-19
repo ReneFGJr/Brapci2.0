@@ -1,6 +1,7 @@
 <?php
-class ipccr extends CI_Model
-{
+
+class ipccrs extends CI_model {
+
     var $base = 'brapci_icr.';
     var $baseCited = 'brapci_cited.';
     var $jnl = 0;
@@ -11,6 +12,10 @@ class ipccr extends CI_Model
     {
         $sx = '';
         switch ($d1) {
+            case 'dataset':
+
+            break;
+
             case 'ipccr_jnl_list':
                 $sx .= '<div class="' . bscol(4) . '">';
                 $sx .= $this->icr_logo();
@@ -19,6 +24,17 @@ class ipccr extends CI_Model
                 $sx .= $this->jnl_list($d2, $d3);
                 $sx .= '</div>';
             break;
+
+            case 'author':
+                $this->load->model('cited');
+                $this->load->model('ias');
+                $this->load->model('ias_cited');
+                $this->load->model('frad');
+                $this->load->model('frbr_core');
+                $this->load->model('api_brapci');
+                $sx .= $this -> frbr_core-> person_show($d2);
+                $sx .= $this->show_citation_by_author($d2,$d3);
+                break;
 
             case 'jnl':
                 $this->load->helper("highcharts");
@@ -77,6 +93,17 @@ class ipccr extends CI_Model
         return ($sx);
     }
 
+    function ipccr($v=0)
+        {
+            $sx = '<div class="">';
+            $sx .= '<a href="'.base_url(PATH.'ipccr/author/'.$v).'">';
+            $sx .= '<img src="'.base_url('img/icon/icone_cited.png').'">';
+            $sx .= msg('Quote');
+            $sx .= '</a>';
+            $sx .= '</div>';
+            return($sx);
+        }
+
     function show_citation_types($jnl,$ini,$fim)
         {
             $sql = "
@@ -125,6 +152,12 @@ class ipccr extends CI_Model
             return($sx);
         }
 
+    function show_citation_by_author($ida)
+        {
+                $sx = $this->show_citation($ida,'author');
+                return($sx);    
+        }
+
     function show_citation_idententify($jnl,$ini,$fim)
         {
             if (strlen($ini) == 0) { $ini = 2005; }
@@ -132,6 +165,7 @@ class ipccr extends CI_Model
             $limit = 50;
             $wh = '';
             $wh = " AND ((ca_year_origem >= $ini) AND (ca_year_origem <= $fim))";
+            
             $sx = '<h1>'.msg('Identidade de Citação').' '.$ini.'-'.$fim.'</h1>';
             $sql = "select count(*) as total 
                         FROM ".$this->baseCited."cited_article
@@ -215,24 +249,93 @@ class ipccr extends CI_Model
             $sx .= '</table>';
             return($sx);
         }
-
-    function show_citation($jnl)
+    
+    function citation_by_author($ida)
         {
-            $sql = "select * from ".$this->baseCited."cited_article
-                        inner join ".$this->baseCited."cited_journal ON ca_journal = id_cj 
-                        where cj_journal = $jnl
-                        order by ca_year desc, ca_text";
-            $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();
+                $rdf = new rdf;
+                $dt = $rdf->le_data($ida);
+                $ob = $rdf->extract_id($dt,'hasAuthor',$ida);
+                return($ob);
+        }
+
+    function show_citation($id=0,$type='jnl')
+        {
+            $ida = $id;
+            $auth = array();
+            $rlt = $this->cited->citation($id,$type);
             $sx = '';
+            $sx .= '<div class="'.bscol(11).'">';
             $sx .= '<h3>Total de citações - '.count($rlt).'</h3>';
             $sx .= '<ul>';
             for ($r=0;$r < count($rlt);$r++)
                 {
                     $line = $rlt[$r];
-                    $sx .= '<li>'.$line['ca_text'].'</li>';
+                    $sx .= '<li>';
+                    $sx .= $line['ca_text'];
+                    $sx .= ' '.$this->cited->cited_type($line,0);
+                    $sx .= $this->link_article($line);
+                    $sx .= '</li>';
+                    $auth = $this->add_authors($line['ca_text'],$auth);
                 }
             $sx .= '</ul>';
+
+            $au = array();
+            foreach($auth as $author=>$total)
+                {
+                    if ($total > 3)
+                        {
+                            array_push($au,strzero($total,5).$author);
+                        }
+                }
+            sort($au);
+
+            $sz = '';
+            foreach($au as $ida=>$nome)
+                {
+                    $x = '<li>'.substr($nome,5,strlen($nome)).' - (';
+                    $x .= round(substr($nome,0,5));
+                    $x .= ')</li>';
+                    $sz = $x . $sz;
+                }     
+            $sz = ' <div class="'.bscol(11).'">
+                    <h4>Autores com cinco ou mais citações</h4>
+                    <ol>'.$sz.'</ol>
+                    </div>';
+            $sz .= '<div class="'.bscol(1).'">';
+            $sz .= 'Datasets<br/>';
+
+            $lk['service'] = 'cited/author/';
+            $lk['format'] = 'csv';
+            $lk['id'] = $id;
+            
+            $link = $this->api_brapci->link($lk);
+            $sz .= $link.'<img src="'.base_url('img/icon/icon_dataset.png').'" class="img-fluid">'.'</a>';
+            $sz .= '</div>';
+
+            $sx = $sz . $sx;
+
+            return($sx);
+        }
+
+    function add_authors($txt,$auth)
+        {
+            $a = $this->ias_cited->cited_analyse($txt);
+            for ($r=0;$r < count($a);$r++)
+                {
+                    $w = $a[$r];
+                    if (isset($auth[$w]))
+                        {
+                            $auth[$w] = $auth[$w] + 1;
+                        } else {
+                            $auth[$w] = 1;
+                        }
+                }
+            return($auth);
+        }
+    
+    function link_article($l)
+        {
+            $sx = '<a href="'.base_url(PATH.'/v/'.$l['ca_rdf']).'" target="_new'.$l['ca_rdf'].'">[A]</a>';
             return($sx);
         }
 
@@ -292,7 +395,6 @@ class ipccr extends CI_Model
 
         $this->le_jnl($id);    
         $jnlrdf = $this->jnlrdf;
-        print_r($this->j);
 
         $sx = '';
         $sx .= '<div class="' . bscol(6) . '">';

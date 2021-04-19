@@ -15,8 +15,12 @@ if ($hd == 0) {
     for ($r = 0; $r < count($rlt); $r++) {
         $line = $rlt[$r];
         $class = $line['c_class'];
-        //echo '<br>'.$class.'='.$line['n_name'];
         switch($class) {
+            case 'hasClassificacaoAssunto':
+                $link = '<a href="' . base_url(PATH.'a/' . $line['d_r2']) . '">';
+                $linka = '</a>';
+                $localizacao = $link . $line['n_name'] . $linka;
+                break;                
             case 'hasClassificationCDU' :
                 $link = '<a href="' . base_url(PATH.'a/' . $line['d_r2']) . '">';
                 $linka = '</a>';

@@ -73,8 +73,15 @@
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'basket/inport'); ?>"><?php echo msg('basket_inport'); ?></a>
                         <a class="dropdown-item" href="<?php echo base_url(PATH . 'bibliometric'); ?>"><?php echo msg('bibliometric_tools'); ?></a>
 						<a class="dropdown-item" href="<?php echo base_url(PATH . 'evaluation'); ?>"><?php echo msg('journal_evaluation'); ?></a>
-                        <a class="dropdown-item" href="<?php echo base_url(PATH . 'ia'); ?>"><?php echo msg('artificial_inteligence'); ?></a>
-						<a class="dropdown-item" href="<?php echo base_url(PATH . 'ipccr'); ?>"><?php echo msg('indicadores_citacao'); ?></a>
+						<?php 
+						if (perfil("#ADM#IAS")) {
+							echo '<a class="dropdown-item" href="'.base_url(PATH . 'ia').'">'.msg('artificial_inteligence').'</a>';
+						}
+
+						if (perfil("#ADM#ICP")) {
+							echo '<a class="dropdown-item" href="'.base_url(PATH . 'ipccr').'">'.msg('indicadores_citacao').'</a>';
+						}
+						?>
                     </div>
                 </li>
                 <?php } ?>

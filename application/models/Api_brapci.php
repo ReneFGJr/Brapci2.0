@@ -1,12 +1,29 @@
 <?php
 class Api_brapci extends CI_model
 {
-	function index($act,$token)
+	function error($erro)
+		{
+			$s = array();
+			$s['status'] = 'error';
+			$s['501'] = $erro;
+			return($s);
+		}
+	function index($act,$suba='')
 	{
 		$q = get("q");
+		$f = get("f");
 		$dt['error'] = 0;
 		switch($act)
 		{
+			case 'cited':
+				$this->load->model('cited');
+				$dt = $this->cited->api_citation($suba);
+			break;
+
+			case 'help':
+				$dt = $this->help();
+			break;
+
 			case 'dialogflow':
 				$this->load->model('GoogleDialogFlow');
 				$dt = $this->GoogleDialogFlow->run($token);
@@ -29,8 +46,43 @@ class Api_brapci extends CI_model
 			$dt['description'] = 'Service not found';
 		break;
 	}
-	echo json_encode($dt);
+	switch($f)
+		{
+			case 'csv':
+			header("Content-type: text/csv");
+			header("Content-Disposition: attachment; filename=brapci_cited_".date("Ymd_His").".csv");
+			header("Pragma: no-cache");
+			header("Expires: 0");
+			$utf8 = false;
+			echo array2csv($dt,';',$utf8);
+			break;
+
+			default:
+			echo json_encode($dt);
+			break;
+		}
+	
 }
+
+function help()
+	{
+		$s = array();
+		$s['dataset']['cited']['author'] = 'Cited author';
+		return($s);
+	}
+
+function link($d=array())
+	{
+		if (!isset($d['service'])) { $d['service'] = 'help'; }
+		$cp = '';
+		if (isset($d['id'])) { $cp .= '&id='.strtolower($d['id']); }		
+		if (isset($d['format'])) { $cp .= '&f='.strtolower($d['format']); }
+		if (isset($d['startdate'])) { $cp .= '&sd='.strtolower($d['startdate']); }
+		if (isset($d['enddate'])) { $cp .= '&ed='.strtolower($d['enddate']); }		
+		$sx = '<a href="'.base_url(PATH.'api/'.$d['service'].'?'.$cp).'">';
+		return($sx);
+	}
+	
 function affiliation_cron()
 {
 	$rdf = new rdf;
@@ -84,6 +136,7 @@ function affiliation_cron()
 	}
 	exit;
 }
+
 function nlp($txt)
 {
 	$t = $txt;
@@ -183,5 +236,4 @@ function nlp($txt)
 			
 		}
 		
-	}	
-	?>
+	}

@@ -16,6 +16,7 @@ class ias_cited extends CI_Model
 {
     var $cities = array();
     var $base = 'brapci_cited.';
+    var $sensor = '';
 
     function index($d1, $d2, $d3)
     {
@@ -692,7 +693,23 @@ class ias_cited extends CI_Model
             $link = $this->link($line);
             $linka = '</span>';
             $txt = trim($line['ca_text']);
+            $txt = ascii($txt);
+            $txt = troca($txt,'.','. ');
+            $txt = troca($txt,':','. ');
+            $txt = troca($txt,chr(128),'');
+            $txt = troca($txt,chr(139),' ');
+            $txt = troca($txt,chr(226),' ');
+            for ($z=128;$z < 255;$z++)
+                {
+                    $txt = troca($txt,chr($z),' ');
+                }
+            $txt = troca($txt,'  ',' ');
+            $txt = troca($txt,'  ',' ');
+            $txt = troca($txt,'  ',' ');
             //$txt = utf8_decode($txt);
+            //echo '<pre>';
+            //echo hex_dump($txt);
+            //exit;
             $t = $link . $line['ca_text'] . $linka . ' - ' . $line['id_ca'];
             $idj = $this->nlp_jounal($txt);
             if ($idj[0] > 0) {
@@ -730,19 +747,28 @@ class ias_cited extends CI_Model
         $tt['Rev.'] = 'Revista';
         $tt['rev.'] = 'Revista';
         $tt['J.'] = 'Journal';
+        $tt['Adm.'] = 'Administração';         
         $tt['Bi.'] = 'Biblioteconomia';
         $tt['Ci.'] = 'Ciência';
         $tt['Ciênc.'] = 'Ciência';
         $tt['Cienc.'] = 'Ciência';
-        $tt['Cont.'] = 'Contabilidade';        
+        $tt['ciênc.'] = 'Ciência';
+        $tt['cienc.'] = 'Ciência';        
+        $tt['Cont.'] = 'Contabilidade';
+        $tt['Contemp.'] = 'Contemporanea';
         $tt['Cult.'] = 'Cultura';        
         $tt['Doc.'] = 'Documentação';
         $tt['Inf.'] = 'Informação';
+        $tt['inf.'] = 'Informação';
+        $tt['Hist.'] = 'História';
         $tt['Soc.'] = 'Sociedade';
         $tt['Per.'] = 'Perspectivas';
         $tt['Perspec.'] = 'Perspectiva';
+        $tt['Perspect.'] = 'Perspectiva';
         $tt['Esc.'] = 'Escola';
         $tt['Est.'] = 'Estudos';
+        $tt['Esp.'] = 'Especializada';
+        $tt['esp.'] = 'Especializada';
         $tt['Enferm.'] = 'Enfermagem';
         $tt['educ.'] = 'Educação';
         $tt['Educ.'] = 'Educação';
@@ -750,7 +776,7 @@ class ias_cited extends CI_Model
         $tt['Eletr.'] = 'Eletrônica';
         $tt['Enc.'] = 'Encontros';
         $tt['Fin.'] = 'Finanças';
-        $tt['R.'] = 'Revista';
+        $tt[' R.'] = 'Revista';
         $tt['Cad.'] = 'Cadernos';
         $tt['Stat.'] = 'Statistical';
         $tt['Pesq.'] = 'Pesquisa';
@@ -785,6 +811,7 @@ class ias_cited extends CI_Model
         $t = troca($t,'–','-');
         $t = troca($t,'.','.');
         $t = troca($t,'&','e');
+        $t = troca($t,chr(128+11),'.');
         $t = str_replace(array(', ', '. ', '!', '?','(',')'), ';', $t);
         $t = splitx(";", $t);
 
@@ -795,6 +822,7 @@ class ias_cited extends CI_Model
             $tt = troca($tt, '&', '');
             $tt = troca($tt, '<', '$lt;');
             $tt = troca($tt, '>', '$gt;');
+            $tt = trim($tt);
             $link = '<span onclick="newxy(\'' . base_url(PATH . 'ia/cited/journal/?dd1=' . $tt) . '\',800,600);" style="cursor: pointer;">';
             $sx = '[' . $link . nbr_author($tt, 7) . '</span>]; ' . $sx;
             if (strlen($tt) > 0) {
@@ -874,10 +902,7 @@ class ias_cited extends CI_Model
         }
 
         if (perfil("#ADM")) {
-            echo $txt;
-            echo '<br>';
-            echo $this->ias->show_sensores($n);
-            echo '<hr>';
+            $this->sensor = $txt . $this->ias->show_sensores($n);
         }
         return ($sx);
     }
@@ -913,9 +938,12 @@ class ias_cited extends CI_Model
     function e_uma_lei($txt)
     {
         $a = array(' Lei nº ', '. Lei n. ',
+        '. Ley nº',
         'Decreto nº', '. Lei ','. Resolução ',
         ' Decreto Federal ','. Portaria ',' Decreto estadual ',
-        'Projeto de Lei ', '. Decreto n. ','Decreto-Lei',
+        'Projeto de Lei ', 
+        '. Decreto n. ','Decreto-Lei',
+        '. Decreto ',
         ' Ley N° ');
         return ($this->locate($txt, $a));
     }
@@ -1050,6 +1078,7 @@ class ias_cited extends CI_Model
             'Referências Bibliográficas',
             'Referências Bibliográficas',
             'Referências bibliográficas',
+            'Referências Bibliográficas',
             'REFERÊNCIAS',
             'REFERENCIAS',
             'REFERENCES',
@@ -1062,7 +1091,9 @@ class ias_cited extends CI_Model
             'Références',
             'Bibliografía',
             'BIBLIOGRAFÍA',
-            'REFERENCIAS BIBLIOGRÁFICAS'
+            'Bibliografia',
+            'REFERENCIAS BIBLIOGRÁFICAS',
+            'REFERÊNCIAS BIBLIOGRAFICAS'
         );
         $ref = '';
 
@@ -1365,5 +1396,121 @@ class ias_cited extends CI_Model
                 }
             return($sx);
         }
+    function cited_analyse($txt)
+        {
+            $txto = $txt;
+            $sx = '';
+            $authors = array();
+            $s = '';
+            $n = 0;
+            
+            $txt = troca($txt,'.,',' # ');
+            $txt = troca($txt,' and ',' # ');
 
+            $c = array(':','0','1','2','3','4','5','6','7','8','9','?','[','<',']','>','(',')');
+            $txt = troca($txt,$c,'; ');
+            $txt = troca($txt,',',';');
+            $txt = troca($txt,'.',';');
+            $txt = troca($txt,' ',';');
+
+            $txt = ascii($txt);
+                       
+            if (strlen($txt) > 0)
+                {
+                    $w = splitx(';',$txt);
+                    $ca = array();
+                    $cl = array();
+                    /* Prepara */
+                    for ($r=0;$r < count($w);$r++)
+                        {
+                            if ($w[$r]=='#')
+                                {
+                                    if (isset($w[$r+1]))
+                                    { $w[$r+1] = UpperCase($w[$r+1]); }
+                                }
+                            $ca[$r] = $this->ias->caixa_alta($w[$r]);
+                            $cl[$r] = strlen(trim($w[$r]));
+                            if (($r == 0) and ($ca[$r] == 0))
+                                {
+                                    $w[$r] = UpperCaseSql($w[$r]);
+                                    $ca[$r] = 1;
+                                }
+                        }
+                    /************* Processa */
+                    $n = 0;
+                    $comp = 0;
+                    $auth = '';
+                    $sep = 0;
+                    for ($r=0;$r < count($w);$r++)
+                        {
+                            
+                            /*
+                            echo '<br>'.$r.'. '.$w[$r];
+                            echo ' ca='.$ca[$r];
+                            echo ' cl='.$cl[$r];
+                            echo ' comp='.$comp;
+                            echo ' n='.$n;
+                            */
+                            
+                            /* Loop */
+                            if ($w[$r] == '#')
+                                {
+                                    $comp = 0;
+                                    $auth = '';
+                                    Continue;
+                                }
+
+
+                            /***************************** REGRAS */
+                            /* Caixa Alta */
+                            if (($ca[$r]==1) and (strlen($w[$r]) > 1))
+                                {                                    
+                                    $auth = trim($auth.' '.$w[$r]);
+                                    $comp = 1; /* Primeiro componente */
+                                } else {
+                                    if (UpperCase(substr($w[$r],0,1)) != substr($w[$r],0,1))
+                                    { 
+                                        $comp = 0; 
+                                        if (strlen($auth) > 0)
+                                            {
+                                                array_push($authors,$auth);  
+                                            }
+                                    }
+
+                                    /* Se não tiver componente, sai do processo */
+                                    if ($comp == 0) 
+                                    { 
+                                        $ex = 1;
+                                        for ($y=$r;$y < count($w);$y++)
+                                            {
+                                                if ($w[$y] == '#')
+                                                    {
+                                                        if (($y -$r) < 4)
+                                                        {
+                                                            $r = $y-1;
+                                                            $ex = 0;
+                                                        }
+                                                        break;
+                                                    }
+                                            } 
+                                        if ($ex == 1)
+                                        {   
+                                            //echo "FIM-'"; 
+                                            break; 
+                                        }
+                                    }
+                                    else 
+
+                                    /******* Continua se existe compomente */
+                                    {
+                                        $cax = substr($w[$r],0,1);                                        
+                                        $auth .= ','.$cax;
+                                        array_push($authors,$auth);
+                                        $comp = 0;
+                                    }
+                                }
+                        }                        
+                }
+            return($authors);
+        }
 }

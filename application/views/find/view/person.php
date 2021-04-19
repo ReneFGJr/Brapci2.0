@@ -81,7 +81,7 @@ if (strlen($born.$dead) > 0)
     }
     $dates .= $dead;                
 }
-$img = troca($img,'class="img-fluid"','class="img-fluid img-person"');        
+$img = troca($img,'class="img-fluid"','class="img-fluid img-person"');    
 ?>
 <!---------------- WORK --------------------------------------------------------------->
 <div class="container">
@@ -89,7 +89,7 @@ $img = troca($img,'class="img-fluid"','class="img-fluid img-person"');
 <div class="col-md-2 text-right" style="border-right: 4px solid #8080FF;">
 <tt style="font-size: 100%;"><?php echo msg('Person');?></tt>            
 </div>
-<div class="col-md-8">
+<div class="col-md-7">
 <font style="font-size: 200%"><?php echo $nome;?><?php echo $dates;?></font>
 <?php
 if (strlen($cc_origin) > 0)
@@ -121,6 +121,9 @@ if (perfil("#ADM#CAT"))
     echo $this->frad->find_remissiva($w);
 }               
 ?>
+</div>
+<div class="col-md-1 text-center">
+<?php echo $ipccr; ?>
 </div>
 <div class="col-md-2 text-center">
 <?php echo $img;?>

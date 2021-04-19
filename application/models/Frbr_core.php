@@ -413,6 +413,7 @@ class frbr_core extends CI_model {
     }
 
     function person_show($id) {
+        $this->load->model('ipccrs');
         $data = array();
         $sx = '';
 
@@ -420,6 +421,7 @@ class frbr_core extends CI_model {
         $data['person'] = $this -> le_data($id);
         $data['use'] = $this -> le_remissiva($id);
         $data['id'] = $id;
+        $data['ipccr'] = $this -> ipccrs -> ipccr($id);
 
         $sx = $this -> load -> view('find/view/person', $data, true);
         return ($sx);
@@ -443,6 +445,7 @@ class frbr_core extends CI_model {
     }
 
     function corporate_show($id) {
+        $this->load->model('ipccr');
         $data = array();
         $sx = '';
 
@@ -450,6 +453,7 @@ class frbr_core extends CI_model {
         $data['person'] = $this -> le_data($id);
         $data['use'] = $this -> le_remissiva($id);
         $data['id'] = $id;
+        $data['ipccr'] = $this -> ipccr -> ipccr($id);
 
         $sx = $this -> load -> view('find/view/corporate', $data, true);
         return ($sx);
