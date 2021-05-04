@@ -179,12 +179,160 @@ class ai
 /******************************************************************** BUSCADOR */
 Class ia_index
 {
+function search($txt)
+    {
+        $t = strtolower(ascii($txt));
+        $t = troca($t,' ',';');
+        $tl = splitx(';',$t);
+        $rst = array();
+        
+        $f = array('Work.txt','authors.txt','Subject.txt');
+        for ($r=0;$r < count($f);$r++)
+            {
+                $file = "_temp/".LIBRARY.'/'.$f[$r];
+                if (file_exists($file))
+                {
+                $tx = file_get_contents($file);
+                if (strpos($tx,$tl[0]) > 0)
+                    {
+                        $tt = explode(chr(10),$tx);
+                        for ($y=0;$y < count($tt);$y++)
+                        {
+                            $ts = 0;
+                            for ($z=0;$z < count($tl);$z++)
+                                {
+                                    if (strpos($tt[$y],$tl[$z]) > 0)
+                                        {
+                                            $ts++;
+                                        }
+                                }
+                            if ($ts == count($tl))
+                                {
+                                    array_push($rst,round(substr($tt[$y],0,8)));
+                                }
+                        }
+                    }
+                }
+            }
+        return($rst);
+    }
 function export_index($class='',$id='')
     {
         $sx = 'Exporta lista de autores';
         $sx .= $this->index_author($id);
         return($sx);
     }
+
+function export_search($class='')
+    {
+        $sx = 'Exporta texto para busca';
+        $sx .= $this->search_author($class);
+        $sx .= $this->search_class('Work');
+        $sx .= $this->search_class('Subject');
+        return($sx);
+    }
+function search_author($class)
+    {
+        $dir = '_temp';
+        dircheck($dir);
+        $dir = '_temp/'.LIBRARY.'/';
+        dircheck($dir);
+        $file = $dir.'/authors.txt';
+
+        $CI = &get_instance();
+        $rdf = new rdf;
+        $f = $rdf -> find_class($class);
+        $wh = '';
+        $sql = "select 
+                    N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                    N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
+                        FROM rdf_concept as C1
+                        INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n 
+                        INNER JOIN rdf_data as RD1 ON RD1.d_r2 = C1.id_cc
+                        INNER JOIN rdf_data as RD2 ON (RD1.d_r1 = RD2.d_r1) and (RD2.d_r2 > 0) and (RD2.d_p = 54) /* Expressao */
+                        INNER JOIN rdf_data as RD3 ON (RD2.d_r2 = RD3.d_r1) and (RD3.d_p = 55) /* Manifestacao */
+                        INNER JOIN find_item ON RD3.d_r2 = i_manitestation
+                        LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                        LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                        WHERE i_library = '".LIBRARY."' AND C1.cc_class = " . $f . " ".$wh."
+                        group by n_name, n_lang, id_cc, n_name_use, n_lang_use, id_cc_use 
+                        order by n_name";
+        $rlt = $CI -> db -> query($sql);
+        $rlt = $rlt -> result_array();  
+        $lx = '';
+        for ($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $lx .= strzero($line['id_cc'],8);
+                $lx .= ';';
+                $lx .= strtolower(ascii($line['n_name']));
+                $lx .= cr();
+            } 
+        file_put_contents($file,$lx);
+        return(message($class.' exported to '.$file,1));
+    }
+
+function search_class($class)
+    {
+        $dir = '_temp';
+        dircheck($dir);
+        $dir = '_temp/'.LIBRARY.'/';
+        dircheck($dir);
+        $file = $dir.$class.'.txt';
+
+        $CI = &get_instance();
+        $rdf = new rdf;
+        $f = $rdf -> find_class($class);
+        $wh = '';
+        switch($class)
+            {
+                case 'Subject':  
+                $prop = 119;        
+                $sql = "
+                    SELECT n_name, id_cc, i_manitestation 
+                    FROM `find_item`
+                    inner join rdf_data ON i_manitestation = d_r1 and d_p = $prop
+                    inner join rdf_concept ON d_r2 = id_cc
+                    inner join rdf_name ON id_n = cc_pref_term
+                    where i_library = '".LIBRARY."' 
+                    group by n_name, id_cc, i_manitestation
+                    order by n_name, id_cc, i_manitestation                   
+                ";
+                break;
+
+                case 'Work':            
+                $sql = "
+                select n_name, id_cc, i_manitestation
+                    FROM rdf_data as R1
+                    INNER JOIN rdf_data as R2 ON (R1.d_r2 = R2.d_r1) and (R2.d_p = 55) /* Manifestation */
+                    INNER JOIN find_item ON R2.d_r2 = i_manitestation
+                    INNER JOIN rdf_concept ON id_cc = R1.d_r1
+                    INNER JOIN rdf_name ON cc_pref_term = id_n
+                    where R1.d_p = 54  /* 54 - Expressão */
+                    AND i_library = '".LIBRARY."'
+                    group by n_name, id_cc, i_manitestation
+                    order by n_name, id_cc, i_manitestation
+                ";
+                break;
+
+                default:
+                    
+                break;
+            }
+        $rlt = $CI -> db -> query($sql);
+        $rlt = $rlt -> result_array();  
+        $lx = '';
+        for ($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $lx .= strzero($line['i_manitestation'],8);
+                $lx .= ';';
+                $lx .= strtolower(ascii($line['n_name']));
+                $lx .= cr();
+            } 
+        file_put_contents($file,$lx);
+        return(message($class.' exported to '.$file,1));
+    }    
 
 function index_author($id='')
     {

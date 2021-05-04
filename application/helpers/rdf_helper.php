@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/
-* @version     v0.03.01.31
+* @version     v0.21.05.04
 */
 
 /*
@@ -44,8 +44,7 @@ class rdf
 	}
 	
 	function index($link='',$path='',$id='',$id2='',$id3='')
-	{        
-		
+	{        		
 		$dt = array();
 		$sx = '';
 		switch($path)
@@ -83,6 +82,10 @@ class rdf
 				$sx = $this->saved($id);
 			break;
 
+			case 'save_cont':
+				$sx = $this->saved($id,0);
+			break;
+
 			case 'create_and_save':				
 				$term = get("text");
 				$class = get("type");
@@ -99,7 +102,7 @@ class rdf
 			/**************** FORMULARIOS **************/
 			case 'forms':
 				$sx .= msg('FORMS');
-				$sx .= $this -> class_view_form($id);
+				$sx .= $this -> class_view_form($id, $id2, $id3);
 			break;
 			
 			
@@ -979,6 +982,7 @@ function saved($id)
 	$prop = get("prop");
 	$r2 = get("resource");
 	$text = get("text");
+	$close = get("close");
 	if ($r1 > 0)
 	{
 		if ($r2 > 0)
@@ -995,9 +999,18 @@ function saved($id)
 		}
 	} else {
 		echo "ERRO DE RECURSO 1";
-	}				
-	sleep(1);
-	echo '<script> wclose(); </script>';		
+	}		
+	if ($close == 1) 
+	{ 		
+		sleep(1);
+		echo '<script> wclose(); </script>';		
+	} else {
+		echo 'Saving...';
+		echo '	<script> 
+				window.opener.location.reload(); 
+				window.location.reload(false); 
+				</script>';
+	}
 }
 
 function form_ed($id,$id2,$cl=0) {
@@ -1025,7 +1038,7 @@ function form_ed($id,$id2,$cl=0) {
 	array_push($cp, array('$Q id_c:c_class:' . $sqlc2, 'sc_range', msg('range'), true, true));
 	
 	array_push($cp, array('$O 1:Ativo&0:Inativo', 'sc_ativo', msg('ativo'), true, true));
-	array_push($cp, array('$R 0:'.msg('Yes').'&'.SYSTEM_ID.':'.msg('sc_local'), 'sc_global', msg('sc_global'), true, true));
+	array_push($cp, array('$HV', 'sc_global', LIBRARY, true, true));
 	array_push($cp, array('$A', '', msg('sc_group'), False, true));
 	array_push($cp, array('$S', 'sc_group', msg('sc_group'), False, true));
 	array_push($cp, array('$[1:99]', 'sc_ord', msg('ordem'), true, true));
@@ -1426,7 +1439,8 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			<span id="force" style="left: 0px; padding-right: 20px">'.msg('create_force').'</span>
 			<input type="hidden" id="dd52" value="'.$line['sc_propriety'].'">
 			<button type="button" id="create" class="btn btn-outline-primary" style="display: none;">'.msg('create').'</button>
-			<button type="button" id="submt" class="btn btn-outline-primary" '.$disable.'>'.msg('save').'</button>			
+			<button type="button" id="submtc" class="btn btn-outline-primary" '.$disable.'>'.msg('save_continue').'</button>
+			<button type="button" id="submt" class="btn btn-outline-primary" '.$disable.'>'.msg('save').'</button>
 			<button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">'.msg('cancel').'</button>			
 			</div>
 			<div id="dd51a"></div>
@@ -1472,6 +1486,16 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 
 			/***************************** SUBMIT *************/
 			$("#submt").click(function() 
+			{
+				saved(1);
+			});
+
+			$("#submtc").click(function() 
+			{
+				saved(0);
+			});
+
+			function saved($v)
 			{ 
 				var $vlr = $("#dd51").val();
 				var $prop = $("#dd52").val();
@@ -1480,7 +1504,8 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						concept: '.$id.', 
 						text: $text, 
 						prop: $prop, 
-						resource: $vlr 
+						resource: $vlr,
+						close: $v
 						};
 				
 				$.ajax(
@@ -1493,10 +1518,10 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 							$("#dd51a").html(data);
 						}
 					}); 
-				});
-				</script>';
-				return($sx.$js);
 			}
+			</script>';
+			return($sx.$js);
+		}
 			
 			################################################## DATA
 			function form_ajax($idc, $form, $id) {
@@ -1540,6 +1565,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					) as tabela
 					LEFT join ".$this->base." rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
 					LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c";
+					
 					$rlt = $CI -> db -> query($sql);
 					$rlt = $rlt -> result_array();
 					for ($r=0;$r < count($rlt);$r++)
@@ -1550,9 +1576,13 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						{
 							$prop = $line['d_p'];
 							$sql = "insert into ".$this->base."rdf_form_class
-							(sc_class,sc_propriety,sc_range,sc_library, sc_global, sc_ativo)
+							(
+							sc_class,sc_propriety,sc_range,sc_library, 
+							sc_global, sc_ativo)
 							values
-							($class,$prop,0,".LIBRARY.",0,1)";
+							(
+								$class,$prop,0,".LIBRARY.",0,1
+							)";
 							$xrlt = $CI -> db -> query($sql);							
 						}
 					}
@@ -1620,8 +1650,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						INNER join ".$this->base." rdf_class as t0 ON id_c = sc_propriety
 						LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
 						LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c
-						where (sc_class = $class) 
-							and ((sc_global = 1) or (sc_library = ".LIBRARY.") or (sc_library = 0)) 
+						where (sc_class = $class) and (sc_library = ".LIBRARY.")
 							and sc_ativo = 1
 						order by sc_ord, id_sc, t0.c_order";
 						
@@ -2080,18 +2109,28 @@ function index_work($lt = '') {
 	return ($sx);
 }
 
+function class_data_recober($class='')
+	{
+			$CI = &get_instance();
+            $f = $this->find_class("Person");
+
+			$sql = "select * from ".$this->base." rdf_concept 
+			INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
+			where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
+			ORDER BY n_name";
+			$rlt = $CI -> db -> query($sql);
+			$rlt = $rlt -> result_array();	
+
+			return($rlt);		
+	}
+
 
 function index_author($lt = '') {
 	$CI = &get_instance();
 	$class = "Person";
-	$f = $this -> find_class($class);
-	
-	$sql = "select * from ".$this->base." rdf_concept 
-	INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
-	where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
-	ORDER BY n_name";
-	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();
+
+	$rlt = $this->class_data_recober($class);
+
 	$sx = '<ul>';
 	$l = '';
 	for ($r = 0; $r < count($rlt); $r++) {
@@ -2232,41 +2271,108 @@ function recupera_id($dt,$prop)
 	return($vlr);
 }
 
-function class_view_form($id='')
+function class_view_form($id='',$idx='',$act='')
 {
 	$CI = &get_instance();
-	$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc,
+
+	if ($act == 'add')
+		{
+			$sql = "select * from rdf_form_class 
+					 	where id_sc = ".$idx;
+			echo $sql;
+			$rlt = $CI->db->query($sql);
+			$rlt = $rlt->result_array();
+			$line = $rlt[0];
+
+			$sc_class = $line['sc_class'];
+			$sc_propriety = $line['sc_propriety'];
+			$sc_range = $line['sc_range'];
+			$sc_ord = $line['sc_ord'];
+			$sc_group = $line['sc_group'];
+
+			$sql = "insert into rdf_form_class 
+					(
+						sc_class, sc_propriety, sc_range,
+						sc_ord, sc_library, sc_global,
+						sc_group
+					)
+					values
+					(
+						$sc_class, $sc_propriety, $sc_range,
+						$sc_ord, '".LIBRARY."', 0,
+						'$sc_group'
+					)";
+			$rlt = $CI->db->query($sql);
+		}
+	
+	$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc, sc_ativo,
 	t1.c_class as c_class, t2.prefix_ref as prefix_ref,
 	t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref,
 	sc_group, sc_library
-	from ".$this->base." rdf_form_class
-	INNER join ".$this->base." rdf_class as t1 ON t1.id_c = sc_propriety
-	LEFT join ".$this->base." rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
+	from ".$this->base."rdf_form_class
+	INNER join ".$this->base."rdf_class as t1 ON t1.id_c = sc_propriety
+	LEFT join ".$this->base."rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
 	
-	LEFT join ".$this->base." rdf_class as t3 ON t3.id_c = sc_range
-	LEFT join ".$this->base." rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
+	LEFT join ".$this->base."rdf_class as t3 ON t3.id_c = sc_range
+	LEFT join ".$this->base."rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
 	
-	where sc_class = $id
-	AND ((sc_global =1) or (sc_library = 0) or (sc_library = ".LIBRARY."))
-	order by sc_ord";
+	where sc_class = $id AND (sc_library = ".LIBRARY.")
+	order by sc_ord, sc_group";
 	
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();	
 	$sx = '<div class="col-md-12">';
 	$sx .= '<h4>'.msg("Form").'</h4>';
 	$sx .= '<table class="table">';
-	$sx .= '<tr><th width="4%">#</th>';
-	$sx .= '<th width="47%">'.msg('propriety').'</th>';
-	$sx .= '<th width="42%">'.msg('range').'</th>';
-	$sx .= '<th width="5%">'.msg('group').'</th>';
-	$sx .= '</tr>';
+	$hr = '';
+	$hr .= '<tr class="small"><th width="4%">#</th>';
+	$hr .= '<th width="47%">'.msg('propriety').'</th>';
+	$hr .= '<th width="42%">'.msg('range').'</th>';
+	$hr .= '<th width="5%">'.msg('status').'</th>';
+	$hr .= '</tr>';
+	$xgr = '';
+	$grs = array();
+	$wh = '';
 	for ($r=0;$r < count($rlt);$r++)			
 	{
 		$line = $rlt[$r];
-		$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
-		$linka = '</a>';
-		$sx .= '<tr>';
+
+		/*** Regras já existentes */
+		array_push($grs,$line['sc_propriety']);
+		if (strlen($wh) > 0) { $wh .= ' AND '; }
+		$wh .= '(sc_propriety <> '.$line['sc_propriety'].')';		
+
+		/* GROUP */
+		$gr = $line['sc_group'];
+		if ($xgr != $gr)
+			{
+				$sx .= '<tr>';
+				$sx .= '<td class="text-center" colspan=4 style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">';
+				$sx .= $line['sc_group'];
+				$sx .= '</td>';
+				$sx .= '</tr>';
+				$sx .= $hr;
+				$xgr = $gr;
+			}
 		
+		/* Cor */
+		switch($line['sc_ativo'])
+			{
+				case '0':
+					$cor = 'style="color: red;" ';
+					$sit = msg('inative');
+				break;
+
+				default:
+					$cor = 'style="color: black;" ';
+					$sit = msg('activo');
+				break;
+			} 
+		/* Link para editar */
+		$link = '<a href="#" '.$cor.' onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
+		$linka = '</a>';
+
+		$sx .= '<tr '.$cor.'>';		
 		$sx .= '<td align="center">';
 		$sx .= $line['sc_ord'];
 		$sx .= '</td>';
@@ -2280,28 +2386,62 @@ function class_view_form($id='')
 		$sx .= '</td>';
 		
 		/* RANGE */
-		$dt = array();
 		$dt['c_class'] = $line['pc_class'];
 		$dt['prefix_ref'] = $line['pc_prefix_ref'];
 		$sx .= '<td>';
 		$sx .= $this->prefixn($dt);
 		$sx .= '</td>';
-		
-		/* GROUP */
-		$dt = array();
+
 		$sx .= '<td>';
-		$sx .= $line['sc_group'];
-		$sx .= '</td>';
-		
+		$sx .= $sit;
+		$sx .= '</td>';		
+
 		$sx .= '</tr>';
 	}
 	$sx .= '</table>';
 	$sx .= '</div>';
-	
-	$link = '<a href="#" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$id.'/0').'\',800,600);">';
+
+	$link = '<a href="#" class="btn btn-outline-primary" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$id.'/0').'\',800,600);">';
 	$linka = '</a>';
 	$sx .= $link.'novo'.$linka;
-	
+
+
+	/************************* APROVEITAMENTO */
+
+	$sql = "select sc_group, sc_class, sc_propriety, sc_range, min(id_sc) as idm, 
+				c_class, prefix_ref 
+				from rdf_form_class 
+				INNER JOIN rdf_class ON sc_propriety = id_c
+				LEFT JOIN rdf_prefix ON c_prefix = id_prefix
+				where $wh and sc_class=16
+				group by 
+					sc_group, sc_class, sc_propriety, 
+					sc_range, c_class, prefix_ref
+			";
+	$rlt = $CI->db->query($sql);
+	$rlt = $rlt->result_array();
+
+	$sz = '<div class="col-md-12">';
+	$sz .= '<h2>Aproveitamento de registros</h2>';
+	$sz .= '<ul>';
+	for ($r=0;$r < count($rlt);$r++)
+		{
+			$line = $rlt[$r];
+			$sz .= '<li>';
+			$sz .= msg($line['c_class']);
+			$sz .= ' ';
+			$link = base_url(PATH.'config/class/forms/'.$id.'/'.$line['idm'].'/add');
+			$sz .= '<a href="'.$link.'" class="btn-primary small pad5 rad5">importar</a>';
+			$sz .= ' ('.$line['sc_group'].')';
+			$sz .= '</li>';
+		}
+	$sz .= '</ul>';
+	$sz .= '</div>';
+	if (count($rlt) > 0)
+		{
+			$sx .= $sz;
+		}
+
 	return($sx);
 }
 function class_view_data($id = '') {
@@ -2693,9 +2833,11 @@ function ajax_search($id, $type = '') {
 	function change()
 	{
 		jQuery("#submt").removeAttr("disabled");
+		jQuery("#submtc").removeAttr("disabled");
 	}
 	
 	jQuery("#submt").attr("disabled","disabled");
+	jQuery("#submtc").attr("disabled","disabled");
 	</script>';
 	return ($sx);
 }		

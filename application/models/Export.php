@@ -84,19 +84,21 @@ class export extends CI_Model {
                     $bib .= 'abstract={'.$l['n_name'].'},'.cr();
                     break;
                 case 'hasSubject' :
-                    $rwork .= 'KW - ' . $l['n_name'] . cr();
+                    $kname = lowercase(ascii(trim($l['n_name'])));
+                    $kname = UpperCase(substr($kname,0,1)).substr($kname,1,strlen($kname));
+                    $rwork .= 'KW - ' . $kname.'@'.trim($l['n_lang']) . cr();
                     $dc .= '<meta name="DC.Subject" xml:lang="' . $l['n_lang'] . '" content="' . $l['n_name'] . '"/>' . cr();
                     $dc .= '<meta name="citation_keywords" xml:lang="' . $l['n_lang'] . '" content="' . $l['n_name'] . '"/>' . cr();
                     if (strlen($subj) > 0) { $subj .= '; ';
                     }
-                    $subj .= trim($l['n_name']);
+                    $subj .= $kname;
 
                     /* BIB */
                     if (strlen($biba) == 0)
                         {
-                            $biba .= 'author_keywords={'.$l['n_name'].'},'.cr();
+                            $biba .= 'author_keywords={'.$kname.'@'.trim($l['n_lang']).'},'.cr();
                         } else {
-                            $biba = troca($biba,'}',';'.$l['n_name'].'}');
+                            $biba = troca($biba,'}',';'.$kname.'@'.trim($l['n_lang']).'}');
                         }
                     
                     break;
@@ -392,7 +394,7 @@ class export extends CI_Model {
     function all_xls($pg = 0) {
         header ("Content-type: application/x-msexcel");
         //header("Content-type:   application/x-msexcel; charset=utf-8");
-        header("Content-Disposition: attachment; filename=Brapci".date("Y-m-d-H-m").".xsl");
+        header("Content-Disposition: attachment; filename=Brapci".date("Y-m-d-H-m").".xls");
         header("Expires: 0");
         header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
         header("Cache-Control: private", false);
@@ -491,7 +493,88 @@ class export extends CI_Model {
 
     }
 
+    function author_consistencia()
+        {
+            $sx = '';
+            $sql = "TRUNCATE brapci_ia.ai_author_check";
+            $this->db->query($sql);
+
+            $this->load->model("ias");
+            $rdf = new rdf;
+            $rlt = $rdf->class_data_recober("Person");
+
+            $id = 1;
+            
+            $cra = array('(',')',' - ',' - ','$','&');
+            $xname = '';
+            $xnameid = 0;
+
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $name = $line['n_name'];
+
+                    /* Checar caracteres especiais */
+                    $err = 0;
+                    for ($y=0;$y < count($cra);$y++)
+                        {
+                            $search = $cra[$y];                            
+                            $pos = strpos(' '.$name,$search);
+                            if ($pos > 0)
+                                {
+                                    $err = 1;
+                                }
+                        }
+                    /* Checar se inicia com letras */
+                    if ($err == 0)
+                    {
+                        $l = uppercasesql(substr($name,0,1));
+                        $lc = ord($l);
+                        if (($lc < 65) or ($lc > 90))
+                            {
+                                $err = 2;
+                            }
+                    }
+
+                    /* Entrada muito curta */
+                    if ($err == 0)
+                        {
+                            $l = substr($name,0,strpos($name,','));
+                            $l = strlen($l);
+                            if ($l < 3) { $err = 3; }
+                        }
+
+                    /* Salvar o erro */
+                    if ($err != 0)
+                    {
+                        $this->ias->error_register($id,1);
+                    } else {
+                        $name2 = nbr_author($name,1);
+                        if (($name2 == $xname) and ($line['cc_use'] == 0))
+                            {
+                                $this->ias->error_register($id,1,$xnameid);
+                            } else {
+
+                                /************ FORMATO DIFERENTE */
+                                $nname =nbr_author($name,1);
+                                if ($name != $nname)
+                                    {
+                                        $sx .= '<br>'.$name.'==>'.$nname;
+                                        $sql = "update rdf_name set n_name = '$nname' where id_n = ".$line['id_n'];
+                                        $this->db->query($sql);
+                                    }
+                            }
+                        $xname = $name2;
+                        $xnameid = $line['id_cc'];
+                    }
+                    
+                }    
+                return($sx);        
+        }
+
     function export_author_index_list($lt = 0, $class = 'Person') {
+        /********************************** Padroniza entrada de autores */
+
         $nouse = 0;
         $dir = 'application/views';
         dircheck($dir);

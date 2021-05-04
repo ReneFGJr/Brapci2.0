@@ -9,7 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 * @category    Helpers
 * @author      Rene F. Gabriel Junior <renefgj@gmail.com>
 * @link        http://www.sisdoc.com.br/CodIgniter
-* @version     v0.20.05.12
+* @version     v0.21.04.30
 */
 
 
@@ -142,6 +142,24 @@ class socials
             case 'email':
                 $sx = $this->email($id,$chk);
             break;
+
+            case 'group':
+                $this->groups($id, $chk);                
+            break;  
+
+            case 'group_members':
+                if (perfil("#ADM#GER"))
+                {            
+                    $this->groups_members($id);
+                }
+            break;
+
+            case 'group_edit':
+                if (perfil("#ADM#GER"))
+                {
+                    $this->group_edit($id);
+                }
+            break;  
             
             case 'attrib':
                 $this->attributes($id, $chk);
@@ -172,6 +190,290 @@ class socials
         }
         return ($sx);
     }
+
+    function group_edit($id='')
+        {
+            $sx = '
+            <div class="row">
+            <div class="'.bscol(12).'">
+            <h1>Grupos de usuários</h1>';
+
+            $CI = &get_instance();
+            $form = new form;
+            $form->id = round($id);
+            $cp = array();
+            array_push($cp,array('$H8','id_gr','',false,false));
+            array_push($cp,array('$S100','gr_name',msg('gr_name'),true,true));
+            if ($id == 0)
+                {
+                    array_push($cp,array('$HV','gr_library',LIBRARY,true,true));
+                } else {
+                    array_push($cp,array('$S20','gr_library',msg('gr_library'),false,false));
+                }       
+            $sx .= $form->editar($cp,'users_group');
+            $sx .= '</div></div>';
+
+            /* Saved */
+            if ($form->saved > 0) { redirect(base_url(PATH.'social/group')); }
+            $data['content'] = $sx;
+            $CI->load->view('content',$data);            
+        }
+
+    function groups_members($id)         
+        {
+            $CI = &get_instance();
+            $id = round($id);
+            $sx = $this->group_show($id);
+            $sx .= $this->group_members_show($id);
+
+            $data['content'] = $sx;
+            $CI->load->view('content',$data); 
+        }
+
+    
+    function group_show($id)
+        {
+            $CI = &get_instance();
+            $sql = "select * from users_group 
+                        where gr_library = '".LIBRARY."' and id_gr = $id";
+            $rlt = $CI->db->query($sql);
+            $rlt = $rlt->result_array();            
+            $line = $rlt[0];
+            $sx = '<div class="row" style="border-bottom: 1px solid #000000">';
+            $sx .= '<div class="'.bscol(11).'  big">'.$line['gr_name'].'</div>';
+            $sx .= '<div class="'.bscol(1).'">'.$line['gr_hash'].'</div>';
+            $sx .= '</div>';
+            return($sx);
+        }
+
+    function group_members_include($gr,$us,$lb)
+        {
+            $CI = &get_instance();
+            $sql = "select * from users_group_members
+                    where
+                    grm_group = $gr
+                    and grm_user = $us
+                    and grm_library = '$lb'";
+            $rlt = $CI->db->query($sql);
+            if ($rlt->result_id->num_rows == 0)
+                {
+                    $sql = "insert into users_group_members
+                            (grm_group, grm_user, grm_library)
+                            values
+                            ($gr, $us, '$lb')";
+                    $rlt = $CI->db->query($sql);
+                    return(TRUE);
+                }
+            return(FALSE);            
+        }
+
+    function group_members_show($id)
+        {
+            $CI = &get_instance();
+            if (perfil("#ADM#GES") > 0)
+            {
+                $us = get("us");
+                $chk = get("chk");
+                if (checkpost_link($us.$id) == $chk)
+                    {
+                        $this->group_members_include($id,$us,LIBRARY);
+                    }
+            }
+
+            $sql = "select * from users_group_members
+                        inner join users ON id_us = grm_user
+                        where grm_library = '".LIBRARY."' and grm_group = $id";
+            $rlt = $CI->db->query($sql);
+            $rlt = $rlt->result_array();            
+            $sx = '<div class="row" style="margin-bottom: 50px;">';
+            for ($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $link = '<a href="#">'.'[remove]'.'</a>';
+                $sx .= '<div class="'.bscol(6).'">'.$line['us_nome'].'</div>';
+                $sx .= '<div class="'.bscol(5).'">'.$line['us_login'].'</div>';
+                $sx .= '<div class="'.bscol(1).'">'.$link.'</div>';
+                //$sx .= '<div class="'.bscol(1).'">'.$line['gr_hash'].'</div>';
+            } 
+            if (count($rlt) == 0)
+                {
+                    $sx .= message('Sem usuários atribuídos',3);
+                }
+            $sx .= '</div>';
+
+            if (perfil("#ADM#GES") > 0)
+            {                
+                $form = new form;
+                $form->id = 0;
+                $cp = array();
+                array_push($cp,array('$H8','','',false,false));
+                array_push($cp,array('$S100','',msg('user_name'),true,true));
+                $sx .= '<div class="row" >';
+                $sx .= '<div class="'.bscol(12).'" style="border-top: 1px solid #000000">';
+                $sx .= '<span class="big">Buscar / inserir</span>';
+                $sx .= $form->editar($cp,'');
+                $sx .= '</div>';
+                $sx .= '</div>';
+
+                /* */
+                $q = get("dd1");
+                if (strlen($q) > 0)
+                {
+                    $sx .= '<div class="row" style="border-bottom: 1px solid #000000">';
+                    $sx .= '<div class="'.bscol(12).'">';
+                    $sql = "select * from users where us_nome like '%$q%' order by us_nome";
+                    $rlt = $CI->db->query($sql);
+                    $rlt = $rlt->result_array();
+                    $sx .= '<ul>';
+                    for ($r=0;$r < count($rlt);$r++)
+                        {
+                            $line = $rlt[$r];
+                            $link = '<a href="'.base_url(PATH.'social/group_members/'.$id.'/?dd1='.$q.'&us='.$line['id_us'].'&chk='.checkpost_link($line['id_us'].$id)).'">+</a>';
+                            $sx .= '<li>'.$line['us_nome'].' '.$link.'</li>';
+                        }
+                    $sx .= '</ul>';
+                    $sx .= '</div>';
+                    $sx .= '</div>';
+                }
+            }                    
+            
+            return($sx);
+        }        
+
+    function groups($id='',$chk='') 
+        {
+            $CI = &get_instance();
+            $sx = '
+            <div class="row">
+            <div class="'.bscol(12).'">
+            <h1>Grupos de usuários</h1>';
+            
+            $this->check_sql_tables();
+            $sql = "select * from users_group 
+                        where gr_library = '".LIBRARY."' 
+                        ORDER BY gr_name";
+            $rlt = $CI->db->query($sql);
+            $rlt = $rlt->result_array();
+
+            if (count($rlt) == 0)
+                {
+                    $this->group_create("Administradores",LIBRARY,'#ADM');
+                    $this->group_create("Gerentes",LIBRARY,'#GER');
+                    redirect(base_url(PATH.'social/group'));
+                }  else {
+                    $sx .= '<ul>';
+                    for ($r=0;$r < count($rlt);$r++)
+                        {
+                            $line = $rlt[$r];
+                            $sx .= '<li class="big">'.$line['gr_name'].'</li>';
+
+                            /* Mostra membros */
+                            $sql = "select * from users_group_members
+                                        INNER JOIN users ON grm_user = id_us
+                                        where grm_group = ".$line['id_gr']."
+                                        and grm_library = '".LIBRARY."'";
+                            $rrr = $CI->db->query($sql);
+                            $rrr = $rrr->result_array();
+                            $sx .= '<div class="small">';
+                            for ($y=0;$y < count($rrr);$y++)
+                                {
+                                    $sx .= $rrr[$y]['us_nome'].'. ';
+                                }
+                            $sx .= '</div>';
+
+                            /* Novos membros */
+                            if (perfil("#ADM#GES"))
+                            {
+                                $sx .= '<a class="small" href="'.base_url(PATH.'social/group_members/'.$line['id_gr']).'">'.msg('edit_member').'</a>';
+                            } 
+
+                        }
+                    $sx .= '</ul>';
+                }           
+            
+            for($r=0;$r < count($rlt);$r++)
+                {
+
+                }
+
+            /* Novo grupo */
+            if (perfil("#ADM#GES"))
+            {
+                $sx .= '<a class="small" href="'.base_url(PATH.'social/group_edit/0').'">'.msg('new_group').'</a>';
+            }
+            $sx .= '</div></div>';
+            $data['content'] = $sx;
+            $CI->load->view('content',$data);
+            return("");
+        }
+
+    function group_create($name,$lb,$hash)
+        {
+            $CI = &get_instance();
+            $sql = "select * from users_group
+                        where gr_hash = '$hash'
+                        and gr_library = '$lb' ";
+            $rlt = $CI->db->query($sql);
+            $t = $rlt->result_id->num_rows;
+            if ($t==0)
+                {
+                    $sql = "insert into users_group
+                            (gr_name, gr_library,gr_hash)
+                            values
+                            ('$name','$lb','$hash')";
+                    $rlt = $CI->db->query($sql);
+                }
+        }
+
+    function check_sql_tables()
+        {
+            $CI = &get_instance();
+            $db = $CI->db->database;
+            /************************************************* users_group */
+
+            $sql = "
+            SELECT COUNT(*) as total
+            FROM information_schema.tables 
+            WHERE table_schema = '$db' 
+            AND table_name = 'users_group'
+            ";
+            $rlt = $CI->db->query($sql);
+            $rlt = $rlt->result_array();
+            
+            if ($rlt[0]['total'] == 0)
+                {
+                    $sql = "CREATE TABLE users_group (
+                    id_gr serial NOT NULL,
+                    gr_name char(50) NOT NULL,
+                    gr_hash char(4) NOT NULL,
+                    gr_library char(4) NOT NULL,
+                    gr_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    ) ENGINE=InnoDB DEFAULT CHARSET=UTF8;";
+                    $rlt = $CI->db->query($sql);
+                }
+
+            /************************************************* users_group */
+            $sql = "
+            SELECT COUNT(*) as total
+            FROM information_schema.tables 
+            WHERE table_schema = '$db' 
+            AND table_name = 'users_group_members'
+            ";
+            $rlt = $CI->db->query($sql);
+            $rlt = $rlt->result_array();
+            
+            if ($rlt[0]['total'] == 0)
+                {
+                    $sql = "CREATE TABLE users_group_members (
+                    id_grm serial NOT NULL,
+                    grm_group int(4) NOT NULL,
+                    grm_user int(4) NOT NULL,
+                    grm_library char(4) NOT NULL,
+                    grm_created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    ) ENGINE=InnoDB DEFAULT CHARSET=UTF8;";
+                    $rlt = $CI->db->query($sql);
+                }
+        }
 
     function email($act)
         {
@@ -959,7 +1261,10 @@ class socials
                 /****************************** FORCA LOGIN **************/
                 $forced = 0;
                 
-                $sql = "select * from " . $this->table . " where (us_email = '$login' OR us_login = '$login') OR (1=$forced) limit 1";
+                $sql = "select * from " . $this->table . " 
+                        where (us_email = '$login' OR us_login = '$login')
+                        OR (1=$forced) 
+                        limit 1";
                 $rlt = $CI->db->query($sql);
                 $rlt = $rlt->result_array();
                 
@@ -976,7 +1281,7 @@ class socials
                         $ss_user = $line['us_nome'];
                         $ss_email = $line['us_email'];
                         $ss_image = $line['us_image'];
-                        $ss_perfil = $line['us_perfil'];
+                        $ss_perfil = $this->perfil_load($ss_id,$line);
                         $ss_nivel = $line['us_nivel'];
                         $data = array('id' => $ss_id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'perfil' => $ss_perfil, 'nivel' => $ss_nivel);
                         $CI->session->set_userdata($data);
@@ -990,6 +1295,29 @@ class socials
                     return (-1);
                 }
             }
+
+            function perfil_load($id,$line)
+                {
+                    $CI = &get_instance();
+                    $this->check_sql_tables();
+                    $perfil = $line['us_perfil'];
+                    $sql = "select * from users_group_members
+                            INNER JOIN users_group 
+                            where grm_user = $id 
+                            and grm_library = '".LIBRARY."'";
+                    $rlt = $CI->db->query($sql);
+                    $rlt = $rlt->result_array();
+                    for ($r=0;$r < count($rlt);$r++)
+                        {
+                            $line = $rlt[$r];
+                            $p = $line['gr_hash'];
+                            if (strpos(' '.$perfil,$p) ==0)
+                                {
+                                    $perfil .= $p;
+                                }
+                        }
+                    return($perfil);
+                }
             
             function my_account($id)
             {

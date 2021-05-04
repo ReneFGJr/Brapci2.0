@@ -42,6 +42,8 @@ class Bs extends CI_model {
         $this->load->model('elasticsearch');
         $js = '';
         $dd3 = get("dd3") . ';';
+        $vlr2 = '';
+        $hits = '';
         
         $a = splitx(';', $dd3);
         if (count($a) > 0)
@@ -51,17 +53,24 @@ class Bs extends CI_model {
                 $js .= '$("#chk' . $a[$r] . '").prop("checked", true);';
                 $vlr2 = $this -> bs -> mark($a[$r], 'true');
             }
-            
+        } else {            
             /* Parte 2 */
             $t = get("type");
             $type = 'article';
             $term = get("q");
             $term = troca($term, '¢', '"');
-            
-            $_SESSION['year_s'] = get("year_s");
-            $_SESSION['year_e'] = get("year_e");            
-            
-            $q = $this -> elasticsearch -> query($type, $term, $t, 0, 1); 
+            if (get("year_s") != '') { $_SESSION['year_s'] = get("year_s"); }
+            if (get("year_e") != '') { $_SESSION['year_e'] = get("year_e"); }
+      
+
+            //$q = $this -> elasticsearch -> query($type, $term, $t, 0, 1); 
+            $q = $this -> elasticsearch -> query($type, $term, $t,0,1);
+            /*
+            echo '<pre>';
+            print_r($q);
+            echo '</pre>';
+            */
+
             $hits = $q['hits']['hits'];
             for ($r=0;$r < count($hits);$r++)
             {
@@ -69,8 +78,6 @@ class Bs extends CI_model {
                 $ht = round($hit['_id']);
                 $vlr2 = $this -> bs -> mark($ht, 'true'); 
             }
-        } else {
-            echo 'Ops';
         }
         echo $vlr2 . cr();
         echo '<script>' . $js . '</script>';
@@ -239,7 +246,6 @@ class Bs extends CI_model {
         $sx = '<div class="col-md-12">';
         $sx .= '<span onclick="mark_all();" style="cursor: pointer;">' . msg('select_page') . '</span>' . cr();
         $sx .= ' | <span onclick="mark_all_pages();" style="cursor: pointer;">' . msg('select_all_page') . '</span>' . cr();
-        
         $sx .= '
         <script>
         function mark_all()
@@ -259,19 +265,22 @@ class Bs extends CI_model {
         $dts = '';
         if (strlen(get("year_s")) > 0) { $dts .= ', year_s :"'.round(get("year_s")).'"'; }
         if (strlen(get("year_e")) > 0) { $dts .= ', year_e :"'.round(get("year_e")).'"'; }                
+
         $sx .= '
         <script>
         function mark_all_pages()
         {                                
-            var ok = "' . $s . '";
-            
+            var ok = "";
+            $loading = $("#loading2");
+            $loading.show();
             $.ajax({
                 type: "POST",
                 url: "' . base_url(PATH . 'mark_all/') . '",
                 data: { q: "'.troca($q,'"','¢').'", dd3: ok, type: "'.$t.'", p: 0 '.$dts.' }
             }).done(function( data ) {
                 $("#basket").html(data);
-            });                     
+                $loading.hide();
+            });            
         }                
         </script>
         ';                

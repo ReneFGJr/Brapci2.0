@@ -797,6 +797,7 @@ class res extends CI_Controller
     function mark_all($key = '', $vlr = '')
     {
         $this->bs->ajax_mark_all($key, $vlr);
+        sleep(1);
     }
 
     function basket($fcn = '', $arg = '')
@@ -999,6 +1000,9 @@ class res extends CI_Controller
                 }
                 $tela = $this->export->export_author_index_list($pg);
                 break;
+            case 'author_consistencia':
+                $tela = $this->export->author_consistencia($pg);
+                break;
             case 'collections_form':
                 $tela = $this->export->collections_form();
                 break;
@@ -1013,6 +1017,7 @@ class res extends CI_Controller
                 $tela .= '<li><a href="' . base_url(PATH . 'export/collections_form') . '">' . msg('export_collections_form') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/genere') . '">' . msg('export_genere') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/author_consistencia') . '">' . msg('author_consistencia') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
         }
 

@@ -2,7 +2,10 @@
 
 function nbr_author($xa, $tp) 
 {
-    $xa = utf8_decode($xa);
+    $xa = troca($xa,'JúNIOR','JÚNIOR');
+    $xa = utf8_decode($xa);    
+    $xa = troca($xa,', ,',',');
+
     if (strpos($xa, ',') > 0) 
     {
         $xb = trim(substr($xa, strpos($xa, ',') + 1, 100));
@@ -26,33 +29,35 @@ function nbr_author($xa, $tp)
         }
     }
     
-    $xa = "";
-    
+    $xa = "";    
     /////////////////////////////
     $xp1 = "";
     $xp2 = "";
-    $er1 = array("JUNIOR", "JÚNIOR", "JúNIOR", "NETTO", "NETO", "SOBRINHO", "FILHO", "JR.");
+    $er1 = array(utf8_decode('JÚNIOR'),"JUNIOR", "NETTO", "NETO", "SOBRINHO", "FILHO", "JR.", "JR");
+    
     ///////////////////////////// SEPARA NOMES
     $xop = 0;
     for ($qk = count($xp) - 1; $qk >= 0; $qk--) 
     {
         $xa = trim($xa . ' - ' . $xp[$qk]);
+
+        /* Primeira operação */
         if ($xop == 0) 
         { 
             $xp1 = trim($xp[$qk] . ' ' . $xp1);
             $xop = -1;
         } else { 
             $xp2 = trim($xp[$qk] . ' ' . $xp2);
-            
-            if ($xop == -1) 
+        }  
+        /* Checa os nomes */ 
+        if ($xop == -1) 
             {
-                $xop = 1;
-                for ($kr = 0; $kr < count($er1); $kr++) 
+            $xop = 1;
+            for ($kr = 0; $kr < count($er1); $kr++) 
+            {
+                if (trim(UpperCaseSQL($xp[$qk])) == trim($er1[$kr])) 
                 {
-                    if (trim(UpperCaseSQL($xp[$qk])) == trim($er1[$kr])) 
-                    {
-                        $xop = 0;
-                    }
+                    $xop = 0;
                 }
             }
         }
@@ -122,7 +127,7 @@ function nbr_author($xa, $tp)
                 $xa = substr($xa, 0, $r) . UpperCase(substr($xa, $r, 1)) . substr($xa, $r + 1, strlen($xa));
                 $mai = 0;
             } else {
-                if (substr($xa, $r, 1) == ' ') 
+                if ((substr($xa, $r, 1) == ' ') or (substr($xa, $r, 1) == '-')) 
                 { 
                     $mai = 1;
                 }

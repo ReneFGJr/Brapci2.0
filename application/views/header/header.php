@@ -109,7 +109,7 @@ if (isset($meta))
 		<link href="<?php echo base_url('css/jquery-ui.css?v1.12.1'); ?>" rel="stylesheet">
 		
 		<!--- JS ---->
-		<script src="<?php echo base_url('js/jquery-3.3.1.min.js?v3.3.1'); ?>"></script>
+		<script src="<?php echo base_url('js/jquery-3.6.0.min.js?v3.6.0'); ?>"></script>
 		<script src="<?php echo base_url('js/bootstrap.min.js?v4.0'); ?>"></script>
 		<script src="<?php echo base_url('js/jquery-ui.js?v1.12.1'); ?>"></script>
 		<script src="<?php echo base_url('js/sisdoc_form.js?v1.1.1'); ?>"></script>
@@ -127,3 +127,50 @@ if (isset($meta))
 		<body>
 		<?php
 	}
+
+
+echo '
+<style>
+.xmodal {
+    /* display:    none; */
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url(\'https://brapci.inf.br/img/icone/FhHRx.gif\') 
+                50% 50% 
+                no-repeat
+}
+</style>
+';
+echo '
+
+
+<div id="loading2" class="xmodal"></div>
+
+<script>
+$body = $("body");
+$loading = $("#loading2");
+$(\'document\').ready(function(){ 
+	$loading.hide();
+	});
+$(\'document\').on({
+    ajaxStart: function() { alert("AJAX:ON");    },
+    ajaxStop: function() { alert("AJAX:OFF"); }    
+});
+</script>
+
+
+';
+
+/*******************************
+ * 
+$(document).on({
+    ajaxStart: function() { $body.addClass("loading");    },
+    ajaxStop: function()  { $body.removeClass("loading"); }    
+})
+*/
+?>

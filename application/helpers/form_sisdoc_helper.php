@@ -16,6 +16,7 @@ defined("BASEPATH") OR exit("No direct script access allowed");
 require("form_sisdoc_helper_2.php");
 require("form_sisdoc_helper_3.php");
 require("form_sisdoc_helper_4.php");
+require("form_sisdoc_helper_5.php");
 
 /* 2017-12-21 function read_link($url) */
 $dd = array();

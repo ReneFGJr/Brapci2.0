@@ -94,13 +94,15 @@ class frbr extends CI_model {
                 $sx .= '<meta http-equiv="refresh" content="10;' . base_url(PATH . 'tools/remissive/1') . '">';
                 $sx .= '<br><br>wait phase ' . romano(2);
             break;
+
             case '1' :
                 $sx = '<h1>Phase ' . romano(2) . '</h1>';
                 $sx .= $this -> author_check_method_2($p);
                 $sx .= '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/remissive/2') . '">';
             break;
+
             case '2' :
-                $sx = '<h1>Phase ' . romano(3) . '</h1>';
+                $sx = '<h1>Phase ' . romano(3) . ' - CorporateBody</h1>';
                 $sx .= $this -> author_check_method_2($p, 'CorporateBody');
                 $sx .= '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/remissive/3') . '">';
             break;

@@ -388,6 +388,15 @@ class Ias extends CI_model
 		return ($sx);
 	}
 
+	function error_register($id,$err=-1,$eq=0)
+		{
+			$sql = "insert into brapci_ia.ai_author_check
+						(reg_id, reg_erro, reg_id_eq)
+						values
+						($id,$err,$eq)";
+			$this->db->query($sql);
+		}
+
 	function submit_accept($txt)
 	{
 		$this->gerate_dates();

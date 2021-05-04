@@ -43,9 +43,9 @@ class elasticsearch extends CI_model {
             return ( array());
         }
 
-        $url = $this -> server . '/' . $this -> index . '/' . $path;
-        
+        $url = $this -> server . '/' . $this -> index . '/' . $path;                
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -416,8 +416,11 @@ class elasticsearch extends CI_model {
 
         $ttt = ' "bool": { ' . $ooo . ' } ';
         $qqq = ' "query": { ' . $ttt . ' } ';
+        /************ Campos */
+        $fields = '"_source": ["_id","article_id","id_jnl","year"],';
         $data = '
                         {
+                          '.$fields.'
                           ' . $min_score . '
                           "from": "' . $fr . '",
                           "size": "' . $sz . '",
@@ -425,7 +428,7 @@ class elasticsearch extends CI_model {
                           ' . $qqq . '                          
                         }              
                 ';
-                        //echo '<pre>'.$data.'</pre>';
+                       /* echo '<pre>'.$data.'</pre>'; */
         $rq = $this -> call($type . '/_search?' . $qs, $method, $data);
         return $rq;
     }
