@@ -490,6 +490,20 @@ class frbr_core extends CI_model {
             $sx .= $this -> mostra_dados($line['n_name'], $link, $line);
             $sx .= ' <sup>(' . $line['n_lang'] . ')</sup>';
             $sx .= ' <sup>' . $line['rule'] . '</sup>';
+
+            /* CITED */
+            if (perfil("#USR#ADM"))
+            {
+                $file_cited = 'c/'.$line['d_r1'].'/cited.total';
+                if (file_exists(($file_cited)))
+                {
+                    $cited = file_get_contents($file_cited);
+                    $sx .= ' <span class="btn-secondary" style="border-radius: 5px;">&nbsp;'.$cited.'&nbsp;</span>';
+                } else {
+                    $sx .= ' (sn)';
+                }
+            }
+
             $sx .= '</td>';
             $sx .= '</tr>';
         }

@@ -5,7 +5,7 @@ class nets extends CI_model {
 		{
 		$d = $this -> dados($data);
         $uri = 'http://hdl.handle.net/20.500.11959/brapci/'.$data[0]['d_r1'];
-        $link = ' Disponível em: &lt;<a href="'.$uri.'" target=_"new">' . $uri . '</a>&gt;.';
+        $link = ' Disponível em: <a href="'.$uri.'" target=_"new">' . $uri . '</a>.';
         $acesso = ' Acesso em: ' . date("d") . ' ' . msg('mes_' . date("m")) . ' ' . date("Y") . '.';
         
 		$mn = $d['autor_full'];

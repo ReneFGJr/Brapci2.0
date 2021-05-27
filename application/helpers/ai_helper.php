@@ -287,7 +287,8 @@ function search_class($class)
         switch($class)
             {
                 case 'Subject':  
-                $prop = 119;        
+                $prop = 119; 
+                /* Melhorar para recuperar as remissivas */       
                 $sql = "
                     SELECT n_name, id_cc, i_manitestation 
                     FROM `find_item`

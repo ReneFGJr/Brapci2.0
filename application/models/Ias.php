@@ -19,7 +19,7 @@ defined("BASEPATH") or exit("No direct script access allowed");
 
 class Ias extends CI_model
 {
-	var $version_nlp = '0.26';
+	var $version_nlp = '0.27';
 
 	function check($f = 0)
 	{
@@ -354,6 +354,20 @@ class Ias extends CI_model
 				$sx .= $this->ias_cited->process(get("dd1"));
 				break;
 
+			case 'charset':
+				$this->load->model('ias_cited');
+				$sx .= 'Process CharSet <sup><i>alfa</i></sup>';
+				$sx .= $this->nlp_form();
+				$sx .= $this->process_charset(get("dd1"));
+				break;	
+
+			case 'genere':
+				$this->load->model('ias_cited');
+				$sx .= 'Process Genere <sup><i>alfa</i></sup>';
+				$sx .= $this->nlp_form();
+				$sx .= $this->process_genere(get("dd1"));
+				break;							
+
 			case 'cited_analyse':
 				$this->load->model('ias_cited');
 				$sx .= 'Process Cited Analyse <sup><i>alfa</i></sup>';
@@ -380,6 +394,8 @@ class Ias extends CI_model
 			default:
 				$sx .= '<ul>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/run') . '">' . msg("Processing Teste") . '</a>';
+				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/charset') . '">' . msg("Convert ISO-9981 <-> UTF8") . '</a>';
+				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/genere') . '">' . msg("Genere Identify") . '</a>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/singular') . '">' . msg("Processing plural/singular") . '</a>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/cited') . '">' . msg("Processing cited/refs") . '</a>';
 				$sx .= '<li>' . '<a href="' . base_url(PATH . 'ia/nlp/cited_analyse') . '">' . msg("Processing cited_analyse") . '</a>';
@@ -1025,6 +1041,61 @@ class Ias extends CI_model
 				}
 			return($ano);
 		}
+
+		function process_charset($t)
+			{
+				$sx = '<form>';
+
+				$sx .= '<div class="'.bscol(12).'">';
+				$sx .= 'UTF8-Decode';
+				$sx .= '<textarea cols=80 rows=5 class="form-control form_textarea">'.utf8_decode($t).'</textarea>';
+				$sx .= '</div>';
+
+				$sx .= '<div class="'.bscol(12).'">';
+				$sx .= 'UTF8-Encode';
+				$sx .= '<textarea cols=80 rows=5 class="form-control form_textarea">'.utf8_encode($t).'</textarea>';
+				$sx .= '</div>';
+
+				$sx .= '</form>';
+
+				return($sx);
+			}
+
+		function process_genere($t)
+			{
+				$sx = '';
+				$t = troca($t,chr(13),chr(10));
+				$t = troca($t,chr(10).chr(10),chr(10));
+				if (strlen($t) > 0)
+				{
+					$t .= chr(10);
+					$tn = explode(chr(10),$t);
+					$rst = '';
+					$sx = '<form>';
+					for ($r=0;$r < (count($tn)-1);$r++)
+					{
+						$url = 'https://brapci.inf.br/ws/api/?verb=genere&q='.rawurlencode($tn[$r]);
+						$txt = read_link($url);
+						$txt = (array)json_decode($txt);
+						$rst .= $tn[$r].';';
+						if (isset($txt['genere']))
+							{
+								$rst .= $txt['genere'];
+							} else {
+								$rst .= 'Indefinido';
+							}
+						$rst .= chr(10);
+					}
+					$sx .= '<div class="'.bscol(12).'">';
+					$sx .= msg('Genere');
+					$sx .= '<textarea cols=80 rows=5 class="form-control form_textarea">'.$rst.'</textarea>';
+					$sx .= '</div>';
+					$sx .= '</form>';
+				}
+				
+
+				return($sx);
+			}			
 
 	function neuro_email($t)
 	{

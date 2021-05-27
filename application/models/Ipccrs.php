@@ -266,7 +266,7 @@ class ipccrs extends CI_model {
             $sx = '';
             $sx .= '<div class="'.bscol(11).'">';
             $sx .= '<h3>Total de citações - '.count($rlt).'</h3>';
-            $sx .= '<ul>';
+            $sx .= '<ol>';
             for ($r=0;$r < count($rlt);$r++)
                 {
                     $line = $rlt[$r];
@@ -277,7 +277,7 @@ class ipccrs extends CI_model {
                     $sx .= '</li>';
                     $auth = $this->add_authors($line['ca_text'],$auth);
                 }
-            $sx .= '</ul>';
+            $sx .= '</ol>';
 
             $au = array();
             foreach($auth as $author=>$total)

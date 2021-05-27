@@ -1034,7 +1034,7 @@ class articles extends CI_model {
         $pgf = trim($ln['ar_pg_final']);
         $doi = trim($ln['ar_doi']);
         $tipo = trim($ln['jnl_tipo']);
-        $link = ' Disponível em: &lt;' . 'http://hdl.handle.net/20.500.11959/brapci/'.$ln['id_ar'] . '&gt;.';
+        $link = ' Disponível em: http://hdl.handle.net/20.500.11959/brapci/'.$ln['id_ar'] . '.';
         $acesso = ' Acesso em: ' . date("d") . ' ' . msg('mes_' . date("m") . 'a') . ' ' . date("Y") . '.';
         $pag = '';
 

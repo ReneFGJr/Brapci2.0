@@ -44,7 +44,7 @@ class rdf
 	}
 	
 	function index($link='',$path='',$id='',$id2='',$id3='')
-	{        		
+	{       		
 		$dt = array();
 		$sx = '';
 		switch($path)
@@ -1039,10 +1039,11 @@ function form_ed($id,$id2,$cl=0) {
 	
 	array_push($cp, array('$O 1:Ativo&0:Inativo', 'sc_ativo', msg('ativo'), true, true));
 	array_push($cp, array('$HV', 'sc_global', LIBRARY, true, true));
+	array_push($cp, array('$HV', 'sc_library', LIBRARY, true, true));
+	
 	array_push($cp, array('$A', '', msg('sc_group'), False, true));
 	array_push($cp, array('$S', 'sc_group', msg('sc_group'), False, true));
 	array_push($cp, array('$[1:99]', 'sc_ord', msg('ordem'), true, true));
-	
 	$sx = $form -> editar($cp, 'rdf_form_class');	
 	
 	if ($form -> saved) {
@@ -1565,6 +1566,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					) as tabela
 					LEFT join ".$this->base." rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
 					LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c";
+
 					
 					$rlt = $CI -> db -> query($sql);
 					$rlt = $rlt -> result_array();
@@ -1583,7 +1585,8 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 							(
 								$class,$prop,0,".LIBRARY.",0,1
 							)";
-							$xrlt = $CI -> db -> query($sql);							
+							$CI -> db -> query($sql);							
+							echo '<hr><tt>'.$sql.'</tt>';
 						}
 					}
 				}
@@ -2318,7 +2321,7 @@ function class_view_form($id='',$idx='',$act='')
 	
 	where sc_class = $id AND (sc_library = ".LIBRARY.")
 	order by sc_ord, sc_group";
-	
+
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();	
 	$sx = '<div class="col-md-12">';
@@ -2404,6 +2407,8 @@ function class_view_form($id='',$idx='',$act='')
 	$link = '<a href="#" class="btn btn-outline-primary" onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$id.'/0').'\',800,600);">';
 	$linka = '</a>';
 	$sx .= $link.'novo'.$linka;
+
+	if ($wh == '') { $wh = '(1=1)'; }
 
 
 	/************************* APROVEITAMENTO */

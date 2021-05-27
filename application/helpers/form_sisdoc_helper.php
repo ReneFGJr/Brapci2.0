@@ -149,8 +149,7 @@ function get($key) {
         
         $dp = troca($dp, "'", '´');
     }
-    return ($dp);
-    
+    return ($dp);    
 }
 
 function alert($msg) 

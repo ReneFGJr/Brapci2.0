@@ -183,6 +183,8 @@ class socials
                 $sx = '<h1>Socials Menu</h1>';
                 $sx .= '<ul>';
                 $sx .= '<li><a href="' . base_url(PATH . 'social/email/') . '">' . msg('email_test') . '</a></li>';
+                $sx .= '<li><a href="' . base_url(PATH . 'social/group/') . '">' . msg('groups') . '</a></li>';
+
                 $sx .= '</ul>';
             } else {
                 $sx = message("Function not found - " . $act, 3);
@@ -204,6 +206,7 @@ class socials
             $cp = array();
             array_push($cp,array('$H8','id_gr','',false,false));
             array_push($cp,array('$S100','gr_name',msg('gr_name'),true,true));
+            array_push($cp,array('$S10','gr_hash',msg('gr_hash'),true,true));
             if ($id == 0)
                 {
                     array_push($cp,array('$HV','gr_library',LIBRARY,true,true));
@@ -329,7 +332,7 @@ class socials
                         {
                             $line = $rlt[$r];
                             $link = '<a href="'.base_url(PATH.'social/group_members/'.$id.'/?dd1='.$q.'&us='.$line['id_us'].'&chk='.checkpost_link($line['id_us'].$id)).'">+</a>';
-                            $sx .= '<li>'.$line['us_nome'].' '.$link.'</li>';
+                            $sx .= '<li>'.$line['us_nome'].' ('.$line['us_email'].') '.$link.'</li>';
                         }
                     $sx .= '</ul>';
                     $sx .= '</div>';
@@ -643,6 +646,9 @@ class socials
         $link = '<a href="' . base_url(PATH . 'social/user_password/' . $dt['id_us'] . '/' . md5($dt['us_login'])) . '">';
         $linka = '</a>';
         $cnt .= '<li>' . $link . msg('change_password') . $linka . '</li>';
+
+        $link = '<a href="' . base_url(PATH . 'social/api_key/' . $dt['id_us'] . '/' . md5($dt['us_login'])) . '">';
+        $cnt .= '<li>' . $link . msg('gerate_api_key') . $linka . '</li>';
         $cnt .= '</ul>';
         
         $cnt .= $this->show_attri($id);
@@ -1589,17 +1595,18 @@ class socials
     function show_attri($id)
     {
         $CI = &get_instance();
-        $sql = "select * from users_perfil_attrib 
-        inner join users_perfil ON id_pe = pa_perfil
-        where pa_user = " . $id;
+        $sql = "select * from users_group_members 
+                    inner join users_group ON id_gr = grm_group
+                    where grm_user = " . $id." and grm_library = '".LIBRARY."'" ;
         $rlt = $CI->db->query($sql);
         $rlt = $rlt->result_array();
-        $sx = '<table class="table">';
+        
+        $sx = '';
+        $sx .= '<table class="table">';
         $sx .= '<tr>';
-        $sx .= '<th>ID</th>';
-        $sx .= '<th>Perfil</th>';
+        $sx .= '<th>Classe</th>';
+        $sx .= '<th>Grupo</th>';
         $sx .= '<th>Atribuído</th>';
-        $sx .= '<th>Ação</th>';
         $sx .= '</tr>';
         if (isset($_SESSION['nivel']))
         {
@@ -1608,23 +1615,22 @@ class socials
             $_SESSION['nivel'] = 0;
             $nivel = 0;
         }
+
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
             $sx .= '<tr>';
-            $sx .= '<td>' . $line['pe_abrev'] . '</td>';
-            $sx .= '<td>' . $line['pe_descricao'] . '</td>';
-            $sx .= '<td>' . stodbr($line['pa_created']) . '</td>';
-            
-            if ($nivel >= $line['pe_nivel']) {
-                $link = '<a href="' . base_url(PATH . 'social/attrib/' . $id . '/R' . $line['id_pa']) . '" style="color: red;">';
-                $linka = '</a>';
-                $sx .= '<td>' . $link . '[remover]' . $linka . '</td>';
-            } else {
-                $sx .= '<td>-</td>';
-            }
+            $sx .= '<td>' . $line['gr_hash'] . '</td>';
+            $sx .= '<td>' . $line['gr_name'] . '</td>';
+            $sx .= '<td>' . stodbr($line['gr_created']) . '</td>';           
             $sx .= '</tr>';
         }
         $sx .= '</table>';
+
+        if (isset($_SESSION['perfil']))
+        {
+            $sx .= 'SESSÃO: '.$_SESSION['perfil'];
+        }
+        
         return ($sx);
     }
     function show_perfil($dt)
@@ -1650,10 +1656,13 @@ class socials
         }
         $sx .= '</div>';
         /***************** */
-        $sx .= '<div class="col-2"></div>';
-        $sx .= '<div class="col-8">';
+        $sx .= '<div class="'.bscol(2).'"></div>';
+        $sx .= '<div class="'.bscol(10).'">';
         $sx .= 'API Access: <tt><span style="color: blue; weigth: bold;">' . md5($dt['us_perfil_check']) . '</span></tt>';
         $sx .= '</div>';
+
+        $sx .= '<div class="'.bscol(2).'"></div>';
+        $sx .= '<div class="'.bscol(10).'"><cnt/></div>';
         
         $sx .= '</div>';
         return ($sx);
