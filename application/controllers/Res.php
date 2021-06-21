@@ -13,10 +13,8 @@ define("SYSTEM_ID", 1);
 
 class res extends CI_Controller
 {
-
     function __construct()
     {
-
         parent::__construct();
         $this->load->database();
         $this->load->helper('url');
@@ -45,7 +43,7 @@ class res extends CI_Controller
 
     private function cab($data = array())
     {
-        $data['title'] = '';
+        if (!isset($data['title'])) { $data['title'] = ''; }
         $this->load->view('header/header.php', $data);
         if ((!isset($data['nocab'])) and (strlen(get("nocab")) == 0)) {
             $this->load->view('header/menu_top.php', $data);
@@ -1779,4 +1777,18 @@ class res extends CI_Controller
         /* Footer */
         $this->footer();
     }
+
+    function ws($d1='',$d2='',$d3='',$d4='')
+    {
+        $this->load->helper('ws_class');
+        $h = array();
+        $h['nocab'] = true;
+        $h['title'] = 'Web Semantic';
+        $this->cab($h); 
+        $ws = new wsc;
+        $ws->dir = 'ws/source/';
+        $data['title'] = '';
+        $data['content'] = $ws->web();
+        $this->load->view('content', $data);
+    }    
 }

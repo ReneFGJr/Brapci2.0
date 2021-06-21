@@ -100,6 +100,17 @@ class bibliometrics extends CI_model {
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
             break;
+
+            case 'list_row' :
+                if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this -> bibliometrics -> list_row($dd1, $dd2);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }
+            break;
             
             default :
             $tela = $this -> bibliometrics -> tools_menu();
@@ -142,7 +153,11 @@ class bibliometrics extends CI_model {
         $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix_ocorrencia').'">';
         $sx .= msg('csv_to_matrix_ocorrencia');
         $sx .= '</a>';
-        $sx .= '</li>';          
+        $sx .= '</li>';
+
+        $sx .= '<li>'.msg('Text_process').'</li>';
+
+        $sx .= '<ul>';
         
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/change_to').'">';
@@ -154,7 +169,15 @@ class bibliometrics extends CI_model {
         $sx .= '<a href="'.base_url(PATH.'bibliometric/remove_tags').'">';
         $sx .= msg('remove_tags');
         $sx .= '</a>';
-        $sx .= '</li>';  
+        $sx .= '</li>'; 
+
+        $sx .= '<li>';
+        $sx .= '<a href="'.base_url(PATH.'bibliometric/list_row').'">';
+        $sx .= msg('list_row');
+        $sx .= '</a>';
+        $sx .= '</li>';          
+
+        $sx .= '</ul>';
         
         $sx .= '<li>';
         $sx .= '<b>'.msg('citation_index').'</b>';
@@ -228,7 +251,13 @@ class bibliometrics extends CI_model {
         $d1 = troca($d1,']','>');
         $d1 = strip_tags($d1);
         return($d1);
-    }        
+    }
+
+    function list_row($d1)
+        {
+            $ln = troca($d2,chr(13),';');
+            $ln = troca($ln,chr(10),'');
+        }        
     function change_text_to($d1,$d2)
     {
         $ln = troca($d2,chr(13),';');
@@ -239,7 +268,12 @@ class bibliometrics extends CI_model {
         {
             $ln = troca($lns[$r],'=>',';');
             $m = splitx(';',$ln);
-            $d1 = troca($d1,$m[0],$m[1]);
+            if (!isset($m[1]))
+                {
+                    $d1 = '[erro] linha: '.$r.' => '.$m[0];
+                } else {
+                    $d1 = troca($d1,$m[0],$m[1]);
+                }            
         }
         return($d1);
     }

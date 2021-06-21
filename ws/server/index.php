@@ -9,8 +9,8 @@ if (isset($_SERVER['HTTP_ACCEPT']))
 require("ws_class_helper.php");
 require("../../application/helpers/form_sisdoc_helper.php");
 
-if (isset($attr[1])) {
-    $verb = $attr[1];
+if (isset($attr[1]) or (strlen($_GET['verb']) > 0)) {
+    $verb = $attr[1].$_GET['verb'];
 } else {
     $verb = 'Verb: ?';
 }

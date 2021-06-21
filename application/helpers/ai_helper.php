@@ -218,8 +218,31 @@ function search($txt)
     }
 function export_index($class='',$id='')
     {
-        $sx = 'Exporta lista de autores';
-        $sx .= $this->index_author($id);
+        switch($class)
+            {
+                case 'Person':
+                $sx = '';
+                $sx .= '<div class="container">';
+                $sx .= '<div class="row">';
+                $sx .= '<div class="'.bscol(12).'">';
+                $sx .= 'Exporta lista de autores';
+                $sx .= $this->index_author($id);
+                $sx .= '</div>';
+                $sx .= '</div>';
+                $sx .= '</div>';
+                break;
+
+                default:
+                $sx = '';
+                $sx .= '<div class="container">';
+                $sx .= '<div class="row">';
+                $sx .= '<div class="'.bscol(12).'">';
+                $sx .= 'Exporta lista de '.$class;
+                $sx .= $this->index_class($id,$class);
+                $sx .= '</div>';
+                $sx .= '</div>';
+                $sx .= '</div>';
+            }
         return($sx);
     }
 
@@ -343,6 +366,38 @@ function index_author($id='')
         return($sx);
     }
 
+function index_class($id='',$class)
+    {
+        if (strlen($id)==0) { $id = 65; }
+        $rdf = new rdf;
+        $sx = $this->export_class_index_list($id,$class);
+        return($sx);
+    } 
+
+    function export_class_index_list($lt = 0, $class) {
+        $sx = 'Exporting';
+        $nouse = 0;
+        $dir = 'application/views';
+        dircheck($dir);
+        $dir = 'application/views/index/';
+        dircheck($dir);
+        $dir = 'application/views/index/'.LIBRARY;
+        dircheck($dir);
+        $sx = '';
+        if (($lt >= 65) and ($lt <= 90)) {
+            $ltx = chr(round($lt));
+            $txt = $this -> index_list_style_2($ltx, $class, 0);
+            $file = $dir . '/'.strtolower($class).'_' . $ltx . '.php';
+            $hdl = fopen($file, 'w+');
+            fwrite($hdl, $txt);
+            fclose($hdl);
+            $sx .= bs_alert('success', msg('Export_author') . ' #' . $ltx . '<br>');
+            $sx .= '<meta http-equiv="refresh" content="3;' . base_url(PATH . 'admin/index/'.($class).'/' . ($lt + 1)) . '">';
+            $sx .= $lt;
+        }
+        return ($sx);
+    }       
+
     function export_author_index_list($lt = 0, $class = 'Person') {
         $sx = 'Exporting';
         $nouse = 0;
@@ -367,7 +422,7 @@ function index_author($id='')
         return ($sx);
     } 
 
-    function index_list_style_2($lt = 'G', $class = 'Person', $nouse = 0) {
+    function index_list_style_2($lt = 'G', $class, $nouse = 0) {
         $rdf = new rdf;
         $CI = &get_instance();
         $f = $rdf -> find_class($class);
@@ -379,7 +434,8 @@ function index_author($id='')
         if (strlen($lt) > 0) {
             $wh .= " and (N1.n_name like '$lt%') ";
         }
-
+        if ($class=="Person")
+        {
         $sql = "select 
                     N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
                     N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
@@ -394,6 +450,19 @@ function index_author($id='')
                         WHERE i_library = '".LIBRARY."' AND C1.cc_class = " . $f . " ".$wh."
                         group by n_name, n_lang, id_cc,n_name_use, n_lang_use, id_cc_use 
                         order by n_name";
+        } else {
+            $sql = "SELECT 
+                    N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc                    
+                    FROM find_item
+                    INNER JOIN rdf_data as RD1 on i_manitestation = d_r1 and d_p = $f
+                    INNER JOIN rdf_concept as C1 ON id_cc = d_r2
+                    INNER JOIN rdf_name as N1 ON id_n = cc_pref_term
+                    WHERE i_library = '".LIBRARY."' $wh
+                    group by n_name, n_lang, id_cc
+                    ORDER BY cc_pref_term ASC";
+
+            //echo '<pre>'.$sql.'</pre>';
+        }
         $rlt = $CI -> db -> query($sql);
         $rlt = $rlt -> result_array();
 

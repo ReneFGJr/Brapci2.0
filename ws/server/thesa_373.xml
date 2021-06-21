@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/2004/02/skos/core#" 
+xmlns:dc="http://purl.org/dc/elements/1.1/" 
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+xmlns:thesa="http://www.ufrgs.br/thesa/index.php/c/">
+<Collection>
+<name>AskMe</name>
+<idth>373</idth>
+<description></description>
+<created>2021-06-03 23:37:11</created>
+<update>2021-06-03</update>
+<introdution>Vocabulário de início de perguntas em portugues</introdution>
+<methodology></methodology>
+<audience>Sistema WS</audience>
+<language>364</language>
+<url>https://www.ufrgs.br/tesauros/index.php/thesa/terms/373</url>
+</Collection>
+<Concept about="thesa:26570#">
+<prefLabel lang="pt" >Quem é</prefLabel>
+<hiddenLabel lang="pt" >Quem é a</hiddenLabel>
+<hiddenLabel lang="pt" >Quem é o</hiddenLabel>
+<hiddenLabel lang="pt" >Quem são</hiddenLabel>
+</Concept>
+<Concept about="thesa:26571#">
+<prefLabel lang="pt" >Quem é quem</prefLabel>
+</Concept>
+<Concept about="thesa:26572#">
+<prefLabel lang="pt" >Qual é</prefLabel>
+<hiddenLabel lang="pt" >Quais são</hiddenLabel>
+<hiddenLabel lang="pt" >Qual é a</hiddenLabel>
+</Concept>
+<Concept about="thesa:26573#">
+<prefLabel lang="pt" >Onde está</prefLabel>
+<hiddenLabel lang="pt" >Onde estão</hiddenLabel>
+</Concept>
+</RDF>

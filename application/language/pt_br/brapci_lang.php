@@ -185,6 +185,7 @@ $lang['cache_status'] = 'Situação dos trabalhos';
 $lang['genere'] = 'Genêro';
 $lang['Selected'] = 'Seleção';
 $lang['change_to'] = 'Muda strings DE/PARA';
+$lang['change_to_info'] = 'Utilize o separador "=>" para troca';
 $lang['remove_tags'] = "Remove Tags/Html";
 $lang['Genere'] = "Indicadores de Gênero do autores";
 

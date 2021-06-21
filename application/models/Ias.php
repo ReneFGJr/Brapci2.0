@@ -364,6 +364,7 @@ class Ias extends CI_model
 			case 'genere':
 				$this->load->model('ias_cited');
 				$sx .= 'Process Genere <sup><i>alfa</i></sup>';
+				$sx .= '<br><tt>API: https://brapci.inf.br/ws/api/?verb=genere&q=NOME</tt>';
 				$sx .= $this->nlp_form();
 				$sx .= $this->process_genere(get("dd1"));
 				break;							
@@ -1064,6 +1065,7 @@ class Ias extends CI_model
 		function process_genere($t)
 			{
 				$sx = '';
+				$n = array();
 				$t = troca($t,chr(13),chr(10));
 				$t = troca($t,chr(10).chr(10),chr(10));
 				if (strlen($t) > 0)
@@ -1074,17 +1076,28 @@ class Ias extends CI_model
 					$sx = '<form>';
 					for ($r=0;$r < (count($tn)-1);$r++)
 					{
-						$url = 'https://brapci.inf.br/ws/api/?verb=genere&q='.rawurlencode($tn[$r]);
-						$txt = read_link($url);
-						$txt = (array)json_decode($txt);
-						$rst .= $tn[$r].';';
-						if (isset($txt['genere']))
-							{
-								$rst .= $txt['genere'];
-							} else {
-								$rst .= 'Indefinido';
-							}
-						$rst .= chr(10);
+						$names = $tn[$r];
+						$names = troca($names,'"','');
+						$nm = $names;
+						if (!isset($n[$names]))
+						{
+							
+							$names = trim($names);
+							$names = rawurlencode($names);
+							$url = 'https://brapci.inf.br/ws/api/?verb=genere&q='.$names;
+							$txt = read_link($url);
+							$txt = (array)json_decode($txt);
+							$rst .= $tn[$r];
+							if (isset($txt['genere']))
+								{
+									$gnr = $nm.';'.$txt['genere'];
+								} else {
+									$gnr = $nm.';Indefinido';
+								}
+							$rst = troca($rst,$nm,$gnr);
+							$rst .= chr(10);
+							$n[$nm] = $gnr;
+						}
 					}
 					$sx .= '<div class="'.bscol(12).'">';
 					$sx .= msg('Genere');

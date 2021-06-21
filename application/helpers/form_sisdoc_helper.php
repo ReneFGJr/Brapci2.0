@@ -1380,6 +1380,7 @@ class form {
                 $tt = substr($type, 1, 1);
                 
                 /* exessoes */
+                if (substr($type, 0, 3) == '$DM') { $tt = 'DM';}
                 if (substr($type, 0, 3) == '$QC') { $tt = 'QC';}
                 if (substr($type, 0, 3) == '$QR') { $tt = 'QR';}
                 if (substr($type, 0, 4) == '$MES') { $tt = 'MES';}
@@ -1953,6 +1954,41 @@ class form {
                                 </script>
                                 ';
                             break;
+
+                            /* String */
+                            case 'DM' :
+                                /* TR da tabela */
+                                //$tela .= $tr;
+                                
+                                /* label */
+                                if (strlen($label) > 0) {
+                                    $tela .= $tdl . $label . ' ';
+                                }
+                                if ($required == 1) { $tela .= ' <font color="red">*</font> ';
+                                }
+                                
+                                $dados = array('name' => $dn, 'id' => $dn, 'value' => $vlr, 'maxlenght' => 1, 'size' => 1, 'placeholder' => $label, 'class' => 'form_string ');
+                                if ($readonly == false) { $dados['readonly'] = 'readonly';
+                                }
+                                $year = date("Y");
+                                $month = date("m");
+                                for ($r=0;$r < 48;$r++)
+                                    {
+                                        $mes = $year.'/'.strzero($month,2);
+                                        $options[$mes] = $mes;
+                                        $month--;
+                                        if ($month == 0)
+                                            {
+                                                $month = 12;
+                                                $year--;
+                                            }
+                                    }
+
+                                $tela .= $td . form_dropdown($dados, $options, $vlr);
+                                $tela .= $tdn;
+                                //$tela .= $trn;
+
+                            break;                            
                             
                             /* String */
                             case 'LINK' :
@@ -2457,4 +2493,21 @@ class form {
                 $sx .= '</script>';
                 return($sx);
             }
+
+            function dias_mes($mes,$year='')
+                {                    
+                if ($year == '') { $year = date("Y"); }
+                $dias = 31;
+                $mes = round($mes);
+                if (($mes == 4) or ($mes == 6) or ($mes == 4) or ($mes == 9) or ($mes == 11))
+                    {
+                        $dias = 30;
+                    }
+                if ($mes == 2)
+                    {
+                        $dias = 28;
+                        if (round($year/4) == ($year / 4)) { $dias++; }
+                    }
+                return($dias);
+                }
             ?>

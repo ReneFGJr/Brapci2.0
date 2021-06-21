@@ -665,22 +665,17 @@ class socials
         if (isset($_SESSION['user']) and (strlen($_SESSION['user']) > 0)) {
             $name = $_SESSION['user'];
             $sx = '
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>
-            
-            ';
-            $sx = '
-            <li class="nav-item dropdown ml-auto">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' . $name . ' </a>        
-            
-            <div class="dropdown-menu ml-auto" aria-labelledby="navbarDropdownMenuLink" style="right: 0px;">
-            <a class="dropdown-item" href="' . base_url(PATH . 'social/perfil') . '">' . msg('user_perfil') . '</a>
-            <a class="dropdown-item" href="' . base_url(PATH . 'social/logout') . '">' . msg('user_logout') . '</a>
-            </div>
-            
-            </li>       
-            ';
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    ' . $name . '
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="' . base_url(PATH . 'social/perfil') . '">' . msg('user_perfil') . '</a></li>
+                    <li><a class="dropdown-item" href="' . base_url(PATH . 'social/logout') . '">' . msg('user_logout') . ' action</a></li>
+                </ul>
+                </li>';
         } else {
-            $sx = '<A href="#" class="nav-link" data-toggle="modal" data-target="#exampleModalLong">' . msg('sign_in') . '</a>';
+            $sx = '<A href="' . base_url(PATH . 'social/login') . '" class="nav-link" data-toggle="modal" data-target="#exampleModalLong">' . msg('sign_in') . '</a>';
             $sx .= $this->button_login_modal();
         }
         return ($sx);

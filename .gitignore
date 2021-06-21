@@ -64,3 +64,4 @@ application/views/brapci/index/authors_Y.php
 *.doc
 _repository/47/2020/.htaccess
 _repository/47/2020/04/.htaccess
+*.json

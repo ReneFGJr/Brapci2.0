@@ -7,8 +7,7 @@ class altmets extends CI_model
 		$sx = '';
 		if (strlen($doi) > 0)
 		{
-			$sx .= '<br/><br/>';
-			$sx .= '<span id="plum" style="font-size: 70%;">Plum X Metrics</span>';
+			$sx .= '<span id="plum" style="font-size: 70%;">Plum X Metrics</span><br/>';
 			$sx .= '<a href="https://plu.mx/plum/a/?doi='.$doi.'" class="plumx-plum-print-popup img-fluid"></a>';
 			$sx .= '<script type="text/javascript" src="//cdn.plu.mx/widget-all.js"></script>';
 			$sx .= '<script>window.__plumX.widgets.init();</script>';

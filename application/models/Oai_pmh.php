@@ -673,6 +673,8 @@ class oai_pmh extends CI_model
         $n = troca($n, 'número', 'n.');
         $n = troca($n, 'Número', 'n.');
         $n = troca($n, 'no ', 'n. ');
+        $n = troca($n, ' N.º ', 'n. ');
+        $n = troca($n, ' n.º ', 'n. ');
         $n = troca($n, 'online first', 'n. online');
         $n = troca($n, 'ahead of print', 'n. online');
 

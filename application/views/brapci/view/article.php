@@ -115,16 +115,16 @@ for ($r = 0; $r < count($article); $r++) {
     <?php require("article_metadata.php"); ?>
 </header>
 <div class="row">
-	<div class="col-8">
+	<div class="<?php echo bscol(8);?>">
 		[<?php echo $source; ?>]
 	</div>
-	<div class="col-4 btn btn-primary">
+	<div class="<?php echo bscol(4);?> btn btn-primary">
 		<?php echo $section; ?>
 	</div>
 </div>
 
 <div class="row" style="margin-top: 40px;">
-	<div class="col-10">
+	<div class="<?php echo bscol(10);?>">
 	    <?php
 	       if (perfil("#ADMIN") > 0)
             {
@@ -143,12 +143,12 @@ for ($r = 0; $r < count($article); $r++) {
 			?>
 		</center>
 	</div>
-	<div class="col-10 text-right article_author">
+	<div class="<?php echo bscol(10);?> text-right article_author">
 		<p>
 			<?php echo $author; ?>
 		</p>
 	</div>
-	<div class="col-10 text-justify">
+	<div class="<?php echo bscol(10);?> text-justify">
 		<?php
 		if (isset($abs['pt'])) {
 			echo '<p><b>Resumo</b>: ' . $abs['pt'] . '</p>' . cr();
@@ -170,13 +170,12 @@ for ($r = 0; $r < count($article); $r++) {
 		}
 		echo '<div>'.msg('how_cite').'<br>'.$cited.'</div>';
 		echo '<br>';
-		echo '<div>'.msg('how_sharing').'<br>'.$social.'</div>';
+		echo '<div class="'.bscol(12).'" style="margin-bottom: 20px;">'.msg('how_sharing').'<br>'.$social.'</div>';
 		?>
 	</div>
-	<div class="col-2 text-justify">
+	<div class="<?php echo bscol(2);?> text-justify">
 		<?php
-		echo $linkpdf . $pdf . $linkpdfa;
-		
+		echo '<div class="float-left">'.$linkpdf . $pdf . $linkpdfa;		
 		//if (perfil("#ADM") and ($epdf == 0))
         if (perfil("#ADM"))
 			{
@@ -190,11 +189,12 @@ for ($r = 0; $r < count($article); $r++) {
 				echo '</a>';
 				echo '</div>';
 			}
-		echo '<br><br>';
-		echo $altmetrics;
-		echo $plum;
-		echo '<hr>'.$ia;
-		
+		echo '</div>';
+
+		//echo '<br><br>';
+		echo '<div class="float-left pad5">'.$altmetrics.'</div>';
+		echo '<div class="float-left pad5 text-center">'.$plum.'</div>';
+		echo '<div class="float-left pad5">'.$ia.'</div>';		
 		?>
 	</div>
 </div>

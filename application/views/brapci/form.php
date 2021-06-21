@@ -27,7 +27,7 @@ input[type=text] {
     border-radius: 4px;
     font-size: 16px;
     background-color: white;
-    background-image: url('<?php echo HTTP; ?>img/icone/searchicon.png');
+    background-image: url('<?php echo base_url('img/icone/searchicon.png');?>');
     background-position: 10px 10px;
     background-repeat: no-repeat;
     padding: 12px 20px 12px 40px;
@@ -37,12 +37,12 @@ input[type=text] {
 
 input[type=text]:focus {
     width: 100%;
-    background-image: url('<?php echo HTTP; ?>
-        img/icone/searchicon.png');
-        background-color: white;
-        background-position: 10px 10px;
-        background-repeat: no-repeat;
-        }
+    background-image: url('<?php echo base_url('img/icone/searchicon_on.png');?>');
+    background-color: white;
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    }
 </style>
 </head>
 <body>

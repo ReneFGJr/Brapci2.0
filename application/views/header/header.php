@@ -1,10 +1,10 @@
 <!doctype html>
 <?php
-if (!isset($title)) { $title = 'no title';
-}
+if ((!isset($title)) or ($title == '')) 
+	{ $title = 'Brapci - Base de Dados em Ciência da Informação'; }
 $HTTP = 'http://www.brapci.inf.br/';
 
-$title = 'Brapci - Base de Dados em Ciência da Informação';
+
 $desc = '';
 $url = 'http://www.brapci.inf.br/';
 $sufix = ' #Brapci2.1';
