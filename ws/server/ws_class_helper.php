@@ -124,8 +124,10 @@ class wsc //extends CI_Model
         $excluir=0;
         if ($excluir==1)
         {
+            echo '<br>Buscando '.$file;
             if (file_exists($file))
                 {
+                    echo '==>EXCLUíDO';
                     unlink($file);
                 }
             return("");

@@ -23,11 +23,15 @@ $force = TRUE; /* Força gravação, se já existe dados */
 #require("inport_paises.php");
 #require("inport_genere.php");
 #require("inport_years.php");
-require("inport_meses.php");
+#require("inport_meses.php");
+#require("inport_estdos_brasil.php");
+#require("inport_universidade.php");
+require("inport_cidade.php");
 exit;
 
+
 $th = 64; /* Ciencia da Informação */
-#require("inport_thesa.php");
+require("inport_thesa.php");
 
 $th = 8; /* Instituicoes */
 #require("inport_thesa.php");
@@ -35,7 +39,7 @@ $th = 8; /* Instituicoes */
 $th = 373; /* Questions */
 //require("inport_thesa.php");
 
-
+exit;
 
 
 /********************************** UNIVERSIDADE */
