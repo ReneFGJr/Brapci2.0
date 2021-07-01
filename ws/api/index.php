@@ -21,6 +21,12 @@ switch($verb)
         $rst = $ws->genere($q);
         break;
 
+        case 'lattes':
+        $ws = new wsc;  
+        $ws->dir = '../'.$ws->dir;      
+        $rst = $ws->lattesXML($q);
+        break;        
+
         default: 
         $rst = array();
         $rst['erro'] = 'verb not informed';
