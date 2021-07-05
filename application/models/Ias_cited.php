@@ -691,6 +691,25 @@ class ias_cited extends CI_Model
             $txt = troca($txt, '  ', ' ');
             $txt = troca($txt, '  ', ' ');
             $txt = troca($txt, '  ', ' ');
+            if ((strpos($txt,' v.') > 0) or (strpos($txt,' V.') > 0))
+                {
+                    $pos = strpos($txt,', v.');
+                    $pos = round($pos) + round(strpos($txt,'. V.')) + round(strpos($txt,'. v.')) + round(strpos($txt,', v.'))  + round(strpos($txt,', V.'));
+                    if ($pos <= 0)
+                    {
+                    echo $txt.'<hr>';
+                    echo '===>'.$pos.'<hr>';
+                    $txt = troca($txt,' v.',', v.');
+                    $txt = troca($txt,' V.',', v.');
+                    $sql = "update " . $this->base . "cited_article set
+                                    ca_text = '$txt'
+                                    where id_ca = " . $line['id_ca'];
+                    $this->db->query($sql); 
+                    //echo $txt;
+                    //exit;
+                    }
+                                       
+                }
             //$txt = utf8_decode($txt);
             //echo '<pre>';
             //echo hex_dump($txt);
