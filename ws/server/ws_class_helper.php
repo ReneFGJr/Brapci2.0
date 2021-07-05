@@ -8,6 +8,44 @@ class wsc //extends CI_Model
     var $email = array();
     var $abrv = array();
     /********************************************************* IA */
+    function lattesXML()
+        {
+            if (isset($_GET['q']))
+            {
+            $id = $_GET['q'];
+            if (strlen($id) == 16)
+            {
+                $filename = 'lattes'.$id.'.zip';
+                $dir = '_lattes';
+                $file = $dir.'/'.$filename;
+                dircheck($dir);
+                if (!file_exists(($file)))
+                {
+                    $client = new SoapClient("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo?wsdl");
+                    $param = array('id'=>$id);
+                    $response = $client ->__call('getCurriculoCompactado', $param);
+                    #$response = base64_decode($response);                
+                    file_put_contents($file,$response);
+                    sleep(0.5);
+                }
+
+                /********************************************************** */
+                header('Cache-control: private');
+                header('Content-Type: application/octet-stream');
+                header('Content-Length: '.filesize($file));
+                header('Content-Disposition: filename='.'lattes_'.$id.'.zip');
+                ob_clean();
+                flush();
+                readfile($file);
+                exit;
+            } else {
+                    $dt['erro'] = "Erro de indicador Size:".strlen($id);
+            }
+        } else {
+            $dt['erro'] = "Parametro não informado";
+        }            
+        return($dt);
+        }
     function genere($name)
     {
         $nf = $name;
