@@ -647,6 +647,7 @@ class Ias extends CI_model
 			$txt .= $cmd;
 			shell_exec($cmd);			
 			$this->pdfs->pdftotext_index_file($file,$id);
+			echo '<meta http-equiv="refresh" content="0;" />';
 		}
 		return ($txt);
 	}
