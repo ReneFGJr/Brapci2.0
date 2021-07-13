@@ -3,20 +3,7 @@ class pqs extends CI_Model  {
     var $table = 'brapci_pq.bolsistas';
     var $table_bolsas = 'brapci_pq.bolsas';
     var $table_bolsas_tipo = 'brapci_pq.modalidades';
-    function import()
-        {
-            $file = "_temp/process.csv";
-            if (file_exists($file))
-                {
-                    $ds = read_csv($file,';');
-                    echo '<pre>';
-                    print_r($ds);
-                    echo '</pre>';
-                } else {
-                    echo "Arquivo não localizado";
-                    exit;                    
-                }
-        }
+
     function index($d1,$d2,$d3,$d4)
     {
         $sx = '<h1>'.msg("BasePQ").'</h1>';
@@ -25,10 +12,7 @@ class pqs extends CI_Model  {
             case 'edit':
                 $sx .= $this->edit($d2);
             break;
-            case 'import':
-                $sx .= 'Importação';
-                $this->import();
-                break;
+
             default: 
             $sx = $this->row_pq($d2,$d3);
         }
@@ -55,6 +39,7 @@ class pqs extends CI_Model  {
             array_push($cp,array('$S100','bs_nome','bs_nome',True,True));
             array_push($cp,array('$I8','bs_rdf_id','bs_rdf_id',True,True));
             array_push($cp,array('$S100','bs_lattes','bs_lattes',False,True));
+            
 
             $sx = $form->editar($cp,$this->table);
             $line = $this->le($id);
@@ -69,9 +54,13 @@ class pqs extends CI_Model  {
     function row_pq($d1='',$d2='')
     {
         $sx = '<h1>Bolsistas PQ</h1>';
-        $sql = "select * from ".$this->table." 
+        $sql = "select bs_rdf_id, bs_nome, id_bs, bs_lattes, count(*) as bolsas,
+            min(bs_start) as bs_start,
+            max(bs_finish) as bs_finish
+         from ".$this->table." 
         inner join ".$this->table_bolsas." ON bb_person = id_bs
         inner join ".$this->table_bolsas_tipo." ON bs_tipo = id_mod
+        group by bs_rdf_id, bs_nome, id_bs, bs_lattes
         order by bs_nome
         ";
         $rlt = $this->db->query($sql);
@@ -98,12 +87,12 @@ class pqs extends CI_Model  {
             $sx .= $linkrdf.$line['bs_nome'].$linkrdfa;
             $sx .= '</td>';
             
-            $sx .= '<td>'.$line['mod_sigla'].$line['bs_nivel'].'</td>';
+            $sx .= '<td align="center">'.$line['bolsas'].'</td>';
             
             $sx .= '<td class="text-center">'.stodbr($line['bs_start']).'</td>';
             $sx .= '<td class="text-center">'.stodbr($line['bs_finish']).'</td>';
             
-            $sx .= '<td>'.$line['BS_IES'].'</td>';
+            //$sx .= '<td>'.$line['BS_IES'].'</td>';
             $sx .= '<td>'.'<a href="'.base_url(PATH.'pq/edit/'.$line['id_bs']).'">[ed]</a></td>';
             $sx .= '</tr>';
         }
