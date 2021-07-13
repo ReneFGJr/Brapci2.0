@@ -561,11 +561,11 @@ class Bs extends CI_model {
                 $total++;
             }
         }
-        $_POST['dd2'] = $s;
         array_push($cp, array('$H8', 'id_bb', '', false, false));
         array_push($cp, array('$S100', 'bb_title', msg('ID_save_name'), true, true));
-        array_push($cp, array('$T100:5', 'bb_sel', msg('IDs'), true, true));
+        array_push($cp, array('$HV', 'bb_sel', $s, true, true));
         array_push($cp, array('$HV', 'bb_user', $_SESSION['id'], false, true));
+        array_push($cp, array('$M', '','<h2>Total '.$total.'</h2>'.$s, false, true));
         array_push($cp, array('$HV', 'bb_update', date("Y-m-d"), false, true));
         array_push($cp, array('$C1', 'bb_public', msg('bb_public'), false, true));
         array_push($cp, array('$HV', 'bb_total', $total, false, true));

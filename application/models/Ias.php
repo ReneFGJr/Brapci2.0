@@ -178,6 +178,10 @@ class Ias extends CI_model
 		$sx .= 'Ferramentas R';
 		$sx .= '</a></li>';		
 
+		$sx .= '<li><a href="' . base_url(PATH . 'pq') . '">';
+		$sx .= 'Base PQ';
+		$sx .= '</a></li>';			
+
 
 		$sx .= '</ul>';
 		$sx .= '</div>';		

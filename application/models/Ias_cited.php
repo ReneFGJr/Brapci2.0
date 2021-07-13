@@ -82,6 +82,19 @@ class ias_cited extends CI_Model
     /******************************************************************/
     function list_type($id, $offset = 0)
     {
+        $act = get("act");
+        $idz = get("idz");
+        switch ($act)
+            {
+                case 'ERR':
+                $sql = "update " . $this->base . "cited_article set ca_tipo = 99 where id_ca = $idz ";
+                $this->db->query($sql);
+                break;
+                case 'DEL':
+                $sql = "DELETE from " . $this->base . "cited_article where id_ca = $idz ";
+                $this->db->query($sql);
+                break;                
+            }
         if (strlen($offset) == '') {
             $offset = 0;
         }
@@ -100,9 +113,12 @@ class ias_cited extends CI_Model
             $linka = '</span>';
             $sx .= '<li>';
             $sx .= $link . $line['ca_text'] . $linka;
-            $sx .= ' [';
-            $sx .= '<a href="' . base_url(PATH . 'v/' . $line['ca_rdf']) . '" target="_new' . $line['ca_rdf'] . '">A</a>';
-            $sx .= ']';
+            /* Editar */
+            $sx .= '[<a href="' . base_url(PATH . 'v/' . $line['ca_rdf']) . '" target="_new' . $line['ca_rdf'] . '">A</a>]';
+            /* Deletear */
+            $sx .= '[<a href="' . base_url(PATH . 'ia/cited/type/' . $id) . '?act=DEL&idz='.$line['id_ca'].'">DEL</a>]';
+            /* Deletear */
+            $sx .= '[<a href="' . base_url(PATH . 'ia/cited/type/' . $id) . '?act=ERR&idz='.$line['id_ca'].'">ERRO</a>]';
             if ($id == 0) {
                 $rs = $this->neuro_type_source($line['ca_text']);
                 $sx .= '<br>' . $rs;

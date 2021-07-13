@@ -22,6 +22,9 @@ class pqs extends CI_Model  {
         $sx = '<h1>'.msg("BasePQ").'</h1>';
         switch($d1)
         {
+            case 'edit':
+                $sx .= $this->edit($d2);
+            break;
             case 'import':
                 $sx .= 'Importação';
                 $this->import();
@@ -31,6 +34,38 @@ class pqs extends CI_Model  {
         }
         return($sx);
     }
+
+    function le($id)
+        {
+            $sql = "select * from ".$this->table." where id_bs = ".$id;
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            if (count($rlt) > 0)
+                {
+                    return($rlt[0]);
+                }
+        }
+
+    function edit($id)
+        {
+            $form = new form;
+            $form->id = $id;
+            $cp = array();
+            array_push($cp,array('$H8','id_bs','id_bs',false,false));
+            array_push($cp,array('$S100','bs_nome','bs_nome',True,True));
+            array_push($cp,array('$I8','bs_rdf_id','bs_rdf_id',True,True));
+            array_push($cp,array('$S100','bs_lattes','bs_lattes',False,True));
+
+            $sx = $form->editar($cp,$this->table);
+            $line = $this->le($id);
+
+            $sx .= '<a href="'.base_url(PATH.'?q='.$line['bs_nome'].'&type=2').'" target="_new'.$line['id_bs'].'">Busca ...</a>';
+            if ($form->saved > 0)
+                {
+                    redirect(base_url(PATH.'pq'));
+                }
+            return($sx);
+        }
     function row_pq($d1='',$d2='')
     {
         $sx = '<h1>Bolsistas PQ</h1>';
@@ -69,6 +104,7 @@ class pqs extends CI_Model  {
             $sx .= '<td class="text-center">'.stodbr($line['bs_finish']).'</td>';
             
             $sx .= '<td>'.$line['BS_IES'].'</td>';
+            $sx .= '<td>'.'<a href="'.base_url(PATH.'pq/edit/'.$line['id_bs']).'">[ed]</a></td>';
             $sx .= '</tr>';
         }
         $sx .= '<tr><td colspan=10>Total '.$tot.'</td></tr>';

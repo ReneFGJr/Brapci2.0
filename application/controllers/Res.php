@@ -805,7 +805,10 @@ class res extends CI_Controller
         switch ($fcn) {
             case 'metrics':
                 $this->load->model("bibliometrics");
-                $this->bibliometrics->metrics_basket();
+                $this->cab();
+                $data['content'] = $this->bibliometrics->metrics_basket();
+                $this->load->view('show', $data);
+                $this->footer();                
                 break;
 
                 /* Export */

@@ -1058,7 +1058,261 @@ class bibliometrics extends CI_model {
         /* Titulos dos periódicos */
         /* Assuntos */
         /* Autores */
-        print_r($ob);
+        
+        $sx = $this->bibliotetric_authors($ob);
+        $sx .= $this->bibliotetric_year($ob);
+        return($sx);
     }
+
+    function bibliotetric_authors($ob)
+        {
+            $limit = get("limit");
+            if (strlen($limit) == 0)
+                {
+                    $limit = 20;
+                }
+
+            $au = array();
+            $csv = 'id,author,value,percente,acumulate'.cr();
+            $ip = troca(ip(),'.','_');
+            $file_csv = '_temp/author_'.$ip.date("His").'.csv';
+            for ($r=0;$r < count($ob);$r++)
+                {
+                    $rst = $this->metadata($ob[$r],'AU');
+                    foreach($rst as $key => $value)
+                        {
+                            if (isset($au[$key]))
+                                {
+                                    $au[$key] = $au[$key] + 1;
+                                } else {
+                                    $au[$key] = 1;
+                                }
+                        }
+                }
+
+            /*********** Ordenar */
+            $aut = array();
+            foreach($au as $key => $value)
+                {
+                    array_push($aut,strzero($value,4).$key);
+                }
+            rsort($aut);                
+            $au = array();
+            $tot = 0;
+            $totn = 0;
+            foreach($aut as $key => $value)
+                {
+                    $name = substr($value,4,strlen($value));
+                    $vlr = round(substr($value,0,4));
+                    $au[$name] = $vlr;
+                    $totn++;
+                    $tot = $tot + $vlr;
+                }
+
+            $nr = 0;
+            $acm = 0;
+            $last = 0;
+
+            $out = 0;
+            $vout = 0;
+            $sx = '';
+            $sx .= '<span class="legend">Tabela 1 - Autores mais produtivos na temática (n='.count($aut).')</span>';
+            $sx .= '<table width="100%">';
+            $sx .= '<tr>';
+            $sx .= '<td align="center"><b>#</b></td>';
+            $sx .= '<td><b>'.msg('name').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('freq.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('perc.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('acum.').'</b></td>';
+            $sx .= '</tr>'.cr();
+            foreach($au as $key => $value)
+                {
+                    $nr++;
+                    $per = $value/$tot;
+                    $acm = $acm + $per;
+
+                    if (($nr <= $limit) or (($nr > $limit) and ($value >= $last)))
+                    {
+                        $sx .= '<tr>';
+                        $sx .= '<td with="5%" align="center">'.$nr.'</td>';
+                        $sx .= '<td with="65%">'.$key.'</td>';
+                        $sx .= '<td with="10%" align="center">'.$value.'</td>';
+                        $sx .= '<td with="10%" align="center">'.number_format($per*100,1,',','.').'%</td>';
+                        $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
+                        $sx .= '</tr>';
+                        $last = $value;
+                    } else {
+                        $out++;
+                        $vout = $vout + $value;
+                    }
+                    $csv .= $nr.',"'.$key.'",'.$value.',';
+                    $csv .= '"'.number_format($per*100,1,',','.').'%",';
+                    $csv .= '"'.number_format($acm*100,1,',','.').'%"';
+                    $csv .= cr();
+                }
+            if ($out > 0)
+                {
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td>Outros ('.$out.')</td>';
+                    $sx .= '<td align="center">'.number_format($vout,0,',','.').'</td>';
+                    $sx .= '<td align="center">'.number_format($vout/$tot*100,1,',','.').'%</td>';
+                    $sx .= '<td align="center">'.number_format($tot/$tot*100,1,',','.').'%</td>';
+                    $sx .= '</tr>';
+                }
+
+/*********************** total */
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td><b>Total ('.count($au).')</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot,0,',','.').'</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '</tr>';
+
+            $sx .= '</table>';
+            /* Salva CSV */
+            file_put_contents($file_csv,utf8_decode($csv));
+            $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Authors</a>';
+            return($sx);
+        }
+
+    function bibliotetric_year($ob)
+        {
+            $limit = get("limit");
+            if (strlen($limit) == 0)
+                {
+                    $limit = 99;
+                }
+
+            $au = array();
+            $csv = 'id,author,value,percente,acumulate'.cr();
+            $ip = troca(ip(),'.','_');
+            $file_csv = '_temp/year_'.$ip.date("His").'.csv';
+            $tot = 0;
+            $min = 9999;
+            $max = 0;
+            for ($r=0;$r < count($ob);$r++)
+                {
+                    $rst = $this->metadata($ob[$r],'PY');
+                    foreach($rst as $key => $value)
+                        {
+                            if (isset($au[$key]))
+                                {
+                                    $au[$key] = $au[$key] + 1;
+                                } else {
+                                    $au[$key] = 1;
+                                }
+                        }
+                    if ($key < $min) { $min = $key; }
+                    if ($key > $max) { $max = $key; }
+                    $tot++;
+                }
+
+            /*********** Ordenar */
+            ksort($au);
+
+            $nr = 0;
+            $acm = 0;
+            $last = 0;
+
+            $out = 0;
+            $vout = 0;
+            $sx = '';
+            $sx .= '<span class="legend">Tabela 1 - Produção por ano ('.$min.'-'.$max.') (n='.($tot).')</span>';
+            $sx .= '<table width="100%">';
+            $sx .= '<tr>';
+            $sx .= '<td align="center"><b>#</b></td>';
+            $sx .= '<td><b>'.msg('name').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('freq.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('perc.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('acum.').'</b></td>';
+            $sx .= '</tr>'.cr();
+            $ano = round($min);
+            foreach($au as $key => $value)
+                {
+                    $nr++;
+                    $per = $value/$tot;
+                    $acm = $acm + $per;
+
+                    while ($key > $ano)
+                        {
+                            $sx .= '<tr>';
+                            $sx .= '<td with="5%" align="center">'.$nr.'</td>';
+                            $sx .= '<td with="65%">'.$ano.'</td>';
+                            $sx .= '<td with="10%" align="center">0</td>';
+                            $sx .= '<td with="10%" align="center">'.number_format($per*100,1,',','.').'%</td>';
+                            $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
+                            //$sx .= '<td with="10%" align="center">'..'</td>';
+                            $sx .= '</tr>';              
+                            $ano++;
+                            $nr++;
+                            if ($ano > 2099) { exit; }              
+                        }
+
+                    $sx .= '<tr>';
+                    $sx .= '<td with="5%" align="center">'.$nr.'</td>';
+                    $sx .= '<td with="65%">'.$key.'</td>';
+                    $sx .= '<td with="10%" align="center">'.$value.'</td>';
+                    $sx .= '<td with="10%" align="center">'.number_format($per*100,1,',','.').'%</td>';
+                    $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
+                    $sx .= '</tr>';
+                    $last = $value;
+                    $ano = $key+1;
+
+                    $csv .= $nr.',"'.$key.'",'.$value.',';
+                    $csv .= '"'.number_format($per*100,1,',','.').'%",';
+                    $csv .= '"'.number_format($acm*100,1,',','.').'%"';
+                    $csv .= cr();
+                }
+            if ($out > 0)
+                {
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td>Outros ('.$out.')</td>';
+                    $sx .= '<td align="center">'.number_format($vout,0,',','.').'</td>';
+                    $sx .= '<td align="center">'.number_format($vout/$tot*100,1,',','.').'%</td>';
+                    $sx .= '<td align="center">'.number_format($tot/$tot*100,1,',','.').'%</td>';
+                    $sx .= '</tr>';
+                }
+
+/*********************** total */
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td><b>Total ('.count($au).')</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot,0,',','.').'</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '</tr>';
+
+            $sx .= '</table>';
+            /* Salva CSV */
+            file_put_contents($file_csv,utf8_decode($csv));
+            $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Years</a>';
+            return($sx);
+        }
+
+
+    function metadata($id,$meta)
+        {
+            $rst = array();
+            $file = 'c/'.$id.'/name.ABNT';
+            if (file_exists($file))
+            {
+                $txt = file_get_contents($file);
+                $ln = explode(chr(10), $txt);
+                for ($r=0;$r < count($ln);$r++)
+                    {
+                        if (substr($ln[$r],0,2) == $meta)
+                            {
+                                $name = trim(substr($ln[$r],4,strlen($ln[$r])));
+                                $rst[$name] = 1;
+                            }
+                    }
+            } else {
+                echo "OPS = ".$id.'<br>';
+            }
+            return($rst);
+        }
 }
 ?>
