@@ -3,6 +3,7 @@ class pqs extends CI_Model  {
     var $table = 'brapci_pq.bolsistas';
     var $table_bolsas = 'brapci_pq.bolsas';
     var $table_bolsas_tipo = 'brapci_pq.modalidades';
+    var $lista = array();
 
     function index($d1,$d2,$d3,$d4)
     {
@@ -28,6 +29,20 @@ class pqs extends CI_Model  {
                 {
                     return($rlt[0]);
                 }
+        }
+    function is_pq($id)
+        {
+            if (count($this->lista) == 0)
+                {
+                    $this->lista = $this->lista();
+                }
+            $rlt = $this->lista;
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    if ($rlt[$r] == $id)
+                        return(1);
+                }
+            return(0);
         }
 
     function lista()

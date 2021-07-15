@@ -15,6 +15,7 @@ class Bs extends CI_model {
         $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
         //$sx .= '<a href="' . base_url(PATH . 'basket/export/rdf') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('rdf_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/docaks') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('docabs_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/bib') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_selected') . '</a>';
         
         $sx .= '</div>';
@@ -589,6 +590,70 @@ class Bs extends CI_model {
         echo '</html>';
     }
     
+
+    function mark_export_docaks() {
+        $this->load->model("bibliometrics");
+        $file = 'brapci_' . date("YmdHi") . '.doc';
+        header('Content-Encoding: UTF-8');
+        //header('Content-type: application/vnd.ms-word; charset=UTF-8');
+        header('Content-type: application/vnd.ms-word; charset=ISO-8859-1');
+        header('Content-Disposition: attachment; filename=' . $file);
+        $sx = '';
+        $s = $_SESSION;
+        $tot = 0;
+        
+        $a = array();
+        foreach ($s as $key => $value) {
+            if (substr($key, 0, 1) == 'm') {
+                $tot++;
+                $key = substr($key, 1, strlen($key));
+                $abs = '';
+                $kys = '';
+                $file = 'c/' . $key . '/name.ABNT';
+
+                if (file_exists($file)) {
+                    $xxx = $this->bibliometrics->metadata($key,'AB');
+                    foreach($xxx as $abr=>$vlr)
+                    { 
+                        $abs .= '<p style="text-align: justify; text-justify: inter-word;">'.$abr.'</p>';
+                    }
+                    $xxx = $this->bibliometrics->metadata($key,'KW');
+                    foreach($xxx as $kyr=>$vlr)
+                    { 
+                        $kys .= $kyr.'. ';
+                    }
+                    
+                }
+                $file = 'c/' . $key . '/name.nm';
+                if (file_exists($file)) {
+                    $fr = file_get_contents($file);
+                    $fr = troca($fr, '<b>', '_b_');
+                    $fr = troca($fr, '</b>', '_bb_');
+                    $fr = strip_tags($fr);
+                    $fr = troca($fr, '_b_', '<b>');
+                    $fr = troca($fr, '_bb_', '</b>');
+                    
+                    $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
+                    $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
+                    $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+                    $fr .= '<br><p><b>Resumo:</b>'.$abs.'</p>';
+                    $fr .= '<p><b>Keywords:</b>'.$kys.'</p>';
+                    array_push($a, $fr);
+                }
+            }
+        }
+        asort($a);
+        foreach ($a as $key => $value) {
+            $sx .= '<p style="margin-bottom: 10px;">' . $value . '</p>' . cr();
+        }
+        echo '<html>';
+        echo '<body>';
+        echo '<h1>' . utf8_decode(msg('References')) . '</h1>' . cr();
+        echo utf8_decode($sx);
+        echo '</body>';
+        echo '</html>';
+    }
+
     function mark_form_inport() {
         $form = new form;
         $cp = array();

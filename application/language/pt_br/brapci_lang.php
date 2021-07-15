@@ -119,6 +119,7 @@ $lang['xls_selected'] = 'Exportar XLS';
 $lang['csv_selected'] = 'Exportar CSV';
 $lang['doc_selected'] = 'Exportar DOC';
 $lang['bib_selected'] = 'Exportar BibTeX';
+$lang['docabs_selected'] = 'Exportar DOC com Resumos';
 $lang['select_page'] = 'Selecionar Página';
 $lang['select_all'] = 'Selecionar Tudo';
 $lang['select_all_page'] = 'Selecionar Tudo';

@@ -1054,15 +1054,16 @@ class bibliometrics extends CI_model {
     /******************************** Painel Bibliometrico */       
     function metrics_basket($tp='')
     {
+        $this->load->helper('R');
         $ob = $this->bs->sels();
         /* Ano de publicação */
         /* Titulos dos periódicos */
         /* Assuntos */
         /* Autores */
         $sx = '';
-        $sx .= $this->bibliometrics_ref($ob,$tp);
         $sx .= $this->bibliotetric_authors($ob,$tp);
         $sx .= $this->bibliotetric_year($ob,$tp);
+        //$sx .= $this->bibliometrics_ref($ob,$tp);
         return($sx);
     }
 
@@ -1095,22 +1096,62 @@ class bibliometrics extends CI_model {
                 }
 
             $au = array();
+            $aaa = array();
             $csv = 'id,author,value,percente,acumulate'.cr();
             $ip = troca(ip(),'.','_');            
-            
+            $pq = get("pq");
+            $case = '';
+            if (strlen($pq) > 0)
+                {
+                    $this->load->model('Pqs');
+                    $case = 'pq';
+                }
 
             for ($r=0;$r < count($ob);$r++)
                 {
-                    $rst = $this->metadata($ob[$r],'AU');
-
-                    foreach($rst as $key => $value)
-                        {
-                            /**************************************************************/
-                            if (isset($au[$key]))
+                    
+                switch($case)
+                    {
+                        /* PQ */
+                        case 'pq':
+                                $lst = array();
+                                $rst = $this->metadata($ob[$r],'AU');
+                                foreach ($rst as $aaa1=>$aaa2)
+                                    {
+                                        array_push($lst,$aaa1);
+                                    }
+                                $aaa = 'c/'.$ob[$r].'/author.json';
+                                $aaa = file_get_contents($aaa);
+                                $aaa = (array)json_decode($aaa);
+                                $nr = 0;
+                                foreach ($aaa as $aa2=>$aa3)
+                                    {
+                                        $pq = $this->Pqs->is_pq($aa2); 
+                                        if ($pq == 1)
+                                            {
+                                            $key = $lst[$nr];
+                                            if (isset($au[$key]))
+                                                {
+                                                    $au[$key] = $au[$key] + 1;
+                                                } else {
+                                                    $au[$key] = 1;
+                                                }
+                                            }
+                                        $nr++;
+                                    }
+                                break;
+                        default:                        
+                            $nr = 0;
+                            $rst = $this->metadata($ob[$r],'AU');
+                            foreach($rst as $key => $value)
                                 {
-                                    $au[$key] = $au[$key] + 1;
-                                } else {
-                                    $au[$key] = 1;
+                                    /**************************************************************/
+                                    if (isset($au[$key]))
+                                        {
+                                            $au[$key] = $au[$key] + 1;
+                                        } else {
+                                            $au[$key] = 1;
+                                        }
                                 }
                         }
                 }
@@ -1121,7 +1162,9 @@ class bibliometrics extends CI_model {
                 {
                     array_push($aut,strzero($value,4).$key);
                 }
-            rsort($aut);                
+            rsort($aut);
+
+            /*********** Ordenar */
             $au = array();
             $tot = 0;
             $totn = 0;
@@ -1141,6 +1184,24 @@ class bibliometrics extends CI_model {
             $out = 0;
             $vout = 0;
             $sx = '';
+
+            $R = new R;
+            $sc = '';
+            $sc .= $R->library('ggplot2');
+            $sc .= $R->datasets($au);
+            $sc .= $R->fcn('authors_productions');
+            $sc .= $R->image(1);
+            $R->exec($sc);
+
+            $sx .= '<div class="'.bscol(12).'">';
+            $sx .= $R->html_image($R->img);            
+            $sx .= '</div>';
+
+            $sx .= '<div class="'.bscol(12).'">';
+            $sx .= $R->show_script($sc);
+            $sx .= '</div>';
+
+            $sx .= '<div class="'.bscol(12).'">';
             $sx .= '<span class="legend">Tabela 1 - Autores mais produtivos na temática (n='.count($aut).')</span>';
             $sx .= '<table width="100%">';
             $sx .= '<tr>';
@@ -1196,10 +1257,13 @@ class bibliometrics extends CI_model {
                     $sx .= '</tr>';
 
             $sx .= '</table>';
+            $sx .= '</div>';
             /* Salva CSV */
             $file_csv = '_temp/author_'.$ip.date("His").'.csv';
             file_put_contents($file_csv,utf8_decode($csv));
+            $sx .= '<div class="'.bscol(12).'">';
             $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Authors</a>';
+            $sx .= '</div>';
             return($sx);
         }
 

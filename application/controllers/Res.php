@@ -823,12 +823,15 @@ class res extends CI_Controller
                     case 'doc':
                         $this->bs->mark_export_doc();
                         break;
+                    case 'docaks':
+                        $this->bs->mark_export_docaks();
+                        break;                                                                     
                     case 'ris':
                         $this->bs->mark_export_ris();
                         break;
                     case 'bib':
                         $this->bs->mark_export_bib();
-                        break;                        
+                        break;    
                     default:
                         redirect(base_url(PATH . 'basket'));
                         break;

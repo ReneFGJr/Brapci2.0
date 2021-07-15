@@ -14,6 +14,7 @@ defined("BASEPATH") or exit("No direct script access allowed");
 
 class ias_r extends CI_Model
 {
+
     function index($d1, $d2, $d3)
     {
         switch ($d1) {
