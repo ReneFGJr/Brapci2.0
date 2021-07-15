@@ -806,7 +806,7 @@ class res extends CI_Controller
             case 'metrics':
                 $this->load->model("bibliometrics");
                 $this->cab();
-                $data['content'] = $this->bibliometrics->metrics_basket();
+                $data['content'] = $this->bibliometrics->metrics_basket($arg);
                 $this->load->view('show', $data);
                 $this->footer();                
                 break;
@@ -855,6 +855,13 @@ class res extends CI_Controller
                 $this->load->view('show', $data);
                 $this->footer();
                 break;
+
+            case 'active':
+                $this->cab();
+                $this->bs->mark_active($arg);                
+                redirect(base_url(PATH.'basket'));
+                break;
+
             case 'saved':
                 $this->cab();
                 $data = array();
@@ -869,7 +876,7 @@ class res extends CI_Controller
                 $this->cab();
                 $data['content'] = $this->bs->tools();
                 $data['content'] .= '<h1>' . msg('References') . '</h1>' . cr();
-                $data['content'] .= $this->bs->basket();
+                $data['content'] .= $this->bs->basket($fcn,$arg);
                 $this->load->view('show', $data);
                 $this->footer();
                 break;

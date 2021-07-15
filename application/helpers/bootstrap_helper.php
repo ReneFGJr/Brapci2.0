@@ -9,7 +9,15 @@
 * @link        http://www.sisdoc.com.br/CodIgniter
 * @version     v0.21.05.28
 */
-
+function bsdivclose($n)
+    {
+        $sx = '';
+        for ($r=0;$r < $n;$r++)
+            {
+                $sx .= '</div>';
+            }
+        return($sx);
+    }
 function bscard($dt)
     {
         if (isset($dt['img'])) { 
@@ -20,7 +28,7 @@ function bscard($dt)
         $url = $dt['link'];
         $sx = '
         <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="'.$img.'" alt="Card image cap">
+        <img class="card-img-top" src="'.base_url($img).'" alt="Card image cap">
         <div class="card-body">
             <h5 class="card-title text-center">'.$t.'</h5>
             <p class="card-text">'.$s.'</p>

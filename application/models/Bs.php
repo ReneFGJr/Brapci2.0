@@ -118,9 +118,102 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
+        $ttt = 0;
+        $lst = '';
+        
         switch($type) 
         {
-            case '1' :
+            case 'PQ':
+                $this->load->model("Pqs");
+                $PQS = $this->Pqs->lista();
+                $a = array();
+                $tot = 0;
+                foreach ($s as $key => $value) 
+                {
+                    if (substr($key, 0, 1) == 'm') 
+                    {
+                        $tot++;
+                        $key = substr($key, 1, strlen($key));
+                        /* Authors */
+                        $file_authors = 'c/' . $key . '/author.json';
+                        $ath = array();
+                        if (file_exists($file_authors))
+                        {
+                            $ath = file_get_contents($file_authors);
+                            $ath = (array)json_decode($ath);
+                        }
+
+                        $ok = 0;
+                        /****************************************************** PQS */
+                        foreach($ath as $idpq=>$v)
+                            {
+                                for ($q=0;$q < count($PQS);$q++)
+                                    {
+                                        if ($PQS[$q] == $idpq)
+                                        {
+                                            $ok = 1;
+                                            break;
+                                        }
+                                    }                                
+                            }
+                        
+                        if ($ok == 1)
+                        {
+                            $ttt++;
+                            $lst .= $key.'; ';                            
+                            $file = 'c/' . $key . '/name.nm';
+                            if (file_exists($file)) 
+                            {                                
+                                $fr = file_get_contents($file);
+                                $fr = troca($fr, '<b>', '_b_');
+                                $fr = troca($fr, '</b>', '_bb_');
+                                $fr = strip_tags($fr);
+                                $fr = troca($fr, '_b_', '<b>');
+                                $fr = troca($fr, '_bb_', '</b>');
+                                
+                                $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
+                                $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
+                                $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+                                array_push($a, $fr);
+                            }
+                        }
+                    }
+                }
+                asort($a);
+                foreach ($a as $key => $value) {
+                    $sx .= '<p style="margin-bottom: 10px;">' . $value . '</p>' . cr();
+                }
+
+                $sx .= '<hr>'.'<tt>'.$lst.'</tt>'.cr();
+                $sx .= '<hr>'.'Total: '.$ttt.cr();
+            break;
+
+            case 'LT' :
+            foreach ($s as $key => $value) 
+            {
+                if (substr($key, 0, 1) == 'm') 
+                {
+                    $key = substr($key, 1, strlen($key));
+                    $tot++;
+                    $jnl = 0;
+                    $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
+                    if (!is_file($img)) {
+                        //echo '==>' . $img . '<br>';
+                        $img = 'img/cover/cover_issue_0.jpg';
+                        //$sx .= '['.$jnl.']';
+                    }
+                    $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
+                    $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
+                    $sx .= $this -> bs -> checkbox($key);
+                    $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
+                    $sx .= $this -> frbr -> show_v($key);
+                    $sx .= '</a>';
+                    $sx .= '</div>';
+                }
+            }
+           
+            /****************************** Default **************/
+            default :
                 $a = array();
                 foreach ($s as $key => $value) 
                 {
@@ -150,31 +243,7 @@ class Bs extends CI_model {
                     $sx .= '<p style="margin-bottom: 10px;">' . $value . '</p>' . cr();
                 }
             break;
-            
-            /****************************** Default **************/
-            default :
-            foreach ($s as $key => $value) 
-            {
-                if (substr($key, 0, 1) == 'm') 
-                {
-                    $key = substr($key, 1, strlen($key));
-                    $tot++;
-                    $jnl = 0;
-                    $img = 'img/cover/cover_issue_' . $jnl . '.jpg';
-                    if (!is_file($img)) {
-                        //echo '==>' . $img . '<br>';
-                        $img = 'img/cover/cover_issue_0.jpg';
-                        //$sx .= '['.$jnl.']';
-                    }
-                    $sx .= '<div class="col-1 " style="margin-bottom: 15px;"><img src="' . HTTP . $img . '" class="img-fluid"></div>';
-                    $sx .= '<div class="col-11 " style="margin-bottom: 15px;">';
-                    $sx .= $this -> bs -> checkbox($key);
-                    $sx .= '<a href="' . base_url(PATH . 'v/' . $key) . '" target="_new' . $key . '" class="refs">';
-                    $sx .= $this -> frbr -> show_v($key);
-                    $sx .= '</a>';
-                    $sx .= '</div>';
-                }
-            }
+
         }
         
         if ($tot > 0) {
@@ -582,6 +651,32 @@ class Bs extends CI_model {
         
         return ($tela);
     }
+
+    function mark_active($id)
+        {
+            $tela = '';
+            $sql = "select * from _bibliographic_selections 
+            where id_bb = $id 
+            order by bb_update desc";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();    
+
+            if (count($rlt) > 0)
+            {
+                print_r($rlt);
+                $n = troca($rlt[0]['bb_sel'], chr(13), ';');
+                $n = troca($n, chr(10), '');
+                $ln = splitx(';', $n);
+                for ($r = 0; $r < count($ln); $r++) 
+                {
+                    $nn = sonumero($ln[$r]);
+                    $_SESSION['m' . $nn] = 1;
+                }
+                $tela .= bs_alert('success', msg('Was') . ' ' . count($ln) . ' ' . msg('inported_registers'));                    
+            }
+            sleep(1);
+            return('');
+        }
     
     function mark_saved() {
         if (!(isset($_SESSION['id'])) or (sonumero($_SESSION['id']) == 0)) {
@@ -590,7 +685,7 @@ class Bs extends CI_model {
         $id = $_SESSION['id'];
         $sql = "select * from _bibliographic_selections 
         where bb_user = $id 
-        order by bb_update";
+        order by bb_update desc";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
         $sx = '<ul>';
@@ -600,10 +695,11 @@ class Bs extends CI_model {
             $sx .= '<li>';
             $sx .= $line['bb_title'];
             $sx .= ' ';
-            $sx .= '('.$line['bb_total'].')';
+            $sx .= '('.$line['bb_total'].' Itens)';
             $sx .= ' ';
             $sx .= msg('saved_in').' '.stodbr($line['bb_update']);
-            $sx .= '<hr><code>'.$line['bb_sel'].'</code>';
+            $sx .= ' - <a href="'.base_url(PATH.'basket/active/'.$line['id_bb']).'" class="btn btn-outline-primary">SELECIONAR</a>';
+            //$sx .= '<hr><code>'.$line['bb_sel'].'</code>';
             $sx .= '</li>';
         }
         $sx .= '</ul>';

@@ -30,6 +30,21 @@ class pqs extends CI_Model  {
                 }
         }
 
+    function lista()
+        {
+            $sql = "select * from ".$this->table."";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+            $pqs = array();
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $id = $line['bs_rdf_id'];
+                    array_push($pqs,$id);
+                }
+            return($pqs);
+        }
+
     function edit($id)
         {
             $form = new form;

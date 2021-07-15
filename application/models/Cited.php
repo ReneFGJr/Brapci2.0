@@ -105,7 +105,31 @@ class Cited extends CI_Model
                     */
                 }
             return($rlt);
-        }        
+        } 
+
+   function refs_group($ob)
+        {
+            
+            //$this->zera();
+            $wh = '';
+            for ($r=0;$r < count($ob);$r++)
+                {
+                    if (strlen($wh) > 0) { $wh .= ' or '; }
+                    $wh .= '( ca_rdf = '.$ob[$r].') ';
+                }
+            
+            $sql = "SELECT * FROM ".$this->base."cited_article where $wh ORDER BY ca_text";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+
+            $sx = '';
+            for ($r=0;$r < count($rlt);$r++)
+                {
+                    $line = $rlt[$r];
+                    $sx .= trim($line['ca_text']).'<br>';
+                }
+            return($sx);
+        }               
 
     function show_ref($id)
         {

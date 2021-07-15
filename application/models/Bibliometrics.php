@@ -1,6 +1,7 @@
 <?php
 class bibliometrics extends CI_model {
-    var $file_name = '';    
+    var $file_name = '';  
+    var $pqs = array();  
     function index($ac)
     {
         $tela = '<h3>'.msg($ac).'</h3>';
@@ -1051,21 +1052,42 @@ class bibliometrics extends CI_model {
     }     
     
     /******************************** Painel Bibliometrico */       
-    function metrics_basket()
+    function metrics_basket($tp='')
     {
         $ob = $this->bs->sels();
         /* Ano de publicação */
         /* Titulos dos periódicos */
         /* Assuntos */
         /* Autores */
-        
-        $sx = $this->bibliotetric_authors($ob);
-        $sx .= $this->bibliotetric_year($ob);
+        $sx = '';
+        $sx .= $this->bibliometrics_ref($ob,$tp);
+        $sx .= $this->bibliotetric_authors($ob,$tp);
+        $sx .= $this->bibliotetric_year($ob,$tp);
         return($sx);
     }
 
-    function bibliotetric_authors($ob)
+    function is_pq($id)
         {
+            $pqs = $this->pqs;
+            if (count($pqs) == 0)
+            {
+                $this->load->model("Pqs");
+                $this->pqs = $this->Pqs->lista();            
+            }
+            echo '==>'.$id;
+            return(0);
+        }
+
+    function bibliometrics_ref($ob)
+        {
+            $this->load->model('cited');
+            $ref = $this->cited->refs_group($ob);
+            return($ref);
+        }
+
+    function bibliotetric_authors($ob,$tp)
+        {
+            $pqs = array();
             $limit = get("limit");
             if (strlen($limit) == 0)
                 {
@@ -1074,13 +1096,16 @@ class bibliometrics extends CI_model {
 
             $au = array();
             $csv = 'id,author,value,percente,acumulate'.cr();
-            $ip = troca(ip(),'.','_');
-            $file_csv = '_temp/author_'.$ip.date("His").'.csv';
+            $ip = troca(ip(),'.','_');            
+            
+
             for ($r=0;$r < count($ob);$r++)
                 {
                     $rst = $this->metadata($ob[$r],'AU');
+
                     foreach($rst as $key => $value)
                         {
+                            /**************************************************************/
                             if (isset($au[$key]))
                                 {
                                     $au[$key] = $au[$key] + 1;
@@ -1172,6 +1197,7 @@ class bibliometrics extends CI_model {
 
             $sx .= '</table>';
             /* Salva CSV */
+            $file_csv = '_temp/author_'.$ip.date("His").'.csv';
             file_put_contents($file_csv,utf8_decode($csv));
             $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Authors</a>';
             return($sx);

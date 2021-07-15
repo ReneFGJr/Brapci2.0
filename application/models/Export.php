@@ -13,6 +13,7 @@ class export extends CI_Model {
         $file_rdf = 'c/' . $idx . '/name.rdf';
         $file_full = 'c/' . $idx . '/full.txt';
         $file_bib = 'c/' . $idx . '/name.bib';
+        $file_authors = 'c/' . $idx . '/author.json';
 
         /************** zera dados ****/
         $sx = '';
@@ -47,6 +48,7 @@ class export extends CI_Model {
         $bib = '@ARTICLE{A'.$idx.','.cr();
         $biba = '';
         $bibau = '';
+        $authors = array();
 
         /************* recurepa dados ****/
         for ($q = 0; $q < count($dt); $q++) {
@@ -151,6 +153,7 @@ class export extends CI_Model {
                         $aut .= '; ';
                         $aut2 .= '; ';
                     }
+                    $authors[$l['d_r2']] = 1;
                     $link = $this -> frbr_core -> link($l);
                     $aut .= $l['n_name'];
                     $aut2 .= $link . $l['n_name'] . '</a>';
@@ -295,6 +298,11 @@ class export extends CI_Model {
             fwrite($f, $bib);
             fclose($f);  
         }
+
+        if (count($authors) > 0)
+            {
+                file_put_contents($file_authors,json_encode($authors));
+            }
         return ($sx);
     }
 
