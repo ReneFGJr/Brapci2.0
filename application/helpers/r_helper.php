@@ -19,7 +19,6 @@ class r
 {
     var $dir = '/var/www/html/temp/';
     var $img = '';
-    var $quadro = 0;
 
     function fcn($ref)
         {
@@ -38,10 +37,10 @@ class r
             return($sc);
         }
 
-    function show_script($sc)
+    function show_script($sc,$nrq)
         {
           $sx = '';
-          if ($this->quadro == 0)
+          if ($nrq == 0)
                 {
                     $sx .= '
                     <script>
@@ -61,8 +60,7 @@ class r
                     }
                     </script>';
                 }
-
-            $qd = 'script_R'.$this->quadro++;
+            $qd = 'script_R'.$nrq;
 
             $sx .= '<a class="btn btn-outline-primary" onclick="$(\'#'.$qd.'\').toggle(\'slow\');">'.msg('Show_script_code').'</a>';
             $sx .= '<a href="#" onclick="myCopy(\''.$qd.'\');" class="btn btn-outline-primary">'.msg('Copy_code_to_clipboard').'</a>';
@@ -112,12 +110,11 @@ class r
             return($sx);
         }
 
-    function datasets($df,$tp=0)
+    function datasets($df,$tp=1,$limit=10)
         {
             /***************************************** DATAFRAME */
             $v1 = '';
             $v2 = '';
-            $limit = 10;
             $l = 0;
             $vatual = 0;
             foreach($df as $name=>$value)
@@ -129,7 +126,17 @@ class r
                             $v1 .= ', ';
                             $v2 .= ', ';
                         }
-                    $v1 .= '"'.nbr_author($name,5).'"';
+                    switch($tp)
+                        {
+                            case '1':
+                            $v1 .= '"'.nbr_author($name,5).'"';
+                            break;
+
+                            default:
+                            $v1 .= '"'.trim($name).'"';
+                            break;
+
+                        }
                     $v2 .= $value;
                     $vatual = $value;
                     }

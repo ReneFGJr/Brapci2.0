@@ -1063,6 +1063,7 @@ class bibliometrics extends CI_model {
         $sx = '';
         $sx .= $this->bibliotetric_authors($ob,$tp);
         $sx .= $this->bibliotetric_year($ob,$tp);
+        $sx .= $this->bibliotetric_journal($ob,$tp);
         //$sx .= $this->bibliometrics_ref($ob,$tp);
         return($sx);
     }
@@ -1188,7 +1189,7 @@ class bibliometrics extends CI_model {
             $R = new R;
             $sc = '';
             $sc .= $R->library('ggplot2');
-            $sc .= $R->datasets($au);
+            $sc .= $R->datasets($au,1,10);
             $sc .= $R->fcn('authors_productions');
             $sc .= $R->image(1);
             $R->exec($sc);
@@ -1198,7 +1199,7 @@ class bibliometrics extends CI_model {
             $sx .= '</div>';
 
             $sx .= '<div class="'.bscol(12).'">';
-            $sx .= $R->show_script($sc);
+            $sx .= $R->show_script($sc,0);
             $sx .= '</div>';
 
             $sx .= '<div class="'.bscol(12).'">';
@@ -1266,6 +1267,121 @@ class bibliometrics extends CI_model {
             $sx .= '</div>';
             return($sx);
         }
+
+   function bibliotetric_journal($ob)
+        {
+            $limit = get("limit");
+            if (strlen($limit) == 0)
+                {
+                    $limit = 99;
+                }
+
+            $au = array();
+            $csv = 'id,journal,value,percente,acumulate'.cr();
+            $ip = troca(ip(),'.','_');
+            $file_csv = '_temp/journal_'.$ip.date("His").'.csv';
+            $tot = 0;
+            $min = 9999;
+            $max = 0;
+            $jnl = array();
+            for ($r=0;$r < count($ob);$r++)
+                {
+                    $rst = $this->metadata($ob[$r],'T2');
+                    foreach($rst as $key => $value)
+                        {
+                            if (isset($jnl[$key]))
+                                {
+                                    $jnl[$key] = $jnl[$key] + 1;
+                                } else {
+                                    $jnl[$key] = 1;
+                                }
+                        }
+                    $tot++;
+                }
+
+            /*********** Ordenar */
+            arsort($jnl);
+
+            $R = new R;
+            $sc = '';
+            $sc .= $R->library('ggplot2');
+            $sc .= $R->datasets($jnl,0,15);
+            $sc .= $R->fcn('journals');
+            $sc .= $R->image(2);
+            $R->exec($sc);            
+
+            $nr = 0;
+            $acm = 0;
+            $last = 0;
+
+            $out = 0;
+            $vout = 0;
+            $sx = '';
+
+            $sx .= '<div class="'.bscol(12).'">';
+            $sx .= $R->html_image($R->img);            
+            $sx .= '</div>';
+
+            $sx .= '<div class="'.bscol(12).'">';
+            $sx .= $R->show_script($sc,1);
+            $sx .= '</div>';            
+            
+            $sx .= '<span class="legend">Tabela 1 - Local de Publicação (n='.($tot).')</span>';
+            $sx .= '<table width="100%">';
+            $sx .= '<tr>';
+            $sx .= '<td align="center"><b>#</b></td>';
+            $sx .= '<td><b>'.msg('journal').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('freq.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('perc.').'</b></td>';
+            $sx .= '<td align="center"><b>'.msg('acum.').'</b></td>';
+            $sx .= '</tr>'.cr();
+            
+            foreach($jnl as $key => $value)
+                {
+                    $nr++;
+                    $per = $value/$tot;
+                    $acm = $acm + $per;
+
+                    $sx .= '<tr>';
+                    $sx .= '<td with="5%" align="center">'.$nr.'</td>';
+                    $sx .= '<td with="65%">'.$key.'</td>';
+                    $sx .= '<td with="10%" align="center">'.$value.'</td>';
+                    $sx .= '<td with="10%" align="center">'.number_format($per*100,1,',','.').'%</td>';
+                    $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
+                    $sx .= '</tr>';
+                    $nr++;
+ 
+                    $csv .= $nr.',"'.$key.'",'.$value.',';
+                    $csv .= '"'.number_format($per*100,1,',','.').'%",';
+                    $csv .= '"'.number_format($acm*100,1,',','.').'%"';
+                    $csv .= cr();
+                }
+            if ($out > 0)
+                {
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td>Outros ('.$out.')</td>';
+                    $sx .= '<td align="center">'.number_format($vout,0,',','.').'</td>';
+                    $sx .= '<td align="center">'.number_format($vout/$tot*100,1,',','.').'%</td>';
+                    $sx .= '<td align="center">'.number_format($tot/$tot*100,1,',','.').'%</td>';
+                    $sx .= '</tr>';
+                }
+
+/*********************** total */
+                    $sx .= '<tr>';
+                    $sx .= '<td></td>';
+                    $sx .= '<td><b>Total ('.count($au).')</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot,0,',','.').'</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '<td align="center"><b>'.number_format($tot/$tot*100,1,',','.').'%</b></td>';
+                    $sx .= '</tr>';
+
+            $sx .= '</table>';
+            /* Salva CSV */
+            file_put_contents($file_csv,utf8_decode($csv));
+            $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Journal</a>';
+            return($sx);
+        }        
 
     function bibliotetric_year($ob)
         {
