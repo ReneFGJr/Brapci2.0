@@ -107,7 +107,7 @@ class Cited extends CI_Model
             return($rlt);
         } 
 
-   function refs_group($ob)
+   function refs_group($ob,$tp)
         {
             
             //$this->zera();
@@ -122,11 +122,29 @@ class Cited extends CI_Model
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
 
-            $sx = '';
+            $sx = 'id,ca_journal_origem,ca_journal,ca_year,ca_year_origem,ref'.cr();
             for ($r=0;$r < count($rlt);$r++)
                 {
                     $line = $rlt[$r];
-                    $sx .= trim($line['ca_text']).'<br>';
+                    if (strlen($line['ca_text']) > 10)
+                    {
+                        
+                        $t  = $line['ca_text'];
+                        $t = troca($t,chr(13),' ');
+                        $t = troca($t,chr(10),' ');
+                        $t = troca($t,'"','`');
+                        $sx .= trim($line['ca_rdf']);
+                        $sx .= ',';
+                        $sx .= trim($line['ca_journal_origem']);
+                        $sx .= ',';
+                        $sx .= trim($line['ca_journal']);
+                        $sx .= ',';
+                        $sx .= trim($line['ca_year']);
+                        $sx .= ',';
+                        $sx .= trim($line['ca_year_origem']);
+                        $sx .= ',';
+                        $sx .= ',"'.trim($t).'"'.cr();
+                    }
                 }
             return($sx);
         }               

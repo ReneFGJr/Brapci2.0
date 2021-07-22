@@ -7,6 +7,7 @@ class Bs extends CI_model {
             $sx .= '<a href="' . base_url(PATH . 'basket/save') . '" class="btn btn-outline-primary" style="margin-right: 10px;">' . msg('save_selected') . '</a>';
         }
         $sx .= '<a href="' . base_url(PATH . 'basket/metrics') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('metrics') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/PQ') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('PQs') . '</a>';
         
         
         $sx .= '</br>';
@@ -17,6 +18,7 @@ class Bs extends CI_model {
         $sx .= '<a href="' . base_url(PATH . 'basket/export/doc') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('doc_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/docaks') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('docabs_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/bib') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_selected') . '</a>';
+        $sx .= '<a href="' . base_url(PATH . 'basket/export/cited') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_cited_export') . '</a>';
         
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
@@ -175,6 +177,7 @@ class Bs extends CI_model {
                                 $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                                 $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                                 $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+
                                 array_push($a, $fr);
                             }
                         }
@@ -235,6 +238,13 @@ class Bs extends CI_model {
                             $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                             $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                             $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
+
+                            $file = "c/".$key."/cited.total";
+                            if (file_exists($file))
+                                {                                        
+                                    $fr .= '<span class="btn-secondary" style="border-radius: 5px;">&nbsp;'.file_get_contents($file).'&nbsp;</span>';
+                                }
+
                             array_push($a, $fr);
                         }
                     }

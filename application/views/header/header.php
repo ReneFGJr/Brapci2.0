@@ -112,6 +112,7 @@ if (isset($meta))
 		<script src="<?php echo base_url('js/jquery-3.6.0.min.js?v3.6.0'); ?>"></script>
 		<script src="<?php echo base_url('js/bootstrap.min.js?v4.0'); ?>"></script>
 		<script src="<?php echo base_url('js/jquery-ui.js?v1.12.1'); ?>"></script>
+		<script src="<?php echo base_url('js/jquery.mask.js?v1.11.4'); ?>"></script>
 		<script src="<?php echo base_url('js/sisdoc_form.js?v1.1.1'); ?>"></script>
 		
 		<script>

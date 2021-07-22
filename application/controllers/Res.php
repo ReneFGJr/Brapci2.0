@@ -825,7 +825,27 @@ class res extends CI_Controller
                         break;
                     case 'docaks':
                         $this->bs->mark_export_docaks();
-                        break;                                                                     
+                        break; 
+                    case 'cited':
+                        
+                        if (isset($_SESSION['order']))
+                            {
+                                $file = 'brapci_cited_csv_' . date("YmdHi") . '.csv';
+                                header('Content-Encoding: UTF-8');
+                                header('Content-type: text/csv; charset=UTF-8');
+                                header('Content-Disposition: attachment; filename=' . $file);
+                                $this->load->model("cited");
+                                $ob = $this->bs->sels();                               
+                                $sx = $this->cited->refs_group($ob,2);
+                                echo utf8_decode($sx);
+                                exit;
+                            } else {
+                                $sx = 'Empty selection';
+                            }
+                        
+                        exit;
+                        
+                        break;                                                                                              
                     case 'ris':
                         $this->bs->mark_export_ris();
                         break;
@@ -840,6 +860,7 @@ class res extends CI_Controller
             case 'clean':
                 $this->bs->mark_clear();
                 redirect(base_url(PATH . 'basket'));
+                break;
             case 'inport':
                 $this->cab();
                 $data = array();
@@ -848,7 +869,7 @@ class res extends CI_Controller
                 $data['content'] .= $this->bs->mark_form_inport();
                 $this->load->view('show', $data);
                 $this->footer();
-
+                break;
             case 'save':
                 $this->cab();
                 $data = array();
