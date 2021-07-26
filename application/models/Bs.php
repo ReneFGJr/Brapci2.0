@@ -738,7 +738,6 @@ class Bs extends CI_model {
 
             if (count($rlt) > 0)
             {
-                print_r($rlt);
                 $n = troca($rlt[0]['bb_sel'], chr(13), ';');
                 $n = troca($n, chr(10), '');
                 $ln = splitx(';', $n);

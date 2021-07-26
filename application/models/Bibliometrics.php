@@ -9,6 +9,17 @@ class bibliometrics extends CI_model {
         $dd1 = get("dd1");
         $dd2 = get("dd2");
         switch($ac) {
+            case 'basket_cited':
+                if ((strlen($dd1) == 0)) {
+                    $tela .= $this -> bibliometrics -> form_1();
+                } else {
+                    $rst = $this->basket_cited($dd1, $dd2);
+                    $tela .= $this -> bibliometrics -> form_1();
+                    $tela .= '<h4>' . msg('result') . '</h4>';
+                    $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
+                }            
+                
+            break;
             case 'half_live':
                 if (strlen($dd1) == 0) {
                     $tela .= $this -> bibliometrics -> form_1();
@@ -194,6 +205,13 @@ class bibliometrics extends CI_model {
         $sx .= msg('half_live');
         $sx .= '</a>';
         $sx .= '</li>';
+
+        /* Half Live */
+        $sx .= '<li>';
+        $sx .= '<a href="'.base_url(PATH.'bibliometric/basket_cited').'">';
+        $sx .= msg('basket_cited');
+        $sx .= '</a>';
+        $sx .= '</li>';        
         
         $sx .= '</ul>';
         $sx .= '</li>';                       
@@ -203,6 +221,32 @@ class bibliometrics extends CI_model {
         $sx .= '</div>';
         return($sx);
     }
+    function basket_cited($d1,$d2)
+        {
+            /****/
+            $dd1 = troca($d1,chr(13),';');
+            $dd1 = splitx(';',$dd1);            
+            $wh2 = '';
+            for ($r=0;$r < count($dd1);$r++)
+                {
+                    $t = $dd1[$r];
+                    if (strlen($wh2) > 0) { $wh2 .= ' OR '; }
+                    $wh2 .= " (ca_text like '%$t,%') ";
+                }
+            $this->load->model("Cited");
+            $ob = $this->bs->sels();
+            $wh = '';            
+            for ($r=0;$r < count($ob);$r++)
+                {
+                    if (strlen($wh) > 0) { $wh .= ' or '; }
+                    $wh .= '( ca_rdf = '.$ob[$r].') ';
+                }
+                
+            $sql = "SELECT * FROM ".$this->Cited->base."cited_article where ($wh) and ($wh2) ORDER BY ca_text";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();            
+            return($rlt);
+        }
     function half_live($d1)
     {
         $sx = troca($d1,';','.,');
@@ -1122,6 +1166,8 @@ class bibliometrics extends CI_model {
                                         array_push($lst,$aaa1);
                                     }
                                 $aaa = 'c/'.$ob[$r].'/author.json';
+                                if (file_exists($aaa))
+                                {
                                 $aaa = file_get_contents($aaa);
                                 $aaa = (array)json_decode($aaa);
                                 $nr = 0;
@@ -1140,6 +1186,7 @@ class bibliometrics extends CI_model {
                                             }
                                         $nr++;
                                     }
+                                }
                                 break;
                         default:                        
                             $nr = 0;
@@ -1403,15 +1450,23 @@ class bibliometrics extends CI_model {
                     $rst = $this->metadata($ob[$r],'PY');
                     foreach($rst as $key => $value)
                         {
-                            if (isset($au[$key]))
-                                {
-                                    $au[$key] = $au[$key] + 1;
-                                } else {
-                                    $au[$key] = 1;
-                                }
+                            $xkey = round($key);
+                            if ($xkey > 1950)
+                            {
+                                if (isset($au[$key]))
+                                    {
+                                        $au[$key] = $au[$key] + 1;
+                                    } else {
+                                        $au[$key] = 1;
+                                    }
+                            }
                         }
-                    if ($key < $min) { $min = $key; }
-                    if ($key > $max) { $max = $key; }
+                    
+                    if ($xkey > 1950)
+                    {
+                        if ($xkey < $min) { $min = $xkey; }
+                        if ($xkey > $max) { $max = $xkey; }
+                    }
                     $tot++;
                 }
 
@@ -1464,7 +1519,12 @@ class bibliometrics extends CI_model {
                     $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
                     $sx .= '</tr>';
                     $last = $value;
-                    $ano = $key+1;
+
+                    $xkey = round($key);
+                    if ($xkey > 1900)
+                        {
+                            $ano = $key+1;
+                        }                    
 
                     $csv .= $nr.',"'.$key.'",'.$value.',';
                     $csv .= '"'.number_format($per*100,1,',','.').'%",';
