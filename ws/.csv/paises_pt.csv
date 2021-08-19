@@ -1,251 +1,240 @@
-prefLabel,hasPopulation,hasUpdate
-China,1411780000,2021
-Índia,1380004385,2020
-Estados Unidos,331449281,2020
-Indonésia,273523615,2020
-Paquistão,220892340,2020
-Brasil,211755692,2020
-Nigéria,206139589,2020
-Bangladesh,164689383,2020
-Rússia,145934462,2020
-México,128932753,2020
-Japão,126476461,2020
-Etiópia,114963588,2020
-Filipinas,109581078,2020
-Egito,102334404,2020
-Vietname,97338579,2020
-República Democrática do Congo,89561403,2020
-Turquia,84339067,2020
-Irã,83992949,2020
-Alemanha,83783942,2020
-Tailândia,69799978,2020
-Reino Unido,67886011,2020
-França,65273511,2020
-Itália,60461826,2020
-Tanzânia,59734218,2020
-África do Sul,59308690,2020
-Myanmar,54409800,2020
-Quénia,53771296,2020
-Coreia do Sul,51269185,2020
-Colômbia,50882891,2020
-Espanha,46754778,2020
-Uganda,45741007,2020
-Argentina,45195774,2020
-Argélia,43851044,2020
-Sudão,43849260,2020
-Ucrânia,43733762,2020
-Iraque,40222493,2020
-Afeganistão,38928346,2020
-Polónia,37846611,2020
-Canadá,37742154,2020
-Marrocos,36910560,2020
-Arábia Saudita,34813871,2020
-Uzbequistão,33469203,2020
-Peru,32971854,2020
-Angola,32866272,2020
-Malásia,32365999,2020
-Moçambique,31255435,2020
-Gana,31072940,2020
-Iémen,29825968,2020
-Nepal,29136808,2020
-Venezuela,28435940,2020
-Madagascar,27691018,2020
-Camarões,26545864,2020
-Costa do Marfim,26378274,2020
-Coreia do Norte,25778816,2020
-Austrália,25499884,2020
-Níger,24206644,2020
-Taiwan,23816775,2020
-Sri Lanka,21413249,2020
-Burquina Fasso,20903273,2020
-Mali,20250833,2020
-Roménia,19237691,2020
-Malawi,19129952,2020
-Chile,19116201,2020
-Cazaquistão,18776707,2020
-Zâmbia,18383955,2020
-Guatemala,17915568,2020
-Equador,17643054,2020
-Síria,17500657,2020
-Países Baixos,17134872,2020
-Senegal,16743927,2020
-Camboja,16718965,2020
-Chade,16425864,2020
-Somália,15893222,2020
-Zimbabwe,14862924,2020
-Guiné,13132795,2020
-Ruanda,12952218,2020
-Benim,12123000,2020
-Burundi,11890784,2020
-Tunísia,11818619,2020
-Bolívia,11673021,2020
-Bélgica,11589623,2020
-Haiti,11402528,2020
-Cuba,11326616,2020
-Sudão do Sul,11193725,2020
-República Dominicana,10847910,2020
-Chéquia,10708981,2020
-Grécia,10423054,2020
-Jordânia,10203134,2020
-Portugal,10196709,2020
-Azerbaijão,10139177,2020
-Suécia,10099265,2020
-Honduras,9904607,2020
-Emirados Árabes Unidos,9890402,2020
-Hungria,9660351,2020
-Tajiquistão,9537645,2020
-Bielorrússia,9449323,2020
-Áustria,9006398,2020
-Papua-Nova Guiné,8947024,2020
-Israel,8655535,2020
-Suíça,8654622,2020
-Togo,8278724,2020
-Serra Leoa,7976983,2020
-Hong Kong (China),7496981,2020
-Laos,7275560,2020
-Paraguai,7132538,2020
-Bulgária,6948445,2020
-Sérvia,6926705,2020
-Líbia,6871292,2020
-Líbano,6825445,2020
-Nicarágua,6624554,2020
-Quirguistão,6524195,2020
-El Salvador,6486205,2020
-Turquemenistão,6031200,2020
-Singapura,5850342,2020
-Dinamarca,5792202,2020
-Finlândia,5540720,2020
-Congo,5518087,2020
-Eslováquia,5459642,2020
-Noruega,5421241,2020
-Oman,5106626,2020
-Palestina,5101414,2020
-Costa Rica,5094118,2020
-Libéria,5057681,2020
-Irlanda,4937786,2020
-República Centro-Africana,4829767,2020
-Nova Zelândia,4822233,2020
-Mauritânia,4649658,2020
-Panamá,4314767,2020
-Kuwait,4270571,2020
-Croácia,4105267,2020
-Geórgia,3989167,2020
-Eritreia,3546421,2020
-Uruguai,3473730,2020
-Bósnia e Herzegovina,3280819,2020
-Mongólia,3278290,2020
-Arménia,2963243,2020
-Jamaica,2961167,2020
-Catar,2881053,2020
-Albânia,2877797,2020
-Porto Rico (Estados Unidos),2860853,2020
-Lituânia,2722289,2020
-Moldávia,2640438,2020
-Namíbia,2540905,2020
-Gâmbia,2416668,2020
-Botswana,2351627,2020
-Gabão,2225734,2020
-Lesoto,2142249,2020
-Macedônia do Norte,2083374,2020
-Eslovénia,2078938,2020
-Guiné-Bissau,1968001,2020
-Letónia,1886198,2020
-Kosovo,1795666,2020
-Bahrein,1701575,2020
-Guiné Equatorial,1402985,2020
-Trinidad e Tobago,1399488,2020
-Estónia,1326335,2020
-Timor-Leste,1318445,2020
-Maurícia,1271768,2020
-Eswatini,1160164,2020
-Djibouti,988000,2020
-Chipre,900432,2020
-Fiji,896445,2020
-Reunião (França),895312,2020
-Comores,869601,2020
-Guiana,786552,2020
-Butão,771608,2020
-Ilhas Salomão,686884,2020
-Macau (China),649335,2020
-Montenegro,649335,2020
-Luxemburgo,625978,2020
-Saara Ocidental (Marrocos),597339,2019
-Suriname,586632,2020
-Cabo Verde,555987,2020
-Maldivas,540544,2020
-Malta,441543,2020
-Transnístria (Moldávia),469000,2020
-Brunei,437479,2020
-Guadalupe (França),400124,2020
-Belize,397628,2020
-Bahamas,393244,2020
-Martinica (França),375265,2020
-República Turca de Chipre do Norte (Chipre),351965,2020
-Islândia,341243,2020
-Vanuatu,307145,2020
-Guiana Francesa (França),298682,2020
-Barbados,287375,2020
-Nova Caledônia (França),285498,2020
-Polinésia Francesa (França),280908,2020
-Mayotte (França),272815,2020
-Abecásia (Geórgia),245424,2020
-São Tomé e Príncipe,219159,2020
-Samoa,198414,2020
-Santa Lúcia,183627,2020
-Guam (Estados unidos),168775,2020
-Curaçao (Países Baixos),164093,2020
-Kiribati,119449,2020
-Estados Federados da Micronésia,114419,2020
-Granada,112523,2020
-São Vicente e Granadinas,110940,2020
-Jersey (Reino Unido),107800,2020
-Aruba (Países Baixos),106766,2020
-Tonga,105695,2020
-U.S. Ilhas Virgens (Estados Unidos),104425,2020
-Seicheles,98347,2020
-Antígua e Barbuda,97929,2020
-Ilha de Man (Reino Unido),85033,2020
-Andorra,77265,2020
-Domínica,71986,2020
-Ilhas Cayman (Reino Unido),65722,2020
-Guernsey (Reino Unido),63155,2020
-Bermudas (Reino Unido),62278,2020
-Ilhas Marshall,59190,2020
-Marianas Setentrionais (Estados Unidos),57559,2020
-Ossétia do Sul (Geórgia),57095,2020
-Gronelândia (Dinamarca),56770,2020
-Samoa Americana (Estados Unidos),55191,2020
-São Cristóvão e Nevis,53199,2020
-Ilhas Faroe (Dinamarca),48863,2020
-São Martinho (Países Baixos),42876,2020
-Mônaco,39242,2020
-Ilhas Turks e Caicos (Reino Unido),38717,2020
-Saint-Martin (França),38666,2020
-Liechtenstein,38128,2020
-San Marino,33931,2020
-Gibraltar (Reino Unido),33691,2020
-Ilhas Virgens Britânicas (Reino Unido),30231,2020
-Bonaire (Países Baixos),20915,2020
-Palau,18094,2020
-Ilhas Cook,17564,2020
-Anguilla (Reino Unido),15003,2020
-Tuvalu,11792,2020
-Wallis e Futuna (França),11239,2020
-Nauru,10824,2020
-São Bartolomeu (França),9877,2020
-São Pedro e Miquelon (França),6008,2016
-Montserrat (Reino Unido),4992,2020
-Santa Helena (território) do Reino Unido),4889,2020
-Ilhas Malvinas (Reino Unido),3480,2020
-Santo Eustáquio (Países Baixos),3139,2020
-Território Britânico do Oceano Índico (UK),3000,2020
-Ilha Christmas (Austrália),1996,2020
-Niue,1626,2020
-Saba (Países Baixos),1933,2020
-Ilha Norfolk (Austrália),1734,2020
-Tokelau (NZ),1357,2020
-Ilha de Ascensão (Reino Unido),806,2021
-Vaticano,801,2020
-Ilhas Cocos (Keeling) (Austrália),573,2020
-Tristão da Cunha (Reino Unido),277,2020
-Ilhas Pitcairn (Reino Unido),50,2020
+i_lg;lg_code;lg_language;lg_lang
+1;af;Afrikaans;en
+2;af-ZA;Afrikaans (South Africa);en
+3;ar;Arabic;en
+4;ar-AE;Arabic (U.A.E.);en
+5;ar-BH;Arabic (Bahrain);en
+6;ar-DZ;Arabic (Algeria);en
+7;ar-EG;Arabic (Egypt);en
+8;ar-IQ;Arabic (Iraq);en
+9;ar-JO;Arabic (Jordan);en
+10;ar-KW;Arabic (Kuwait);en
+11;ar-LB;Arabic (Lebanon);en
+12;ar-LY;Arabic (Libya);en
+13;ar-MA;Arabic (Morocco);en
+14;ar-OM;Arabic (Oman);en
+15;ar-QA;Arabic (Qatar);en
+16;ar-SA;Arabic (Saudi Arabia);en
+17;ar-SY;Arabic (Syria);en
+18;ar-TN;Arabic (Tunisia);en
+19;ar-YE;Arabic (Yemen);en
+20;az;Azeri (Latin);en
+21;az-AZ;Azeri (Latin) (Azerbaijan);en
+22;az-AZ;Azeri (Cyrillic) (Azerbaijan);en
+23;be;Belarusian;en
+24;be-BY;Belarusian (Belarus);en
+25;bg;Bulgarian;en
+26;bg-BG;Bulgarian (Bulgaria);en
+27;bs-BA;Bosnian (Bosnia and Herzegovina);en
+28;ca;Catalan;en
+29;ca-ES;Catalan (Spain);en
+30;cs;Czech;en
+31;cs-CZ;Czech (Czech Republic);en
+32;cy;Welsh;en
+33;cy-GB;Welsh (United Kingdom);en
+34;da;Danish;en
+35;da-DK;Danish (Denmark);en
+36;de;German;en
+37;de-AT;German (Austria);en
+38;de-CH;German (Switzerland);en
+39;de-DE;German (Germany);en
+40;de-LI;German (Liechtenstein);en
+41;de-LU;German (Luxembourg);en
+42;dv;Divehi;en
+43;dv-MV;Divehi (Maldives);en
+44;el;Greek;en
+45;el-GR;Greek (Greece);en
+46;en;English;en
+47;en-AU;English (Australia);en
+48;en-BZ;English (Belize);en
+49;en-CA;English (Canada);en
+50;en-CB;English (Caribbean);en
+51;en-GB;English (United Kingdom);en
+52;en-IE;English (Ireland);en
+53;en-JM;English (Jamaica);en
+54;en-NZ;English (New Zealand);en
+55;en-PH;English (Republic of the Philippines);en
+56;en-TT;English (Trinidad and Tobago);en
+57;en-US;English (United States);en
+58;en-ZA;English (South Africa);en
+59;en-ZW;English (Zimbabwe);en
+60;eo;Esperanto;en
+61;es;Spanish;en
+62;es-AR;Spanish (Argentina);en
+63;es-BO;Spanish (Bolivia);en
+64;es-CL;Spanish (Chile);en
+65;es-CO;Spanish (Colombia);en
+66;es-CR;Spanish (Costa Rica);en
+67;es-DO;Spanish (Dominican Republic);en
+68;es-EC;Spanish (Ecuador);en
+69;es-ES;Spanish (Castilian);en
+70;es-ES;Spanish (Spain);en
+71;es-GT;Spanish (Guatemala);en
+72;es-HN;Spanish (Honduras);en
+73;es-MX;Spanish (Mexico);en
+74;es-NI;Spanish (Nicaragua);en
+75;es-PA;Spanish (Panama);en
+76;es-PE;Spanish (Peru);en
+77;es-PR;Spanish (Puerto Rico);en
+78;es-PY;Spanish (Paraguay);en
+79;es-SV;Spanish (El Salvador);en
+80;es-UY;Spanish (Uruguay);en
+81;es-VE;Spanish (Venezuela);en
+82;et;Estonian;en
+83;et-EE;Estonian (Estonia);en
+84;eu;Basque;en
+85;eu-ES;Basque (Spain);en
+86;fa;Farsi;en
+87;fa-IR;Farsi (Iran);en
+88;fi;Finnish;en
+89;fi-FI;Finnish (Finland);en
+90;fo;Faroese;en
+91;fo-FO;Faroese (Faroe Islands);en
+92;fr;French;en
+93;fr-BE;French (Belgium);en
+94;fr-CA;French (Canada);en
+95;fr-CH;French (Switzerland);en
+96;fr-FR;French (France);en
+97;fr-LU;French (Luxembourg);en
+98;fr-MC;French (Principality of Monaco);en
+99;gl;Galician;en
+100;gl-ES;Galician (Spain);en
+101;gu;Gujarati;en
+102;gu-IN;Gujarati (India);en
+103;he;Hebrew;en
+104;he-IL;Hebrew (Israel);en
+105;hi;Hindi;en
+106;hi-IN;Hindi (India);en
+107;hr;Croatian;en
+108;hr-BA;Croatian (Bosnia and Herzegovina);en
+109;hr-HR;Croatian (Croatia);en
+110;hu;Hungarian;en
+111;hu-HU;Hungarian (Hungary);en
+112;hy;Armenian;en
+113;hy-AM;Armenian (Armenia);en
+114;id;Indonesian;en
+115;id-ID;Indonesian (Indonesia);en
+116;is;Icelandic;en
+117;is-IS;Icelandic (Iceland);en
+118;it;Italian;en
+119;it-CH;Italian (Switzerland);en
+120;it-IT;Italian (Italy);en
+121;ja;Japanese;en
+122;ja-JP;Japanese (Japan);en
+123;ka;Georgian;en
+124;ka-GE;Georgian (Georgia);en
+125;kk;Kazakh;en
+126;kk-KZ;Kazakh (Kazakhstan);en
+127;kn;Kannada;en
+128;kn-IN;Kannada (India);en
+129;ko;Korean;en
+130;ko-KR;Korean (Korea);en
+131;kok;Konkani;en
+132;kok-IN;Konkani (India);en
+133;ky;Kyrgyz;en
+134;ky-KG;Kyrgyz (Kyrgyzstan);en
+135;lt;Lithuanian;en
+136;lt-LT;Lithuanian (Lithuania);en
+137;lv;Latvian;en
+138;lv-LV;Latvian (Latvia);en
+139;mi;Maori;en
+140;mi-NZ;Maori (New Zealand);en
+141;mk;FYRO Macedonian;en
+142;mk-MK;FYRO Macedonian (Former Yugoslav Republic of Macedonia);en
+143;mn;Mongolian;en
+144;mn-MN;Mongolian (Mongolia);en
+145;mr;Marathi;en
+146;mr-IN;Marathi (India);en
+147;ms;Malay;en
+148;ms-BN;Malay (Brunei Darussalam);en
+149;ms-MY;Malay (Malaysia);en
+150;mt;Maltese;en
+151;mt-MT;Maltese (Malta);en
+152;nb;Norwegian (Bokm?l);en
+153;nb-NO;Norwegian (Bokm?l) (Norway);en
+154;nl;Dutch;en
+155;nl-BE;Dutch (Belgium);en
+156;nl-NL;Dutch (Netherlands);en
+157;nn-NO;Norwegian (Nynorsk) (Norway);en
+158;ns;Northern Sotho;en
+159;ns-ZA;Northern Sotho (South Africa);en
+160;pa;Punjabi;en
+161;pa-IN;Punjabi (India);en
+162;pl;Polish;en
+163;pl-PL;Polish (Poland);en
+164;ps;Pashto;en
+165;ps-AR;Pashto (Afghanistan);en
+166;pt;Portuguese;en
+167;pt-BR;Portuguese (Brazil);en
+168;pt-PT;Portuguese (Portugal);en
+169;qu;Quechua;en
+170;qu-BO;Quechua (Bolivia);en
+171;qu-EC;Quechua (Ecuador);en
+172;qu-PE;Quechua (Peru);en
+173;ro;Romanian;en
+174;ro-RO;Romanian (Romania);en
+175;ru;Russian;en
+176;ru-RU;Russian (Russia);en
+177;sa;Sanskrit;en
+178;sa-IN;Sanskrit (India);en
+179;se;Sami (Northern);en
+180;se-FI;Sami (Northern) (Finland);en
+181;se-FI;Sami (Skolt) (Finland);en
+182;se-FI;Sami (Inari) (Finland);en
+183;se-NO;Sami (Northern) (Norway);en
+184;se-NO;Sami (Lule) (Norway);en
+185;se-NO;Sami (Southern) (Norway);en
+186;se-SE;Sami (Northern) (Sweden);en
+187;se-SE;Sami (Lule) (Sweden);en
+188;se-SE;Sami (Southern) (Sweden);en
+189;sk;Slovak;en
+190;sk-SK;Slovak (Slovakia);en
+191;sl;Slovenian;en
+192;sl-SI;Slovenian (Slovenia);en
+193;sq;Albanian;en
+194;sq-AL;Albanian (Albania);en
+195;sr-BA;Serbian (Latin) (Bosnia and Herzegovina);en
+196;sr-BA;Serbian (Cyrillic) (Bosnia and Herzegovina);en
+197;sr-SP;Serbian (Latin) (Serbia and Montenegro);en
+198;sr-SP;Serbian (Cyrillic) (Serbia and Montenegro);en
+199;sv;Swedish;en
+200;sv-FI;Swedish (Finland);en
+201;sv-SE;Swedish (Sweden);en
+202;sw;Swahili;en
+203;sw-KE;Swahili (Kenya);en
+204;syr;Syriac;en
+205;syr-SY;Syriac (Syria);en
+206;ta;Tamil;en
+207;ta-IN;Tamil (India);en
+208;te;Telugu;en
+209;te-IN;Telugu (India);en
+210;th;Thai;en
+211;th-TH;Thai (Thailand);en
+212;tl;Tagalog;en
+213;tl-PH;Tagalog (Philippines);en
+214;tn;Tswana;en
+215;tn-ZA;Tswana (South Africa);en
+216;tr;Turkish;en
+217;tr-TR;Turkish (Turkey);en
+218;tt;Tatar;en
+219;tt-RU;Tatar (Russia);en
+220;ts;Tsonga;en
+221;uk;Ukrainian;en
+222;uk-UA;Ukrainian (Ukraine);en
+223;ur;Urdu;en
+224;ur-PK;Urdu (Islamic Republic of Pakistan);en
+225;uz;Uzbek (Latin);en
+226;uz-UZ;Uzbek (Latin) (Uzbekistan);en
+227;uz-UZ;Uzbek (Cyrillic) (Uzbekistan);en
+228;vi;Vietnamese;en
+229;vi-VN;Vietnamese (Viet Nam);en
+230;xh;Xhosa;en
+231;xh-ZA;Xhosa (South Africa);en
+232;zh;Chinese;en
+233;zh-CN;Chinese (S);en
+234;zh-HK;Chinese (Hong Kong);en
+235;zh-MO;Chinese (Macau);en
+236;zh-SG;Chinese (Singapore);en
+237;zh-TW;Chinese (T);en
+238;zu;Zulu;en
+239;zu-ZA;Zulu (South Africa);en

@@ -1,0 +1,250 @@
+id_ct;ct_code;ct_name;ct_lang
+1;AF;Afeganistão;pt-BR
+2;ZA;África do Sul;pt-BR
+3;AL;Albânia;pt-BR
+4;DE;Alemanha;pt-BR
+5;AD;Andorra;pt-BR
+6;AO;Angola;pt-BR
+7;AI;Anguila;pt-BR
+8;AQ;Antártida;pt-BR
+9;AG;Antígua e Barbuda;pt-BR
+10;SA;Arábia Saudita;pt-BR
+11;DZ;Argélia;pt-BR
+12;AR;Argentina;pt-BR
+13;AM;Armênia;pt-BR
+14;AW;Aruba;pt-BR
+15;AU;Austrália;pt-BR
+16;AT;Áustria;pt-BR
+17;AZ;Azerbaijão;pt-BR
+18;BS;Bahamas;pt-BR
+19;BH;Bahrein;pt-BR
+20;BD;Bangladesh;pt-BR
+21;BB;Barbados;pt-BR
+22;BE;Bélgica;pt-BR
+23;BZ;Belize;pt-BR
+24;BJ;Benin;pt-BR
+25;BM;Bermudas;pt-BR
+26;BY;Bielorrússia;pt-BR
+27;BO;Bolívia;pt-BR
+28;BA;Bósnia e Herzegovina;pt-BR
+29;BW;Botsuana;pt-BR
+30;BR;Brasil;pt-BR
+31;BN;Brunei;pt-BR
+32;BG;Bulgária;pt-BR
+33;BF;Burquina Faso;pt-BR
+34;BI;Burundi;pt-BR
+35;BT;Butão;pt-BR
+36;CV;Cabo Verde;pt-BR
+37;CM;Camarões;pt-BR
+38;KH;Camboja;pt-BR
+39;CA;Canadá;pt-BR
+40;QA;Catar;pt-BR
+41;KZ;Cazaquistão;pt-BR
+42;TD;Chade;pt-BR
+43;CL;Chile;pt-BR
+44;CN;China;pt-BR
+45;CY;Chipre;pt-BR
+46;VA;Cidade do Vaticano;pt-BR
+47;CO;Colômbia;pt-BR
+48;KM;Comores;pt-BR
+49;CD;Congo - Kinshasa;pt-BR
+50;KP;Coreia do Norte;pt-BR
+51;KR;Coreia do Sul;pt-BR
+52;CI;Costa do Marfim;pt-BR
+53;CR;Costa Rica;pt-BR
+54;HR;Croácia;pt-BR
+55;CU;Cuba;pt-BR
+56;CW;Curaçao;pt-BR
+57;DK;Dinamarca;pt-BR
+58;DJ;Djibuti;pt-BR
+59;DM;Dominica;pt-BR
+60;EG;Egito;pt-BR
+61;SV;El Salvador;pt-BR
+62;AE;Emirados Árabes Unidos;pt-BR
+63;EC;Equador;pt-BR
+64;ER;Eritreia;pt-BR
+65;SK;Eslováquia;pt-BR
+66;SI;Eslovênia;pt-BR
+67;ES;Espanha;pt-BR
+68;SZ;Essuatíni;pt-BR
+69;US;Estados Unidos;pt-BR
+70;EE;Estônia;pt-BR
+71;ET;Etiópia;pt-BR
+72;FJ;Fiji;pt-BR
+73;PH;Filipinas;pt-BR
+74;FI;Finlândia;pt-BR
+75;FR;França;pt-BR
+76;GA;Gabão;pt-BR
+77;GM;Gâmbia;pt-BR
+78;GH;Gana;pt-BR
+79;GE;Geórgia;pt-BR
+80;GI;Gibraltar;pt-BR
+81;GD;Granada;pt-BR
+82;GR;Grécia;pt-BR
+83;GL;Groenlândia;pt-BR
+84;GP;Guadalupe;pt-BR
+85;GU;Guam;pt-BR
+86;GT;Guatemala;pt-BR
+87;GG;Guernsey;pt-BR
+88;GY;Guiana;pt-BR
+89;GF;Guiana Francesa;pt-BR
+90;GN;Guiné;pt-BR
+91;GQ;Guiné Equatorial;pt-BR
+92;GW;Guiné-Bissau;pt-BR
+93;HT;Haiti;pt-BR
+94;HN;Honduras;pt-BR
+95;HK;Hong Kong, RAE da China;pt-BR
+96;HU;Hungria;pt-BR
+97;YE;Iêmen;pt-BR
+98;BV;Ilha Bouvet;pt-BR
+99;CX;Ilha Christmas;pt-BR
+100;IM;Ilha de Man;pt-BR
+101;NF;Ilha Norfolk;pt-BR
+102;AX;Ilhas Aland;pt-BR
+103;KY;Ilhas Cayman;pt-BR
+104;CC;Ilhas Cocos (Keeling);pt-BR
+105;CK;Ilhas Cook;pt-BR
+106;FO;Ilhas Faroe;pt-BR
+107;GS;Ilhas Geórgia do Sul e Sandwich do Sul;pt-BR
+108;HM;Ilhas Heard e McDonald;pt-BR
+109;FK;Ilhas Malvinas;pt-BR
+110;MP;Ilhas Marianas do Norte;pt-BR
+111;MH;Ilhas Marshall;pt-BR
+112;UM;Ilhas Menores Distantes dos EUA;pt-BR
+113;PN;Ilhas Pitcairn;pt-BR
+114;SB;Ilhas Salomão;pt-BR
+115;TC;Ilhas Turcas e Caicos;pt-BR
+116;VI;Ilhas Virgens Americanas;pt-BR
+117;VG;Ilhas Virgens Britânicas;pt-BR
+118;IN;Índia;pt-BR
+119;ID;Indonésia;pt-BR
+120;IR;Irã;pt-BR
+121;IQ;Iraque;pt-BR
+122;IE;Irlanda;pt-BR
+123;IS;Islândia;pt-BR
+124;IL;Israel;pt-BR
+125;IT;Itália;pt-BR
+126;JM;Jamaica;pt-BR
+127;JP;Japão;pt-BR
+128;JE;Jersey;pt-BR
+129;JO;Jordânia;pt-BR
+130;KW;Kuwait;pt-BR
+131;LA;Laos;pt-BR
+132;LS;Lesoto;pt-BR
+133;LV;Letônia;pt-BR
+134;LB;Líbano;pt-BR
+135;LR;Libéria;pt-BR
+136;LY;Líbia;pt-BR
+137;LI;Liechtenstein;pt-BR
+138;LT;Lituânia;pt-BR
+139;LU;Luxemburgo;pt-BR
+140;MO;Macau, RAE da China;pt-BR
+141;MK;Macedônia do Norte;pt-BR
+142;MG;Madagascar;pt-BR
+143;MY;Malásia;pt-BR
+144;MW;Malaui;pt-BR
+145;MV;Maldivas;pt-BR
+146;ML;Mali;pt-BR
+147;MT;Malta;pt-BR
+148;MA;Marrocos;pt-BR
+149;MQ;Martinica;pt-BR
+150;MU;Maurício;pt-BR
+151;MR;Mauritânia;pt-BR
+152;YT;Mayotte;pt-BR
+153;MX;México;pt-BR
+154;MM;Mianmar (Birmânia);pt-BR
+155;FM;Micronésia;pt-BR
+156;MZ;Moçambique;pt-BR
+157;MD;Moldova;pt-BR
+158;MC;Mônaco;pt-BR
+159;MN;Mongólia;pt-BR
+160;ME;Montenegro;pt-BR
+161;MS;Montserrat;pt-BR
+162;NA;Namíbia;pt-BR
+163;NR;Nauru;pt-BR
+164;NP;Nepal;pt-BR
+165;NI;Nicarágua;pt-BR
+166;NE;Níger;pt-BR
+167;NG;Nigéria;pt-BR
+168;NU;Niue;pt-BR
+169;NO;Noruega;pt-BR
+170;NC;Nova Caledônia;pt-BR
+171;NZ;Nova Zelândia;pt-BR
+172;OM;Omã;pt-BR
+173;NL;Países Baixos;pt-BR
+174;BQ;Países Baixos Caribenhos;pt-BR
+175;PW;Palau;pt-BR
+176;PA;Panamá;pt-BR
+177;PG;Papua-Nova Guiné;pt-BR
+178;PK;Paquistão;pt-BR
+179;PY;Paraguai;pt-BR
+180;PE;Peru;pt-BR
+181;PF;Polinésia Francesa;pt-BR
+182;PL;Polônia;pt-BR
+183;PR;Porto Rico;pt-BR
+184;PT;Portugal;pt-BR
+185;KE;Quênia;pt-BR
+186;KG;Quirguistão;pt-BR
+187;KI;Quiribati;pt-BR
+188;GB;Reino Unido;pt-BR
+189;CF;República Centro-Africana;pt-BR
+190;CG;República do Congo;pt-BR
+191;DO;República Dominicana;pt-BR
+192;RE;Reunião;pt-BR
+193;RO;Romênia;pt-BR
+194;RW;Ruanda;pt-BR
+195;RU;Rússia;pt-BR
+196;EH;Saara Ocidental;pt-BR
+197;WS;Samoa;pt-BR
+198;AS;Samoa Americana;pt-BR
+199;SM;San Marino;pt-BR
+200;SH;Santa Helena;pt-BR
+201;LC;Santa Lúcia;pt-BR
+202;BL;São Bartolomeu;pt-BR
+203;KN;São Cristóvão e Névis;pt-BR
+204;MF;São Martinho;pt-BR
+205;PM;São Pedro e Miquelão;pt-BR
+206;ST;São Tomé e Príncipe;pt-BR
+207;VC;São Vicente e Granadinas;pt-BR
+208;SC;Seicheles;pt-BR
+209;SN;Senegal;pt-BR
+210;SL;Serra Leoa;pt-BR
+211;RS;Sérvia;pt-BR
+212;SG;Singapura;pt-BR
+213;SX;Sint Maarten;pt-BR
+214;SY;Síria;pt-BR
+215;SO;Somália;pt-BR
+216;LK;Sri Lanka;pt-BR
+217;SD;Sudão;pt-BR
+218;SS;Sudão do Sul;pt-BR
+219;SE;Suécia;pt-BR
+220;CH;Suíça;pt-BR
+221;SR;Suriname;pt-BR
+222;SJ;Svalbard e Jan Mayen;pt-BR
+223;TJ;Tadjiquistão;pt-BR
+224;TH;Tailândia;pt-BR
+225;TW;Taiwan;pt-BR
+226;TZ;Tanzânia;pt-BR
+227;CZ;Tchéquia;pt-BR
+228;IO;Território Britânico do Oceano Índico;pt-BR
+229;TF;Territórios Franceses do Sul;pt-BR
+230;PS;Territórios palestinos;pt-BR
+231;TL;Timor-Leste;pt-BR
+232;TG;Togo;pt-BR
+233;TK;Tokelau;pt-BR
+234;TO;Tonga;pt-BR
+235;TT;Trinidad e Tobago;pt-BR
+236;TN;Tunísia;pt-BR
+237;TM;Turcomenistão;pt-BR
+238;TR;Turquia;pt-BR
+239;TV;Tuvalu;pt-BR
+240;UA;Ucrânia;pt-BR
+241;UG;Uganda;pt-BR
+242;UY;Uruguai;pt-BR
+243;UZ;Uzbequistão;pt-BR
+244;VU;Vanuatu;pt-BR
+245;VE;Venezuela;pt-BR
+246;VN;Vietnã;pt-BR
+247;WF;Wallis e Futuna;pt-BR
+248;ZM;Zâmbia;pt-BR
+249;ZW;Zimbábue;pt-BR

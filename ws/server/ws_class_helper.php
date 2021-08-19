@@ -85,6 +85,20 @@ class wsc //extends CI_Model
         return ($rs);
     }
 
+    /************************************************** BASE PQ */
+    function basepq()
+        {
+            $file = '../../c/pq.json';
+            if (!file_exists($file))
+                {
+                    echo "NOT FILE";
+                    exit;
+                }
+            $rlt = file_get_contents($file);
+            $rlt = json_decode($rlt);
+            return($rlt);
+        }
+
     /************************************************** I O Interface */
     function read($f)
     {

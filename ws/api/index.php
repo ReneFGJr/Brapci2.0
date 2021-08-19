@@ -25,7 +25,13 @@ switch($verb)
         $ws = new wsc;  
         $ws->dir = '../'.$ws->dir;      
         $rst = $ws->lattesXML($q);
-        break;        
+        break;
+
+        case 'basepq':
+        $ws = new wsc;  
+        $ws->dir = '../'.$ws->dir;      
+        $rst = $ws->basepq();
+        break;
 
         default: 
         $rst = array();

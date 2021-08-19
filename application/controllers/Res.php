@@ -1017,6 +1017,9 @@ class res extends CI_Controller
             case 'article':
                 $tela = $this->export->export_Article($pg);
                 break;
+            case 'basepq':
+                $tela = $this->export->export_basepq();
+                break;                
             case 'subject':
                 if ($pg == 0) {
                     $pg = 65;
@@ -1050,6 +1053,7 @@ class res extends CI_Controller
                 $tela .= '<li><a href="' . base_url(PATH . 'export/all_xls') . '">' . msg('export_all_xls') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/genere') . '">' . msg('export_genere') . '</a></li>' . cr();
                 $tela .= '<li><a href="' . base_url(PATH . 'export/author_consistencia') . '">' . msg('author_consistencia') . '</a></li>' . cr();
+                $tela .= '<li><a href="' . base_url(PATH . 'export/basepq') . '">' . msg('basepq') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
         }
 

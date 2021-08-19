@@ -1,0 +1,239 @@
+af;Afrikaans;en
+af-ZA;Afrikaans (South Africa);en
+ar;Arabic;en
+ar-AE;Arabic (U.A.E.);en
+ar-BH;Arabic (Bahrain);en
+ar-DZ;Arabic (Algeria);en
+ar-EG;Arabic (Egypt);en
+ar-IQ;Arabic (Iraq);en
+ar-JO;Arabic (Jordan);en
+ar-KW;Arabic (Kuwait);en
+ar-LB;Arabic (Lebanon);en
+ar-LY;Arabic (Libya);en
+ar-MA;Arabic (Morocco);en
+ar-OM;Arabic (Oman);en
+ar-QA;Arabic (Qatar);en
+ar-SA;Arabic (Saudi Arabia);en
+ar-SY;Arabic (Syria);en
+ar-TN;Arabic (Tunisia);en
+ar-YE;Arabic (Yemen);en
+az;Azeri (Latin);en
+az-AZ;Azeri (Latin) (Azerbaijan);en
+az-AZ;Azeri (Cyrillic) (Azerbaijan);en
+be;Belarusian;en
+be-BY;Belarusian (Belarus);en
+bg;Bulgarian;en
+bg-BG;Bulgarian (Bulgaria);en
+bs-BA;Bosnian (Bosnia and Herzegovina);en
+ca;Catalan;en
+ca-ES;Catalan (Spain);en
+cs;Czech;en
+cs-CZ;Czech (Czech Republic);en
+cy;Welsh;en
+cy-GB;Welsh (United Kingdom);en
+da;Danish;en
+da-DK;Danish (Denmark);en
+de;German;en
+de-AT;German (Austria);en
+de-CH;German (Switzerland);en
+de-DE;German (Germany);en
+de-LI;German (Liechtenstein);en
+de-LU;German (Luxembourg);en
+dv;Divehi;en
+dv-MV;Divehi (Maldives);en
+el;Greek;en
+el-GR;Greek (Greece);en
+en;English;en
+en-AU;English (Australia);en
+en-BZ;English (Belize);en
+en-CA;English (Canada);en
+en-CB;English (Caribbean);en
+en-GB;English (United Kingdom);en
+en-IE;English (Ireland);en
+en-JM;English (Jamaica);en
+en-NZ;English (New Zealand);en
+en-PH;English (Republic of the Philippines);en
+en-TT;English (Trinidad and Tobago);en
+en-US;English (United States);en
+en-ZA;English (South Africa);en
+en-ZW;English (Zimbabwe);en
+eo;Esperanto;en
+es;Spanish;en
+es-AR;Spanish (Argentina);en
+es-BO;Spanish (Bolivia);en
+es-CL;Spanish (Chile);en
+es-CO;Spanish (Colombia);en
+es-CR;Spanish (Costa Rica);en
+es-DO;Spanish (Dominican Republic);en
+es-EC;Spanish (Ecuador);en
+es-ES;Spanish (Castilian);en
+es-ES;Spanish (Spain);en
+es-GT;Spanish (Guatemala);en
+es-HN;Spanish (Honduras);en
+es-MX;Spanish (Mexico);en
+es-NI;Spanish (Nicaragua);en
+es-PA;Spanish (Panama);en
+es-PE;Spanish (Peru);en
+es-PR;Spanish (Puerto Rico);en
+es-PY;Spanish (Paraguay);en
+es-SV;Spanish (El Salvador);en
+es-UY;Spanish (Uruguay);en
+es-VE;Spanish (Venezuela);en
+et;Estonian;en
+et-EE;Estonian (Estonia);en
+eu;Basque;en
+eu-ES;Basque (Spain);en
+fa;Farsi;en
+fa-IR;Farsi (Iran);en
+fi;Finnish;en
+fi-FI;Finnish (Finland);en
+fo;Faroese;en
+fo-FO;Faroese (Faroe Islands);en
+fr;French;en
+fr-BE;French (Belgium);en
+fr-CA;French (Canada);en
+fr-CH;French (Switzerland);en
+fr-FR;French (France);en
+fr-LU;French (Luxembourg);en
+fr-MC;French (Principality of Monaco);en
+gl;Galician;en
+gl-ES;Galician (Spain);en
+gu;Gujarati;en
+gu-IN;Gujarati (India);en
+he;Hebrew;en
+he-IL;Hebrew (Israel);en
+hi;Hindi;en
+hi-IN;Hindi (India);en
+hr;Croatian;en
+hr-BA;Croatian (Bosnia and Herzegovina);en
+hr-HR;Croatian (Croatia);en
+hu;Hungarian;en
+hu-HU;Hungarian (Hungary);en
+hy;Armenian;en
+hy-AM;Armenian (Armenia);en
+id;Indonesian;en
+id-ID;Indonesian (Indonesia);en
+is;Icelandic;en
+is-IS;Icelandic (Iceland);en
+it;Italian;en
+it-CH;Italian (Switzerland);en
+it-IT;Italian (Italy);en
+ja;Japanese;en
+ja-JP;Japanese (Japan);en
+ka;Georgian;en
+ka-GE;Georgian (Georgia);en
+kk;Kazakh;en
+kk-KZ;Kazakh (Kazakhstan);en
+kn;Kannada;en
+kn-IN;Kannada (India);en
+ko;Korean;en
+ko-KR;Korean (Korea);en
+kok;Konkani;en
+kok-IN;Konkani (India);en
+ky;Kyrgyz;en
+ky-KG;Kyrgyz (Kyrgyzstan);en
+lt;Lithuanian;en
+lt-LT;Lithuanian (Lithuania);en
+lv;Latvian;en
+lv-LV;Latvian (Latvia);en
+mi;Maori;en
+mi-NZ;Maori (New Zealand);en
+mk;FYRO Macedonian;en
+mk-MK;FYRO Macedonian (Former Yugoslav Republic of Macedonia);en
+mn;Mongolian;en
+mn-MN;Mongolian (Mongolia);en
+mr;Marathi;en
+mr-IN;Marathi (India);en
+ms;Malay;en
+ms-BN;Malay (Brunei Darussalam);en
+ms-MY;Malay (Malaysia);en
+mt;Maltese;en
+mt-MT;Maltese (Malta);en
+nb;Norwegian (Bokm?l);en
+nb-NO;Norwegian (Bokm?l) (Norway);en
+nl;Dutch;en
+nl-BE;Dutch (Belgium);en
+nl-NL;Dutch (Netherlands);en
+nn-NO;Norwegian (Nynorsk) (Norway);en
+ns;Northern Sotho;en
+ns-ZA;Northern Sotho (South Africa);en
+pa;Punjabi;en
+pa-IN;Punjabi (India);en
+pl;Polish;en
+pl-PL;Polish (Poland);en
+ps;Pashto;en
+ps-AR;Pashto (Afghanistan);en
+pt;Portuguese;en
+pt-BR;Portuguese (Brazil);en
+pt-PT;Portuguese (Portugal);en
+qu;Quechua;en
+qu-BO;Quechua (Bolivia);en
+qu-EC;Quechua (Ecuador);en
+qu-PE;Quechua (Peru);en
+ro;Romanian;en
+ro-RO;Romanian (Romania);en
+ru;Russian;en
+ru-RU;Russian (Russia);en
+sa;Sanskrit;en
+sa-IN;Sanskrit (India);en
+se;Sami (Northern);en
+se-FI;Sami (Northern) (Finland);en
+se-FI;Sami (Skolt) (Finland);en
+se-FI;Sami (Inari) (Finland);en
+se-NO;Sami (Northern) (Norway);en
+se-NO;Sami (Lule) (Norway);en
+se-NO;Sami (Southern) (Norway);en
+se-SE;Sami (Northern) (Sweden);en
+se-SE;Sami (Lule) (Sweden);en
+se-SE;Sami (Southern) (Sweden);en
+sk;Slovak;en
+sk-SK;Slovak (Slovakia);en
+sl;Slovenian;en
+sl-SI;Slovenian (Slovenia);en
+sq;Albanian;en
+sq-AL;Albanian (Albania);en
+sr-BA;Serbian (Latin) (Bosnia and Herzegovina);en
+sr-BA;Serbian (Cyrillic) (Bosnia and Herzegovina);en
+sr-SP;Serbian (Latin) (Serbia and Montenegro);en
+sr-SP;Serbian (Cyrillic) (Serbia and Montenegro);en
+sv;Swedish;en
+sv-FI;Swedish (Finland);en
+sv-SE;Swedish (Sweden);en
+sw;Swahili;en
+sw-KE;Swahili (Kenya);en
+syr;Syriac;en
+syr-SY;Syriac (Syria);en
+ta;Tamil;en
+ta-IN;Tamil (India);en
+te;Telugu;en
+te-IN;Telugu (India);en
+th;Thai;en
+th-TH;Thai (Thailand);en
+tl;Tagalog;en
+tl-PH;Tagalog (Philippines);en
+tn;Tswana;en
+tn-ZA;Tswana (South Africa);en
+tr;Turkish;en
+tr-TR;Turkish (Turkey);en
+tt;Tatar;en
+tt-RU;Tatar (Russia);en
+ts;Tsonga;en
+uk;Ukrainian;en
+uk-UA;Ukrainian (Ukraine);en
+ur;Urdu;en
+ur-PK;Urdu (Islamic Republic of Pakistan);en
+uz;Uzbek (Latin);en
+uz-UZ;Uzbek (Latin) (Uzbekistan);en
+uz-UZ;Uzbek (Cyrillic) (Uzbekistan);en
+vi;Vietnamese;en
+vi-VN;Vietnamese (Viet Nam);en
+xh;Xhosa;en
+xh-ZA;Xhosa (South Africa);en
+zh;Chinese;en
+zh-CN;Chinese (S);en
+zh-HK;Chinese (Hong Kong);en
+zh-MO;Chinese (Macau);en
+zh-SG;Chinese (Singapore);en
+zh-TW;Chinese (T);en
+zu;Zulu;en
+zu-ZA;Zulu (South Africa);en

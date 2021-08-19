@@ -1,6 +1,18 @@
 <?php
 class export extends CI_Model {
 
+    function export_basepq()
+        {
+            $sql = "select * from brapci_pq.bolsistas order by bs_nome";
+            $rlt = $this->db->query($sql);
+            $rlt = $rlt->result_array();
+
+            $file = 'c/pq.json';
+            file_put_contents($file,json_encode($rlt));
+            $sx = 'Exported';
+            return $sx;
+        }
+
     function export_Article_Single($idx) {
         $dt = $this -> frbr_core -> le_data($idx);
 
