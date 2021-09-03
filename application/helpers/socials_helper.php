@@ -61,17 +61,17 @@ class socials
     /* Google */
     var $auth_google = 1;
     var $google_redirect = 'http://www.brapci.inf.br/oauth_google.php';
-    var $google_key = '205743538602-t6i1hj7p090g5jd4u70614vldnhe7143.apps.googleusercontent.com';
+    var $google_key = 'xx-xx.apps.googleusercontent.com';
     var $google_key_client = 'AMhQ7Vfc7Lpzi_ZVZKq4wbWV';
     /* Windows */
     var $auth_microsoft = 1;
-    var $microsoft_id = '0000000040124367';
-    var $microsoft_key = 'JOlz8eVtECgfKt0MKTg0I-aXZrUboW21';
+    var $microsoft_id = 'xx';
+    var $microsoft_key = 'xx-aXZrUboW21';
     
     /* Facebook */
     var $auth_facebook = 1;
-    var $face_id = '547858661992170';
-    var $face_app = '06d0290245ca0dad338d821792df96aa';
+    var $face_id = 'xx';
+    var $face_app = 'xx';
     var $face_url = 'https://www.facebook.com/dialog';
     var $face_redirect = 'http://www.brapci.inf.br/oauth_facebook.php';
     
@@ -79,9 +79,9 @@ class socials
     var $auth_linkedin = 1;
     var $linkedin_url = "https://www.linkedin.com/uas/oauth2/authorization";
     var $linkedin_token = "https://www.linkedin.com/uas/oauth2/accessToken";
-    var $linkedin_key = '77rk2tnk7ykhoi';
-    var $linkedin_key_user = '0f68b98f-4e38-4980-b631-4f64520c9c2e';
-    var $linkedin_key_secret = '06fd1eff-0c5b-4d95-bb7b-681deb588919';
+    var $linkedin_key = 'xx';
+    var $linkedin_key_user = 'xx-xx-xx-xx-xx';
+    var $linkedin_key_secret = 'xx-xx-xx-xx-xx';
     var $linkedin_redirect = 'http://www.brapci.inf.br/oauth_linkedin.php';
 
     var $user_picture_dir = '_repositorio/users/';
@@ -97,6 +97,17 @@ class socials
         });
         </script>';
     }
+
+    function about()
+        {
+            $sx = '<h1>About</h1>';
+            $sx .= 'PHP Version: '.phpversion();
+            echo $sx;
+            echo '<pre>';
+            print_r(get_loaded_extensions());
+            echo '</pre>';
+            return($sx);
+        }
     
     function social($act = '', $id = '', $chk = '')
     {
@@ -109,6 +120,9 @@ class socials
         }
         
         switch ($act) {
+            case 'about':
+                $sx .= $this->about();
+            break;
             case 'perfil':
                 $this->perfil($id, $chk);
             break;
