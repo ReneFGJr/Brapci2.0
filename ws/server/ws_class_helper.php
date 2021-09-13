@@ -7,9 +7,21 @@ class wsc //extends CI_Model
     var $link = array();
     var $email = array();
     var $abrv = array();
+    function auth()
+        {
+            $ip = $_SERVER['REMOTE_ADDR'];
+            if (substr($ip,0,6) == '143.54') { return True; }
+            if (substr($ip) == '54.233.226.131') { return True; }
+            $dt['erro'] = '500';
+            $dt['description'] = 'Access from this IP '.$ip.' is not authorized';
+            echo json_encode($dt);
+            exit;
+        }
     /********************************************************* IA */
     function lattesXML()
         {
+            $this->auth();
+
             if (isset($_GET['q']))
             {
             $id = $_GET['q'];
