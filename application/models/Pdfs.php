@@ -77,6 +77,7 @@ class pdfs extends CI_model {
 			<form method="post" enctype="multipart/form-data">
 			Select image to upload:
 			<input type="file" name="fileToUpload" id="fileToUpload">
+			<input type="hidden" name="MAX_FILE_SIZE" value="3000000000" />
 			<input type="submit" value="Upload Image" name="submit">
 			</form>
 			';
@@ -86,12 +87,18 @@ class pdfs extends CI_model {
 				$target_dir = "uploads/";
 				$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 				$uploadOk = 1;
+				print_r($_FILES);
+				if ($_FILES['error'] == 1)
+					{
+						echo "Erro no carregamento do arquivo";
+						exit;
+					}
 				$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 				$check = (lowercase(substr($imageFileType, strlen($imageFileType) - 3, 3)) == 'pdf');
 				if ($check !== false) {
 					$namef = $_FILES["fileToUpload"]["tmp_name"];
 					$txt = '';
-					
+					echo $namef.'<hr>';
 					$myfile = fopen($namef, "r") or die("Unable to open file!");
 					$txt .= fread($myfile, filesize($namef));
 					fclose($myfile);
