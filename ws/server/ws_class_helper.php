@@ -17,6 +17,24 @@ class wsc //extends CI_Model
             echo json_encode($dt);
             exit;
         }
+    /*********************************************************** Authors */
+    function authors()
+        {
+            if (isset($_GET["q"]))
+                {
+                    $q = $_GET["q"];
+                } else {
+                    $q = '';
+                }            
+            $rs = array();
+            $rs['query'] = $q;
+            $file = '../../ws/.csv/authors.csv';
+            $rst = file_get_contents($file);
+            echo $rst;
+            exit;
+            $rs['name'] = $rst;
+            return ($rs);
+        }
     /********************************************************* IA */
     function lattesXML()
         {

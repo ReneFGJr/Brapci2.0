@@ -1032,6 +1032,7 @@ class res extends CI_Controller
             case 'index_authors':
                 if ($pg == 0) {
                     $pg = 65;
+                    $this->export->export_author_index_list_all();
                 }
                 $tela = $this->export->export_author_index_list($pg);
                 break;

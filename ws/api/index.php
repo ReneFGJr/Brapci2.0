@@ -27,6 +27,12 @@ switch($verb)
         $rst = $ws->lattesXML($q);
         break;
 
+        case 'authors':
+        $ws = new wsc;  
+        $ws->dir = '../'.$ws->dir;      
+        $rst = $ws->authors($q);
+        break;        
+
         case 'basepq':
         $ws = new wsc;  
         $ws->dir = '../'.$ws->dir;      

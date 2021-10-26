@@ -592,6 +592,25 @@ class export extends CI_Model {
                 return($sx);        
         }
 
+    function export_author_index_list_all($lt = 0, $class = 'Person') 
+        {
+        /********************************** Padroniza entrada de autores */
+        $nouse = 0;
+        $dir = 'ws/';
+        dircheck($dir);
+        $dir = 'ws/.csv';
+        dircheck($dir);
+
+        $sx = '';
+        $txt = $this -> frbr_core -> index_list_csv('Person', 0);
+        $file = $dir . '/authors.csv';
+        $hdl = fopen($file, 'w+');
+        fwrite($hdl, $txt);
+        fclose($hdl);
+        $sx .= bs_alert('success', msg('Export_all_authors') . '<br>');
+        return($sx);
+    }        
+
     function export_author_index_list($lt = 0, $class = 'Person') {
         /********************************** Padroniza entrada de autores */
 

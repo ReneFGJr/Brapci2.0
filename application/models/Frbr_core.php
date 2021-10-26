@@ -214,6 +214,53 @@ class frbr_core extends CI_model {
         return ($sx);
     }
 
+function index_list_csv($class = 'Person', $nouse = 0) 
+        {
+        $f = $this -> find_class($class);
+        $this -> check_language();
+        $wh = '';
+        if ($nouse == 1) {
+            $wh .= " and C1.cc_use = 0 ";
+        }
+        $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                        FROM rdf_concept as C1
+                        INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
+                        LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
+                        LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
+                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0                        
+                        ORDER BY N1.n_name";
+
+        $rlt = $this -> db -> query($sql);
+        $rlt = $rlt -> result_array();
+
+        $l = '';
+        $sx = '';
+        $csv = 'id;value;uri'.cr();
+        for ($r = 0; $r < count($rlt); $r++) {
+            $line = $rlt[$r];
+            $idx = $line['id_cc'];
+            $name_use = trim($line['n_name']);
+            $nome = nbr_author(trim($line['n_name']),7);
+            $ok = 1;
+            if (strpos($nome,'?')) { $ok = 0; }
+            if (strpos($nome,'(')) { $ok = 0; }
+            if (strpos($nome,' -')) { $ok = 0; }
+            if (strpos($nome,'*')) { $ok = 0; }
+            if (strpos($nome,'*')) { $ok = 0; }
+            if (strlen($nome) < 8) { $ok = 0; }
+            if ($ok ==1)
+            {
+                $link = base_url(PATH . 'v/' . $line['id_cc']);
+                $ln = $nome;
+                $ln .= ';'.$link;
+                $ln = troca($ln,' .;',';');
+                $csv .= $ln.cr();
+            }
+        }
+        return ($csv);
+    }    
+
     function index_list_style_2($lt = 'G', $class = 'Person', $nouse = 0) {
         $f = $this -> find_class($class);
         $this -> check_language();
@@ -1632,4 +1679,3 @@ function person_work($id) {
     }
     return ($wk);
 }
-?>
