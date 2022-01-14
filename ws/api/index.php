@@ -21,6 +21,12 @@ switch($verb)
         $rst = $ws->genere($q);
         break;
 
+        case 'lattesdata':
+        $ws = new wsc;  
+        $ws->dir = '../'.$ws->dir;      
+        $rst = $ws->lattesdataXML($q);
+        break;        
+
         case 'lattes':
         $ws = new wsc;  
         $ws->dir = '../'.$ws->dir;      
