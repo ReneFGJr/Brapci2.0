@@ -13,7 +13,6 @@ class wsc //extends CI_Model
             if (substr($ip,0,6) == '143.54') { return True; }
             if (trim($ip) == '54.233.226.131') { return True; }
             if (trim($ip) == '170.231.47.90') { return True; }
-            if (trim($ip) == '198.136.59.220') { return True; }
             
             $dt['erro'] = '500';
             $dt['description'] = 'Access from this IP '.$ip.' is not authorized';
@@ -70,65 +69,6 @@ class wsc //extends CI_Model
                 ob_clean();
                 flush();
                 readfile($file);
-                exit;
-            } else {
-                    $dt['erro'] = "Erro de indicador Size:".strlen($id);
-            }
-        } else {
-            $dt['erro'] = "Parametro não informado";
-        }            
-        return($dt);
-        }    
-    function lattesdataXML()
-        {
-            $this->auth();
-
-            if (isset($_GET['q']))
-            {
-            $id = $_GET['q'];
-            if (strlen($id) == 11)
-            {
-                //$token = '1bff0ead-c76f-371e-8f47-e56d6b0a024c';
-                //$url = "https://api.cnpq.br/lattes-data/v1/processos/".$id;
-                $token = '150c6a3d-a5aa-440c-871c-ce81453c0a5d';
-                $url = "https://cnpqapi-fomento.cnpq.br/v1/lattesdata/processos/".$id;
-                $filename = 'lattesData'.$id.'.zip';
-                $dir = '_lattesData';
-                $file = $dir.'/'.$filename;
-                dircheck($dir);
-
-                if (!file_exists(($file)))
-                {
-		/********************************************************* CURL */
-		$ch = curl_init($url);
-
-		curl_setopt_array($ch, [
-
-			    // Equivalente ao -X:
-			    CURLOPT_CUSTOMREQUEST => 'GET',
-
-			    // Equivalente ao -H:
-			    CURLOPT_HTTPHEADER => [
-			        'auth-token: 150c6a3d-a5aa-440c-871c-ce81453c0a5d'
-			    ],
-
-			    // Permite obter o resultado
-			    CURLOPT_RETURNTRANSFER => 1,
-			]);
-
-			$file = curl_exec($ch);
-			curl_close($ch);
-                }
-                /********************************************************** */
-                header('Cache-control: private');
-                header('Content-Type: application/octet-stream');
-                //header('Content-Length: '.filesize($file));
-                header('Content-Disposition: filename='.'lattesData_'.$id.'.json');
-                ob_clean();
-                flush();
-                //readfile($file);
-                //print_r($response);
-		echo $file;
                 exit;
             } else {
                     $dt['erro'] = "Erro de indicador Size:".strlen($id);
