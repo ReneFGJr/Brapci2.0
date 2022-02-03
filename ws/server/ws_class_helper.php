@@ -88,10 +88,10 @@ class wsc //extends CI_Model
             $id = $_GET['q'];
             if (strlen($id) == 11)
             {
-                $token = '1bff0ead-c76f-371e-8f47-e56d6b0a024c';
-                $url = "https://api.cnpq.br/lattes-data/v1/processos/".$id;
-
-
+                //$token = '1bff0ead-c76f-371e-8f47-e56d6b0a024c';
+                //$url = "https://api.cnpq.br/lattes-data/v1/processos/".$id;
+                $token = '150c6a3d-a5aa-440c-871c-ce81453c0a5d';
+                $url = "https://cnpqapi-fomento.cnpq.br/v1/lattesdata/processos/".$id;
                 $filename = 'lattesData'.$id.'.zip';
                 $dir = '_lattesData';
                 $file = $dir.'/'.$filename;
@@ -99,53 +99,36 @@ class wsc //extends CI_Model
 
                 if (!file_exists(($file)))
                 {
-                    $fields = array();
-                    $fields['Authorization'] = 'Bearer '.$token;
-                    $fields = (is_array($fields)) ? http_build_query($fields) : $fields;
+		/********************************************************* CURL */
+		$ch = curl_init($url);
 
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-                    curl_setopt($ch, CURLOPT_NOBODY, TRUE); // remove body
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);  
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $fields);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-                    $data = curl_exec($ch);
-                    echo ($id++).'<br>y<br>';
-                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                    echo ($id++).'<br>-<br>';
+		curl_setopt_array($ch, [
 
-                    $curl_errno = curl_errno($ch);
-                    $curl_error = curl_error($ch);
-                    curl_close($ch);  
+			    // Equivalente ao -X:
+			    CURLOPT_CUSTOMREQUEST => 'GET',
 
-                    echo '<hr>HTTPCODE<hr:';
-                    print_r($httpCode);
-                    echo '<hr>CH<hr>';
-                    print_r($ch);
-                    echo '<hr>Data<hr>';
-                    echo '<pre>';
-                    print_r($data);                    
-                    echo '</pre>';
-            
-                    if ($curl_errno > 0) {
-                            echo "cURL Error ($curl_errno): $curl_error\n";
-                    } else {
-                            echo "Data received: $data\n";
-                    }                    
-                    exit;                   
+			    // Equivalente ao -H:
+			    CURLOPT_HTTPHEADER => [
+			        'auth-token: 150c6a3d-a5aa-440c-871c-ce81453c0a5d'
+			    ],
+
+			    // Permite obter o resultado
+			    CURLOPT_RETURNTRANSFER => 1,
+			]);
+
+			$file = curl_exec($ch);
+			curl_close($ch);
                 }
-
                 /********************************************************** */
                 header('Cache-control: private');
                 header('Content-Type: application/octet-stream');
-                header('Content-Length: '.filesize($file));
-                header('Content-Disposition: filename='.'lattesData_'.$id.'.zip');
+                //header('Content-Length: '.filesize($file));
+                header('Content-Disposition: filename='.'lattesData_'.$id.'.json');
                 ob_clean();
                 flush();
-                readfile($file);
-                print_r($response);
+                //readfile($file);
+                //print_r($response);
+		echo $file;
                 exit;
             } else {
                     $dt['erro'] = "Erro de indicador Size:".strlen($id);
