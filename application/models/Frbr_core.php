@@ -639,7 +639,11 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     $tela = $this -> frbr -> show_article($id);
                     $tela .= $this -> cited->show_ref($id);
                     $tela .= $this -> view_data($id);
-                    
+                    break;
+                case 'Proceeding' :
+                    $tela = $this -> frbr -> show_article($id);
+                    $tela .= $this -> cited->show_ref($id);
+                    $tela .= $this -> view_data($id);                                        
                     break;
                 case 'Issue' :
                     if (perfil("#ADM"))
@@ -682,6 +686,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     $tela = $this -> journal_show($id);
                     $tela .= $this -> view_data($id);
                     break;
+                   
                 default :
                     $tela .= $this -> view_data($id);
                     $tela .= $this -> related($id);

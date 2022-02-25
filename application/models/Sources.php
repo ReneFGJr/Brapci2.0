@@ -565,6 +565,14 @@ class sources extends CI_Model {
                 $n = $line['n_name'] . '#' . $line['d_r1'];
                 array_push($ar, $n);
             }
+            if ($line['c_class'] == 'hasIssueProceeding') {
+                $n = $line['n_name'] . '#' . $line['d_r2'];
+                array_push($ar, $n);
+            }            
+            if ($line['c_class'] == 'hasIssueProceedingOf') {
+                $n = $line['n_name'] . '#' . $line['d_r2'];
+                array_push($ar, $n);
+            }            
         }
         rsort($ar);
 
