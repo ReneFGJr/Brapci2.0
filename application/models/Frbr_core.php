@@ -663,6 +663,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                 case 'Person' :
                     $tela = $this -> person_show($id);
                     $data = $this -> frad -> production($id);
+                    
 
                     //$tela .= $this->load->view("brapci/cloud_tags_2",$data,true);
                     //$tela .= $this -> load -> view("brapci/cloud_tags", $data, true);
