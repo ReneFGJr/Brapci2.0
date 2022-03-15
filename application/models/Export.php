@@ -592,7 +592,7 @@ class export extends CI_Model {
                 return($sx);        
         }
 
-    function export_author_index_list_all($lt = 0, $class = 'Person') 
+        function export_author_index_list_all($lt = 0, $class = 'Person') 
         {
         /********************************** Padroniza entrada de autores */
         $nouse = 0;

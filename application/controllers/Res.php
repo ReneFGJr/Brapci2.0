@@ -1057,7 +1057,7 @@ class res extends CI_Controller
                 $tela .= '<li><a href="' . base_url(PATH . 'export/basepq') . '">' . msg('basepq') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
         }
-
+        
         $data['content'] = $tela;
         $data['title'] = '';
         $this->load->view('show', $data);
