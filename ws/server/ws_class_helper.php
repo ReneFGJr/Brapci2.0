@@ -39,6 +39,20 @@ class wsc //extends CI_Model
             return ($rs);
         }
     /********************************************************* IA */
+    function getFile($id)
+        {
+            $filename = 'lattes'.$id.'.zip';
+            $dir = '_lattes';
+            $file = $dir.'/'.$filename;
+
+            $client = new SoapClient("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo?wsdl");
+            $param = array('id'=>$id);
+            $response = $client ->__call('getCurriculoCompactado', $param);
+            #$response = base64_decode($response);                
+            file_put_contents($file,$response);
+            sleep(0.5);
+            return true;
+        }
     function lattesXML()
         {
             $this->auth();
@@ -54,12 +68,16 @@ class wsc //extends CI_Model
                 dircheck($dir);
                 if (!file_exists(($file)))
                 {
-                    $client = new SoapClient("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo?wsdl");
-                    $param = array('id'=>$id);
-                    $response = $client ->__call('getCurriculoCompactado', $param);
-                    #$response = base64_decode($response);                
-                    file_put_contents($file,$response);
-                    sleep(0.5);
+                    $this->getFile($id);
+                } else {
+                    $dt = filectime($file);
+                    $day = date("Y-m-d",$dt);
+                    $now = date("Y-m-d");
+                    /* Compara datas */
+                    if ($now != $day)
+                    {
+                        $this->getFile($id);
+                    }
                 }
 
                 /********************************************************** */
