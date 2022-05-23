@@ -373,6 +373,7 @@ class pdfs extends CI_model {
 	}
 	
 	function download($d1) {
+
 		$data = $this -> frbr_core -> le_data($d1);
 		
 		$size = 0;
@@ -384,6 +385,9 @@ class pdfs extends CI_model {
 			$attr = $data[$r]['c_class'];
 			$vlr = $data[$r]['n_name'];
 			switch ($attr) {
+				case 'hasFileStorage':
+					$type = 'PDF';
+				break;
 				case 'hasFileType' :
 					$type = $vlr;
 				break;
@@ -394,22 +398,25 @@ class pdfs extends CI_model {
 			break;
 		}
 	}
-	
 	if ($type == 'PDF') {
 		header('Content-type: application/pdf');
 		readfile($file);
+		exit;
 	}
 
 	if ($type == 'TXT') {
 		header('Content-type: text/html');
 		if (file_exists($file)) {
 			readfile($file);
+			exit;
 		} else {
 			echo 'File not found - ' . $file;
-		}
-		
+		}		
+		exit;		
 	}
+	echo "OPS: $type - $file";
 }
+	
 
 function txt($d1) {
 	$data = $this -> frbr_core -> le_data($d1);
