@@ -8,74 +8,77 @@ class wsc //extends CI_Model
     var $email = array();
     var $abrv = array();
     function auth()
-        {
-            $ip = $_SERVER['REMOTE_ADDR'];
-            if (substr($ip,0,6) == '143.54') { return True; }
-            if (trim($ip) == '54.233.226.131') { return True; }
-            if (trim($ip) == '170.231.47.90') { return True; }
-            if (trim($ip) == '198.136.59.220') { return True; }
-            
-            $dt['erro'] = '500';
-            $dt['description'] = 'Access from this IP '.$ip.' is not authorized';
-            echo json_encode($dt);
-            exit;
+    {
+        $ip = $_SERVER['REMOTE_ADDR'];
+        if (substr($ip, 0, 6) == '143.54') {
+            return True;
         }
+        if (trim($ip) == '54.233.226.131') {
+            return True;
+        }
+        if (trim($ip) == '170.231.47.90') {
+            return True;
+        }
+        if (trim($ip) == '198.136.59.220') {
+            return True;
+        }
+
+        $dt['erro'] = '500';
+        $dt['description'] = 'Access from this IP ' . $ip . ' is not authorized';
+        echo json_encode($dt);
+        exit;
+    }
     /*********************************************************** Authors */
     function authors()
-        {
-            if (isset($_GET["q"]))
-                {
-                    $q = $_GET["q"];
-                } else {
-                    $q = '';
-                }            
-            $rs = array();
-            $rs['query'] = $q;
-            $file = '../../ws/.csv/authors.csv';
-            $rst = file_get_contents($file);
-            echo $rst;
-            exit;
-            $rs['name'] = $rst;
-            return ($rs);
+    {
+        if (isset($_GET["q"])) {
+            $q = $_GET["q"];
+        } else {
+            $q = '';
         }
+        $rs = array();
+        $rs['query'] = $q;
+        $file = '../../ws/.csv/authors.csv';
+        $rst = file_get_contents($file);
+        echo $rst;
+        exit;
+        $rs['name'] = $rst;
+        return ($rs);
+    }
     /********************************************************* IA */
     function getFile($id)
-        {
-            $filename = 'lattes'.$id.'.zip';
-            $dir = '_lattes';
-            $file = $dir.'/'.$filename;
+    {
+        $filename = 'lattes' . $id . '.zip';
+        $dir = '_lattes';
+        $file = $dir . '/' . $filename;
 
-            $client = new SoapClient("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo?wsdl");
-            $param = array('id'=>$id);
-            $response = $client ->__call('getCurriculoCompactado', $param);
-            #$response = base64_decode($response);                
-            file_put_contents($file,$response);
-            sleep(0.5);
-            return true;
-        }
+        $client = new SoapClient("http://servicosweb.cnpq.br/srvcurriculo/WSCurriculo?wsdl");
+        $param = array('id' => $id);
+        $response = $client->__call('getCurriculoCompactado', $param);
+        #$response = base64_decode($response);                
+        file_put_contents($file, $response);
+        sleep(0.5);
+        return true;
+    }
     function lattesXML()
-        {
-            $this->auth();
+    {
+        $this->auth();
 
-            if (isset($_GET['q']))
-            {
+        if (isset($_GET['q'])) {
             $id = $_GET['q'];
-            if (strlen($id) == 16)
-            {
-                $filename = 'lattes'.$id.'.zip';
+            if (strlen($id) == 16) {
+                $filename = 'lattes' . $id . '.zip';
                 $dir = '_lattes';
-                $file = $dir.'/'.$filename;
+                $file = $dir . '/' . $filename;
                 dircheck($dir);
-                if (!file_exists(($file)))
-                {
+                if (!file_exists(($file))) {
                     $this->getFile($id);
                 } else {
                     $dt = filectime($file);
-                    $day = date("Y-m-d",$dt);
+                    $day = date("Y-m-d", $dt);
                     $now = date("Y-m-d");
                     /* Compara datas */
-                    if ($now != $day)
-                    {
+                    if ($now != $day) {
                         $this->getFile($id);
                     }
                 }
@@ -83,79 +86,76 @@ class wsc //extends CI_Model
                 /********************************************************** */
                 header('Cache-control: private');
                 header('Content-Type: application/octet-stream');
-                header('Content-Length: '.filesize($file));
-                header('Content-Disposition: filename='.'lattes_'.$id.'.zip');
+                header('Content-Length: ' . filesize($file));
+                header('Content-Disposition: filename=' . 'lattes_' . $id . '.zip');
                 ob_clean();
                 flush();
                 readfile($file);
                 exit;
             } else {
-                    $dt['erro'] = "Erro de indicador Size:".strlen($id);
+                $dt['erro'] = "Erro de indicador Size:" . strlen($id);
             }
         } else {
             $dt['erro'] = "Parametro não informado";
-        }            
-        return($dt);
-        }    
-    function lattesdataXML()
-        {
-            $this->auth();
+        }
+        return ($dt);
+    }
+    function lattesdataXML($q = '')
+    {
+        $this->auth();
 
-            if (isset($_GET['q']))
-            {
+        if (isset($_GET['q'])) {
             $id = $_GET['q'];
-            if (strlen($id) == 11)
-            {
+            if (strlen($id) == 11) {
                 //$token = '1bff0ead-c76f-371e-8f47-e56d6b0a024c';
                 //$url = "https://api.cnpq.br/lattes-data/v1/processos/".$id;
                 $token = '150c6a3d-a5aa-440c-871c-ce81453c0a5d';
-                $url = "https://cnpqapi-fomento.cnpq.br/v1/lattesdata/processos/".$id;
-                $filename = 'lattesData'.$id.'.zip';
+                $url = "https://cnpqapi-fomento.cnpq.br/v1/lattesdata/processos/" . $id;
+                $filename = 'lattesData' . $id . '.zip';
                 $dir = '_lattesData';
-                $file = $dir.'/'.$filename;
+                $file = $dir . '/' . $filename;
                 dircheck($dir);
 
-                if (!file_exists(($file)))
-                {
-		/********************************************************* CURL */
-		$ch = curl_init($url);
+                if (!file_exists(($file))) {
+                    /********************************************************* CURL */
+                    $ch = curl_init($url);
 
-		curl_setopt_array($ch, [
+                    curl_setopt_array($ch, [
 
-			    // Equivalente ao -X:
-			    CURLOPT_CUSTOMREQUEST => 'GET',
+                        // Equivalente ao -X:
+                        CURLOPT_CUSTOMREQUEST => 'GET',
 
-			    // Equivalente ao -H:
-			    CURLOPT_HTTPHEADER => [
-			        'auth-token: 150c6a3d-a5aa-440c-871c-ce81453c0a5d'
-			    ],
+                        // Equivalente ao -H:
+                        CURLOPT_HTTPHEADER => [
+                            'auth-token: 150c6a3d-a5aa-440c-871c-ce81453c0a5d'
+                        ],
 
-			    // Permite obter o resultado
-			    CURLOPT_RETURNTRANSFER => 1,
-			]);
+                        // Permite obter o resultado
+                        CURLOPT_RETURNTRANSFER => 1,
+                    ]);
 
-			$file = curl_exec($ch);
-			curl_close($ch);
+                    $file = curl_exec($ch);
+                    curl_close($ch);
                 }
                 /********************************************************** */
                 header('Cache-control: private');
                 header('Content-Type: application/octet-stream');
                 //header('Content-Length: '.filesize($file));
-                header('Content-Disposition: filename='.'lattesData_'.$id.'.json');
+                header('Content-Disposition: filename=' . 'lattesData_' . $id . '.json');
                 ob_clean();
                 flush();
                 //readfile($file);
                 //print_r($response);
-		echo $file;
+                echo $file;
                 exit;
             } else {
-                    $dt['erro'] = "Erro de indicador Size:".strlen($id);
+                $dt['erro'] = "Erro de indicador Size:" . strlen($id);
             }
         } else {
             $dt['erro'] = "Parametro não informado";
-        }            
-        return($dt);
         }
+        return ($dt);
+    }
     function genere($name)
     {
         $nf = $name;
@@ -197,17 +197,16 @@ class wsc //extends CI_Model
 
     /************************************************** BASE PQ */
     function basepq()
-        {
-            $file = '../../c/pq.json';
-            if (!file_exists($file))
-                {
-                    echo "NOT FILE";
-                    exit;
-                }
-            $rlt = file_get_contents($file);
-            $rlt = json_decode($rlt);
-            return($rlt);
+    {
+        $file = '../../c/pq.json';
+        if (!file_exists($file)) {
+            echo "NOT FILE";
+            exit;
         }
+        $rlt = file_get_contents($file);
+        $rlt = json_decode($rlt);
+        return ($rlt);
+    }
 
     /************************************************** I O Interface */
     function read($f)
@@ -283,16 +282,14 @@ class wsc //extends CI_Model
         $file = $dir . '/' . $class . '.json';
 
         /**************************** Exluir */
-        $excluir=0;
-        if ($excluir==1)
-        {
-            echo '<br>Buscando '.$file;
-            if (file_exists($file))
-                {
-                    echo '==>EXCLUíDO';
-                    unlink($file);
-                }
-            return("");
+        $excluir = 0;
+        if ($excluir == 1) {
+            echo '<br>Buscando ' . $file;
+            if (file_exists($file)) {
+                echo '==>EXCLUíDO';
+                unlink($file);
+            }
+            return ("");
         }
         if ((!file_exists($file)) or ($force == 1)) {
             $dt['created'] = date("Y-m-d") . 'T' . date("H:i:s");
@@ -357,144 +354,132 @@ class wsc //extends CI_Model
         for ($r = 0; $r < count($w); $r++) {
             $word = '';
             for ($z = $r; $z < count($w); $z++) {
-                if (strlen($word) > 0)
-                    { 
-                        $word .= '_';
-                    }
+                if (strlen($word) > 0) {
+                    $word .= '_';
+                }
                 $word .= $w[$z];
                 $rlt = $this->find($word);
-                if (count($rlt) > 0)
-                    {
-                        $rst[$r] = $rlt;
-                        $w[$r] = $word;
-                        for ($q=($r+1);$q <= $z;$q++)
-                            {
-                                $w[$q] = 'xDELETEDx';
-                            }
+                if (count($rlt) > 0) {
+                    $rst[$r] = $rlt;
+                    $w[$r] = $word;
+                    for ($q = ($r + 1); $q <= $z; $q++) {
+                        $w[$q] = 'xDELETEDx';
                     }
+                }
             }
         }
         $this->phrase = $w;
         $this->phrase_ws = $rst;
     }
     function link_internet($t)
-        {
-            $loop = 0;
-            while ((($pos = strpos($t,'http:')) or ($pos = strpos($t,'https:'))) and ($loop < 50))
-                {
-                    $link = substr($t,$pos,strlen($t));
-                    $link = substr($link.' ',0,strpos($link,' '));
-                    array_push($this->link, $link);
-                    $t = troca($t,$link,'link_'.strzero(count($this->link),3));
-                    $loop++;
-                }
-            return($t);
+    {
+        $loop = 0;
+        while ((($pos = strpos($t, 'http:')) or ($pos = strpos($t, 'https:'))) and ($loop < 50)) {
+            $link = substr($t, $pos, strlen($t));
+            $link = substr($link . ' ', 0, strpos($link, ' '));
+            array_push($this->link, $link);
+            $t = troca($t, $link, 'link_' . strzero(count($this->link), 3));
+            $loop++;
         }
+        return ($t);
+    }
     function limpa_CR($t)
-        {
-            $t = troca($t,chr(13),' ');
-            $t = troca($t,chr(10),' ');
-            while (strpos($t,'  '))
-                {
-                    $t = troca($t,'  ',' ');
-                }
-            return($t);
+    {
+        $t = troca($t, chr(13), ' ');
+        $t = troca($t, chr(10), ' ');
+        while (strpos($t, '  ')) {
+            $t = troca($t, '  ', ' ');
         }
+        return ($t);
+    }
     function email($t)
-        {
-            $loop = 0;
-            while (($pos = strpos($t,'@'))  and ($loop < 50))
-                {
-                    echo '===>'.$pos;
-                    $link = substr($t,$pos,strlen($t));
-                    echo '<h4>'.$link.'</h4>';
-                    $link = substr($link.' ',0,strpos($link,' '));
-                    array_push($this->link, $link);
-                    $t = troca($t,$link,'link_'.strzero(count($this->link),3));
-                    $loop++;
-                }
-       
-            return($t);
+    {
+        $loop = 0;
+        while (($pos = strpos($t, '@'))  and ($loop < 50)) {
+            echo '===>' . $pos;
+            $link = substr($t, $pos, strlen($t));
+            echo '<h4>' . $link . '</h4>';
+            $link = substr($link . ' ', 0, strpos($link, ' '));
+            array_push($this->link, $link);
+            $t = troca($t, $link, 'link_' . strzero(count($this->link), 3));
+            $loop++;
         }
+
+        return ($t);
+    }
     function acronicos($t)
-        {
-            if (count($this->abrv) == 0)
-                {
-                    $dir = $this->dir.'../indexes';
-                    $tb = file_get_contents($dir.'/acronico.json');
-                    $tb = json_decode($tb);
-                   foreach($tb as $ta => $to)
-                        {
-                            if ($pos=strpos($t,$ta))
-                                {
-                                    $t = troca($t,$ta,$to);
-                                }
-                        }
+    {
+        if (count($this->abrv) == 0) {
+            $dir = $this->dir . '../indexes';
+            $tb = file_get_contents($dir . '/acronico.json');
+            $tb = json_decode($tb);
+            foreach ($tb as $ta => $to) {
+                if ($pos = strpos($t, $ta)) {
+                    $t = troca($t, $ta, $to);
                 }
-            return($t);
-        }        
-    function separator_words($t)
-        {
-            $t = ascii($t);
-            $t = troca($t,',',' ,');
-            $t = troca($t,'"',' " ');
-            $t = troca($t,chr(8),'');
-
-            /* Trata excessões */
-            $t = $this->acronicos($t);
-            $t = $this->link_internet($t);
-            $t = $this->email($t);
-
-            $sb = array(':','?','#','!','?','"','(',')','{','}','[',']','-');
-            for ($r = 0;$r < count($sb);$r++)
-                {
-                    $t = troca($t,$sb[$r],' '.$sb[$r].' ');
-                }
-            /* Elimina caracteres duplos */
-            $loop = 0;
-            while ((strpos($t,'  ') and ($loop++) < 100))
-                {
-                    $t = troca($t,'  ',' ');
-                }
-            $t = troca($t,'.',' .');
-            $t = strtolower($t);
-            $w = explode(' ',$t);
-            return($w);
+            }
         }
+        return ($t);
+    }
+    function separator_words($t)
+    {
+        $t = ascii($t);
+        $t = troca($t, ',', ' ,');
+        $t = troca($t, '"', ' " ');
+        $t = troca($t, chr(8), '');
+
+        /* Trata excessões */
+        $t = $this->acronicos($t);
+        $t = $this->link_internet($t);
+        $t = $this->email($t);
+
+        $sb = array(':', '?', '#', '!', '?', '"', '(', ')', '{', '}', '[', ']', '-');
+        for ($r = 0; $r < count($sb); $r++) {
+            $t = troca($t, $sb[$r], ' ' . $sb[$r] . ' ');
+        }
+        /* Elimina caracteres duplos */
+        $loop = 0;
+        while ((strpos($t, '  ') and ($loop++) < 100)) {
+            $t = troca($t, '  ', ' ');
+        }
+        $t = troca($t, '.', ' .');
+        $t = strtolower($t);
+        $w = explode(' ', $t);
+        return ($w);
+    }
 
     function analyse($t)
-        {
-            $t = $this->limpa_CR($t);
-            $this->phrase = $this->separator_words($t);
-            $this->busca_01();
-            $sx = $this->show_phrase();
-            return($sx);
-        }
+    {
+        $t = $this->limpa_CR($t);
+        $this->phrase = $this->separator_words($t);
+        $this->busca_01();
+        $sx = $this->show_phrase();
+        return ($sx);
+    }
 
     function show_phrase()
-        {
-            $fr = $this->phrase;
-            $sx = '<table width="100%" align="center">';
-            for ($r=0;$r < count($fr);$r++)
-                {
-                    $sx .= '<tr>';
-                    $sx .= '<td style="border-bottom: 1px solid #808080;">'.$fr[$r].'</td>';
-                    $sx .= '<td style="border-bottom: 1px solid #808080;">';
-                    if (isset($this->phrase_ws[$r]))
-                        {
-                            $ln = $this->phrase_ws[$r];
-                            for ($z=0;$z < count($ln);$z++)
-                            {
-                                if ($z > 0) { $sx .= '<br>';}
-                                $sx .= $ln[$z];
-                            }
-                        }
-                    $sx .= '</td>';
-                    $sx .= '</tr>';
+    {
+        $fr = $this->phrase;
+        $sx = '<table width="100%" align="center">';
+        for ($r = 0; $r < count($fr); $r++) {
+            $sx .= '<tr>';
+            $sx .= '<td style="border-bottom: 1px solid #808080;">' . $fr[$r] . '</td>';
+            $sx .= '<td style="border-bottom: 1px solid #808080;">';
+            if (isset($this->phrase_ws[$r])) {
+                $ln = $this->phrase_ws[$r];
+                for ($z = 0; $z < count($ln); $z++) {
+                    if ($z > 0) {
+                        $sx .= '<br>';
+                    }
+                    $sx .= $ln[$z];
                 }
-            $sx .= '</table>';
-            return($sx);
+            }
+            $sx .= '</td>';
+            $sx .= '</tr>';
         }
+        $sx .= '</table>';
+        return ($sx);
+    }
 
     function web()
     {
@@ -519,7 +504,7 @@ class wsc //extends CI_Model
             $sx .= '</div>' . cr();
 
             $sx .= '<div class="' . bscol(12) . '">' . cr();
-            $sx .= 'Classe: ';        
+            $sx .= 'Classe: ';
 
             $sx .= $txt;
             $sx .= '</div>' . cr();
@@ -536,10 +521,9 @@ class wsc //extends CI_Model
             $sx .= '<div class="' . bscol(11) . '">' . cr();
             $sx .= '<form>';
             $sx .= '<textarea name="ws" rows=5 placeholder="WS Search" style="width: 100%; font-size: 200%;"/>' . cr();
-            if (isset($_GET['ws']))
-                {
-                    $sx .= $_GET['ws'];
-                }            
+            if (isset($_GET['ws'])) {
+                $sx .= $_GET['ws'];
+            }
             $sx .= '</textarea>';
             $sx .= '<input type="submit" class="btn btn-primary" value="Analyse >>>">';
             $sx .= '</form>';
