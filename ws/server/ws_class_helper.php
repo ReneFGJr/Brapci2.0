@@ -121,15 +121,12 @@ class wsc //extends CI_Model
                     $ch = curl_init($url);
 
                     curl_setopt_array($ch, [
-
                         // Equivalente ao -X:
                         CURLOPT_CUSTOMREQUEST => 'GET',
-
                         // Equivalente ao -H:
                         CURLOPT_HTTPHEADER => [
                             'auth-token: 150c6a3d-a5aa-440c-871c-ce81453c0a5d'
                         ],
-
                         // Permite obter o resultado
                         CURLOPT_RETURNTRANSFER => 1,
                     ]);
