@@ -360,6 +360,7 @@ function le_dados($id,$tp=0)
 }	
 
 function le_data($id, $prop = '') {
+	if ($id == '') { return array(); }
 	$CI = &get_instance();
 	if (strlen($prop) > 0) {
 		$wh = " AND (c_class = '$prop')";

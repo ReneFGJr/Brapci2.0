@@ -23,7 +23,7 @@ class ias_cited extends CI_Model
         switch ($d1) {
             case 'process_year':
                 $sx = $this->process_year($d2, $d3);
-                $sx = $this->process_journal_origem($d2, $d3);
+                //$sx = $this->process_journal_origem($d2, $d3);
                 break;
             case 'jnl_join':
                 $sx = $this->journal_cited_join($d2);
@@ -562,12 +562,13 @@ class ias_cited extends CI_Model
             $_GET['dd1'] = $d1;
         }
 
-
+        $xx = nbr_author($d1, 7);
+        $xx = '<span onclick="$(\'#dd1\').val(\'' . $xx . '\');">' . $xx . '</span>';
         $cp = array();
         array_push($cp, array('$H', '', '', false, false));
         array_push($cp, array('$S80', 'cj_name', msg('cj_name'), True, True));
         array_push($cp, array('$B8', '', msg('include'), False, True));
-        array_push($cp, array('$M', '', nbr_author($d1, 7), False, True));
+        array_push($cp, array('$M', '', $xx, False, True));
         array_push($cp, array('$O ' . $op, 'cj_use', msg('cj_use'), True, True));
         array_push($cp, array('$S40', 'cj_place_text', msg('cj_place_text'), False, True));
         array_push($cp, array('$S10', 'cj_qualis', msg('cj_qualis'), False, True));
@@ -707,6 +708,8 @@ class ias_cited extends CI_Model
             $txt = troca($txt, '  ', ' ');
             $txt = troca($txt, '  ', ' ');
             $txt = troca($txt, '  ', ' ');
+            $txt = troca($txt, 'amp.', '&');
+            $txt = troca($txt, '& ,', '&');
             if ((strpos($txt,' v.') > 0) or (strpos($txt,' V.') > 0))
                 {
                     $pos = strpos($txt,', v.');
@@ -717,6 +720,7 @@ class ias_cited extends CI_Model
                     echo '===>'.$pos.'<hr>';
                     $txt = troca($txt,' v.',', v.');
                     $txt = troca($txt,' V.',', v.');
+                    $txt = troca($txt,"'",'´');
                     $sql = "update " . $this->base . "cited_article set
                                     ca_text = '$txt'
                                     where id_ca = " . $line['id_ca'];
@@ -762,16 +766,20 @@ class ias_cited extends CI_Model
     {
         $sx = '';
         $jnl = $this->journals();
+        $t = troca($t, ' R.', ' Rev.');
+        $tt['amp.,'] = '&';
         $tt['Rev.'] = 'Revista';
         $tt['rev.'] = 'Revista';
         $tt['J.'] = 'Journal';
         $tt['Adm.'] = 'Administração';
         $tt['Bi.'] = 'Biblioteconomia';
         $tt['Ci.'] = 'Ciência';
+        $tt['CI.'] = 'Ciência';
         $tt['Ciênc.'] = 'Ciência';
         $tt['Cienc.'] = 'Ciência';
         $tt['ciênc.'] = 'Ciência';
         $tt['cienc.'] = 'Ciência';
+        $tt['Com.'] = 'Comunicacao';
         $tt['Cont.'] = 'Contabilidade';
         $tt['Contemp.'] = 'Contemporanea';
         $tt['Cult.'] = 'Cultura';
@@ -789,12 +797,12 @@ class ias_cited extends CI_Model
         $tt['esp.'] = 'Especializada';
         $tt['Enferm.'] = 'Enfermagem';
         $tt['educ.'] = 'Educação';
+        $tt['Est.'] = 'Estudo';
         $tt['Educ.'] = 'Educação';
         $tt['Int.'] = 'Internacional';
         $tt['Eletr.'] = 'Eletrônica';
         $tt['Enc.'] = 'Encontros';
         $tt['Fin.'] = 'Finanças';
-        $tt[' R.'] = 'Revista';
         $tt['Cad.'] = 'Cadernos';
         $tt['Stat.'] = 'Statistical';
         $tt['Pesq.'] = 'Pesquisa';
@@ -816,10 +824,29 @@ class ias_cited extends CI_Model
         $tt['Internat.'] = 'International';
         $tt['Microbiol.'] = 'Microbiological';
         $tt['Segur.'] = 'Segurança';
+        $tt['Soc.'] = 'Sociedade';
         $tt['Aliment.'] = 'Alimentar';
         $tt['Nutr.'] = 'Nutrição';
+        $tt['Serv.'] = 'Serviço';
+        $tt['Digit.'] = 'Digital';
+        $tt['Epidemiol.'] = 'Epidemiologia';
+        $tt['Eletron.'] = 'Eletrônica';
+        $tt['Gest.'] = 'Gestao';
+        $tt['Prod.'] = 'Produção';
+        $tt['Econ.'] = 'Economia';
+        $tt['Apl.'] = 'Aplicada';
+        $tt['Proc.'] = 'Proceedings';
+        $tt['of.'] = 'of';
+        $tt['amp.'] = '&';
+        $tt['Lib.'] = 'Library';
+        $tt['Manag.'] = 'Managements';
+        $tt['Knowl.'] = 'Knowledge';
+        $tt['Org.'] = 'Organization';
+        $tt['Comum.'] = 'Comunicação';
+        $tt['Acad.'] = 'Academico';
 
-
+        $t = troca($t, ' R.', 'Rev.');
+        $t = troca($t, ',v', ', v');
         foreach ($tt as $t1 => $t2) {
             $t = troca($t, $t1, $t2);
         }
@@ -1112,6 +1139,9 @@ class ias_cited extends CI_Model
             'References',
             'Reférences',
             'Referencias',
+            'Referencias:',
+            'Referências:',
+            'Referênca bibliográfica:',
             'BIBLIOGRAFIA',
             'Referëncias',
             'Références',
@@ -1119,7 +1149,9 @@ class ias_cited extends CI_Model
             'BIBLIOGRAFÍA',
             'Bibliografia',
             'REFERENCIAS BIBLIOGRÁFICAS',
-            'REFERÊNCIAS BIBLIOGRAFICAS'
+            'REFERÊNCIAS BIBLIOGRAFICAS',
+            'Referencias bibliográficas',
+            'Bibliografía y documentos consultados'
         );
         $ref = '';
 
@@ -1382,7 +1414,12 @@ class ias_cited extends CI_Model
             $jnl = $rdf->recupera_id($dt, 'isPubishIn');
             $iss = $rdf->recupera_id($dt, 'hasIssueOf ');
             $id_jnl = $jnl['d_r2'];
-            $issue = $iss['d_r1'];
+            
+            if (!isset($iss['d_r1'])) { 
+                $issue = 0;
+            } else {
+                $issue = $iss['d_r1'];
+            }
             /***************** Issue */
             $dti = $rdf->le_data($issue);
             $ano = $rdf->recupera_id($dti, 'dateOfPublication');
@@ -1402,6 +1439,8 @@ class ias_cited extends CI_Model
             }
             $idj = $jnls[$id_jnl];
 
+            if ($idj != '')
+            {
             $sql = "update " . $this->base . "cited_article 
                                 set 
                                 ca_journal_origem = $idj,
@@ -1409,6 +1448,7 @@ class ias_cited extends CI_Model
                                 where id_ca = " . $idca;
             $this->db->query($sql);
             $sx .= '<li>' . 'Update #' . $idca . ' => ' . $ano . '-' . $idj . '</li>';
+            }
             $tot++;
         }
         $sx .= '</ul>';
