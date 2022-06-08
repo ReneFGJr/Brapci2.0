@@ -23,7 +23,7 @@ class ias_cited extends CI_Model
         switch ($d1) {
             case 'process_year':
                 $sx = $this->process_year($d2, $d3);
-                //$sx = $this->process_journal_origem($d2, $d3);
+                $sx = $this->process_journal_origem($d2, $d3);
                 break;
             case 'jnl_join':
                 $sx = $this->journal_cited_join($d2);
@@ -1390,12 +1390,23 @@ class ias_cited extends CI_Model
     function process_journal_origem($offset = 0)
     {
         $this->load->model('sources');
+        /*************** SOURCES */
+        $sql = "select jnl_frbr, id_jnl from brapci.source_source";
+        $rlt = $this->db->query($sql);
+        $rlt = $rlt->result_array();
+        $src = array();
+        for($r=0;$r < count($rlt);$r++)
+            {
+                $line = $rlt[$r];
+                $src[$line['jnl_frbr']] = $line['id_jnl'];
+            }
         if (strlen($offset) == 0) {
             $offset = '0';
         }
         $sql = "select * 
                         from " . $this->base . "cited_article 
-                        where ca_journal_origem = 0
+                        inner join brapci.rdf_concept ON id_cc  = ca_rdf
+                        where ca_journal_origem = 0 and cc_status < 90
                         limit 100
                         offset $offset
                         ";
@@ -1412,8 +1423,28 @@ class ias_cited extends CI_Model
             $idr = $line['ca_rdf'];
             $dt = $rdf->le_data($idr);
             $jnl = $rdf->recupera_id($dt, 'isPubishIn');
+            $eve = $rdf->recupera_id($dt, 'hasIssueProceedingOf');
             $iss = $rdf->recupera_id($dt, 'hasIssueOf ');
-            $id_jnl = $jnl['d_r2'];
+            if ($eve > 0)
+                {
+                    $jnl = array();
+                    $id_jnl = $eve['d_r1'];
+                    $deve = $rdf->le_data($id_jnl);
+                    $eve = $rdf->recupera_id($deve, 'hasIssueProceeding');
+                    $ano = $rdf->recupera_id($deve, 'hasDateTime');
+                    $id_jnl = $eve['d_r1'];
+                } else {    
+                    echo '<pre>';
+                    print_r($jnl);   
+                    print_r($dt);
+                    $id_jnl = $jnl['d_r2'];
+                }
+            
+            if (!isset($src[$id_jnl]))
+                {
+                    echo "OPS - ".$id_jnl."<br>";
+                    exit;
+                }
             
             if (!isset($iss['d_r1'])) { 
                 $issue = 0;
@@ -1421,8 +1452,12 @@ class ias_cited extends CI_Model
                 $issue = $iss['d_r1'];
             }
             /***************** Issue */
-            $dti = $rdf->le_data($issue);
-            $ano = $rdf->recupera_id($dti, 'dateOfPublication');
+            if (!isset($ano))
+                {
+                    $dti = $rdf->le_data($issue);
+                    $ano = $rdf->recupera_id($dti, 'dateOfPublication');
+                }
+
             if (!is_array($ano)) {
                 $ano = array();
                 $ano['n_name'] = 9999;
@@ -1455,6 +1490,7 @@ class ias_cited extends CI_Model
         if ($tot > 0) {
             $sx .= '<META http-equiv="refresh" content="1;">';
         }
+        echo "FIM";
         return ($sx);
     }
     function cited_analyse($txt)
