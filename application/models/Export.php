@@ -500,6 +500,7 @@ class export extends CI_Model {
             /*************************** EXPORTAR ****************/
             $sx .= '<li>' . $this -> export_Article_Single($idx) . '</li>' . cr();
             $sx .= $this -> elasticsearch -> update($idx);
+            
 
             /*****************************************************/
         }
