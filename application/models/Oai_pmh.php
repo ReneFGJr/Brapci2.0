@@ -130,6 +130,18 @@ class oai_pmh extends CI_model
         $this->load->model('export');
         $this->load->model('elasticsearch');
 
+        if (!isset($dt['title']))
+            {
+                $sx = '';
+                $sx .= '<div>';
+                $sx = '<h4 style="color: red">Erro no processamento</h4>';
+                $sx .= '<hr>';
+                $sx .= '<pre>';
+                $sx .= print_r($dt,true);
+                $sx .= '</div>';
+                return $sx;
+            }
+
         /*********************************** PROCESS **************************************/
         $dt2 = $this->le_cache($dt['idc']);
         $dt3 = $this->sources->le($dt2['li_jnl']);
@@ -215,8 +227,8 @@ class oai_pmh extends CI_model
 
     function leftHarvesting()
     {
-        $sql = "select count(*) as total 
-                    from " . $this->base . "source_listidentifier 
+        $sql = "select count(*) as total
+                    from " . $this->base . "source_listidentifier
                     where li_status = 'active' and li_s = 1
                     order by li_s, li_u, id_li
                     limit 1";
@@ -234,7 +246,7 @@ class oai_pmh extends CI_model
             $wh = '';
         }
 
-        $sql = "select * from " . $this->base . "source_listidentifier 
+        $sql = "select * from " . $this->base . "source_listidentifier
                     where $wh li_status = 'active' and li_s = 1
                     order by li_s, li_u, id_li
                     limit 1";
@@ -415,7 +427,7 @@ class oai_pmh extends CI_model
     function getRecord_oai_dc($id = 0, $dt)
     {
         $this->load->model("sources");
-        $sql = "select * from " . $this->base . "source_listidentifier 
+        $sql = "select * from " . $this->base . "source_listidentifier
                     where id_li = $id";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -426,11 +438,17 @@ class oai_pmh extends CI_model
             $data = $this->sources->le($jnl);
             $url = $this->oai_url($data, 'GetRecord') . $line['li_identifier'];
 
+            echo '<h4>'.$url.'</h4>';
+
             $cnt = $this->readfile($url);
             $cnt = troca($cnt, 'oai_dc:', 'oai_');
             $cnt = troca($cnt, 'dc:', '');
             $cnt = troca($cnt, 'xml:', '');
             $xml = simplexml_load_string($cnt);
+
+            if (!isset($xml->GetRecord->record)) {
+                return array();
+            }
 
             $rcn = $xml->GetRecord->record->metadata->oai_dc;
 
@@ -836,7 +854,7 @@ class oai_pmh extends CI_model
             $sx .= '
                         <div class="alert alert-success" role="alert">
                         Success! Changed this status!
-                        </div>                
+                        </div>
                         ';
         }
         $sx .= msg('change_to') . ':<br>';
@@ -867,8 +885,8 @@ class oai_pmh extends CI_model
         } else {
             $wh = " AND (li_s = $id2)";
         }
-        $sql = "select * from " . $this->base . "source_listidentifier 
-                    where li_jnl = $id 
+        $sql = "select * from " . $this->base . "source_listidentifier
+                    where li_jnl = $id
                     $wh
                     ";
         $rlt = $this->db->query($sql);
@@ -895,9 +913,9 @@ class oai_pmh extends CI_model
             $wh .= ' GROUP BY li_s, li_jnl ' . cr();
 
             /* Counter Registers */
-            $sql = "select count(*) as total, li_s, li_jnl 
+            $sql = "select count(*) as total, li_s, li_jnl
                         from " . $this->base . "source_listidentifier
-                        $wh 
+                        $wh
                         ORDER BY li_s ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
@@ -914,10 +932,10 @@ class oai_pmh extends CI_model
 
 
             /* Counter Registers */
-            $sql = "select count(*) as total, li_s, li_jnl, jnl_name 
+            $sql = "select count(*) as total, li_s, li_jnl, jnl_name
                         from " . $this->base . "source_listidentifier
                         INNER join " . $this->base . "source_source ON li_jnl = id_jnl
-                        $wh 
+                        $wh
                         ORDER BY jnl_name, li_s ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
@@ -944,7 +962,7 @@ class oai_pmh extends CI_model
         $sql = "select * from " . $this->base . "source_source
                     where jnl_url_oai <> '' and jnl_active = 1
                     and jnl_historic = 0
-                    order by jnl_oai_token desc, jnl_oai_last_harvesting 
+                    order by jnl_oai_token desc, jnl_oai_last_harvesting
                     limit 1";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -984,13 +1002,13 @@ class oai_pmh extends CI_model
     public function LisIdentifiesToHarvestingAll()
     {
         /* Zera tudo */
-        $sql = "update " . $this->base . "source_source 
-                    set jnl_oai_to_harvesting = 0 
+        $sql = "update " . $this->base . "source_source
+                    set jnl_oai_to_harvesting = 0
                     where 1=1";
         $rlt = $this->db->query($sql);
 
-        $sql = "SELECT li_jnl, count(*) as total, li_s 
-                    from " . $this->base . "source_listidentifier  
+        $sql = "SELECT li_jnl, count(*) as total, li_s
+                    from " . $this->base . "source_listidentifier
                     where li_s = 1
                     group by li_s, li_jnl ";
         $rlt = $this->db->query($sql);
@@ -1009,8 +1027,8 @@ class oai_pmh extends CI_model
 
     public function LisIdentifiesToHarvesting($id)
     {
-        $sql = "SELECT count(*) as total, li_s 
-                    from " . $this->base . "source_listidentifier  
+        $sql = "SELECT count(*) as total, li_s
+                    from " . $this->base . "source_listidentifier
                     where li_jnl = $id and li_s = 1
                     group by li_s ";
         $rlt = $this->db->query($sql);
@@ -1102,8 +1120,8 @@ class oai_pmh extends CI_model
     private function update_token($id_jnl, $token)
     {
         $date = date("Y-m-d H:m:s");
-        $sql = "update " . $this->base . "source_source 
-                    set 
+        $sql = "update " . $this->base . "source_source
+                    set
                     jnl_oai_token = '$token',
                     jnl_oai_last_harvesting = '$date'
                     where id_jnl = $id_jnl";
@@ -1113,7 +1131,7 @@ class oai_pmh extends CI_model
     private function cache($id_jnl, $data)
     {
         $identifier = $data['identifier'];
-        $sql = "select * from " . $this->base . "source_listidentifier 
+        $sql = "select * from " . $this->base . "source_listidentifier
                     where li_identifier = '$identifier'
                     AND li_jnl = $id_jnl ";
         $rlt = $this->db->query($sql);
@@ -1290,9 +1308,9 @@ class oai_pmh extends CI_model
             $rlt = $rlt->result_array();
             if (count($rlt) == 0) {
                 $this->load->view('content', $data);
-                $sql = "insert into " . $this->base . "brapci_article_suporte 
+                $sql = "insert into " . $this->base . "brapci_article_suporte
                                                 (
-                                                    bs_status, bs_article, bs_type, 
+                                                    bs_status, bs_article, bs_type,
                                                     bs_adress, bs_journal_id, bs_update
                                                     ) values (
                                                         '@','$art','URL',
@@ -1307,9 +1325,9 @@ class oai_pmh extends CI_model
 
     public function repository_list()
     {
-        $sql = "select * from " . $this->base . "source_source 
+        $sql = "select * from " . $this->base . "source_source
                                                 where jnl_active <> 'X'
-                                                AND jnl_url_oai <> ''	
+                                                AND jnl_url_oai <> ''
                                                 order by jnl_name
                                                 ";
         $rlt = $this->db->query($sql);
@@ -1359,8 +1377,8 @@ class oai_pmh extends CI_model
 
             /* Insere na agenda */
             $sql = "insert into " . $this->base . "oai_cache (
-                                                        cache_oai_id, cache_status, cache_journal, 
-                                                        cache_prioridade, cache_datastamp, cache_setSpec, 
+                                                        cache_oai_id, cache_status, cache_journal,
+                                                        cache_prioridade, cache_datastamp, cache_setSpec,
                                                         cache_tentativas
                                                         ) values (
                                                             '$ida','@','$njid',
@@ -1593,10 +1611,10 @@ class oai_pmh extends CI_model
             /* Trata issue */
             $jid = strzero($jid, 7);
 
-            $sql = "selectx * from " . $this->base . "brapci_edition where 
+            $sql = "selectx * from " . $this->base . "brapci_edition where
                                                                     ed_vol = '$vol'
                                                                     and ed_nr = '$nr'
-                                                                    and ed_ano = '$ano' 
+                                                                    and ed_ano = '$ano'
                                                                     and ed_journal_id = '$jid' ";
             $rlt = db_query($sql);
             $sx = "v. $vol, n. $nr, $ano";
@@ -1823,7 +1841,7 @@ class oai_pmh extends CI_model
 
     function oai_resumo_to_harvesing()
     {
-        $sql = "select count(*) as total, cache_journal, jnl_nome from " . $this->base . "oai_cache 
+        $sql = "select count(*) as total, cache_journal, jnl_nome from " . $this->base . "oai_cache
                                                                 inner join " . $this->base . "brapci_journal on jnl_codigo = cache_journal
                                                                 where cache_status = '@'
                                                                 group by cache_journal, jnl_nome
@@ -1841,7 +1859,7 @@ class oai_pmh extends CI_model
 
     function oai_resumo_to_progress()
     {
-        $sql = "select count(*) as total, cache_journal, jnl_nome from " . $this->base . "oai_cache 
+        $sql = "select count(*) as total, cache_journal, jnl_nome from " . $this->base . "oai_cache
                                                                 inner join " . $this->base . "brapci_journal on jnl_codigo = cache_journal
                                                                 where cache_status = 'A'
                                                                 group by cache_journal, jnl_nome
@@ -1871,8 +1889,8 @@ class oai_pmh extends CI_model
             $wh = " cache_journal = '" . strzero($jid, 7) . "' ";
         }
 
-        $sql = "select count(*) as total, cache_status from " . $this->base . "oai_cache 
-                                                                where $wh 
+        $sql = "select count(*) as total, cache_status from " . $this->base . "oai_cache
+                                                                where $wh
                                                                 group by cache_status ";
         $rlt = db_query($sql);
         $t = array(0, 0, 0, 0);
@@ -1909,9 +1927,9 @@ class oai_pmh extends CI_model
     function doublePDFlink()
     {
         $sql = "select * from " . $this->base . "(
-                                                                                SELECT bs_adress, count(*) as total, max(id_bs) as id 
-                                                                                from " . $this->base . "`brapci_article_suporte` 
-                                                                                WHERE bs_type = 'URL' 
+                                                                                SELECT bs_adress, count(*) as total, max(id_bs) as id
+                                                                                from " . $this->base . "`brapci_article_suporte`
+                                                                                WHERE bs_type = 'URL'
                                                                                 and bs_adress like 'http%'
                                                                                 and (bs_status ='A' or bs_status = '@')
                                                                                 and bs_adress <> ''
@@ -1926,9 +1944,9 @@ class oai_pmh extends CI_model
                 $line = $rlt[$r];
                 $adress = $line['bs_adress'];
                 $id = $line['id'];
-                $sql = "update " . $this->base . "brapci_article_suporte 
-                                                                                        set bs_status = 'D' 
-                                                                                        WHERE bs_adress = '$adress' 
+                $sql = "update " . $this->base . "brapci_article_suporte
+                                                                                        set bs_status = 'D'
+                                                                                        WHERE bs_adress = '$adress'
                                                                                         and id_bs <> $id ";
                 $xrlt = $this->db->query($sql);
             }
@@ -1942,11 +1960,11 @@ class oai_pmh extends CI_model
         $off = $pag * 350;
         $sql = "select count(*) as total from " . $this->base . "brapci_article
                                                                                 LEFT join " . $this->base . "(
-                                                                                    select count(*) as total, bs_article from " . $this->base . "brapci_article_suporte 
-                                                                                    where bs_status <> 'X' and bs_type = 'PDF' 
+                                                                                    select count(*) as total, bs_article from " . $this->base . "brapci_article_suporte
+                                                                                    where bs_status <> 'X' and bs_type = 'PDF'
                                                                                     group by bs_article
                                                                                     ) as tabela ON bs_article = ar_codigo
-                                                                                    WHERE TOTAL is null AND ar_status <> 'X' 
+                                                                                    WHERE TOTAL is null AND ar_status <> 'X'
                                                                                     limit 50 offset $off";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -1954,14 +1972,14 @@ class oai_pmh extends CI_model
 
         $sql = "select ar_codigo, ar_titulo_1, jnl_nome from " . $this->base . "brapci_article
                                                                                     LEFT join " . $this->base . "(
-                                                                                        select count(*) as total, bs_article from " . $this->base . "brapci_article_suporte 
-                                                                                        where bs_status <> 'X' and bs_type = 'PDF' 
+                                                                                        select count(*) as total, bs_article from " . $this->base . "brapci_article_suporte
+                                                                                        where bs_status <> 'X' and bs_type = 'PDF'
                                                                                         group by bs_article
                                                                                         ) as tabela
                                                                                         ON bs_article = ar_codigo
                                                                                         INNER join " . $this->base . "brapci_journal ON jnl_codigo = ar_journal_id
-                                                                                        
-                                                                                        WHERE TOTAL is null AND ar_status <> 'X'					
+
+                                                                                        WHERE TOTAL is null AND ar_status <> 'X'
                                                                                         ORDER BY jnl_nome, ar_codigo";
         /* removido em 27/07/2017 - limit 350 offset $off"; */
 
@@ -1989,13 +2007,13 @@ class oai_pmh extends CI_model
         $sz = 30;
         $OFFSET = ($pag * 100);
         $data = date("Ymd");
-        $sql = "select * from " . $this->base . "brapci_article_suporte 
-                                                                                        WHERE bs_update <> '$data' 
+        $sql = "select * from " . $this->base . "brapci_article_suporte
+                                                                                        WHERE bs_update <> '$data'
                                                                                         and bs_status <> 'X'
                                                                                         and bs_type = 'PDF'
-                                                                                        order by id_bs 
+                                                                                        order by id_bs
                                                                                         LIMIT 100 OFFSET $OFFSET
-                                                                                        
+
                                                                                         ";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -2029,7 +2047,7 @@ class oai_pmh extends CI_model
                                                                                             inner join " . $this->base . "brapci_article_suporte on art = bs_article
                                                                                             where total = 1 and bs_adress like 'http%'
                                                                                             and bs_status ='A' or bs_status = '@'
-                                                                                            and art <> '' 
+                                                                                            and art <> ''
                                                                                             limit 1";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -2043,15 +2061,15 @@ class oai_pmh extends CI_model
     function nextPDFharvesting()
     {
         $sql = "select * from " . $this->base . "(
-                                                                                                SELECT `bs_article` as art, count(*) as total 
-                                                                                                FROM " . $this->base . "brapci_article_suporte` 
+                                                                                                SELECT `bs_article` as art, count(*) as total
+                                                                                                FROM " . $this->base . "brapci_article_suporte`
                                                                                                 WHERE bs_type = 'URL' group by bs_article
                                                                                                 )
                                                                                                 as tebela
                                                                                                 inner join " . $this->base . "brapci_article_suporte on art = bs_article
                                                                                                 where total = 1 and bs_adress like 'http%'
                                                                                                 and bs_status ='A' or bs_status = '@'
-                                                                                                and art <> '' 
+                                                                                                and art <> ''
                                                                                                 order by art desc
                                                                                                 limit 1";
         $rlt = $this->db->query($sql);
@@ -2076,7 +2094,7 @@ class oai_pmh extends CI_model
         $rlt = $rlt->result_array();
         if (count($rlt) > 0) {
             $id = $rlt[0]['id_bs'];
-            $sql = "update " . $this->base . "brapci_article_suporte set bs_status = 'U', bs_update = $data 
+            $sql = "update " . $this->base . "brapci_article_suporte set bs_status = 'U', bs_update = $data
                                                                                                     where id_bs = " . $id;
             $this->db->query($sql);
             return ($rlt[0]);
@@ -2089,7 +2107,7 @@ class oai_pmh extends CI_model
         $jnl = 16;
         $sx = bs_alert('info', msg("OK"));
         $wh = 'li_jnl = ' . $jnl . ' and ';
-        $sql = "select * from " . $this->base . "source_listidentifier 
+        $sql = "select * from " . $this->base . "source_listidentifier
                                                                                                 where $wh li_status = 'active' and li_s = 3
                                                                                                 order by li_s, li_u, id_li
                                                                                                 limit 1 offset " . $id;
@@ -2131,7 +2149,7 @@ class oai_pmh extends CI_model
 
             //echo '<pre>';
             //print_r($xml);
-            //echo '</pre>';        
+            //echo '</pre>';
         }
         return ($sx);
     }
