@@ -8,10 +8,10 @@ class Bs extends CI_model {
         }
         $sx .= '<a href="' . base_url(PATH . 'basket/metrics') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('metrics') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/PQ') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('PQs') . '</a>';
-        
-        
+
+
         $sx .= '</br>';
-        $sx .= '</br>';        
+        $sx .= '</br>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/csv') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('csv_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/xls') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('xls_selected') . '</a>';
         //$sx .= '<a href="' . base_url(PATH . 'basket/export/rdf') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('rdf_selected') . '</a>';
@@ -19,16 +19,16 @@ class Bs extends CI_model {
         $sx .= '<a href="' . base_url(PATH . 'basket/export/docaks') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('docabs_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/bib') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_selected') . '</a>';
         $sx .= '<a href="' . base_url(PATH . 'basket/export/cited') . '" class="btn btn-outline-secondary" style="margin-right: 10px;">' . msg('bib_cited_export') . '</a>';
-        
+
         $sx .= '</div>';
         $sx .= '<div class="col-md-12">';
         $sx .= '<hr>';
         $sx .= '</div>';
         return ($sx);
     }
-    
+
     function mark_clear() {
-        
+
         if (isset($_SESSION)) {
             $a = $_SESSION;
             foreach ($a as $key => $value) {
@@ -38,7 +38,7 @@ class Bs extends CI_model {
             }
         }
     }
-    
+
     function ajax_mark_all($key='',$vlr='')
     {
         $this->load->model('searchs');
@@ -47,7 +47,7 @@ class Bs extends CI_model {
         $dd3 = get("dd3") . ';';
         $vlr2 = '';
         $hits = '';
-        
+
         $a = splitx(';', $dd3);
         if (count($a) > 0)
         {
@@ -56,7 +56,7 @@ class Bs extends CI_model {
                 $js .= '$("#chk' . $a[$r] . '").prop("checked", true);';
                 $vlr2 = $this -> bs -> mark($a[$r], 'true');
             }
-        } else {            
+        } else {
             /* Parte 2 */
             $t = get("type");
             $type = 'article';
@@ -64,9 +64,9 @@ class Bs extends CI_model {
             $term = troca($term, '¢', '"');
             if (get("year_s") != '') { $_SESSION['year_s'] = get("year_s"); }
             if (get("year_e") != '') { $_SESSION['year_e'] = get("year_e"); }
-      
 
-            //$q = $this -> elasticsearch -> query($type, $term, $t, 0, 1); 
+
+            //$q = $this -> elasticsearch -> query($type, $term, $t, 0, 1);
             $q = $this -> elasticsearch -> query($type, $term, $t,0,1);
             /*
             echo '<pre>';
@@ -78,15 +78,15 @@ class Bs extends CI_model {
             for ($r=0;$r < count($hits);$r++)
             {
                 $hit = $hits[$r];
-                $ht = round($hit['_id']);
-                $vlr2 = $this -> bs -> mark($ht, 'true'); 
+                $ht = sround($hit['_id']);
+                $vlr2 = $this -> bs -> mark($ht, 'true');
             }
         }
         echo $vlr2 . cr();
         echo '<script>' . $js . '</script>';
-        
+
     }
-    
+
     function ajax_mark($key = '', $vlr = '') {
         $js = '';
         if (strlen($key) > 0) {
@@ -116,24 +116,24 @@ class Bs extends CI_model {
         }
         return ('');
     }
-    
+
     function basket($type = '1') {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
         $ttt = 0;
         $lst = '';
-        
-        switch($type) 
+
+        switch($type)
         {
             case 'PQ':
                 $this->load->model("Pqs");
                 $PQS = $this->Pqs->lista();
                 $a = array();
                 $tot = 0;
-                foreach ($s as $key => $value) 
+                foreach ($s as $key => $value)
                 {
-                    if (substr($key, 0, 1) == 'm') 
+                    if (substr($key, 0, 1) == 'm')
                     {
                         $tot++;
                         $key = substr($key, 1, strlen($key));
@@ -157,23 +157,23 @@ class Bs extends CI_model {
                                             $ok = 1;
                                             break;
                                         }
-                                    }                                
+                                    }
                             }
-                        
+
                         if ($ok == 1)
                         {
                             $ttt++;
-                            $lst .= $key.'; ';                            
+                            $lst .= $key.'; ';
                             $file = 'c/' . $key . '/name.nm';
-                            if (file_exists($file)) 
-                            {                                
+                            if (file_exists($file))
+                            {
                                 $fr = file_get_contents($file);
                                 $fr = troca($fr, '<b>', '_b_');
                                 $fr = troca($fr, '</b>', '_bb_');
                                 $fr = strip_tags($fr);
                                 $fr = troca($fr, '_b_', '<b>');
                                 $fr = troca($fr, '_bb_', '</b>');
-                                
+
                                 $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                                 $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                                 $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
@@ -193,9 +193,9 @@ class Bs extends CI_model {
             break;
 
             case 'LT' :
-            foreach ($s as $key => $value) 
+            foreach ($s as $key => $value)
             {
-                if (substr($key, 0, 1) == 'm') 
+                if (substr($key, 0, 1) == 'm')
                 {
                     $key = substr($key, 1, strlen($key));
                     $tot++;
@@ -215,18 +215,18 @@ class Bs extends CI_model {
                     $sx .= '</div>';
                 }
             }
-           
+
             /****************************** Default **************/
             default :
                 $a = array();
-                foreach ($s as $key => $value) 
+                foreach ($s as $key => $value)
                 {
-                    if (substr($key, 0, 1) == 'm') 
+                    if (substr($key, 0, 1) == 'm')
                     {
                         $tot++;
                         $key = substr($key, 1, strlen($key));
                         $file = 'c/' . $key . '/name.nm';
-                        if (file_exists($file)) 
+                        if (file_exists($file))
                         {
                             $fr = file_get_contents($file);
                             $fr = troca($fr, '<b>', '_b_');
@@ -234,14 +234,14 @@ class Bs extends CI_model {
                             $fr = strip_tags($fr);
                             $fr = troca($fr, '_b_', '<b>');
                             $fr = troca($fr, '_bb_', '</b>');
-                            
+
                             $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                             $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                             $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
 
                             $file = "c/".$key."/cited.total";
                             if (file_exists($file))
-                                {                                        
+                                {
                                     $fr .= '<span class="btn-secondary" style="border-radius: 5px;">&nbsp;'.file_get_contents($file).'&nbsp;</span>';
                                 }
 
@@ -256,9 +256,9 @@ class Bs extends CI_model {
             break;
 
         }
-        
+
         if ($tot > 0) {
-            
+
         } else {
             $sx .= '<div class="col-md-12">';
             $sx .= bs_alert('warning', msg('basket_empty'));
@@ -266,7 +266,7 @@ class Bs extends CI_model {
         }
         return ($sx);
     }
-    
+
     function sels()
     {
         $a = array();
@@ -277,10 +277,10 @@ class Bs extends CI_model {
                     array_push($a,sonumero($key));
                 }
             }
-        } 
-        return($a);           
+        }
+        return($a);
     }
-    
+
     function selected() {
         $s = $_SESSION;
         $tot = 0;
@@ -297,19 +297,19 @@ class Bs extends CI_model {
             '.msg('Selected').'
             <br>
             <span class="btn-primary" style="padding: 0px 10px; border-radius: 10px;">' . $tot . '</span>
-            </div></a>'.cr();            
+            </div></a>'.cr();
         } else {
             $tot = '';
         }
-        
+
         return ($tot);
     }
-    
+
     function mark($key, $dd2 = '') {
         if (strlen($dd2) == 0) {
             $dd2 = get("dd2");
         }
-        
+
         $key = trim($key);
         if ($dd2 == 'true') {
             $vlr = 1;
@@ -321,7 +321,7 @@ class Bs extends CI_model {
         $vlr = $this -> selected();
         return ($vlr);
     }
-    
+
     function script_all($s,$q='',$t='') {
         $sx = '<div class="col-md-12">';
         $sx .= '<span onclick="mark_all();" style="cursor: pointer;">' . msg('select_page') . '</span>' . cr();
@@ -329,7 +329,7 @@ class Bs extends CI_model {
         $sx .= '
         <script>
         function mark_all()
-        {                                
+        {
             var ok = "' . $s . '";
             $.ajax({
                 type: "POST",
@@ -337,19 +337,19 @@ class Bs extends CI_model {
                 data: { dd1: "", dd2: "", dd3: ok }
             }).done(function( data ) {
                 $("#basket").html(data);
-            });                     
-        }                
+            });
+        }
         </script>
         ';
-        
+
         $dts = '';
         if (strlen(get("year_s")) > 0) { $dts .= ', year_s :"'.round(get("year_s")).'"'; }
-        if (strlen(get("year_e")) > 0) { $dts .= ', year_e :"'.round(get("year_e")).'"'; }                
+        if (strlen(get("year_e")) > 0) { $dts .= ', year_e :"'.round(get("year_e")).'"'; }
 
         $sx .= '
         <script>
         function mark_all_pages()
-        {                                
+        {
             var ok = "";
             $loading = $("#loading2");
             $loading.show();
@@ -360,20 +360,20 @@ class Bs extends CI_model {
             }).done(function( data ) {
                 $("#basket").html(data);
                 $loading.hide();
-            });            
-        }                
+            });
+        }
         </script>
-        ';                
+        ';
         $sx .= '</div>';
         return ($sx);
     }
-    
+
     function script() {
         $sx = '';
         if (!isset($jss)) {
             $sx = '<script>
             function mark(ms,ta)
-            {                                
+            {
                 var ok = ta.checked;
                 $.ajax({
                     type: "POST",
@@ -381,8 +381,8 @@ class Bs extends CI_model {
                     data: { dd1: ms, dd2: ok }
                 }).done(function( data ) {
                     $("#basket").html(data);
-                });                     
-            }               
+                });
+            }
             function mark_ch(ms)
             {
                 var ok = $("#check").prop("checked");
@@ -396,7 +396,7 @@ class Bs extends CI_model {
                     $("#check").prop("checked", true);
                     $("#select").attr("src","' . base_url('img/icone/icone_select_off.png') . '");
                 }
-                
+
                 $.ajax({
                     type: "POST",
                     url: "' . base_url(PATH . 'mark/') . '"+ms,
@@ -404,13 +404,13 @@ class Bs extends CI_model {
                 }).done(function( data ) {
                     $("#basket").html(data);
                 });
-            }        
+            }
             </script>
             ';
         }
         return ($sx);
     }
-    
+
     function change($key) {
         $sx = $this -> script();
         $cd = 'on';
@@ -429,11 +429,11 @@ class Bs extends CI_model {
         $sx .= '<input type="checkbox" id="check" ' . $chk . ' style="display: none;">';
         return ($sx);
     }
-    
+
     function checkbox($key) {
         global $jss;
         $sx = $this -> script();
-        
+
         if (strlen($key) > 0) {
             $id = 'm' . $key;
             if (isset($_SESSION[$id])) {
@@ -442,7 +442,7 @@ class Bs extends CI_model {
                 } else {
                     $chk = '';
                 }
-                
+
             } else {
                 $chk = '';
             }
@@ -451,7 +451,7 @@ class Bs extends CI_model {
         }
         return ($sx);
     }
-    
+
     function mark_export_csv() {
         $file = 'brapci_csv_' . date("YmdHi") . '.txt';
         header('Content-Encoding: UTF-8');
@@ -460,7 +460,7 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
+
         $a = array();
         $sx = '';
         $sx .= '' . msg('author');
@@ -474,9 +474,9 @@ class Bs extends CI_model {
         $sx .= ',' . msg('id');
         $sx .= ',' . msg('link');
         $sx .= ',' . cr();
-        foreach ($s as $key => $value) 
+        foreach ($s as $key => $value)
         {
-            if (substr($key, 0, 1) == 'm') 
+            if (substr($key, 0, 1) == 'm')
             {
                 $tot++;
                 $key = substr($key, 1, strlen($key));
@@ -498,10 +498,10 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
-        foreach ($s as $key => $value) 
+
+        foreach ($s as $key => $value)
         {
-            if (substr($key, 0, 1) == 'm') 
+            if (substr($key, 0, 1) == 'm')
             {
                 $tot++;
                 $key = substr($key, 1, strlen($key));
@@ -523,7 +523,7 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
+
         $a = array();
         $sx = '<table>' . cr();
         $sx .= '<tr><th>' . msg('author') . '</th>';
@@ -549,13 +549,13 @@ class Bs extends CI_model {
             }
         }
         $sx .= '</table>';
-        
+
         echo '<html>';
         echo '<body>';
         echo utf8_decode($sx);
         echo '</body>';
         echo '</html>';
-        
+
     }
     function mark_export_doc() {
         $file = 'brapci_' . date("YmdHi") . '.doc';
@@ -566,7 +566,7 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
+
         $a = array();
         foreach ($s as $key => $value) {
             if (substr($key, 0, 1) == 'm') {
@@ -580,7 +580,7 @@ class Bs extends CI_model {
                     $fr = strip_tags($fr);
                     $fr = troca($fr, '_b_', '<b>');
                     $fr = troca($fr, '_bb_', '</b>');
-                    
+
                     $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                     $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                     $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
@@ -599,7 +599,7 @@ class Bs extends CI_model {
         echo '</body>';
         echo '</html>';
     }
-    
+
 
     function mark_export_docaks() {
         $this->load->model("bibliometrics");
@@ -611,7 +611,7 @@ class Bs extends CI_model {
         $sx = '';
         $s = $_SESSION;
         $tot = 0;
-        
+
         $a = array();
         foreach ($s as $key => $value) {
             if (substr($key, 0, 1) == 'm') {
@@ -624,15 +624,15 @@ class Bs extends CI_model {
                 if (file_exists($file)) {
                     $xxx = $this->bibliometrics->metadata($key,'AB');
                     foreach($xxx as $abr=>$vlr)
-                    { 
+                    {
                         $abs .= '<p style="text-align: justify; text-justify: inter-word;">'.$abr.'</p>';
                     }
                     $xxx = $this->bibliometrics->metadata($key,'KW');
                     foreach($xxx as $kyr=>$vlr)
-                    { 
+                    {
                         $kys .= $kyr.'. ';
                     }
-                    
+
                 }
                 $file = 'c/' . $key . '/name.nm';
                 if (file_exists($file)) {
@@ -642,7 +642,7 @@ class Bs extends CI_model {
                     $fr = strip_tags($fr);
                     $fr = troca($fr, '_b_', '<b>');
                     $fr = troca($fr, '_bb_', '</b>');
-                    
+
                     $link = '<a href="' . base_url(PATH . 'v/' . $key) . '">';
                     $fr .= ' Disponível em: &lt;' . $link . base_url(PATH . 'v/' . $key) . '</a>' . '&gt;.';
                     $fr .= ' Acesso em: ' . date("d") . '-' . msg('mes_' . date("m")) . '-' . date("Y") . '.';
@@ -671,10 +671,10 @@ class Bs extends CI_model {
         array_push($cp, array('$T80:10', '', msg('IDs'), true, true));
         array_push($cp, array('$M1', '', msg('IDs_info'), false, false));
         array_push($cp, array('$B8', '', msg('inport'), false, true));
-        
+
         $tela = $form -> editar($cp, '');
         $tela = '<div class="row"><div class="col-md-12 col-12">' . $tela . '</div></div>';
-        
+
         if ($form -> saved > 0) {
             $n = troca(get("dd1"), chr(13), ';');
             $n = troca($n, chr(10), '');
@@ -685,17 +685,17 @@ class Bs extends CI_model {
             }
             $tela .= bs_alert('success', msg('Was') . ' ' . count($ln) . ' ' . msg('inported_registers'));
         }
-        
+
         return ($tela);
     }
-    
+
     function mark_save($id = 0) {
         if (!(isset($_SESSION['id'])) or (sonumero($_SESSION['id']) == 0)) {
             return (bs_alert('danger', 'Session not initialized'));
         }
         $form = new form;
         $cp = array();
-        
+
         $s = '';
         $a = $_SESSION;
         $total = 0;
@@ -714,51 +714,51 @@ class Bs extends CI_model {
         array_push($cp, array('$C1', 'bb_public', msg('bb_public'), false, true));
         array_push($cp, array('$HV', 'bb_total', $total, false, true));
         //array_push($cp,array('$HV','bb_session',$_SESSION['session'],true,true));
-        
+
         array_push($cp, array('$B8', '', msg('save_selection'), false, true));
-        
+
         $tela = $form -> editar($cp, '_bibliographic_selections');
         $tela = '<div class="row"><div class="col-md-12 col-12">' . $tela . '</div></div>';
-        
+
         if ($form -> saved > 0) {
             $tela = bs_alert('success', msg('bb_success'));
         }
-        
+
         return ($tela);
     }
 
     function mark_active($id)
         {
             $tela = '';
-            $sql = "select * from _bibliographic_selections 
-            where id_bb = $id 
+            $sql = "select * from _bibliographic_selections
+            where id_bb = $id
             order by bb_update desc";
             $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();    
+            $rlt = $rlt->result_array();
 
             if (count($rlt) > 0)
             {
                 $n = troca($rlt[0]['bb_sel'], chr(13), ';');
                 $n = troca($n, chr(10), '');
                 $ln = splitx(';', $n);
-                for ($r = 0; $r < count($ln); $r++) 
+                for ($r = 0; $r < count($ln); $r++)
                 {
                     $nn = sonumero($ln[$r]);
                     $_SESSION['m' . $nn] = 1;
                 }
-                $tela .= bs_alert('success', msg('Was') . ' ' . count($ln) . ' ' . msg('inported_registers'));                    
+                $tela .= bs_alert('success', msg('Was') . ' ' . count($ln) . ' ' . msg('inported_registers'));
             }
             sleep(1);
             return('');
         }
-    
+
     function mark_saved() {
         if (!(isset($_SESSION['id'])) or (sonumero($_SESSION['id']) == 0)) {
             return (bs_alert('danger', 'Session not initialized'));
         }
         $id = $_SESSION['id'];
-        $sql = "select * from _bibliographic_selections 
-        where bb_user = $id 
+        $sql = "select * from _bibliographic_selections
+        where bb_user = $id
         order by bb_update desc";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();

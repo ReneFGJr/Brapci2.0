@@ -4,12 +4,12 @@ class pdfs extends CI_model {
 		$this -> harvesting_pdf_curl($id);
 		echo '<script> 	window.opener.location.reload(); close();  </script>';
 	}
-	
+
 	function journals_files()
 	{
 		$sx = '';
 		$dd1 = get("dd1");
-		$dd2 = round(get("dd2"));
+		$dd2 = sround(get("dd2"));
 		if (strlen($dd1) == 0)
 		{
 			$sql ="select * from source_source where jnl_active = 1 order by jnl_name";
@@ -26,10 +26,10 @@ class pdfs extends CI_model {
 		} else {
 			$sql ="select * from source_source where id_jnl = $dd1 order by jnl_name";
 			$rlt = $this->db->query($sql);
-			$rlt = $rlt->result_array();			
+			$rlt = $rlt->result_array();
 			$idj = $rlt[0]['jnl_frbr'];
 			//'hasFileStorage'
-			
+
 			$sql = "select * from (
 				SELECT d1.d_r1 as art FROM `rdf_data` as d1
 				INNER JOIN rdf_class ON d_p = id_c and c_class = 'isPubishIn'
@@ -39,7 +39,7 @@ class pdfs extends CI_model {
 				where d_r1 IS NULL and art > $dd2
 				order by art
 				";
-				
+
 				$rlt = $this->db->query($sql);
 				$rlt = $rlt->result_array();
 				$sx .= 'Total de '.count($rlt).' arquivos PDF para coletar<hr>';
@@ -51,19 +51,19 @@ class pdfs extends CI_model {
 				}
 				$sx .= '</ul>';
 				$xart = $rlt[0]['art'];
-				echo '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/pdf_check_article/?dd1='.$dd1.'&dd2='.$xart) . '">';	     		 
+				echo '<meta http-equiv="refresh" content="5;' . base_url(PATH . 'tools/pdf_check_article/?dd1='.$dd1.'&dd2='.$xart) . '">';
 				$sx .= $this -> pdfs -> harvesting_pdf($xart);
-				
+
 			}
 			return($sx);
 		}
-		
+
 		function upload($id = '') {
 			$data = $this -> frbr_core -> le_data($id);
 			for ($r = 0; $r < count($data); $r++) {
 				$attr = trim($data[$r]['c_class']);
 				$vlr = trim($data[$r]['n_name']);
-				
+
 				if ($attr == 'prefLabel') {
 					$file = trim($vlr);
 					$file = troca($file, '/', '_');
@@ -71,7 +71,7 @@ class pdfs extends CI_model {
 					$file = troca($file, ':', '_');
 				}
 			}
-			
+
 			$sx = '
 			<h1>' . msg('upload_file') . '</h1>
 			<form method="post" enctype="multipart/form-data">
@@ -81,7 +81,7 @@ class pdfs extends CI_model {
 			<input type="submit" value="Upload Image" name="submit">
 			</form>
 			';
-			
+
 			// Check if image file is a actual image or fake image
 			if (isset($_POST["submit"])) {
 				$target_dir = "uploads/";
@@ -102,7 +102,7 @@ class pdfs extends CI_model {
 					$myfile = fopen($namef, "r") or die("Unable to open file!");
 					$txt .= fread($myfile, filesize($namef));
 					fclose($myfile);
-					
+
 					$this -> file_pdf($file, $txt, $id, 0);
 					$uploadOk = 1;
 					$sx .= '<script> wclose(); </script>';
@@ -111,10 +111,10 @@ class pdfs extends CI_model {
 					$uploadOk = 0;
 				}
 			}
-			
+
 			return ($sx);
 		}
-		
+
 		function harvesting_next($p = '', $rs = '1') {
 			$s = '';
 			if ($p == '') {
@@ -127,7 +127,7 @@ class pdfs extends CI_model {
 			select count(*) as total from rdf_data AS R1
 			left JOIN rdf_data AS R2 ON R1.d_r1 = R2.d_r1 and R2.d_p = $prop2
 			where (R1.d_p = $prop1 OR R1.d_p = $prop3) and R2.d_p is null ";
-			$s = 'P1:'.date("d/m/Y H:i:s").'<br>';				  
+			$s = 'P1:'.date("d/m/Y H:i:s").'<br>';
 			$rlt = $this -> db -> query($sql);
 			$s .= 'P2:'.date("d/m/Y H:i:s").'<br>';
 			$rlt = $rlt -> result_array();
@@ -140,9 +140,9 @@ class pdfs extends CI_model {
 			where R1.d_p = $prop1 and R2.d_p is null and R1.d_r1 > $p
 			and fl_id is null
 			order by R1.d_r1 desc
-			limit 1			
+			limit 1
 			";
-			
+
 			$rlt = $this -> db -> query($sql);
 			$rlt = $rlt -> result_array();
 			$s .= 'P3:'.date("d/m/Y H:i:s").'<br>';
@@ -155,11 +155,11 @@ class pdfs extends CI_model {
 			if (count($rlt) > 0) {
 				$line = $rlt[0];
 				$id = $line['d_r1'];
-				
+
 				/* */
 				$sql = "insert into __file_temp (fl_id, fl_data) values ($id,'" . $date . "');";
 				$rrr = $this -> db -> query($sql);
-				
+
 				$sx = msg('Article') . ' ' . $id;
 				$sx .= ', ' . msg('left') . ' ' . $total . ' files';
 				if ($rs == '1') {
@@ -174,7 +174,7 @@ class pdfs extends CI_model {
 				return ("Fim da coleta");
 			}
 		}
-		
+
 		function harvesting_pdf_curl($id) {
 			$links = array();
 			$links2 = array();
@@ -184,22 +184,22 @@ class pdfs extends CI_model {
 				return("JOURNAL - ".$id);
 			}
 			$data = $this -> frbr_core -> le_data($id);
-			
+
 			for ($r = 0; $r < count($data); $r++) {
 				$attr = trim($data[$r]['c_class']);
 				$vlr = trim($data[$r]['n_name']);
-				
+
 				if ($attr === 'isPubishIn') {
 					$jnl = $data[$r]['d_r2'];
 				}
-				
+
 				if ($attr == 'prefLabel') {
 					$file = trim($vlr);
 					$file = troca($file, '/', '_');
 					$file = troca($file, '.', '_');
 					$file = troca($file, ':', '_');
 				}
-				
+
 				if ($attr == 'hasUrl') {
 					if (strpos(' '.$vlr,'http') > 0) {
 						$vlr = substr($vlr,strpos($vlr,'http'),strlen($vlr));
@@ -209,18 +209,18 @@ class pdfs extends CI_model {
 						$vlr = 'https:'.$vlr;
 						echo $vlr;
 						array_push($links, $vlr);
-					}					
+					}
 				}
 				if ($attr == 'hasRegisterId'){
 					if (substr($vlr, 0, 4) == 'http') {
 						array_push($links2, $vlr);
-					}			    
+					}
 				}
-				
+
 			}
-			
+
 			echo '<h1>'.$id.'</h1>';
-			
+
 			if ((count($links) == 0) and (count($links2) > 0))
 			{
 				echo "OK";
@@ -229,19 +229,19 @@ class pdfs extends CI_model {
 					$link = $links2[$r];
 					$rsp = load_page($link);
 					$txt = $rsp['content'];
-					
+
 					if (strpos($txt,'citation_pdf_url') > 0)
 					{
 						/*****************************/
 						$d = 'citation_pdf_url';
 						$pos = strpos($txt,$d)+strlen($d);
 						$txt = substr($txt,$pos,1000);
-						
+
 						/*****************************/
 						$d = 'content="';
 						$pos = strpos($txt,$d)+strlen($d);
 						$txt = substr($txt,$pos,1000);
-						$txt = substr($txt,0,strpos($txt,'"'));                                
+						$txt = substr($txt,0,strpos($txt,'"'));
 						if (strlen($txt) > 0)
 						{
 							array_push($links, $txt);
@@ -253,20 +253,20 @@ class pdfs extends CI_model {
 						$d = 'frame src="';
 						$pos = strpos($txt,$d)+strlen($d);
 						$txt = substr($txt,$pos,1000);
-						
+
 						/*****************************/
 						$d = '" frameborder';
 						$pos = strpos($txt,$d)+strlen($d);
 						$txt = substr($txt,0,$pos);
-						$txt = substr($txt,0,strpos($txt,'"')); 
+						$txt = substr($txt,0,strpos($txt,'"'));
 						if ((strlen($txt) > 0) and (substr($txt,0,4) == 'http'))
 						{
 							array_push($links, $txt);
 						}
-					}                                                   
+					}
 				}
 			}
-			
+
 			/************************ IDENTIFICAÇÃO DOS MÉTODOS *************/
 			$method = 0;
 			$link = '';
@@ -275,20 +275,20 @@ class pdfs extends CI_model {
 				$link = $links[$r];
 				if ((strpos($link, '/view/')) or (strpos($link, '/viewFile/')) or (strpos($link, '/viewArticle/')) or (strpos($link, '/download/'))) {
 					$method = 1;
-				} 
+				}
 
-				/*************** ENANCIB e SCIELO */        
+				/*************** ENANCIB e SCIELO */
 
 				if ((strpos($link,'scielo.php') > 0) or (strpos($link,'enancib')) > 0)
 				{
-					$method=1; 
+					$method=1;
 					/* Base do Scielo */
 					$txt = file_get_contents($link);
 					$txt = substr($txt,strpos($txt,'citation_pdf_url'),1024);
 					$txt = substr($txt,strpos($txt,'http'),strlen($txt));
 					$link = substr($txt,0,strpos($txt,'"'));
 				}
-				
+
 				switch($method) {
 					case '1' :
 						$link = $this -> method_1($link, $file, $id);
@@ -298,13 +298,13 @@ class pdfs extends CI_model {
 							$txt = $rsp['content'];
 							$type = $rsp['content_type'];
 							/* save pdf */
-							
+
 							/**************** Correções de regras de download ************************/
 							if (strpos($link,'revista.arquivonacional.gov.br') > 0)
 							{
 								$type = 'application/pdf';
 							}
-							
+
 							if (strpos($type, ';') > 0) {
 								$type = substr($type, 0, strpos($type, ';'));
 							}
@@ -322,7 +322,7 @@ class pdfs extends CI_model {
 								case 'application/save-as' :
 									$this -> file_pdf($file, $txt, $id, $jnl);
 									return("pdf");
-								break;                                                                
+								break;
 								case 'application/zip' :
 									$this -> file_save($file, $txt, $id, 'ZIP', $jnl);
 									//echo ' - ' . msg('save_pdf');
@@ -357,7 +357,7 @@ class pdfs extends CI_model {
 								echo '</pre>';
 								exit ;
 							}
-							
+
 						} catch (Exception $e) {
 							echo 'Caught exception: ', $e -> getMessage(), "\n";
 						}
@@ -371,11 +371,11 @@ class pdfs extends CI_model {
 		exit;
 		return (msg("Harvesting"));
 	}
-	
+
 	function download($d1) {
 
 		$data = $this -> frbr_core -> le_data($d1);
-		
+
 		$size = 0;
 		$name = 'File';
 		$type = '';
@@ -411,12 +411,12 @@ class pdfs extends CI_model {
 			exit;
 		} else {
 			echo 'File not found - ' . $file;
-		}		
-		exit;		
+		}
+		exit;
 	}
 	echo "OPS: $type - $file";
 }
-	
+
 
 function txt($d1) {
 	$data = $this -> frbr_core -> le_data($d1);
@@ -450,7 +450,7 @@ if (file_exists($file)) {
 }
 
 
-}	
+}
 
 function directories($journal = 0) {
 	/* Prepara o nome do arquivo */
@@ -466,7 +466,7 @@ function directories($journal = 0) {
 }
 
 function file_pdf($file, $content, $id, $journal) {
-	
+
 	$filename = $this -> directories($journal);
 	$filename .= '/' . $file . '.pdf';
 
@@ -477,31 +477,31 @@ function file_pdf($file, $content, $id, $journal) {
 			echo 'Excluindo '.$filename_text;
 			unlink($filename_text);
 		}
-	
+
 	$fld = fopen($filename, 'w+');
 	fwrite($fld, $content);
 	fclose($fld);
-	
+
 	$size = filesize($filename);
 	if ($size > 0) {
 		/********** cria objeto do arquivo ****************************************/
 		$r2 = $this -> frbr_core -> rdf_concept_create('FileStorage', $filename, 'en', '');
-		
+
 		/* TIPO DO ARQUIVO */
 		$r3 = $this -> frbr_core -> rdf_concept_create('FileType', 'PDF', 'pt-BR', '');
 		$prop = 'hasFileType';
 		$this -> frbr_core -> set_propriety($r2, $prop, $r3, 0);
-		
+
 		/* Tamanho do Arquivo */
 		$prop = 'hasFileSize';
 		$id_size = $this -> frbr_core -> frbr_name($size, 'pt-BR');
 		$this -> frbr_core -> set_propriety($r2, $prop, 0, $id_size);
-		
+
 		/* DATA DA COLETA DO ARQUIVO */
 		$prop = 'hasDateTime';
 		$idd = $this -> frbr_core -> rdf_concept_create('Date', DATE("Y-m-d"));
 		$this -> frbr_core -> set_propriety($r2, $prop, $idd, 0);
-		
+
 		$prop = 'hasFileStorage';
 		$this -> frbr_core -> set_propriety($id, $prop, $r2, 0);
 	}
@@ -516,27 +516,27 @@ function file_save($file, $content, $id, $type, $journal) {
 	$fld = fopen($filename, 'w+');
 	fwrite($fld, $content);
 	fclose($fld);
-	
+
 	$size = filesize($filename);
 	if ($size > 0) {
 		/********** cria objeto do arquivo ****************************************/
 		$r2 = $this -> frbr_core -> rdf_concept_create('File', $filename, 'en', '');
-		
+
 		/* TIPO DO ARQUIVO */
 		$r3 = $this -> frbr_core -> rdf_concept_create('FileType', $type, 'pt-BR', '');
 		$prop = 'hasFileType';
 		$this -> frbr_core -> set_propriety($r2, $prop, $r3, 0);
-		
+
 		/* Tamanho do Arquivo */
 		$prop = 'hasFileSize';
 		$id_size = $this -> frbr_core -> frbr_name($size, 'pt-BR');
 		$this -> frbr_core -> set_propriety($r2, $prop, 0, $id_size);
-		
+
 		/* DATA DA COLETA DO ARQUIVO */
 		$prop = 'hasDateTime';
 		$idd = $this -> frbr_core -> rdf_concept_create('Date', DATE("Y-m-d"));
 		$this -> frbr_core -> set_propriety($r2, $prop, $idd, 0);
-		
+
 		$prop = 'hasFileStorage';
 		$this -> frbr_core -> set_propriety($id, $prop, $r2, 0);
 	}
@@ -552,62 +552,62 @@ function method_1($link, $file) {
 
 function create_coversheet() {
 	$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-	
+
 	// set document information
 	$pdf -> SetCreator(PDF_CREATOR);
 	$pdf -> SetAuthor('Nicola Asuni');
 	$pdf -> SetTitle('TCPDF Example 001');
 	$pdf -> SetSubject('TCPDF Tutorial');
 	$pdf -> SetKeywords('TCPDF, PDF, example, test, guide');
-	
+
 	// set default header data
 	$pdf -> SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE . ' 001', PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
 	$pdf -> setFooterData(array(0, 64, 0), array(0, 64, 128));
-	
+
 	// set header and footer fonts
 	$pdf -> setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 	$pdf -> setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-	
+
 	// set default monospaced font
 	$pdf -> SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-	
+
 	// set margins
 	$pdf -> SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 	$pdf -> SetHeaderMargin(PDF_MARGIN_HEADER);
 	$pdf -> SetFooterMargin(PDF_MARGIN_FOOTER);
-	
+
 	// set auto page breaks
 	$pdf -> SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-	
+
 	// set image scale factor
 	$pdf -> setImageScale(PDF_IMAGE_SCALE_RATIO);
-	
+
 	$pdf -> AddPage();
-	
+
 	// set some language-dependent strings (optional)
 	if (@file_exists(dirname(__FILE__) . '/lang/eng.php')) {
 		require_once (dirname(__FILE__) . '/lang/eng.php');
 		$pdf -> setLanguageArray($l);
 	}
-	
+
 	// ---------------------------------------------------------
-	
+
 	// set default font subsetting mode
 	$pdf -> setFontSubsetting(true);
-	
+
 	// Set font
 	// dejavusans is a UTF-8 Unicode font, if you only need to
 	// print standard ASCII chars, you can use core fonts like
 	// helvetica or times to reduce file size.
 	$pdf -> SetFont('dejavusans', '', 14, '', true);
-	
+
 	// Add a page
 	// This method has several options, check the source code documentation for more information.
 	$pdf -> AddPage();
-	
+
 	// set text shadow effect
 	$pdf -> setTextShadow(array('enabled' => true, 'depth_w' => 0.2, 'depth_h' => 0.2, 'color' => array(196, 196, 196), 'opacity' => 1, 'blend_mode' => 'Normal'));
-	
+
 	// Set some content to print
 	$html = '
 	<h1>Welcome to <a href="http://www.tcpdf.org" style="text-decoration:none;background-color:#CC0000;color:black;">&nbsp;<span style="color:black;">TC</span><span style="color:white;">PDF</span>&nbsp;</a>!</h1>
@@ -616,12 +616,12 @@ function create_coversheet() {
 	<p>Please check the source code documentation and other examples for further information.</p>
 	<p style="color:#CC0000;">TO IMPROVE AND EXPAND TCPDF I NEED YOUR SUPPORT, PLEASE <a href="http://sourceforge.net/donate/index.php?group_id=128076">MAKE A DONATION!</a></p>
 	"EOD"';
-	
+
 	// Print text using writeHTMLCell()
 	$pdf -> writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
-	
+
 	// ---------------------------------------------------------
-	
+
 	// Close and output PDF document
 	// This method has several options, check the source code documentation for more information.
 	$pdf -> Output('example_001.pdf', 'I');
@@ -632,15 +632,15 @@ function check_pdf() {
 	$f = $this -> frbr_core -> find_class($class);
 	$this -> frbr_core -> check_language();
 	$limit = 200;
-	$offset = round(get('p'));
-	
+	$offset = sround(get('p'));
+
 	$sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-	N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+	N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
 	FROM rdf_concept as C1
 	INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
 	LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
 	LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-	where C1.cc_class = " . $f . "                        
+	where C1.cc_class = " . $f . "
 	ORDER BY N1.n_name
 	limit $limit offset $offset
 	";
@@ -702,12 +702,12 @@ function pdf_to_text($jdi='')
 	$f = $this -> frbr_core -> find_class($class);
 	$this -> frbr_core -> check_language();
 	$limit = 50;
-	$offset = round(get('p'));
-	
+	$offset = sround(get('p'));
+
 	$sql = "
 	select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
 	N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use,
-	ft_file        
+	ft_file
 	FROM rdf_concept as C1
 	INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
 	LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
@@ -718,8 +718,8 @@ function pdf_to_text($jdi='')
 	";
 	$rlt = $this -> db -> query($sql);
 	$rlt = $rlt -> result_array();
-	
-	for ($r=0;$r < count($rlt);$r++)			
+
+	for ($r=0;$r < count($rlt);$r++)
 	{
 		$line = $rlt[$r];
 		$file = $line['n_name'];
@@ -736,7 +736,7 @@ function pdf_to_text($jdi='')
 				$cmd = 'pdftotext '.$file.' '.$fileo;
 				shell_exec($cmd);
 				$this->pdftotext_index_file($fileo,$id);
-				echo ' - Processado';					
+				echo ' - Processado';
 			}
 		} else {
 			echo ' - File not found';
@@ -756,7 +756,7 @@ function pdftotext_index_file($file,$id)
 		(ft_file, ft_status, ft_id)
 		values
 		('$file',1,$id)";
-		$rlt = $this->db-> query($sql);										
+		$rlt = $this->db-> query($sql);
 	}
 	return(1);
 }
@@ -765,7 +765,7 @@ function harvesting_dates($id=0)
 {
 	$sx = 'Harvesting Data';
 	$id = 442; // Transinformacao
-	
+
 	$dt = $this->frbr_core->le_data($id);
 	$issue = array();
 	$art = array();
@@ -779,11 +779,11 @@ function harvesting_dates($id=0)
 			array_push($issue,$id);
 		}
 	}
-	
+
 	/*************************** Resgata artigos ****/
 	for ($r=0;$r <count($issue);$r++)
 	{
-		$dtb = $this->frbr_core->le_data($issue[$r]);		
+		$dtb = $this->frbr_core->le_data($issue[$r]);
 		for ($y=0;$y < count($dtb);$y++)
 		{
 			$line = $dtb[$y];
@@ -793,16 +793,16 @@ function harvesting_dates($id=0)
 				array_push($art,$line['d_r2']);
 			}
 		}
-	}				
-	
+	}
+
 	/******************* Resgata dados do artigo ****/
-	
-	
+
+
 	for ($r=count($art)-1 ;$r >= 0;$r--)
 	{
 		$ok = 0;
 		$url = array();
-		$dtb = $this->frbr_core->le_data($art[$r]);		
+		$dtb = $this->frbr_core->le_data($art[$r]);
 		for ($y=0;$y < count($dtb);$y++)
 		{
 			$line = $dtb[$y];
@@ -824,16 +824,16 @@ function harvesting_dates($id=0)
 			if ($class == 'wasAcceptedOn')
 			{
 				$ok++;
-			}					
+			}
 		}
 		echo '<h1>Dados</h1>';
 		echo '<pre>';
 		print_r($url);
 		echo '</pre>';
-		
+
 		if ($ok == 0)
-		{			
-			echo '<h1>'.$art[$r].'</h1>';					
+		{
+			echo '<h1>'.$art[$r].'</h1>';
 			/*************************** Method 1 ********************/
 			$DT = $this->date_method_1($url);
 			if (isset($DT['REC']) and (strpos($DT['REC'],'00')))
@@ -858,20 +858,20 @@ function harvesting_dates($id=0)
 				$idn = $this -> frbr_core -> frbr_name($DT['ACT']);
 				$idd = $this -> frbr_core -> rdf_concept($idn,'Date');
 				$prop = 'wasAcceptedOn';
-				$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);					
+				$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);
 			}
 			if (isset($DT['APR']) and (!strpos($DT['APR'],'00')))
 			{
 				$idn = $this -> frbr_core -> frbr_name($DT['APR']);
 				$idd = $this -> frbr_core -> rdf_concept($idn,'Date');
 				$prop = 'wasPresentationOn';
-				$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);					
+				$this->frbr_core->set_propriety($art[$r], $prop, $idd, 0);
 			}
 		}
-	}	
-	echo "FIM";	
+	}
+	echo "FIM";
 	exit;
-	
+
 	//$sql = "select * from "
 }
 
@@ -881,7 +881,7 @@ function matrix()
 	$b = array('Aceito:','aprobado el','aprovado em','aprovado em:');
 	$c = array('presentado el');
 	$d = array('reapresentado em');
-	
+
 	$ae = array('Received on');
 	$be = array('approved on','accepted for publication on');
 	$ce = array('resubmitted on');
@@ -894,7 +894,7 @@ function recupera_data($d,$df)
 	$ano = '0000';
 	$mes = '00';
 	$dia = '00';
-	
+
 	echo '<br>===>'.$d;
 	for ($r=1960;$r < date("Y")+1;$r++)
 	{
@@ -914,8 +914,8 @@ function recupera_data($d,$df)
 				$mes = $this->locate_month($d);
 				$dia = $this->locate_day($d);
 				echo '<br>===data==>'.$dia.'-'.$mes.'-'.$ano;
-			}									
-		} 
+			}
+		}
 	}
 	$data = $ano.'-'.$mes.'-'.$dia;
 	if ($data == '0000-00-00') { $data = ''; }
@@ -930,7 +930,7 @@ function locate_day($t)
 	print_r($tt);
 	for ($r=0;$r < count($tt);$r++)
 	{
-		$dd = round($tt[$r]);
+		$dd = sround($tt[$r]);
 		if (($dd > 0) and ($dd <= 31))
 		{
 			$dia = strzero($dd,2);
@@ -950,18 +950,18 @@ function locate_month($t)
 	'January'=>'01','February'=>'02','March'=>'03','April'=>'04','May'=>'05','June'=>'06',
 	'July'=>'07','August'=>'08','September'=>'09','October'=>'10','November'=>'11',
 	'December'=>'12',
-	
+
 	/* Number */
 	'/1/'=>'01','/2/'=>'02','/3/'=>'03','/4/'=>'04','/5/'=>'05','/6/'=>'06','/7/'=>'07','/8/'=>'08',
 	'/9/'=>'09','/10/'=>'10','/11/'=>'11','/12/'=>'12',
 	'/01/'=>'01','/02/'=>'02','/03/'=>'03','/04/'=>'04','/05/'=>'05','/06/'=>'06','/07/'=>'07',
 	'/08/'=>'08', '/09/'=>'09',
-	
+
 	'-1-'=>'01','-2-'=>'02','-3-'=>'03','-4-'=>'04','-5-'=>'05','-6-'=>'06','-7-'=>'07','-8-'=>'08',
 	'-9-'=>'09','-10-'=>'10','-11-'=>'11','-12-'=>'12',
 	'-01-'=>'01','-02-'=>'02','-03-'=>'03','-04-'=>'04','-05-'=>'05','-06-'=>'06','-07-'=>'07',
 	'-08-'=>'08', '-09-'=>'09',
-	
+
 );
 foreach ($x as $key => $value) {
 	if (strpos($t,$key))
@@ -984,10 +984,10 @@ function locate($t,$type=1,$fd='DD-MM-YYYY')
 		break;
 		case 'p':
 			$c = $d[$fd][2];
-		break;	
+		break;
 		case '2':
 			$d = $d[$fd][3];
-		break;					
+		break;
 		default:
 		$c = $d[$fd][0];
 	break;
@@ -1010,7 +1010,7 @@ for ($r=0;$r < count($c);$r++)
 return("0000-00-00");
 }
 function date_method_1($u)
-{			
+{
 	for ($r=0;$r < count($u);$r++)
 	{
 		$ln = $u[$r];
@@ -1028,6 +1028,6 @@ function date_method_1($u)
 		}
 	}
 }
-}		
+}
 
 ?>

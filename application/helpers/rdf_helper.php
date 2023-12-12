@@ -42,9 +42,9 @@ class rdf
 		$msg['check_form'] = 'Checar formulário';
 		$msg['form_text'] = 'Informe o texto';
 	}
-	
+
 	function index($link='',$path='',$id='',$id2='',$id3='')
-	{       		
+	{
 		$dt = array();
 		$sx = '';
 		switch($path)
@@ -52,7 +52,7 @@ class rdf
 			case 'text':
 				$sx = $this->text_edit($id);
 			break;
-			
+
 			case 'image_upload':
 				$sx  = $this->image_save($id,$id2);
 				return($sx);
@@ -61,23 +61,23 @@ class rdf
 			case 'file_upload':
 				$sx  = $this->file_save($id,$id2);
 				return($sx);
-			break;			
+			break;
 
 			case 'class_change':
 				$sx = $this->change_class($id);
 				return($sx);
-			
+
 			case 'form':
 				$form = 0;
 				$sx = $this-> form_ajax($id, $id2, $id3);
 				return($sx);
 			break;
-			
-			case 'check_form':			
+
+			case 'check_form':
 				$sx = $this-> form_check($id);
 				redirect(base_url(PATH.'config/class/view/'.$id));
 			break;
-			
+
 			case 'save':
 				$sx = $this->saved($id);
 			break;
@@ -86,32 +86,32 @@ class rdf
 				$sx = $this->saved($id,0);
 			break;
 
-			case 'create_and_save':				
+			case 'create_and_save':
 				$term = get("text");
 				$class = get("type");
 				if ($class=="AGENT") { $class = 'Person';}
-				
+
 				$orign = '';
 				$idc = $this->rdf_concept_create($class, $term, $orign);
 				$_POST['resource'] = $idc;
 				$sx = $this->saved($id);
 				return("");
 			break;
-			
-			
+
+
 			/**************** FORMULARIOS **************/
 			case 'forms':
 				$sx .= msg('FORMS');
 				$sx .= $this -> class_view_form($id, $id2, $id3);
 			break;
-			
-			
+
+
 			/**************** FORMULARIOS **************/
 			case 'formss':
 				$sx .= msg('FORMS');
 				$sx .= $this->form_ed($id2,$id);
-			break;				
-			
+			break;
+
 			/**************** view **************/
 			case 'view':
 				$sx = '<div class="row">';
@@ -119,17 +119,17 @@ class rdf
 				$sx .= $this->class_view($id);
 				$sx .= $this->class_view_form($id);
 				$sx .= $this->class_view_data($id);
-				$sx .= '</div>';						
+				$sx .= '</div>';
 			break;
-			
+
 			/**************** edit **************/
 			case 'ed':
 				$sx = '<div class="row">';
 				$sx .= '<h1>'.msg('Classes').' '.msg('and').' '.msg('Proprieties').'</h1>';
-				$sx .= $this->class_ed($id);				
-				$sx .= '</div>';						
+				$sx .= $this->class_ed($id);
+				$sx .= '</div>';
 			break;
-			
+
 			case 'exclude':
 				if ($id2 == 'confirm')
 				{
@@ -140,14 +140,14 @@ class rdf
 				$sx = $this->cas_exclude($id);
 				return($sx);
 			break;
-			
+
 			case 'search':
 				$sx = '';
 				$sx = $this->ajax_search($id2,$id);
 				echo $sx;
 				exit;
 			break;
-			
+
 			/************/
 			/**************** AJAX SEARCH *******/
 			case 'ajax_save':
@@ -166,61 +166,61 @@ class rdf
 						$this->set_propriety($id,$pp,0,$idn);
 						echo 'Saved';
 					break;
-					
+
 					default:
-					
+
 					echo "############### ".$q;
 					//$this->ajax_search($id);
 				break;
 			}
 		break;
-		
+
 		/**************** AJAX SEARCH *******/
 		case 'ajax_search':
 			$q = get("q");
 			echo "############### ".$q;
 			//$this->ajax_search($id);
 		break;
-		
+
 		/**************** AJAX EXCLUDE **************/
 		case 'exclude':
 			echo '<div class="col-md-12">';
 			echo $this -> cas_exclude($id2);
 			echo '</div>';
-			exit;			
+			exit;
 		break;
-		
+
 		case 'exclude_confirm':
 			echo message("Excluído!");
 			echo refresh('#',1);
 			$this->data_exclude($id);
-			
+
 		break;
-		
+
 		/**************** AJAX INCLUDE **************/
-		case 'include':	
+		case 'include':
 			echo '<div class="col-md-12">';
 			echo $this -> cas_include($id,$id2,$id3);
 			echo '</div>';
-			exit;			
+			exit;
 			exit;
 		break;
-		
+
 		/**************** AJAX **************/
-		case 'ajax':	
-			$chk = md5($id);	
+		case 'ajax':
+			$chk = md5($id);
 			echo $this->ajax($id,$chk);
 			exit;
 		break;
-		
-		
+
+
 		/**************** AJAX Update **************/
-		case 'ajax_update':	
-			$chk = md5($id);	
+		case 'ajax_update':
+			$chk = md5($id);
 			echo $this->ajax_update($id,$chk);
 			exit;
-		break;				
-		
+		break;
+
 		default:
 		/**************** row **************/
 		$ac = get("acao");
@@ -231,8 +231,8 @@ class rdf
 			$sx .= '| <a href="'.base_url(PATH.'config/class/ed/0/0').'">'.msg('new_class_propr').'</a> |';
 			$sx .= '<hr>';
 			$sx .= '</div>';
-		}		
-		if ($ac=='')				
+		}
+		if ($ac=='')
 		{
 			$sx .= $this->class_row();
 		} else {
@@ -240,7 +240,7 @@ class rdf
 		}
 		$sx .= '</div>';
 	break;
-	
+
 	case 'authority' :
 		if (perfil("#ADM") == 1) {
 			if ($ac == 'update') {
@@ -252,7 +252,7 @@ class rdf
 			$sx .= $this -> frbr -> authority_class();
 		}
 	break;
-}	
+}
 return($sx);
 }
 
@@ -260,7 +260,7 @@ return($sx);
 #################################################### LE CONCEPT
 function le($id) {
 	$CI = &get_instance();
-	$sql = "select * from ".$this->base."rdf_concept 
+	$sql = "select * from ".$this->base."rdf_concept
 	INNER JOIN ".$this->base."rdf_class ON cc_class = id_c
 	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	LEFT JOIN ".$this->base."rdf_name ON cc_pref_term = id_n
@@ -320,7 +320,7 @@ function find($n, $prop = '', $equal = 1) {
 			echo "** ALERT - use like in " . $n . ' ********<br>';
 		}
 	}
-	
+
 	/* PROPRIETY */
 	if (strlen($prop) > 0) {
 		$class = $this -> find_class($prop);
@@ -328,36 +328,36 @@ function find($n, $prop = '', $equal = 1) {
 	} else {
 		$wh .= '';
 	}
-	
-	$sql = "select d_r1, c_class, d_r2, n_name 
+
+	$sql = "select d_r1, c_class, d_r2, n_name
 	from ".$this->base."rdf_name
-	INNER JOIN ".$this->base."rdf_data on d_literal = id_n 
+	INNER JOIN ".$this->base."rdf_data on d_literal = id_n
 	INNER JOIN ".$this->base."rdf_class ON d_p = id_c
 	INNER JOIN ".$this->base."rdf_concept ON id_cc = d_r1
 	where $wh";
-	
+
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
-	
+
 	if (count($rlt) > 0) {
 		$line = $rlt[0];
 		return ($line['d_r1']);
 	}
 	return (0);
-}	
+}
 
 function le_dados($id,$tp=0)
 {
 	$CI = &get_instance();
-	$sql = "select * 
-	from ".$this->base."rdf_data 
+	$sql = "select *
+	from ".$this->base."rdf_data
 	left join ".$this->base."rdf_name ON id_n = d_literal
 	where id_d = ".round($id);
 	$rrr = $CI -> db -> query($sql);
 	$rrr = $rrr -> result_array();
 	$line = $rrr[0];
 	return($line);
-}	
+}
 
 function le_data($id, $prop = '') {
 	if ($id == '') { return array(); }
@@ -369,38 +369,38 @@ function le_data($id, $prop = '') {
 	}
 	$cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
 	$cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang, prefix_ref';
-	$sql = "select $cp,1 as rule 
+	$sql = "select $cp,1 as rule
 	from ".$this->base."rdf_data as rdata
-	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
-	INNER JOIN ".$this->base."rdf_concept ON d_r2 = id_cc 
+	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c
+	INNER JOIN ".$this->base."rdf_concept ON d_r2 = id_cc
 	LEFT JOIN ".$this->base."rdf_name on cc_pref_term = id_n
 	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	WHERE d_r1 = $id and d_r2 > 0 " . $wh . cr() . cr();
 	$sql .= ' union ' . cr() . cr();
 	/* TRABALHOS */
-	$sql .= "select $cp_reverse,2 as rule 
+	$sql .= "select $cp_reverse,2 as rule
 	from ".$this->base."rdf_data as rdata
-	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
-	INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc 
+	INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c
+	INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc
 	LEFT JOIN ".$this->base."rdf_name on cc_pref_term = id_n
-	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix		
+	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	WHERE d_r2 = $id and d_r1 > 0 " . $wh . cr() . cr();
 	$sql .= ' union ' . cr() . cr();
-	$sql .= "select $cp,3 as rule 
+	$sql .= "select $cp,3 as rule
 	from ".$this->base."rdf_data as rdata
-	LEFT JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
-	LEFT JOIN ".$this->base."rdf_concept ON d_r2 = id_cc 
+	LEFT JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c
+	LEFT JOIN ".$this->base."rdf_concept ON d_r2 = id_cc
 	LEFT JOIN ".$this->base."rdf_name on d_literal = id_n
 	LEFT JOIN ".$this->base."rdf_prefix ON c_prefix = id_prefix
 	WHERE d_r1 = $id and d_r2 = 0 " . $wh . cr() . cr();
-	
+
 	/* USE */
 	$prop = $this -> find_class("equivalentClass");
-	$sqll = "SELECT * from ".$this->base." rdf_data 
-		where (d_r2 = $id or d_r1 = $id) 
+	$sqll = "SELECT * from ".$this->base." rdf_data
+		where (d_r2 = $id or d_r1 = $id)
 		and d_p = $prop";
-	
-	//$sqll = "select * from ".$this->base." rdf_concept 
+
+	//$sqll = "select * from ".$this->base." rdf_concept
 	//where (cc_use = $id) and (id_cc <> cc_use)";
 	$rrr = $CI -> db -> query($sqll);
 	$rrr = $rrr -> result_array();
@@ -411,19 +411,19 @@ function le_data($id, $prop = '') {
 			$iduse = $line['d_r2'];
 		}
 		$sql .= ' union ' . cr() . cr();
-		$sql .= "select $cp_reverse, " . (10 + $r) . " as rule 
+		$sql .= "select $cp_reverse, " . (10 + $r) . " as rule
 		from ".$this->base."rdf_data as rdata
-		INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c 
-		INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc 
+		INNER JOIN ".$this->base."rdf_class as prop ON d_p = prop.id_c
+		INNER JOIN ".$this->base."rdf_concept ON d_r1 = id_cc
 		INNER JOIN ".$this->base."rdf_name on cc_pref_term = id_n
 		WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop" . cr() . cr();
 	}
 	$sql .= " order by c_order, c_class, rule, n_lang desc, id_d";
-	
+
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	return ($rlt);
-}  
+}
 
 /******************************** PREFIX AND SUFIX ************/
 function rdf_prefix($url = '') {
@@ -431,8 +431,8 @@ function rdf_prefix($url = '') {
 	$pre = substr($url, 0, strpos($url, ':'));
 	$pos = substr($url, strpos($url, ':') + 1, strlen($url));
 	$sx = $pre;
-	$sql = "select * 
-	from ".$this->base."rdf_prefix 
+	$sql = "select *
+	from ".$this->base."rdf_prefix
 	where prefix_ref = '$pre' ";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
@@ -448,27 +448,27 @@ function rdf_sufix($url = '') {
 }
 
 
-function pagination($t) 
+function pagination($t)
 {
-	$pg = round('0' . get("pg"));
+	$pg = sround('0' . get("pg"));
 	$t = count($t);
 	$l = $this -> limit;
 	/***************************** math *************/
-	if ($l == 0) 
+	if ($l == 0)
 	{
 		return ('');
 	}
 	$p = ($t / $l);
 	$p = (int)$p;
 	if (($t / $l) > $p) { $p++; }
-	
+
 	$sx = '<div class="container">' . cr();
 	$sx .= '<div class="row">' . cr();
 	$sx .= '<nav aria-label="Page navigation example"><ul class="pagination">' . cr();
 	$ds = 'disabled';
 	if ($pg > 0) { $ds = ''; }
 	$sx .= '<li class="page-item ' . $ds . '"><a class="page-link" href="?pg=' . ($pg - 1) . '">Previous</a></li>' . cr();
-	for ($r = 0; $r < $p; $r++) 
+	for ($r = 0; $r < $p; $r++)
 	{
 		$ac = '';
 		if ($pg == $r) { $ac = 'active'; }
@@ -481,25 +481,25 @@ function pagination($t)
 	$sx .= '</div>';
 	$sx .= '</div>';
 	return ($sx);
-}	
+}
 
 function related($id) {
 	$CI = &get_instance();
-	$pg = round('0' . get("pg"));
+	$pg = sround('0' . get("pg"));
 	$limit = $this->limit;
 	$offset = $limit * $pg;
 	/******************************************** by manifestation ********/
 	$cl1 = $this -> find_class('isEmbodiedIn');
 	$cl2 = $this -> find_class('isRealizedThrough');
-	
+
 	/** div **/
 	$sx = '<div class="container">' . cr();
 	$sx .= '<div class="row">' . cr();
-	
-	$sql = "SELECT dd3.d_r1 as w, count(*) as mn 
-		FROM ".$this->base."rdf_data as dd1 
-	left JOIN ".$this->base."rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
-	left JOIN ".$this->base."rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 
+
+	$sql = "SELECT dd3.d_r1 as w, count(*) as mn
+		FROM ".$this->base."rdf_data as dd1
+	left JOIN ".$this->base."rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2
+	left JOIN ".$this->base."rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2
 	LEFT JOIN ".$this->base."rdf_class ON dd2.d_p = id_c
 	where dd1.d_r2 = $id and dd2.d_p = 88 and dd3.d_p = 37
 	group by w";
@@ -521,26 +521,26 @@ function related($id) {
 			$sx .= '</div>';
 		}
 	}
-	
+
 	/******************************************** by expression ***********/
 	if (count($rlt) == 0) {
-		$sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 
-			left join ".$this->base." rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
-			LEFT join ".$this->base." rdf_class ON dd2.d_p = id_c 
+		$sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1
+			left join ".$this->base." rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2
+			LEFT join ".$this->base." rdf_class ON dd2.d_p = id_c
 			where dd1.d_r2 = $id and dd2.d_p = 7
 		group by w ";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$pags = $this -> pagination($rlt);
-		for ($r = 0; $r < count($rlt); $r++) 
+		for ($r = 0; $r < count($rlt); $r++)
 		{
-			if (($r >= $offset) and ($r < ($offset + $limit))) 
+			if (($r >= $offset) and ($r < ($offset + $limit)))
 			{
 				$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
 				$line = $rlt[$r];
 				$idm = $line['w'];
 				//$sx .= $this -> show_manifestation_by_works($idm, 0, 0);
-				if ($line['mn'] > 1) 
+				if ($line['mn'] > 1)
 				{
 					$sx .= '<br>';
 					$sx .= '<a href="' . base_url(PATH . 'v/' . $idm) . '" class="small">';
@@ -551,13 +551,13 @@ function related($id) {
 			}
 		}
 	}
-	
+
 	/** div **/
 	$sx .= '</div>';
 	$sx .= '</div>';
-	
+
 	return ($pags . $sx);
-}	  
+}
 
 #################################################################### Classes
 function xxxx_classes($ac,$id,$chk)
@@ -570,7 +570,7 @@ function xxxx_classes($ac,$id,$chk)
 			$this->ajax($id,$chk);
 		break;
 		case 'ajax_update':
-			
+
 			########## FORM CLASS
 			case 'form':
 				$sx = '<div class="col-md-12"><h1>'.msg('form_class_edit').'</h1></div>'.cr();
@@ -580,8 +580,8 @@ function xxxx_classes($ac,$id,$chk)
 			case 'c':
 				$sx = $this->class_show($id);
 			break;
-			
-			
+
+
 			########## DEFAULT
 			default:
 			$sx = '<div class="col-md-12"><h1>'.msg('class_title').'</h1></div>'.cr();
@@ -608,13 +608,13 @@ function class_view($id)
 			$sx .= '<h1>'.$line['c_class'].'</h1>';
 			$sx .= '<a href="'.base_url(PATH.'config/class/').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('return').'</a>';
 			$sx .= '<a href="'.base_url(PATH.'config/class/ed/'.$line['id_c']).'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('class_edit').'</a>';
-			$sx .= '<a href="'.base_url(PATH.'config/class/forms/'.$line['id_c'].'/0').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('form_edit_class').'</a>';			
-			$sx .= '<a href="'.base_url(PATH.'config/class/check_form/'.$line['id_c'].'/0').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('check_form').'</a>';			
-			$sx .= $this->class_update_data($line);			
+			$sx .= '<a href="'.base_url(PATH.'config/class/forms/'.$line['id_c'].'/0').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('form_edit_class').'</a>';
+			$sx .= '<a href="'.base_url(PATH.'config/class/check_form/'.$line['id_c'].'/0').'" class="btn btn-outline-primary nopr" style="margin-right: 10px;">'.msg('check_form').'</a>';
+			$sx .= $this->class_update_data($line);
 			$sx .= '</div>';
 			$sx .= '<div class="col-md-1">'.cr();
 			$sx .= '</div>'.cr();
-			
+
 			/* Propriedades */
 			$sx .= '<div class="col-md-6">'.cr();
 			$sx .= '<h4>'.msg('class_parameters').'</h4>';
@@ -624,7 +624,7 @@ function class_view($id)
 			$sx .= 'URL Source: <b>'.$line['c_url'].'</b></br>'.cr();
 			$sx .= 'Atualizado em <b>'.stodbr($line['c_url_update']).'</b></br>'.cr();
 			$sx .= '</div>'.cr();
-			
+
 		break;
 		case 'P':
 		break;
@@ -639,7 +639,7 @@ return($sx);
 
 function show($dt)
 {
-	
+
 	$sx = '<div class="col-12">';
 	$sx .= 'no show defined';
 	$sx .= '<h1 class="rdf_name">'.$dt['n_name'].'</h1>';
@@ -679,7 +679,7 @@ function extract_content($dt,$class,$id=0)
 		}
 	}
 	return($rs);
-}	
+}
 
 function show_data($r) {
 	$CI = &get_instance();
@@ -711,8 +711,8 @@ function show_data($r) {
 		} else {
 			$sx .= $this->show($dt);
 			$sx .= '<div class="col-10">class: ' . $dt['c_class'] . '</div>';
-			$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';	
-		
+			$sx .= '<div  class="col-2 text-right">'.$this->link($dt['cc_origin']).'</div>';
+
 			$sx .= '<br/><br/>default: '.$fcn.' not found<br/><br/>';
 
 			$sx .= $this->view_data($r);
@@ -720,15 +720,15 @@ function show_data($r) {
 	}
 	$sx .= '</div>';
 	$sx .= '</div>';
-	
+
 	$sx .= '<div class="container">';
 	$sx .= '<div class="row">';
 	$sx .= '</div>';
-	
+
 	$sx .= '</div>';
 	$sx .= '</div>';
 	return ($sx);
-}	
+}
 
 /***  FIND CLASS **/
 function find_class($class,$create=1) {
@@ -737,15 +737,15 @@ function find_class($class,$create=1) {
 	$wh = '';
 	$inner = '';
 	if (strpos($class,':') > 0)
-	{				
+	{
 		$prefix = substr($class,0,strpos($class,':'));
 		$class = substr($class,strpos($class,':')+1,strlen($class));
 		$wh = " AND (prefix_ref = '$prefix') ";
 		$inner = 'inner join ".$this->base." rdf_prefix ON c_prefix = id_prefix ';
 	}
-	
+
 	$sql = "select * from ".$this->base."rdf_class
-			$inner					
+			$inner
 			WHERE (c_class = '$class') ".$wh;
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
@@ -776,16 +776,16 @@ function class_create($class)
 	if (strpos($class,':') >= 0)
 	{
 		$pre = substr($class,0,strpos($class,':'));
-		$class = substr($class,strpos($class,':'),strlen($class));			
+		$class = substr($class,strpos($class,':'),strlen($class));
 		$class = troca($class,':','');
 		$class = troca($class,' ','');
 	}
 	if (substr($class,0,1) == UpperCaseSql(substr($class,0,1)))
 	{
 		$type = 'C';
-	} 
+	}
 	$pre_id = $this->prefix($pre);
-	
+
 	$sql = "select * from ".$this->base."rdf_class where c_class = '$class' ";
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
@@ -795,7 +795,7 @@ function class_create($class)
 		(c_prefix, c_class, c_type )
 		values
 		($pre_id,'$class','$type')";
-		
+
 		$rlt = $CI->db->query($sqli);
 		sleep(1);
 		$rlt = $CI->db->query($sql);
@@ -820,10 +820,10 @@ function prefixn($dt)
 		$sx = '<i>'.msg('none').'</i>';
 	}
 	return($sx);
-	
+
 }
 
-function prefix($pre)	
+function prefix($pre)
 {
 	$CI = &get_instance();
 	if (strlen($pre) == 0)
@@ -850,7 +850,7 @@ function prefix($pre)
 function le_class($id)
 {
 	$CI = &get_instance();
-	$sql = "select * from ".$this->base."rdf_class 
+	$sql = "select * from ".$this->base."rdf_class
 	LEFT join ".$this->base." rdf_prefix ON c_prefix = id_prefix
 	where id_c = ".round($id);
 	$rlt = $CI -> db -> query($sql);
@@ -867,9 +867,9 @@ function le_class($id)
 function class_row() {
 	$CI = &get_instance();
 	/**************** class *************************/
-	$sql = "select * from ".$this->base."rdf_class 
+	$sql = "select * from ".$this->base."rdf_class
 	LEFT join ".$this->base." rdf_prefix ON c_prefix = id_prefix
-	where c_type = 'C' 
+	where c_type = 'C'
 	order by prefix_ref, c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
@@ -879,7 +879,7 @@ function class_row() {
 	$sx .= '<div class="col-md-1">';
 	$sx .= '<b>' . $lg['C'] . '</b>';
 	$sx .= '</div>';
-	
+
 	########### class
 	$sx .= '<div class="col-md-5">';
 	$xp = '';
@@ -903,18 +903,18 @@ function class_row() {
 			$link = '';
 			$linka = '';
 		}
-		
+
 		$sx .= msg($line['c_class']);
 		$sx .= ' (' . $link . $prefix.$line['c_class'] . $linka . ')';
-		
+
 		if ($line['c_find'] == 1)
 		{
 			$sx .= ' <img src="'.base_url('img/icon/icon_find.png').'" style="height: 16px;">';
-		}			
+		}
 		$sx .= '<br>';
 	}
 	$sx .= '</div>';
-	
+
 	/**************** propriety **********************/
 	$sql = "select * from ".$this->base."rdf_class where c_type = 'P' order by c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
@@ -922,14 +922,14 @@ function class_row() {
 	$sx .= '<div class="col-md-1">';
 	$sx .= '<b>' . $lg['P'] . '</b>';
 	$sx .= '</div>';
-	
+
 	########### proprieties
 	$sx .= '<div class="col-md-5">';
 	for ($r = 0; $r < count($rlt); $r++) {
 		$line = $rlt[$r];
 		$xtp = $line['c_type'];
 		if (perfil("#ADM") > 0)
-		{			
+		{
 			$link = '<a href="' . base_url(PATH . 'config/class/prop/' . $line['id_c']) . '">';
 			$linka = '</a>';
 		} else {
@@ -951,7 +951,7 @@ function class_row() {
 function class_ed($id)
 {
 	$cp = array();
-	array_push($cp, array('$H8', 'id_c', '', false, true));		
+	array_push($cp, array('$H8', 'id_c', '', false, true));
 	array_push($cp, array('$Q id_prefix:prefix_ref:select * from '.$this->base.'rdf_prefix where prefix_ativo = 1', 'c_prefix', 'Prefix', true, true));
 	array_push($cp, array('$S100', 'c_class', 'Classe', true, true));
 	array_push($cp, array('$O : &C:Classe&P:Propriety', 'c_type', 'Tipo', true, true));
@@ -968,13 +968,13 @@ function class_ed($id)
 	if ($form -> saved > 0) {
 		if ($id > 0)
 		{
-			redirect(base_url(PATH . 'config/class/'.$id));			
+			redirect(base_url(PATH . 'config/class/'.$id));
 		} else {
-			redirect(base_url(PATH . 'config/class'));			
+			redirect(base_url(PATH . 'config/class'));
 		}
-		
-	}	
-	return($sx);	
+
+	}
+	return($sx);
 }
 
 function saved($id)
@@ -1000,16 +1000,16 @@ function saved($id)
 		}
 	} else {
 		echo "ERRO DE RECURSO 1";
-	}		
-	if ($close == 1) 
-	{ 		
+	}
+	if ($close == 1)
+	{
 		sleep(1);
-		echo '<script> wclose(); </script>';		
+		echo '<script> wclose(); </script>';
 	} else {
 		echo 'Saving...';
-		echo '	<script> 
-				window.opener.location.reload(); 
-				window.location.reload(false); 
+		echo '	<script>
+				window.opener.location.reload();
+				window.location.reload(false);
 				</script>';
 	}
 }
@@ -1018,11 +1018,11 @@ function form_ed($id,$id2,$cl=0) {
 	$form = new form;
 	$form -> id = $id;
 	$form -> return = base_url(PATH.'class/c/'.$cl);
-	$cp = array();	
+	$cp = array();
 	$sqlc = "select * from ".$this->base."rdf_class where c_type = 'C'";
-	if (round($id2) > 0) 
-	{ 
-		$sqlc .= ' and id_c = '.$id2; 
+	if (round($id2) > 0)
+	{
+		$sqlc .= ' and id_c = '.$id2;
 		//$_POST['dd1'] = $id2;
 	}
 	$sqlp = "select * from ".$this->base." rdf_class where c_type = 'P'";
@@ -1032,25 +1032,25 @@ function form_ed($id,$id2,$cl=0) {
 		$sqlc .= ' AND id_c = '.round($cl);
 		$sqlc2 .= ' AND id_c <> '.round($cl);
 	}
-	
+
 	array_push($cp, array('$H8', 'id_sc', '', false, false));
 	array_push($cp, array('$Q id_c:c_class:' . $sqlc, 'sc_class', msg('resource'), true, true));
 	array_push($cp, array('$Q id_c:c_class:' . $sqlp, 'sc_propriety', msg('propriety'), true, true));
 	array_push($cp, array('$Q id_c:c_class:' . $sqlc2, 'sc_range', msg('range'), true, true));
-	
+
 	array_push($cp, array('$O 1:Ativo&0:Inativo', 'sc_ativo', msg('ativo'), true, true));
 	array_push($cp, array('$HV', 'sc_global', LIBRARY, true, true));
 	array_push($cp, array('$HV', 'sc_library', LIBRARY, true, true));
-	
+
 	array_push($cp, array('$A', '', msg('sc_group'), False, true));
 	array_push($cp, array('$S', 'sc_group', msg('sc_group'), False, true));
 	array_push($cp, array('$[1:99]', 'sc_ord', msg('ordem'), true, true));
-	$sx = $form -> editar($cp, 'rdf_form_class');	
-	
+	$sx = $form -> editar($cp, 'rdf_form_class');
+
 	if ($form -> saved) {
 		if (round($cl) > 0)
 		{
-			redirect(base_url(PATH.'class/c/'.$cl));			
+			redirect(base_url(PATH.'class/c/'.$cl));
 		} else {
 			$sx .= '
 			<script>
@@ -1058,14 +1058,14 @@ function form_ed($id,$id2,$cl=0) {
 			close();
 			</script>
 			';
-			
+
 		}
-		
+
 	}
 	return ($sx);
-}	
+}
 
-####################################### CONCEPT	
+####################################### CONCEPT
 function rdf_concept($term, $class, $orign = '') {
 	$CI = &get_instance();
 	/**** recupera codigo da classe *******************/
@@ -1088,9 +1088,9 @@ function rdf_concept($term, $class, $orign = '') {
 	$rlt = $rlt -> result_array();
 	$id = 0;
 	$date = date("Y-m-d");
-	
+
 	if (count($rlt) == 0) {
-		
+
 		$sqli = "insert into ".$this->base."rdf_concept
 		(cc_class, cc_pref_term, cc_created, cc_origin, cc_update)
 		VALUES
@@ -1117,12 +1117,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 	$CI = &get_instance();
 	$f = $this -> find_class($class);
 	//$this -> check_language();
-	
+
 	$wh = '';
 	if ($nouse == 1) {
 		$wh .= " and C1.cc_use = 0 ";
 	}
-	
+
 	$sql = "select n_name, id, count(*) as total, id From (
 		select N1.n_name as n_name, C1.id_cc as id
 		from ".$this->base." rdf_concept as C1
@@ -1130,18 +1130,18 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		LEFT join ".$this->base." rdf_concept as C2 ON C1.cc_use = C2.id_cc
 		LEFT join ".$this->base." rdf_name as N2 ON C2.cc_pref_term = N2.id_n
 		INNER join ".$this->base." rdf_data ON C1.id_cc = d_r2
-		where C1.cc_class = " . $f . " $wh 
+		where C1.cc_class = " . $f . " $wh
 		) as tabela
 		group by n_name, id
-		ORDER BY n_name";                        
-		
+		ORDER BY n_name";
+
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
-		
+
 		return ($rlt);
 	}
 	/********************************************************************************** List Class */
-	
+
 	function rdf_list($lt = '', $class = '', $nouse = 0) {
 		$CI = &get_instance();
 		$f = $this -> find_class($class);
@@ -1150,16 +1150,16 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		if ($nouse == 1) {
 			$wh .= " and C1.cc_use = 0 ";
 		}
-		
+
 		$sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-		N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+		N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
 		from ".$this->base." rdf_concept as C1
 		INNER join ".$this->base." rdf_name as N1 ON C1.cc_pref_term = N1.id_n
 		LEFT join ".$this->base." rdf_concept as C2 ON C1.cc_use = C2.id_cc
 		LEFT join ".$this->base." rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-		where C1.cc_class = " . $f . " $wh 
+		where C1.cc_class = " . $f . " $wh
 		ORDER BY N1.n_name";
-		
+
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		$sx = '<div class="col"><div class="col-12">';
@@ -1170,12 +1170,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			$line = $rlt[$r];
 			$idx = $line['id_cc'];
 			$name_use = trim($line['n_name']);
-			
+
 			$filex = 'c/' . $idx . '/name.nm';
 			if (file_exists($filex)) {
 				$name_use = load_file_local($filex);
 			}
-			
+
 			$link = '<a href="' . base_url(PATH . 'v/' . $line['id_cc']) . '">';
 			$linka = '</a>';
 			if ($line['id_cc_use'] > 0) {
@@ -1185,7 +1185,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$link_use = '<a href="' . base_url(PATH . 'v/' . $line['id_cc_use']) . '">';
 				$name_use = ' <i>use</i> ' . $link_use . $x2 . '</a>';
 			}
-			
+
 			if ($line['id_cc_use'] == 0) {
 				$xl = substr(UpperCaseSql(strip_tags($name_use)), 0, 1);
 				if ($xl != $l) {
@@ -1198,15 +1198,15 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		}
 		$sx .= '</div></div>';
 		return ($sx);
-	}	
-	
+	}
+
 	/******************************************************************* RDF NAME ***/
-	function rdf_name($n = '', $lang = 'pt_BR', $new = 1) 
+	function rdf_name($n = '', $lang = 'pt_BR', $new = 1)
 	{
 		$rs = $this->frbr_name($n, $lang, $new);
 		return($rs);
 	}
-	function frbr_name($n = '', $lang = 'pt_BR', $new = 1) {		
+	function frbr_name($n = '', $lang = 'pt_BR', $new = 1) {
 		$CI = &get_instance();
 		if (is_array($n))
 		{
@@ -1227,7 +1227,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$lang = $this -> language($lang);
 		$md5 = md5(trim($n));
 		$dt['title'] = $n;
-		
+
 		/************ BUSCA NOMES **************************************/
 		$sql = "select * from ".$this->base." rdf_name where (n_name = '" . $n . "') or (n_md5 = '$md5')";
 		$rlt = $CI -> db -> query($sql);
@@ -1242,7 +1242,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$line = $rlt[0];
 		return ($line['id_n']);
 	}
-	
+
 	/**************************************************************************** SET PROPRIETY *****/
 	function set_propriety($r1, $prop, $r2, $lit = 0) {
 		if (($r1 == 0) or (($r2 == 0) and ($lit == 0))) { return(False); }
@@ -1253,7 +1253,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		{
 			$lit = $rdf->frbr_name($lit, 'pt_BR');
 		}
-		
+
 		/********* propriedade com o prefixo ***************/
 		if (strpos($prop, ':')) {
 			$prop = substr($prop, strpos($prop, ':') + 1, strlen($prop));
@@ -1261,14 +1261,14 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		/*********************** recupera propriedade ID ***/
 		if (!(sonumero($prop) == $prop))
 		{
-			$pr = $this -> find_class($prop);	
+			$pr = $this -> find_class($prop);
 		} else {
 			$pr = $prop;
 		}
-		
-		
+
+
 		$sql = "select * from (
-			select * from ".$this->base." rdf_data 
+			select * from ".$this->base." rdf_data
 			WHERE (d_p = $pr and d_literal = $lit) ) as table1
 			where ((d_r1 = $r1 AND d_r2 = $r2)
 			OR (d_r1 = $r2 AND d_r2 = $r1))";
@@ -1281,11 +1281,11 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				('$r1','$pr','$r2',$lit)";
 				$rlt = $CI -> db -> query($sql);
 			} else {
-				
+
 			}
 			return (true);
 		}
-		
+
 		function set_propriety_update($r1, $prop, $r2, $lit = 0) {
 			if (($r1 == 0) or (($r2 == 0) and ($lit == 0))) { return(False); }
 			$CI = &get_instance();
@@ -1295,7 +1295,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			{
 				$lit = $rdf->frbr_name($lit, 'pt_BR');
 			}
-			
+
 			/********* propriedade com o prefixo ***************/
 			if (strpos($prop, ':')) {
 				$prop = substr($prop, strpos($prop, ':') + 1, strlen($prop));
@@ -1303,11 +1303,11 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			/*********************** recupera propriedade ID ***/
 			if (!(sonumero($prop) == $prop))
 			{
-				$pr = $this -> find_class($prop);	
+				$pr = $this -> find_class($prop);
 			} else {
 				$pr = $prop;
 			}
-			
+
 			$sql = "select * from ".$this->base." rdf_data
 			WHERE (d_p = $pr ) and (d_r1 = $r1)";
 			$rlt = $CI -> db -> query($sql);
@@ -1326,14 +1326,14 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					d_r2 = '$r2',
 					d_literal = '$lit'
 					where id_d = ".$rlt[0]['id_d'];
-					$rlt = $CI -> db -> query($sql);					
+					$rlt = $CI -> db -> query($sql);
 				} else {
-					
+
 				}
 			}
 			return (true);
 		}
-		
+
 		/*****************************************************************  RDF CONCEPT **/
 		function rdf_concept_create($class, $term, $orign = '', $lang = 'pt_BR')
 		{
@@ -1341,12 +1341,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			$cl = $this -> find_class($class);
 			$term = $this -> frbr_name($term, $lang);
 			if ($term == 0) { return(0); }
-			
+
 			$dt = date("Y/m/d H:i:s");
 			$date = date("Y-m-d");
 			/*********** checar se não existe um termo já iserido *********************/
-			$sql = "select * from ".$this->base." rdf_concept 
-			WHERE 
+			$sql = "select * from ".$this->base." rdf_concept
+			WHERE
 			cc_class = $cl AND cc_pref_term = $term ";
 			$rlt = $CI -> db -> query($sql);
 			$rlt = $rlt -> result_array();
@@ -1359,7 +1359,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$rlt = $CI -> db -> query($sql);
 				$rlt = $rlt -> result_array();
 			}
-			
+
 			/**************** pref Term ****************************************************/
 			$line = $rlt[0];
 			$r1 = $line['id_cc'];
@@ -1382,19 +1382,19 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				break;
 			}
 			return ($lang);
-		} 
-		
+		}
+
 		function screen($line)
 		{
 			$sx = '';
 			$disable = 'disabled';
 			$type = UpperCase($line['c_class']);
 			$id = $line['id'];
-			
+
 			$sx .= '<div class="container">';
 			$sx .= '<div class="row">';
 			$sx .= '<div class="col-12">';
-			
+
 			$sx .= '<h1>'.msg($type).'</h1>';
 			switch($type)
 			{
@@ -1404,23 +1404,23 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= '<input type="hidden" id="dd51" value="">'.cr();
 					$disable = '';
 				break;
-				
+
 				case 'URL':
 					$sx .= '<input type="text" name="dd50" id="dd50" class="form-control" value="'.get("dd50").'">'.cr();
 					$sx .= '<input type="hidden" id="dd51" value="">'.cr();
 					$disable = '';
 				break;
-				
+
 				default:
 				$sx .= '<span style="font-size: 75%">filtro do [' . $line['c_class'] . ']</span><br>';
 				$sx .= '<input type="text" id="dd50" name="dd50" class="form-control">'.cr();
 				$sx .= '<span style="font-size: 75%">selecione o [' . $line['c_class'] . ']</span><br>'.cr();
-				$sx .= '<div id="dd51a"><select class="form-control" size=5 name="dd51" id="dd51"></select></div>'.cr();						
-				
+				$sx .= '<div id="dd51a"><select class="form-control" size=5 name="dd51" id="dd51"></select></div>'.cr();
+
 				$sx .= '
 				<script>
 				/************ keyup *****************/
-				jQuery("#dd50").keyup(function() 
+				jQuery("#dd50").keyup(function()
 				{
 					var $key = jQuery("#dd50").val();
 					$.ajax(
@@ -1443,37 +1443,37 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 			<button type="button" id="create" class="btn btn-outline-primary" style="display: none;">'.msg('create').'</button>
 			<button type="button" id="submtc" class="btn btn-outline-primary" '.$disable.'>'.msg('save_continue').'</button>
 			<button type="button" id="submt" class="btn btn-outline-primary" '.$disable.'>'.msg('save').'</button>
-			<button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">'.msg('cancel').'</button>			
+			<button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">'.msg('cancel').'</button>
 			</div>
 			<div id="dd51a"></div>
 			';
-			
+
 			$sx .= '</div></div></div>';
-			
+
 			$js = '<script> $("#cancel").click(function() { wclose(); }); </script>'.cr();
-			
+
 			$js .= '<script>
 			/**************************************************/
-			$("#force").click(function() 
+			$("#force").click(function()
 				{
 					$("#create").show(1);
 					$("#force").hide(1);
 				});
 			/***************************** CREATE *************/
-			$("#create").click(function() 
-			{ 
+			$("#create").click(function()
+			{
 				var $vlr = $("#dd51").val();
 				var $prop = $("#dd52").val();
 				var $text = $("#dd50").val();
 				var $type = "'.$type.'";
-				var $data = { 
-						concept: '.$id.', 
-						text: $text, 
-						prop: $prop, 
+				var $data = {
+						concept: '.$id.',
+						text: $text,
+						prop: $prop,
 						resource: $vlr,
 						type: $type
 						};
-				
+
 				$.ajax(
 					{
 						type: "POST",
@@ -1483,33 +1483,33 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						{
 							$("#dd51a").html(data);
 						}
-					}); 
-				});	
+					});
+				});
 
 			/***************************** SUBMIT *************/
-			$("#submt").click(function() 
+			$("#submt").click(function()
 			{
 				saved(1);
 			});
 
-			$("#submtc").click(function() 
+			$("#submtc").click(function()
 			{
 				saved(0);
 			});
 
 			function saved($v)
-			{ 
+			{
 				var $vlr = $("#dd51").val();
 				var $prop = $("#dd52").val();
 				var $text = $("#dd50").val();
-				var $data = { 
-						concept: '.$id.', 
-						text: $text, 
-						prop: $prop, 
+				var $data = {
+						concept: '.$id.',
+						text: $text,
+						prop: $prop,
 						resource: $vlr,
 						close: $v
 						};
-				
+
 				$.ajax(
 					{
 						type: "POST",
@@ -1519,25 +1519,25 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						{
 							$("#dd51a").html(data);
 						}
-					}); 
+					});
 			}
 			</script>';
 			return($sx.$js);
 		}
-			
+
 			################################################## DATA
 			function form_ajax($idc, $form, $id) {
 				$CI = &get_instance();
 				$sx = '';
-				
-				$sql = "select * 
-				from ".$this->base." rdf_form_class 
+
+				$sql = "select *
+				from ".$this->base." rdf_form_class
 				INNER join ".$this->base." rdf_class ON id_c = sc_range
 				where id_sc = $form";
 				$rlt = $CI -> db -> query($sql);
 				$rlt = $rlt -> result_array();
-				
-				/* Tipo do Range */			
+
+				/* Tipo do Range */
 				if (count($rlt) > 0) {
 					$type = UpperCase($rlt[0]['c_class']);
 					$line = $rlt[0];
@@ -1551,15 +1551,15 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				$sx .= $this->screen($line);
 				return ($sx);
 			}
-			
-			
-			
+
+
+
 			/************************************* checa formulário de dados ***********/
 			function form_check($class=0)
 			{
 				$CI = &get_instance();
 				$sql = "SELECT * FROM (
-					select d_p, id_c as c from ".$this->base." rdf_data 
+					select d_p, id_c as c from ".$this->base." rdf_data
 					INNER join ".$this->base." rdf_concept ON d_r1 = id_cc
 					INNER join ".$this->base." rdf_class ON cc_class = id_c
 					where id_c = $class
@@ -1568,7 +1568,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					LEFT join ".$this->base." rdf_form_class as t1 ON c = t1.sc_class and d_p = sc_propriety and ((sc_library = 0) or (sc_library = ".LIBRARY.") or (sc_global = 1))
 					LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c";
 
-					
+
 					$rlt = $CI -> db -> query($sql);
 					$rlt = $rlt -> result_array();
 					for ($r=0;$r < count($rlt);$r++)
@@ -1580,27 +1580,27 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 							$prop = $line['d_p'];
 							$sql = "insert into ".$this->base."rdf_form_class
 							(
-							sc_class,sc_propriety,sc_range,sc_library, 
+							sc_class,sc_propriety,sc_range,sc_library,
 							sc_global, sc_ativo)
 							values
 							(
 								$class,$prop,0,".LIBRARY.",0,1
 							)";
-							$CI -> db -> query($sql);							
+							$CI -> db -> query($sql);
 							echo '<hr><tt>'.$sql.'</tt>';
 						}
 					}
 				}
-				
+
 				/*********************************** editar dados ***************************/
 				function form($id, $dt) {
 					$CI = &get_instance();
 					$class = $dt['cc_class'];
-					
+
 					$sx = '';
-					$js1 = '';     
-					
-					/***** editar classe */		
+					$js1 = '';
+
+					/***** editar classe */
 					if ((isset($dt['action'])) and ($dt['action'] == 'class'))
 					{
 						$sx .= '<div class="col-md-12">';
@@ -1617,47 +1617,47 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 							redirect(base_url(PATH.'a/'.$dt['id_cc']));
 						}
 					}
-					
-					/***** checar formulário da classe */		
+
+					/***** checar formulário da classe */
 					if ((isset($dt['action'])) and ($dt['action'] == 'check_form'))
 					{
 						$this->form_check($dt['cc_class']);
 						redirect(base_url(PATH.'a/'.$dt['id_cc']));
 					}
-					
-					/***** checar formulário da classe */		
+
+					/***** checar formulário da classe */
 					if ((isset($dt['action'])) and ($dt['action'] == 'form'))
 					{
 						//form_ed($id,$cl=0)
-						
+
 						$sx .= $this->form_ed($id,1);
 						//redirect(base_url(PATH.'a/'.$dt['id_cc']));
-					}				
-					
+					}
+
 					/* complementos */
 					switch($class) {
 						default :
 						$cp = 'n_name, n_lang, cpt.id_cc as idcc, d_p as prop, id_d, d_literal';
 						$sqla = "select $cp from ".$this->base." rdf_data as rdata
-						INNER join ".$this->base." rdf_class as prop ON d_p = prop.id_c 
-						INNER join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc 
+						INNER join ".$this->base." rdf_class as prop ON d_p = prop.id_c
+						INNER join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc
 						INNER join ".$this->base." rdf_name on cc_pref_term = id_n
 						WHERE d_r1 = $id and d_r2 > 0";
 						$sqla .= ' union ';
 						$sqla .= "select $cp from ".$this->base." rdf_data as rdata
-						LEFT join ".$this->base." rdf_class as prop ON d_p = prop.id_c 
-						LEFT join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc 
+						LEFT join ".$this->base." rdf_class as prop ON d_p = prop.id_c
+						LEFT join ".$this->base." rdf_concept as cpt ON d_r2 = id_cc
 						LEFT join ".$this->base." rdf_name on d_literal = id_n
 						WHERE d_r1 = $id and d_r2 = 0";
 						/*****************/
 						$sql = "select * from ".$this->base." rdf_form_class
 						INNER join ".$this->base." rdf_class as t0 ON id_c = sc_propriety
-						LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop 
+						LEFT JOIN (" . $sqla . ") as t1 ON id_c = prop
 						LEFT join ".$this->base." rdf_class as t2 ON sc_propriety = t2.id_c
 						where (sc_class = $class) and (sc_library = ".LIBRARY.")
 							and sc_ativo = 1
 						order by sc_ord, id_sc, t0.c_order";
-						
+
 						$rlt = $CI -> db -> query($sql);
 						$rlt = $rlt -> result_array();
 						$sx .= '<table width="100%" cellpadding=5>';
@@ -1676,24 +1676,24 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 								$sx .= '</tr>';
 								$xgrp = $grp;
 							}
-							
-							
+
+
 							$cap = msg($line['c_class']);
-							
+
 							/************************************************************** LINKS EDICAO */
 							$idc = $id; /* ID do conceito */
 							$form_id = $line['id_sc']; /* ID do formulário */
 							/* $class =>  ID da classe */
-							
+
 							$furl = base_url(PATH.'rdf/form/'.$class.'/'.$line['id_sc'].'/'.$id);
-							
-							$link = '<a href="#" id="action_' . trim($line['c_class']) . '" 
-								onclick="newxy(\''.$furl.'\',800,400);" class="btn-primary br5" 
+
+							$link = '<a href="#" id="action_' . trim($line['c_class']) . '"
+								onclick="newxy(\''.$furl.'\',800,400);" class="btn-primary br5"
 								style="text-decoration: none;">';
 							$linka = '</a>';
 							$sx .= '<tr>';
 							$sx .= '<td width="25%" align="right" valign="top" class="small">';
-							
+
 							if ($xcap != $cap) {
 								$sx .= '<nobr><i>' . msg($line['c_class']) . '</i></nobr>';
 								$sx .= '<td width="1%" valign="top">' . $link . '&nbsp;+&nbsp;' . $linka . '</td>';
@@ -1703,7 +1703,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 								$sx .= '<td>-</td>';
 							}
 							$sx .= '</td>';
-							
+
 							/***************** Editar campo *******************************************/
 							$sx .= '<td style="border-bottom: 1px solid #808080;">';
 							if (strlen($line['n_name']) > 0) {
@@ -1714,12 +1714,12 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 									$linkc = '';
 									$linkca = '';
 								}
-								
+
 								$sx .= $linkc . $line['n_name'] . $linkca;
 								$sx .=  ' <sup>('.$line['n_lang'].')</sup>';
-								
+
 								/********************** Editar caso texto */
-								
+
 								if (strlen($line['idcc']) == 0)
 								{
 									$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/text/'.$line['d_literal']).'\',600,400);"';
@@ -1728,28 +1728,28 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 									$sx .= $elink . '<a class="btn-warning br5 text-white small" title="Editar texto">&nbsp;ed&nbsp;</a>' . $elinka;
 									$sx .= '</span>';
 								}
-								
+
 								/********************* Excluir lancamento */
-								$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';								
+								$onclick = ' onclick="newxy(\''.base_url(PATH.'rdf/exclude/'.$line['id_d']).'\',600,200);"';
 								$link = ' <a style="cursor: pointer;" '.$onclick.'>';
 								$sx .= $link . '<span class="btn-danger br5 text-white small" title="Excluir lancamento">&nbsp;X&nbsp;</span>' . $linka;
 								$sx .= '</a>';
-								
+
 							}
-							
+
 							$sx .= '</td>';
-							$sx .= '</tr>';				
+							$sx .= '</tr>';
 						}
 						$sx .= '</table>';
 					break;
-				}		
+				}
 				return ($sx);
 			}
-			
+
 			function ajax($id = '', $id2 = '', $id3 = '', $id4 = '') {
 				$CI = &get_instance();
 				$q = get("q");
-				
+
 				switch($id) {
 					case 'inport' :
 						$cl = $this -> le_class($id2);
@@ -1765,9 +1765,9 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 						$rlt = $this -> db -> query($sql);
 						$sx = '';
 					break;
-					
-					
-					
+
+
+
 					default :
 					if (strlen($q) > 0) {
 						echo $this -> searchs -> ajax_q($q);
@@ -1782,7 +1782,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				break;
 			}
 		}
-		
+
 		function cas_include($id, $id2, $id3)
 		{
 			$dt = $this->le_class($id2);
@@ -1795,17 +1795,17 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					case 'prefLabel':
 						if ($this->exist_prefLabel($id))
 						{
-							$sx .= message("Já existe um nome preferencial para este termo",5);	
+							$sx .= message("Já existe um nome preferencial para este termo",5);
 							$sx .= '<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-							</div>                  
+							</div>
 							';
 						} else {
 							$this->update_prefLabel($id);
-							$sx .= $this -> cas_text($id, $id2);	
-							
-						}			
-						
+							$sx .= $this -> cas_text($id, $id2);
+
+						}
+
 					break;
 					/**************** Default **********/
 					default:
@@ -1816,34 +1816,34 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		}
 		return($sx);
 	}
-	
+
 	function cas_exclude($id) {
-		
+
 		$dt = $this->le_dados($id);
 		if (strlen($dt['n_name']) > 0)
 		{
 			echo '<h4>'.$dt['n_name'].'</h4>';
 		}
 		$sx = '<center><h1>'.msg('rdf_exclude_confirm').'</h1></center>';
-		
+
 		$sx .= '
-		</div>		
+		</div>
 		<div class="modal-footer">
 		<button type="button" class="btn btn-default" onclick="wclose();" data-dismiss="modal">Cancelar</button>
 		<a href="'.base_url(PATH.'rdf/exclude/'.$id.'/confirm').'" class="btn btn-warning" id="submt">Excluir</a>
-		</div>                  
+		</div>
 		';
 		/**************** fim ******************/
 		return ($sx);
-	}		
-	
-	function xxxxxxxxxxcas_ajax($path, $id, $dt = array()) 
+	}
+
+	function xxxxxxxxxxcas_ajax($path, $id, $dt = array())
 	{
-		if (!isset($dt['label1'])) 
-		{ 
+		if (!isset($dt['label1']))
+		{
 			$dt['label1'] = msg('name');
 		}
-		
+
 		/* */
 		$type = '';
 		if (isset($dt['type'])) {
@@ -1857,7 +1857,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$sx .= '<script>'.cr();
 		$sx .= '
 		/************ keyup *****************/
-		jQuery("#dd50").keyup(function() 
+		jQuery("#dd50").keyup(function()
 		{
 			var $key = jQuery("#dd50").val();
 			$.ajax(
@@ -1871,9 +1871,9 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 				}
 			);
 		});';
-		$sx .= '	
+		$sx .= '
 		/************ submit ***************/
-		jQuery("#submt").click(function() 
+		jQuery("#submt").click(function()
 		{
 			var $key = jQuery("#dd51").val();
 			$.ajax(
@@ -1884,18 +1884,18 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					success: function(data){
 						$("#dd51a").html(data);
 					}
-				});                           
+				});
 			}
 		);
 		</script>';
-		
+
 		/**************** fim ******************/
 		return ($sx);
 	}
-	
+
 	function view_data($id) {
 		$CI = &get_instance();
-		
+
 		$data = $this -> le_data($id);
 		$sx = '<table class="table">';
 		$sx .= '<tr>';
@@ -1932,27 +1932,27 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$sx .= '</table>';
 		return ($sx);
 	}
-	
-	function mostra_dados($n, $l = '', $line) 
+
+	function mostra_dados($n, $l = '', $line)
 	{
 		$la = '';
 		$idx = $line['d_r2'];
 		if ($idx == $line['id']) {
 			$idx = $line['d_r1'];
 		}
-		
-		
+
+
 		if (strlen($l) > 0) {
 			$la = '</a>';
 		}
-		
+
 		return ($l . $n . $la);
 	}
-	
-	function search($d) 
+
+	function search($d)
 	{
 		$CI = &get_instance();
-		if (!isset($d['dd1'])) 
+		if (!isset($d['dd1']))
 		{
 			return ('');
 		}
@@ -1962,21 +1962,21 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$lns = splitx(';', $dd1);
 		$sx = '';
 		$wh = '';
-		for ($r = 0; $r < count($lns); $r++) 
+		for ($r = 0; $r < count($lns); $r++)
 		{
-			if (strlen($wh) > 0) 
-			{ 
+			if (strlen($wh) > 0)
+			{
 				$wh .= ' AND ';
 			}
 			$wh .= " (n_name like '%" . $lns[$r] . "%')";
 		}
-		if (strlen($wh) == 0) 
+		if (strlen($wh) == 0)
 		{
 			return ('');
 		}
 		$cps = 'c_class, id_c, n_name, id_cc';
 		$sql = "select $cps from ".$this->base." rdf_concept
-		INNER join ".$this->base." rdf_name ON id_n = cc_pref_term 
+		INNER join ".$this->base." rdf_name ON id_n = cc_pref_term
 		INNER join ".$this->base." rdf_class ON id_c = cc_class
 		WHERE $wh AND c_find = 1  AND cc_library = " . LIBRARY . "
 		group by $cps";
@@ -1984,7 +1984,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 		$rlt = $rlt -> result_array();
 		$sx .= '<div class="container">' . cr();
 		$sx .= '<div class="row">' . cr();
-		for ($r = 0; $r < count($rlt); $r++) 
+		for ($r = 0; $r < count($rlt); $r++)
 		{
 			$line = $rlt[$r];
 			$class = $line['c_class'];
@@ -2001,7 +2001,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= $this -> show_type($line, 'UDC', $img) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'Corporate Body' :
 					$idw = $line['id_cc'];
 					$img = $this -> recupera_imagem($idw, 'img/icon/icone_build.jpg');
@@ -2009,7 +2009,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= $this -> show_corporate($line) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'SerieName' :
 					$idw = $line['id_cc'];
 					$img = $this -> recupera_imagem($idw);
@@ -2017,13 +2017,13 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= $this -> show_seriename($line) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'Tesauro' :
 					$idw = $line['id_cc'];
 					//$link = '<a href="' . base_url(PATH . 'v/' . $line['id_c']) . '" target="_new">';
 					$link = '<a href="' . base_url(PATH . 'v/' . $idw) . '" target="_new">';
 					$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
-					$img = $this -> recupera_imagem($idw);                    
+					$img = $this -> recupera_imagem($idw);
 					$sx .= $link;
 					$sx .= $img;
 					$sx .= $line['n_name'];
@@ -2032,21 +2032,21 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= '</sup>';
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'Work' :
 					$idw = $line['id_cc'];
 					$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
 					$sx .= $this -> show_manifestation_by_works($idw) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'BookChapter' :
 					$idw = $line['id_cc'];
 					$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
 					$sx .= $this -> show_chapter($line) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'Person' :
 					$idw = $line['id_cc'];
 					$img = $this -> recupera_imagem($idw);
@@ -2054,7 +2054,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= $this -> show_person($line) . cr();
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				case 'Item' :
 					$idw = $line['id_cc'];
 					$sx .= '<div class="col-lg-2 col-md-4 col-xs-3 col-sm-6 text-center" style="line-height: 80%; margin-top: 40px;">' . cr();
@@ -2062,7 +2062,7 @@ function index_count($lt = '', $class = 'Person', $nouse = 0) {
 					$sx .= '<br><br><span style="font-size: 12px;">Tombo:' . $line['n_name'] . '</span>';
 					$sx .= '</div>' . cr();
 				break;
-				
+
 				default :
 				$idw = $line['id_cc'];
 				//$link = '<a href="' . base_url(PATH . 'v/' . $line['id_c']) . '" target="_new">';
@@ -2090,8 +2090,8 @@ function index_work($lt = '') {
 	$CI = &get_instance();
 	$class = "Work";
 	$f = $this -> find_class($class);
-	
-	$sql = "select * from ".$this->base." rdf_concept 
+
+	$sql = "select * from ".$this->base." rdf_concept
 	INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
 	where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
 	ORDER BY n_name";
@@ -2118,14 +2118,14 @@ function class_data_recober($class='')
 			$CI = &get_instance();
             $f = $this->find_class("Person");
 
-			$sql = "select * from ".$this->base." rdf_concept 
+			$sql = "select * from ".$this->base." rdf_concept
 			INNER join ".$this->base." rdf_name ON cc_pref_term = id_n
 			where cc_class = " . $f . " AND cc_library = " . LIBRARY . "
 			ORDER BY n_name";
 			$rlt = $CI -> db -> query($sql);
-			$rlt = $rlt -> result_array();	
+			$rlt = $rlt -> result_array();
 
-			return($rlt);		
+			return($rlt);
 	}
 
 
@@ -2155,9 +2155,9 @@ function index_author($lt = '') {
 function index_other($lt = '', $class = 'isPublisher') {
 	$CI = &get_instance();
 	$f = $this -> find_class($class);
-	
+
 	$sql = "select d_r2, n_name, id_cc from ".$this->base." rdf_data
-	LEFT join ".$this->base." rdf_concept on d_r2 = id_cc  
+	LEFT join ".$this->base." rdf_concept on d_r2 = id_cc
 	LEFT join ".$this->base." rdf_name ON cc_pref_term = id_n
 	where d_P = " . $f . " AND cc_library = " . LIBRARY . "
 	GROUP BY d_r2, n_name, id_cc
@@ -2190,10 +2190,10 @@ function tools($tools,$ac,$id)
 		break;
 		case 'class-ed' :
 			$sx .= $rdf -> classes_ed($id);
-		break;            
+		break;
 	}
-	return($sx);			
-	
+	return($sx);
+
 }
 
 /************************************************************************** CREATE C */
@@ -2203,7 +2203,7 @@ function export_c($id)
 	$class = $dt['c_class'];
 	$file = 'name.nm';
 	$txt = '';
-	
+
 	switch($class)
 	{
 		/********************************************** ENDERECO ******************/
@@ -2218,7 +2218,7 @@ function export_c($id)
 			$rua = $this->recupera($dts,'isStreet');
 			$ruanr = $this->recupera($dts,'isStreetNumber');
 			$work = $this->recupera($dts,'workCorporateBody');
-			
+
 			$txt = '<i>'.$tipo.'</i>';
 			if (strlen($work) > 0)
 			{
@@ -2227,11 +2227,11 @@ function export_c($id)
 			$txt .= '<br>'.$rua.' '.$ruanr.'<br>'.$bairro.' - '.$cidade;
 			if (strlen($cep) > 0)
 			{ $txt .= '<br>CEP: '.$cep; }
-			
+
 			if (($ativo != 'SIM') and ($ativo != 'YES'))
 			{
 				$txt = '<s>'.$txt.'</s>';
-			}		
+			}
 		break;
 	}
 	/******************************************** SALVA ARQUIVOS *********************/
@@ -2241,7 +2241,7 @@ function export_c($id)
 		check_dir($dir);
 		$dir = 'c/'.$id.'/';
 		check_dir($dir);
-		
+
 		if (strlen($file) > 0) { file_put_contents ($dir.$file,$txt) ;}
 	}
 	return(1);
@@ -2281,7 +2281,7 @@ function class_view_form($id='',$idx='',$act='')
 
 	if ($act == 'add')
 		{
-			$sql = "select * from rdf_form_class 
+			$sql = "select * from rdf_form_class
 					 	where id_sc = ".$idx;
 			echo $sql;
 			$rlt = $CI->db->query($sql);
@@ -2294,7 +2294,7 @@ function class_view_form($id='',$idx='',$act='')
 			$sc_ord = $line['sc_ord'];
 			$sc_group = $line['sc_group'];
 
-			$sql = "insert into rdf_form_class 
+			$sql = "insert into rdf_form_class
 					(
 						sc_class, sc_propriety, sc_range,
 						sc_ord, sc_library, sc_global,
@@ -2308,7 +2308,7 @@ function class_view_form($id='',$idx='',$act='')
 					)";
 			$rlt = $CI->db->query($sql);
 		}
-	
+
 	$sql = "select id_sc, sc_class, sc_propriety, sc_ord, id_sc, sc_ativo,
 	t1.c_class as c_class, t2.prefix_ref as prefix_ref,
 	t3.c_class as pc_class, t4.prefix_ref as pc_prefix_ref,
@@ -2316,15 +2316,15 @@ function class_view_form($id='',$idx='',$act='')
 	from ".$this->base."rdf_form_class
 	INNER join ".$this->base."rdf_class as t1 ON t1.id_c = sc_propriety
 	LEFT join ".$this->base."rdf_prefix as t2 ON t1.c_prefix = t2.id_prefix
-	
+
 	LEFT join ".$this->base."rdf_class as t3 ON t3.id_c = sc_range
 	LEFT join ".$this->base."rdf_prefix as t4 ON t3.c_prefix = t4.id_prefix
-	
+
 	where sc_class = $id AND (sc_library = ".LIBRARY.")
 	order by sc_ord, sc_group";
 
 	$rlt = $CI -> db -> query($sql);
-	$rlt = $rlt -> result_array();	
+	$rlt = $rlt -> result_array();
 	$sx = '<div class="col-md-12">';
 	$sx .= '<h4>'.msg("Form").'</h4>';
 	$sx .= '<table class="table">';
@@ -2337,14 +2337,14 @@ function class_view_form($id='',$idx='',$act='')
 	$xgr = '';
 	$grs = array();
 	$wh = '';
-	for ($r=0;$r < count($rlt);$r++)			
+	for ($r=0;$r < count($rlt);$r++)
 	{
 		$line = $rlt[$r];
 
 		/*** Regras já existentes */
 		array_push($grs,$line['sc_propriety']);
 		if (strlen($wh) > 0) { $wh .= ' AND '; }
-		$wh .= '(sc_propriety <> '.$line['sc_propriety'].')';		
+		$wh .= '(sc_propriety <> '.$line['sc_propriety'].')';
 
 		/* GROUP */
 		$gr = $line['sc_group'];
@@ -2358,7 +2358,7 @@ function class_view_form($id='',$idx='',$act='')
 				$sx .= $hr;
 				$xgr = $gr;
 			}
-		
+
 		/* Cor */
 		switch($line['sc_ativo'])
 			{
@@ -2371,24 +2371,24 @@ function class_view_form($id='',$idx='',$act='')
 					$cor = 'style="color: black;" ';
 					$sit = msg('activo');
 				break;
-			} 
+			}
 		/* Link para editar */
 		$link = '<a href="#" '.$cor.' onclick="newxy(\''.base_url(PATH.'config/class/formss/'.$line['sc_class'].'/'.$line['id_sc']).'\',800,600);">';
 		$linka = '</a>';
 
-		$sx .= '<tr '.$cor.'>';		
+		$sx .= '<tr '.$cor.'>';
 		$sx .= '<td align="center">';
 		$sx .= $line['sc_ord'];
 		$sx .= '</td>';
-		
+
 		/* CLASS */
 		$prop = $this->prefixn($line);
-		$sx .= '<td>';	
-		$sx .= $link;			
+		$sx .= '<td>';
+		$sx .= $link;
 		$sx .= msg($line['c_class']).' ('.$prop.')';
 		$sx .= $linka;
 		$sx .= '</td>';
-		
+
 		/* RANGE */
 		$dt['c_class'] = $line['pc_class'];
 		$dt['prefix_ref'] = $line['pc_prefix_ref'];
@@ -2398,7 +2398,7 @@ function class_view_form($id='',$idx='',$act='')
 
 		$sx .= '<td>';
 		$sx .= $sit;
-		$sx .= '</td>';		
+		$sx .= '</td>';
 
 		$sx .= '</tr>';
 	}
@@ -2414,14 +2414,14 @@ function class_view_form($id='',$idx='',$act='')
 
 	/************************* APROVEITAMENTO */
 
-	$sql = "select sc_group, sc_class, sc_propriety, sc_range, min(id_sc) as idm, 
-				c_class, prefix_ref 
-				from rdf_form_class 
+	$sql = "select sc_group, sc_class, sc_propriety, sc_range, min(id_sc) as idm,
+				c_class, prefix_ref
+				from rdf_form_class
 				INNER JOIN rdf_class ON sc_propriety = id_c
 				LEFT JOIN rdf_prefix ON c_prefix = id_prefix
 				where $wh and sc_class=16
-				group by 
-					sc_group, sc_class, sc_propriety, 
+				group by
+					sc_group, sc_class, sc_propriety,
 					sc_range, c_class, prefix_ref
 			";
 	$rlt = $CI->db->query($sql);
@@ -2458,8 +2458,8 @@ function class_view_data($id = '') {
 	$sx .= '<h4>Dados</h4>';
 	/********************************************/
 	if (strlen($id) == 0) {
-		$sql = "select * from ".$this->base." rdf_class 
-		WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1) 
+		$sql = "select * from ".$this->base." rdf_class
+		WHERE c_type = 'C' and (c_vc = 1 or c_vc <> 1)
 		ORDER BY c_class";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
@@ -2492,18 +2492,18 @@ function data_classes($d) {
 	{
 		$id = $d;
 	} else {
-		$id = $this -> find_class($d);	
+		$id = $this -> find_class($d);
 	}
-	
-	$sql = "select * from ".$this->base." rdf_concept 
+
+	$sql = "select * from ".$this->base." rdf_concept
 	INNER join ".$this->base." rdf_name ON cc_pref_term = id_N
 	WHERE cc_class = $id
-	ORDER BY n_name 
+	ORDER BY n_name
 	limit 20";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
 	return ($rlt);
-}	
+}
 function classes_lista() {
 	$CI = &get_instance();
 	/**************** class *************************/
@@ -2517,18 +2517,18 @@ function classes_lista() {
 	$sx .= '<div class="col-md-1">';
 	$sx .= '<b>' . $lg['C'] . '</b>';
 	$sx .= '</div>';
-	
+
 	$sx .= '<div class="col-md-5">';
 	for ($r = 0; $r < count($rlt); $r++) {
 		$line = $rlt[$r];
 		$link = '<a href="' . base_url(PATH . 'vocabulary_ed/' . $line['id_c']) . '">';
-		
+
 		$sx .= msg($line['c_class']);
 		$sx .= ' (' . $link . $line['c_class'] . '</a>' . ')';
 		$sx .= '<br>';
 	}
 	$sx .= '</div>';
-	
+
 	/**************** propriety **********************/
 	$sql = "select * from ".$this->base." rdf_class where c_type = 'P' order by c_type, c_class";
 	$rlt = $CI -> db -> query($sql);
@@ -2536,7 +2536,7 @@ function classes_lista() {
 	$sx .= '<div class="col-md-1">';
 	$sx .= '<b>' . $lg['P'] . '</b>';
 	$sx .= '</div>';
-	
+
 	$sx .= '<div class="col-md-5">';
 	for ($r = 0; $r < count($rlt); $r++) {
 		$line = $rlt[$r];
@@ -2551,17 +2551,17 @@ function classes_lista() {
 	return ($sx);
 }
 function class_update_data($dta)
-{	
-	$CI = &get_instance();	
-	$sx = '';	
+{
+	$CI = &get_instance();
+	$sx = '';
 	$id = $dta['id_c'];
-	if (isset($dta['c_url']) and (strlen($dta['c_url']) > 10)) 
+	if (isset($dta['c_url']) and (strlen($dta['c_url']) > 10))
 	{
 		$sx = '
 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
 		' . msg('update_vocabulary') . '
 		</button>
-		
+
 		<!-- Modal -->
 		<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -2572,9 +2572,9 @@ function class_update_data($dta)
 		<span aria-hidden="true">&times;</span>
 		</button>
 		</div>
-		
+
 		<div class="modal-body" id="cnt">
-		<span style="font-size:75%">Aguardando comando!</span>                                                            
+		<span style="font-size:75%">Aguardando comando!</span>
 		</div>
 		<div class="modal-footer">
 		<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
@@ -2585,15 +2585,15 @@ function class_update_data($dta)
 		</div>';
 		$sx .= '
 		<script>
-		jQuery("#dd50").click(function() 
+		jQuery("#dd50").click(function()
 		{ jQuery("#cnt").html("Buscando...");
 			$.ajax(
 				{ method: "POST", url: "' . base_url(PATH . 'config/class/ajax_update/' . $id.'?nocab=true') . '", data: { name: "John", location: "Boston" }}) .done(function( msg ) {	jQuery("#cnt").html(msg);}); }
 			);
-			</script>'; 
+			</script>';
 		}
 		return($sx);
-	}		
+	}
 	function ajax_update($id)
 	{
 		$CI = &get_instance();
@@ -2606,11 +2606,11 @@ function class_update_data($dta)
 		$t = read_link($url);
 		$class = $cl['c_class'];
 		$this -> inport_rdf($t, $class);
-		$sql = "update ".$this->base."rdf_class 
-			set c_url_update = '" . date("Y-m-d") . "' 
+		$sql = "update ".$this->base."rdf_class
+			set c_url_update = '" . date("Y-m-d") . "'
 			where id_c = " . $cl['id_c'];
 		$rlt = $CI -> db -> query($sql);
-		$sx = '';            		
+		$sx = '';
 	}
 	function inport_rdf($t, $class = '') {
 		if (strlen($class) == 0) {
@@ -2625,7 +2625,7 @@ function class_update_data($dta)
 		for ($r = 0; $r < count($lns); $r++) {
 			$ln = $lns[$r];
 			$ln = troca($ln, chr(9), ';');
-			
+
 			$l = splitx(';', $ln);
 			if (count($l) == 3) {
 				$prop = $l[1];
@@ -2657,7 +2657,7 @@ function class_update_data($dta)
 		}
 	}
 	echo '<span style="color: #0000ff">Fim da importação</span>';
-}            	
+}
 function rdf_concept_find_id($r) {
 	$CI = &get_instance();
 	$id = 0;
@@ -2683,12 +2683,12 @@ function remove_concept($id) {
 	d_update = '$data'
     where d_r1 = $id or d_r2 = $id";
 	$rlt = $CI -> db -> query($sql);
-	
-	$sql = "update ".$this->base."rdf_concept 
-			set 
-			cc_status = 99 
+
+	$sql = "update ".$this->base."rdf_concept
+			set
+			cc_status = 99
 			where id_cc = $id";
-	$rlt = $CI -> db -> query($sql);			
+	$rlt = $CI -> db -> query($sql);
     return (True);
 }
 
@@ -2704,7 +2704,7 @@ function data_exclude($id) {
 			$sql = "update ".$this->base."rdf_data set
 			d_r1 = " . ((-1) * $line['d_r1']) . " ,
 			d_r2 = " . ((-1) * $line['d_r2']) . " ,
-			d_p  = " . ((-1) * $line['d_p']) . ", 
+			d_p  = " . ((-1) * $line['d_p']) . ",
 			d_literal  = " . ((-1) * $line['d_literal']) . ",
 			d_update = $date
 			where id_d = " . $line['id_d'];
@@ -2725,7 +2725,7 @@ function data_recover($id) {
 			$sql = "update ".$this->base."rdf_data set
 			d_r1 = " . ((-1) * $line['d_r1']) . " ,
 			d_r2 = " . ((-1) * $line['d_r2']) . " ,
-			d_p  = " . ((-1) * $line['d_p']) . ", 
+			d_p  = " . ((-1) * $line['d_p']) . ",
 			d_literal  = " . ((-1) * $line['d_literal']) . ",
 			d_update = $date
 			where id_d = " . $line['id_d'];
@@ -2738,7 +2738,7 @@ function exist_prefLabel($id)
 {
 	$CI = &get_instance();
 	$prop = $this->find_class('prefLabel');
-	
+
 	$sql = "select * from ".$this->base." rdf_data where d_r1 = ".$id." and d_p = ".$prop;
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
@@ -2746,14 +2746,14 @@ function exist_prefLabel($id)
 	{
 		return(1);
 	}
-	return(0);	
+	return(0);
 }
 
 function update_prefLabel($id)
 {
 	$CI = &get_instance();
 	$prop = $this->find_class('prefLabel');
-	
+
 	$sql = "select * from ".$this->base." rdf_data where d_r1 = ".$id." and d_p = ".$prop;
 	$rlt = $CI->db->query($sql);
 	$rlt = $rlt->result_array();
@@ -2764,18 +2764,18 @@ function update_prefLabel($id)
 		print($line);
 		exit;
 	}
-	return(0);	
-}	
+	return(0);
+}
 
 function ajax_search($id, $type = '') {
-	
+
 	$CI = &get_instance();
 	$vlr = get("q");
 	$wh = '';
 	$wh2 = '';
 	$sx = 'Busca: "'.$vlr.'" em '.$type. ' ['.$id.']';
 	$sx .= '<select name="dd51" id="dd51" size=5 class="form-control" onchange="change();">' . cr();
-	
+
 	/****************************** Busca ************/
 	if (strlen($vlr) < 1) {
 		$sx .= '<option></option>' . cr();
@@ -2789,12 +2789,12 @@ function ajax_search($id, $type = '') {
 			$wh .= "(n_name like '%" . $v[$r] . "%') ";
 		}
 	}
-	
+
 	/* RANGE **********************************************/
-	if (strlen($type) > 0) {				
+	if (strlen($type) > 0) {
 		$ww = $this -> find_class($type,0);
 		$wh2 = ' (cc_class = ' . $ww . ') ';
-		
+
 		$sql = "select * from ".$this->base." rdf_class
 		WHERE c_class_main = $ww";
 		$rlt = $CI -> db -> query($sql);
@@ -2807,26 +2807,26 @@ function ajax_search($id, $type = '') {
 	} else {
 		$wh2 = '';
 	}
-	
+
 	/***********************************************************************/
 	$lst = -1;
 	if (strlen($wh) > 0) {
 		$sql = "select * from ".$this->base." rdf_name
 		INNER join ".$this->base." rdf_data ON id_n = d_literal
 		INNER join ".$this->base." rdf_concept ON d_r1 = id_cc
-		INNER join ".$this->base." rdf_class ON id_c = d_p 
-		WHERE ($wh) and (n_name <> '') $wh2 
+		INNER join ".$this->base." rdf_class ON id_c = d_p
+		WHERE ($wh) and (n_name <> '') $wh2
 		LIMIT 50";
 		$rlt = $CI -> db -> query($sql);
 		$rlt = $rlt -> result_array();
-		
+
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$sx .= '<option value="' . $line['id_cc'] . '">' . $line['n_name'] . '</option>' . cr();
 		}
 		$lst = count($rlt);
 	}
-	
+
 	$sx .= '</select>' . cr();
 
 	if ($lst ==0)
@@ -2835,18 +2835,18 @@ function ajax_search($id, $type = '') {
 		} else {
 			$sx .= '<script>$("#create").hide(1);$("#force").show(1);</script>';
 		}
-	$sx .= '  <script>                 
+	$sx .= '  <script>
 	function change()
 	{
 		jQuery("#submt").removeAttr("disabled");
 		jQuery("#submtc").removeAttr("disabled");
 	}
-	
+
 	jQuery("#submt").attr("disabled","disabled");
 	jQuery("#submtc").attr("disabled","disabled");
 	</script>';
 	return ($sx);
-}		
+}
 
 function btn_editar($id) {
 	$sx = '<a href="' . base_url(PATH . 'a/' . $id) . '" class="btn btn-secondary">editar</a>';
@@ -2855,19 +2855,19 @@ function btn_editar($id) {
 
 function btn_update($id) {
 	$sx = '<a href="' . base_url(PATH . 'authority_inport_rdf/' . $id) . '" class="btn btn-secondary">atualizar dados</a> ';
-	
+
 	return ($sx);
-}	
+}
 function person_work($id) {
 	$CI = &get_instance();
 	$r = array();
-	$sql = "select d_r1, d_p, d_r2 from ".$this->base." rdf_data 
+	$sql = "select d_r1, d_p, d_r2 from ".$this->base." rdf_data
 	where (d_r1 = $id or d_r2 = $id)
 	AND NOT (d_r1 = 0 OR d_r2 = 0)
 	ORDER BY d_r1, d_p, d_r2";
 	$rlt = $CI -> db -> query($sql);
 	$rlt = $rlt -> result_array();
-	
+
 	$wk = array();
 	$ww = array();
 	for ($r = 0; $r < count($rlt); $r++) {
@@ -2895,7 +2895,7 @@ function show_class($wk) {
 	$wks = array();
 	for ($r = 0; $r < count($wk); $r++) {
 		$id = $wk[$r];
-		
+
 		$data = $this -> le_data($id);
 		for ($z = 0; $z < count($data); $z++) {
 			$line = $data[$z];
@@ -2925,9 +2925,9 @@ function show_class($wk) {
 		$sx .= '</div>';
 	}
 	//$sx .= '</div>' . cr();
-	
+
 	return ($sx);
-}  
+}
 
 /*********************** BIBLIOGRAFIC ***************/
 function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
@@ -2935,7 +2935,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 	$img = base_url('img/no_cover.png');
 	$data = $this -> le_data($id);
 	$year = '';
-	
+
 	$title = '';
 	$autor = '';
 	$nautor = '';
@@ -2960,7 +2960,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 					$autor .= '; ';
 					$nautor .= '; ';
 				}
-				
+
 				$idx = $line['d_r1'];
 				$link = '<a href="' . base_url(PATH . 'v/' . $idx) . '" class="small">';
 				$autor .= $link . $line['n_name'] . '</a>';
@@ -2971,25 +2971,25 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 	/* expression */
 	$class = "isRealizedThrough";
 	$id_cl = $this -> find_class($class);
-	$sql = "select * from ".$this->base." rdf_data 
+	$sql = "select * from ".$this->base." rdf_data
 	WHERE d_r1 = $id and
 	d_p = $id_cl ";
 	$xrlt = $CI -> db -> query($sql);
 	$xrlt = $xrlt -> result_array();
-	
+
 	if (count($xrlt) > 0) {
 		$ide = $xrlt[0]['d_r2'];
 		/************************************ manifestation ********/
 		$class = "isEmbodiedIn";
 		$id_cl = $this -> find_class($class);
-		$sql = "select * from ".$this->base." rdf_data 
+		$sql = "select * from ".$this->base." rdf_data
 		WHERE d_r1 = $ide and
 		d_p = $id_cl ";
 		$xrlt = $CI -> db -> query($sql);
 		$xrlt = $xrlt -> result_array();
 		if (count($xrlt) > 0) {
 			$idm = $xrlt[0]['d_r2'];
-			
+
 			/* Image */
 			$dt2 = $this -> le_data($idm);
 			for ($r = 0; $r < count($dt2); $r++) {
@@ -3004,7 +3004,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 			}
 		}
 	}
-	
+
 	$sx = '';
 	$link = '<a href="' . base_url(PATH . 'v/' . $id) . '" style="line-height: 120%;">';
 	$sx .= $link;
@@ -3017,7 +3017,7 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 		}
 		$title_nr = trim($title_nr) . '...';
 	}
-	
+
 	if ($mini == 1) {
 		$sx .= '<img src="' . $img . '" height="' . $img_size . '" style="box-shadow: 5px 5px 8px #888888; margin-bottom: 10px;" title="' . $title_nr . cr() . $nautor . cr() . troca($year, '<br>', '') . '">' . cr();
 		$sx .= '</a>';
@@ -3034,18 +3034,18 @@ function show_manifestation_by_works($id = '', $img_size = 200, $mini = 0) {
 }
 
 function show_manifestation_by_item($id = '') {
-	
+
 	$item = $this -> le_data($id);
-	
+
 	$idm = $this -> recupera_manifestacao_pelo_item($id);
 	$mani = $this -> le_data($idm[0]);
-	
+
 	$ide = $this -> recupera_expressao_pela_manifestacao($idm[0]);
 	$expr = $this -> le_data($ide[0]);
-	
+
 	$idw = $this -> recupera_work_pela_expressao($ide[0]);
 	$work = $this -> le_data($idw[0]);
-	
+
 	$data = array();
 	$data['manifestation'] = $mani;
 	$data['expression'] = $expr;
@@ -3054,7 +3054,7 @@ function show_manifestation_by_item($id = '') {
 	$data['id'] = $idm[0];
 	$sx = $this -> show_item($data);
 	return ($sx);
-}      
+}
 function show_rdf($url) {
 	$pre = substr($url, 0, strpos($url, ':'));
 	$pos = substr($url, strpos($url, ':') + 1, strlen($url));
@@ -3068,9 +3068,9 @@ function export_json($id)
 	$dt = $this->le($id);
 	$dd = $this->le_data($id);
 	$sx = '{';
-		
+
 		/* Prefixo */
-		$pre = $dt['prefix_ref'];    		
+		$pre = $dt['prefix_ref'];
 		if (strlen($pre) == 0)
 		{
 			$pre = 'brapci';
@@ -3078,12 +3078,12 @@ function export_json($id)
 		$sx .= '"id"'.				': "'.$id.'",'.cr();
 		$sx .= '"a"'.				': "owl:class",'.cr();
 		$sx .= '"'.$pre.':class"'.	': "'.$dt['c_class'].'",'.cr();
-		
+
 		/**************** DADOS *******/
 		for ($r=0;$r < count($dd);$r++)
 		{
-			
-			$pre = $dd[$r]['prefix_ref'];    		
+
+			$pre = $dd[$r]['prefix_ref'];
 			if (strlen($pre) == 0)
 			{
 				$pre = 'brapci';
@@ -3106,12 +3106,12 @@ function export_json($id)
 		$sx .= "}";
 		return($sx);
 	}
-	
+
 	function export_rdf($id)
 	{
 		$dt = $this->le($id);
 		$dd = $this->le_data($id);
-		
+
 		$sx = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .'.cr();
 		$sx .= '@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .'.cr();
 		$sx .= '@prefix owl:   <http://www.w3.org/2002/07/owl#> .'.cr();
@@ -3121,22 +3121,22 @@ function export_json($id)
 		$sx .= '@prefix brapci_v: <'.base_url(PATH.'v').'#> .'.cr();
 		$sx .= cr();
 		$sx .= '<'.base_url(PATH.'v/'.$id).'>'.cr();
-		
+
 		$tab = chr(9);
 		/* Prefixo */
-		$pre = $dt['prefix_ref'];    		
+		$pre = $dt['prefix_ref'];
 		if (strlen($pre) == 0)
 		{
 			$pre = 'brapci';
 		}
 		$sx .= $tab.'a'.				$tab.'owl:class ;'.cr();
 		$sx .= $tab.$pre.':class '.		$tab.$dt['c_class'].' ;'.cr();
-		
+
 		/**************** DADOS *******/
 		for ($r=0;$r < count($dd);$r++)
 		{
-			
-			$pre = $dd[$r]['prefix_ref'];    		
+
+			$pre = $dd[$r]['prefix_ref'];
 			if (strlen($pre) == 0)
 			{
 				$pre = 'brapci';
@@ -3167,17 +3167,17 @@ function export_json($id)
 		$op .= '&es:Espanhol';
 		$op .= '&un:Multilingue';
 		array_push($cp,array('$O '.$op,'n_lang',msg('language'),true,true));
-		
+
 		$table = 'rdf_name';
 		$form = new form;
 		$form->id = $id;
 		$sx = $form->editar($cp,$table);
-		
+
 		if ($form->saved > 0)
 		{
 			$sx = '<script> wclose(); </script>';
 		}
-		return($sx);				
+		return($sx);
 	}
 	function link($c)
 	{
@@ -3210,13 +3210,13 @@ function export_json($id)
 			if ($type == 'image/jpeg')
 			{
 				$sx = message(msg('Saved'),1);
-				if (move_uploaded_file($file, $uploadfile)) 
+				if (move_uploaded_file($file, $uploadfile))
 				{
-					
+
 					$idn = $rdf->rdf_name(base_url($uploadfile));
 					$prop = 'Person:hasPicture';
-					$rdf->set_propriety($id, $prop, 0, $idn);		
-					
+					$rdf->set_propriety($id, $prop, 0, $idn);
+
 					$sx .= '</>';
 					$sx .= '<meta http-equiv="refresh" content="0">';
 				}
@@ -3231,7 +3231,7 @@ function export_json($id)
 		return($sx);
 	}
 
-	
+
 	function image_save($id,$class)
 	{
 		$rdf = new rdf;
@@ -3244,13 +3244,13 @@ function export_json($id)
 			if ($type == 'image/jpeg')
 			{
 				$sx = message(msg('Saved'),1);
-				if (move_uploaded_file($file, $uploadfile)) 
+				if (move_uploaded_file($file, $uploadfile))
 				{
-					
+
 					$idn = $rdf->rdf_name(base_url($uploadfile));
 					$prop = 'Person:hasPicture';
-					$rdf->set_propriety($id, $prop, 0, $idn);		
-					
+					$rdf->set_propriety($id, $prop, 0, $idn);
+
 					$sx .= '</>';
 					$sx .= '<meta http-equiv="refresh" content="0">';
 				}
@@ -3282,15 +3282,15 @@ function export_json($id)
 						case '':
 							$c= '';
 							$cp = 2;
-							break;								
+							break;
 					}
 				if ($cp == 1) { $c = strtoupper($c); }
-				$cp--;						
+				$cp--;
 				$n .= $c;
 			}
 		return($n);
 	}
-		
+
 	function image($w)
 	{
 		$imgf = $this->image_dir.'/'.$w.'.jpg';
@@ -3332,14 +3332,14 @@ function export_json($id)
 		</div>
 		</div>
 		</div>';
-		
+
 		$sx .= '
 		<script>
-		$("#btn_submit_upload").click(function () { enviarconsulta_upload(); }); 
-		
-		function enviarconsulta_upload() 
-		{ 
-			var file_data = $("#sortpicture").prop("files")[0];   
+		$("#btn_submit_upload").click(function () { enviarconsulta_upload(); });
+
+		function enviarconsulta_upload()
+		{
+			var file_data = $("#sortpicture").prop("files")[0];
 			var form_data = new FormData();
 			form_data.append("file", file_data);
 			$.ajax(
@@ -3351,14 +3351,14 @@ function export_json($id)
 					processData: false,
 					data: form_data,
 					type: "post",
-					success: function(data){ 
+					success: function(data){
 						jQuery("#ajax_upload_body").html(data);
 					}
 				}
 			);
 		}
-		</script>';		
-		return($sx);				
+		</script>';
+		return($sx);
 	}
 }
 ?>

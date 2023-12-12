@@ -31,11 +31,11 @@ function row3($p=array())
     $CI = &get_instance();
     $table = $p['table'];
     $show = $p['fields'];
-    
+
     $sql = "select * from ".$table;
     $rst =$CI->db->query($sql);
     $rlt = $rst->result_array();
-        
+
     $sx = '';
     $hr = '';
     $hrs = '';
@@ -44,7 +44,7 @@ function row3($p=array())
     /*************** ID field */
     $idf = key($rlt[0]);
     /*************** Header ***/
-    
+
     for ($r=0;$r < count($rlt);$r++)
     {
         $line = $rlt[$r];
@@ -56,19 +56,19 @@ function row3($p=array())
                 $linka = '</a>';
             }
         foreach($line as $field=>$vlr)
-        {   
+        {
             if ((isset($show[$mst])) and ($show[$mst] != '') and ($show[$mst] != '0'))
             {
                 $sx .= '<td>';
                 $sx .= $link.$vlr.$linka;
                 $sx .= '</td>';
-                
+
                 if ($r==0)
                 {
                     $hr .= '<th width="'.sonumero($show[$mst]).'%">';
                     $hr .= msg($field);
                     $hr .= '</th>';
-                    
+
                     $hrs .= '<th>';
                     $hrs .= '<input type="text" id="txtColuna'.$mst.'"/>';
                     $hrs .= '</th>';
@@ -88,7 +88,7 @@ function row3($p=array())
     $js = '
     <script>
     $(function(){
-        $("#tabela input").keyup(function(){       
+        $("#tabela input").keyup(function(){
             var index = $(this).parent().index();
             var nth = "#tabela td:nth-child("+(index+1).toString()+")";
             var valor = $(this).val().toUpperCase();
@@ -99,12 +99,12 @@ function row3($p=array())
                 }
             });
         });
-        
+
         $("#tabela input").blur(function(){
             $(this).val("");
         });
     });
-    
+
     function AdicionarFiltro(tabela, coluna) {
         var cols = $("#" + tabela + " thead tr:first-child th").length;
         if ($("#" + tabela + " thead tr").length == 1) {
@@ -113,16 +113,16 @@ function row3($p=array())
                 linhaFiltro += "<th></th>";
             }
             linhaFiltro += "</tr>";
-            
+
             $("#" + tabela + " thead").append(linhaFiltro);
         }
-        
+
         var colFiltrar = $("#" + tabela + " thead tr:nth-child(2) th:nth-child(" + coluna + ")");
-        
+
         $(colFiltrar).html("<select id=\'filtroColuna_" + coluna.toString() + "\'  class=\'filtroColuna\'> </select>");
-        
+
         var valores = new Array();
-        
+
         $("#" + tabela + " tbody tr").each(function () {
             var txt = $(this).children("td:nth-child(" + coluna + ")").text();
             if (valores.indexOf(txt) < 0) {
@@ -133,7 +133,7 @@ function row3($p=array())
         for (elemento in valores) {
             $("#filtroColuna_" + coluna.toString()).append("<option>" + valores[elemento] + "</option>");
         }
-        
+
         $("#filtroColuna_" + coluna.toString()).change(function () {
             var filtro = $(this).val();
             $("#" + tabela + " tbody tr").show();
@@ -146,19 +146,19 @@ function row3($p=array())
                 });
             }
         });
-        
+
     };
     AdicionarFiltro("divConteudo", 2);
-    </script>    
+    </script>
     ';
-    return($sx.$js);    
+    return($sx.$js);
 }
 
 function row($obj, $pag = 1) {
     $page = page();
     $npag = $pag;
     $field = 1;
-    
+
     if ($obj->tabela == '')
     {
         $sx = message('ERRO - Propriety "tabela" not informed',3);
@@ -170,25 +170,25 @@ function row($obj, $pag = 1) {
         $pag = 1;
         $npag = 1;
     }
-    $start = round($pag);
+    $start = sround($pag);
     $offset = (integer)$obj -> offset;
     $pag .= get("pag");
-    $pag = round($pag);
+    $pag = sround($pag);
     $start = $pag * $offset;
     $CI = &get_instance();
-    
+
     /* Dados do objeto */
     $fd = $obj -> fd;
     $mk = $obj -> mk;
     $lb = $obj -> lb;
-    
+
     /*********************** Link para editar */
     if (($obj->edit == true) and (strlen($obj->row_edit)==0))
     {
         $lk = base_url(PATH.'admin/languages/ed/');
         $obj->row_edit = $lk;
-    }        
-    
+    }
+
     /************************* Registros da tabela não mostrados */
     if (!isset($fd[0]))
     {
@@ -201,17 +201,17 @@ function row($obj, $pag = 1) {
             $fd[$r] = $fld;
             $lb[$r] = $fld;
             $mk[$r] = 'L';
-            
+
         }
         $obj -> fd = $fd;
-    }        
-    
+    }
+
     /* BOTA NOVO */
     if ($acao == mst('bt_new')) {
         redirect($obj -> row_edit . '/0/0');
         exit ;
     }
-    
+
     /* FILTRO */
     if ($acao == msg('bt_clear')) {
         $CI -> session -> userdata['rt_' . $page] = '';
@@ -219,43 +219,43 @@ function row($obj, $pag = 1) {
         $CI -> session -> userdata['rp_' . $page] = '';
     }
     $term = '';
-    
+
     /* se postado recupera termos */
-    if (strlen(get('dd1'))) 
+    if (strlen(get('dd1')))
     {
         if (strlen(get('dd2')) > 0)
-        { 
+        {
             $acao = get('dd2');
         }
-        if (strlen(get('dd1')) > 0) 
-        { 
+        if (strlen(get('dd1')) > 0)
+        {
             $term = get('dd1');
         }
         $term = troca($term, "'", "´");
     }
     /********** Campo de busca  */
     if (strlen(get('dd5'))) {
-        $field = round(get('dd5'));
+        $field = sround(get('dd5'));
     }
     /********** Se não setado, prioridade no primeiros */
-    if ($field < 1) 
-    { 
+    if ($field < 1)
+    {
         $field = 1;
     }
     /***************** Coloca no último de indicador for maior que total de campos */
-    if ($field >= count($fd)) 
-    { 
+    if ($field >= count($fd))
+    {
         $field = count($fd) - 1;
     }
-    
+
     /* parametros */
     $edit = $obj -> edit;
     $see = $obj -> see;
     $novo = $obj -> novo;
-    
+
     /* campo ID */
     $fld = $fd[0];
-    
+
     /* Cabecalho da Tabela */
     $sh = '<thead><tr>';
     for ($r = 1; $r < count($fd); $r++) {
@@ -268,18 +268,18 @@ function row($obj, $pag = 1) {
         $sh .= '<th>' . msg('action') . '</th>';
     }
     $sh .= '</tr></thead>';
-    
+
     /* Recupera dados */
     $tabela = $obj -> tabela;
     $CI = &get_instance();
-    
+
     /* SEM ACAO REGISTRADA */
     if (strlen($acao) == 0) {
         /* recupera dados da memoria */
         if (isset($_SESSION['rt_' . $page])) {
             $term = $_SESSION['rt_' . $page];
-            $npage = round($_SESSION['rp_' . $page]);
-            $field = round($_SESSION['rf_' . $page]);
+            $npage = sround($_SESSION['rp_' . $page]);
+            $field = sround($_SESSION['rf_' . $page]);
         } else {
             $term = '';
         }
@@ -294,13 +294,13 @@ function row($obj, $pag = 1) {
             redirect($obj -> row);
         }
     }
-    
+
     /* Memoria */
     $termo = $term;
     /* Where */
-    if (strlen($term) > 0) 
+    if (strlen($term) > 0)
     {
-        if (strlen(get('dd5')) > 0) 
+        if (strlen(get('dd5')) > 0)
         {
             $field = get('dd5');
         } else {
@@ -308,23 +308,23 @@ function row($obj, $pag = 1) {
             {
                 $_SESSION['rf_' . $page] = '0';
             }
-            $field = round($_SESSION['rf_' . $page]);
+            $field = sround($_SESSION['rf_' . $page]);
             if ($field <= 1) { $field = 1;
             }
         }
-        
+
         /* Dados para consulta */
         $newdata = array('rt_' . $page => $termo, 'rf_' . $page => $field, 'rp_' . $page => $npag);
         $CI -> session -> set_userdata($newdata);
-        
+
         $term = troca($term, ' ', ';');
         $term = splitx(';', $term);
-        
+
         $wh = '';
-        for ($rt = 0; $rt < count($term); $rt++) 
+        for ($rt = 0; $rt < count($term); $rt++)
         {
-            if (strlen($wh) > 0) 
-            { 
+            if (strlen($wh) > 0)
+            {
                 $wh .= ' and ';
             }
             $wh .= ' (' . $fd[$field] . " like '%" . $term[$rt] . "%') ";
@@ -333,7 +333,7 @@ function row($obj, $pag = 1) {
     } else {
         $wh = '';
     }
-    
+
     /* PRE WHERE */
     if ((isset($obj -> pre_where)) and (strlen($obj -> pre_where) > 0)) {
         if (strlen($wh) == 0) {
@@ -343,24 +343,24 @@ function row($obj, $pag = 1) {
         }
         $wh .= ' (' . $obj -> pre_where . ')';
     }
-    
+
     if (strlen($acao) > 0) {
         $pag = 1;
     }
-    
+
     /* total de registros */
     $sql = "select count(*) as total from " . $tabela . " $wh ";
     $query = $CI -> db -> query($sql);
     $row = $query -> row();
     $total = $row -> total;
-    
+
     /* mostra */
     $start_c = ($start - $offset);
     if ($start_c < 1) { $start_c = 0;
     }
-    
+
     $sql = "select $fld from " . $tabela . ' ' . $wh;
-    
+
     /* PRE WHERE */
     if ((isset($obj -> pre_where)) and (strlen($obj -> pre_where) > 0)) {
         $wh .= ' AND (' . $obj -> pre_where . ')';
@@ -370,32 +370,32 @@ function row($obj, $pag = 1) {
     } else {
         $sql .= " order by " . $fd[1];
     }
-    
+
     $sql .= " limit " . $start_c . " , " . $offset;
     $query = $CI -> db -> query($sql);
     $data = '';
-    
+
     /* Metodo de chamada */
     $url_pre = uri_string();
     $url_pre = substr($url_pre, 0, strpos($url_pre, '/')) . '/view';
-    
+
     $url_pre = $obj -> row_view;
-    
+
     /* PRE */
     $active = 0;
-    for ($r = 0; $r < count($mk); $r++) 
+    for ($r = 0; $r < count($mk); $r++)
     {
-        if ($mk[$r] == 'A') 
+        if ($mk[$r] == 'A')
         {
             $active = $r;
         }
     }
-    
+
     foreach ($query->result_array() as $row) {
         /* recupera ID */
         $flds = trim($fd[0]);
         $id = $row[$flds];
-        
+
         /* mostra resultado da query */
         $style = '';
         if ($active > 0) {
@@ -431,10 +431,10 @@ function row($obj, $pag = 1) {
                     } else {
                         $row[$flds] = '<font color="green">Ativo</font>';
                     }
-                    
+
                 break;
             }
-            
+
             /* see */
             if ($see == TRUE) {
                 $link = '<A HREF="' . $obj -> row_view . '/' . $id . '/' . checkpost_link($id) . '">';
@@ -451,21 +451,21 @@ function row($obj, $pag = 1) {
         }
         $data .= '</tr>' . chr(13) . chr(10);
     }
-    
+
     /* Tela completa */
     $tela = '<table width="100%" class="table" id="row">';
     $tela .= $sh;
     $tela .= $data;
     $tela .= '<tr><th colspan=10 align="left">Total ' . $total . ' de registros' . '</th></tr>';
     $tela .= '</table>';
-    
+
     $total_page = (int)($total / $offset) + 1;
     $obj -> term = $termo;
     $obj -> npag = $npag;
     $obj -> field = $field;
-    
+
     $pags = npag($obj, $pag, $total_page, $offset);
-    
+
     return ($pags . $tela);
 }
 
@@ -481,7 +481,7 @@ function row2($par=array())
         $sx .= '</pre>'.cr();
         return($sx);
     }
-    
+
     /************************************************** View *********/
     if (isset($par['id']))
     {
@@ -491,7 +491,7 @@ function row2($par=array())
         }
         $sql = "select * from ".$par['table'].' where '.$par['cp'][0][1].' = '.$par['id'];
         $sql .= ' order by '.$par['order'];
-        
+
         $rlt = $CI->db->query($sql);
         $rlt = $rlt->result_array();
         $sx = '<!-- Classe de produtos -->'.cr();
@@ -503,7 +503,7 @@ function row2($par=array())
         foreach ($rlt[0] as $key => $value) {
             $i++;
             $sx .= '<tr>';
-            
+
             $sx .= '<td align="right">';
             $sx .= (string)$key;
             $sx .= '</td>';
@@ -515,19 +515,19 @@ function row2($par=array())
         $sx .= '</table>'.cr();
         $sx .= '</div>';
         return($sx);
-    }        
-    
-    
+    }
+
+
     /************************************************** Row **********/
-    if (isset($par['cp']))        
+    if (isset($par['cp']))
     {
-        $pag = round(get("pag"));
+        $pag = sround(get("pag"));
         $order = get("order");
         $filt = get("filter");
         $filter = '';
-        if ((strlen($order) == 0) and (count($par['cp']) > 0)) 
-        { 
-            $order = 'order by '.(string)$par['cp'][1][1]; 
+        if ((strlen($order) == 0) and (count($par['cp']) > 0))
+        {
+            $order = 'order by '.(string)$par['cp'][1][1];
         }
         $cp = $par['cp'];
         $limit = 'limit 50';
@@ -535,12 +535,12 @@ function row2($par=array())
         foreach ($cp as $key => $value) {
             if ((strlen($value[5]) > 0) or ($cps == ''))
             {
-                if (strlen($cps) > 0) 
-                { 
-                    $cps .= ', '; 
-                    if (strlen($filt) > 0) 
-                    { 
-                        $filter .= ' OR '; 
+                if (strlen($cps) > 0)
+                {
+                    $cps .= ', ';
+                    if (strlen($filt) > 0)
+                    {
+                        $filter .= ' OR ';
                     }
                 }
                 $cps .= $value[1];
@@ -557,15 +557,15 @@ function row2($par=array())
         }
         /*************************** QUERY *****************/
         if (strlen($filter) > 0)
-        { 
-            $where = ' where ('.$filter.')'; 
+        {
+            $where = ' where ('.$filter.')';
         } else {
             $where = '';
         }
-        
+
         if (isset($par['where']))
         {
-            if (strlen($where) > 0) 
+            if (strlen($where) > 0)
             {
                 $where .= ' AND ';
             } else {
@@ -573,14 +573,14 @@ function row2($par=array())
             }
             $where .= ' ('.$par['where'].')';
         }
-        
-        $sql = "select $cps 
+
+        $sql = "select $cps
         from ".$par['table']."
-        $where 
+        $where
         $order
         $limit ";
-        
-        
+
+
         /************************* EXECUTA QUERY *************/
         $rlt = $CI->db->query($sql);
         $rlt = $rlt->result_array();
@@ -593,46 +593,46 @@ function row2($par=array())
         <div class="input-group-append">
         <input type="submit" value="'.msg("bt_filter").'" class="input-group-text" id="basic-addon2">
         </div>
-        
+
         <div class="input-group-append">
         <a href="'.$par['path'].'edit/0'.'"class="input-group-text" id="basic-addon3">Novo Registro</a>
         </div>
-        
+
         </div>
         </form></td>';
         $sx .= '</tr>';
         /* header */
         $sx .= '<tr>';
-        foreach ($cp as $key => $value) {   
-            if ($value[5] == true)                 
+        foreach ($cp as $key => $value) {
+            if ($value[5] == true)
             {
                 $cps = trim((string)$value[1]);
                 $sx .= '<th>'.msg($cps).'</th>';
             }
         }
         $sx .= '</tr>';
-        /* Datas */            
+        /* Datas */
         for ($r=0;$r < count($rlt);$r++)
         {
             $line = $rlt[$r];
             $link = '<a href="'.$par['path'].'view/'.$line[$cp[0][1]].'">';
             $linka = '</a>';
             $sx .= '<tr>';
-            
-            foreach ($cp as $key => $value) {   
-                if ($value[5] == true)                 
-                {                    
+
+            foreach ($cp as $key => $value) {
+                if ($value[5] == true)
+                {
                     $value = $line[$value[1]];
-                    $sx .= '<td>'.$link.$value.$linka.'</td>';                   
+                    $sx .= '<td>'.$link.$value.$linka.'</td>';
                 }
             }
             $sx .= '</tr>';
-            
+
         }
         $sx .= '</table>';
         return($sx);
     }
-    
+
     /************* Sem os campos *******************************************/
     if (!isset($par['cp']))
     {
@@ -648,7 +648,7 @@ function row2($par=array())
         foreach ($rlt[0] as $key => $value) {
             $i++;
             $sx .= '<tr>';
-            
+
             $sx .= '<td>'.$i.'</td>';
             $sx .= '<td>';
             $sx .= (string)$key;
@@ -656,16 +656,16 @@ function row2($par=array())
             $sx .= '<td>';
             $sx .= (string)$value;
             $sx .= '</td>';
-            
+
             $sx .= '<td>';
-            
+
             if ($i == 1) {
                 $sx .= 'array_push($cp,array(\'$H8\',"'.$key.'","'.msg($key).'",True,True,True)); ';
             } else {
                 $sx .= 'array_push($cp,array(\'$S100\',"'.$key.'","'.msg($key).'",True,True,True)); ';
             }
             $sx .= '</td>';
-            
+
             $sx .= '</tr>'.cr();
         }
         $sx .= '</table>'.cr();
@@ -690,7 +690,7 @@ function array2csv($rlt,$sep=',',$uft8=true) {
                 }
             if ($r==0) { $header .= $sepa.$key; }
             $ln .= $sepa.'"'.$value.'"';
-        }        
+        }
         $csv .= $ln.cr();
     }
     $csv =  $header.cr().$csv;

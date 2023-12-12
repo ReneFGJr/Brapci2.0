@@ -14,7 +14,7 @@ class apa extends CI_Model {
             if (($n == $m) and ($i == 0)) { $i = $r - 2;
             }
             /********************* ANO ******/
-            $anox = round(sonumero($hn[$r]));
+            $anox = sround(sonumero($hn[$r]));
             if (($anox > 1900) and ($anox < 2020)) {
                 $ano = $anox;
             }
@@ -34,7 +34,7 @@ class apa extends CI_Model {
             }
             $ref .= $n;
         }
-        
+
         /*******************************************************/
         $comp = '';
         for ($r=($i+1);$r < count($hn);$r++)
@@ -46,39 +46,39 @@ class apa extends CI_Model {
                 if ($hn[$r] == $ano.'.')
                     {
                         $hn[$r] = '';
-                    }                    
+                    }
                 switch($hn[$r])
                     {
                     case 'v.':
                         $hn[$r] = '';
                         $hn[$r+1] = troca($hn[$r+1],',','(');
-                        break;                        
+                        break;
                     case 'n.':
                         $hn[$r] = '';
                         $hn[$r+1] = troca($hn[$r+1],',','),');
                         $comp = troca($comp,'( ','(');
-                        break;                        
+                        break;
                     case 'p.':
                         $hn[$r] = '';
                         break;
                     default:
-                        $hn[$r] = $hn[$r] . ' ';                        
+                        $hn[$r] = $hn[$r] . ' ';
                     }
                 if ($r > ($i+1))
                     {
                         $comp .= lowercase($hn[$r]);
                     } else {
-                        $comp .= $hn[$r];        
+                        $comp .= $hn[$r];
                     }
-                
+
             }
         $comp = trim($comp);
         $n = substr($comp,strlen($comp)-1,1);
         $comp = troca($comp,'n.','');
         $comp = troca($comp,'. ,','.,');
         $comp = troca($comp,'( ','(');
-        echo '===>'.$n; 
-        if ( $n == ',') 
+        echo '===>'.$n;
+        if ( $n == ',')
             {
                 $comp = substr($comp,0,strlen($comp)-1).'.';
             }

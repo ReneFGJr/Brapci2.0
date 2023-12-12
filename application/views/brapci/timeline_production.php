@@ -17,7 +17,7 @@ for ($r=0;$r < count($meta);$r++)
                 if (file_exists($fl))
                     {
                         $txt = file_get_contents($fl);
-                        $ano = round(substr($txt,strpos($txt,'PY - ')+5,4));
+                        $ano = sround(substr($txt,strpos($txt,'PY - ')+5,4));
                         if (isset($prod[$ano]))
                             {
                                 $prod[$ano] = $prod[$ano] + 1;
@@ -47,7 +47,7 @@ foreach($prod as $ano => $tot)
         $sx .= '>';
         $sx .= '</td>';
         $sx .= cr();
-        
+
         $ms_ano = '';
         if (substr($ano,3,1) == '0')
             {
@@ -60,15 +60,15 @@ foreach($prod as $ano => $tot)
                 $ms_ano .= '&nbsp;<br>';
             }
         $ms_ano .= substr($ano,3,1);
-        $sl = '<td aling="center" 
-                style="font-size: 10px; margin: 0px; padding: 0px; 
+        $sl = '<td aling="center"
+                style="font-size: 10px; margin: 0px; padding: 0px;
                 border-right: 1px solid #eee; text-align: center;"
                 >'.$ms_ano.'</td>' . $sl;
         $tx = $sx . $tx;
         } else {
             $obs = 'Não identificado(s) '.$tot;
         }
-    }    
+    }
 $tb .= '<tr>'.$sl.'</tr>'.cr();
 $tb .= '<tr>'.$tx.'</tr>'.cr();
 if (strlen($obs) > 0)

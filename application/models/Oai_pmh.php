@@ -615,8 +615,8 @@ class oai_pmh extends CI_model
         $pagf = '';
         if (strlen($n) > 0) {
             if (strpos($n, '-') > 0) {
-                $pagi = round(substr($n, 0, strpos($n, '-')));
-                $pagf = round(substr($n, strpos($n, '-') + 1, strlen($n)));
+                $pagi = sround(substr($n, 0, strpos($n, '-')));
+                $pagf = sround(substr($n, strpos($n, '-') + 1, strlen($n)));
             } else {
                 $pagi = $n;
             }
@@ -1453,7 +1453,7 @@ class oai_pmh extends CI_model
         $sql = "select * from " . $this->base . "oai_listsets where ls_setspec = '$set' and ls_journal = '$jid' ";
         $rlt = db_query($sql);
         if ($line = db_read($rlt)) {
-            $sql = "update " . $this->base . "oai_listsets set ls_equal = '$tema' where id_ls = " . round($line['id_ls']);
+            $sql = "update " . $this->base . "oai_listsets set ls_equal = '$tema' where id_ls = " . sround($line['id_ls']);
             $this->db->query($sql);
             return ('');
         } else {
@@ -1593,7 +1593,7 @@ class oai_pmh extends CI_model
         $issue = $rcn['sources'];
         for ($r = 0; $r < count($issue); $r++) {
             $si = $issue[$r]['source'];
-            $ano = round($this->recupera_ano($si));
+            $ano = sround($this->recupera_ano($si));
             $nr = $this->recupera_nr($si);
             $vol = $this->recupera_vol($si);
 

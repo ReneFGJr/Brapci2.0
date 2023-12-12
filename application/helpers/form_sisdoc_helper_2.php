@@ -1,12 +1,12 @@
 <?php
 
-function nbr_author($xa, $tp) 
+function nbr_author($xa, $tp)
 {
     $xa = troca($xa,'JúNIOR','JÚNIOR');
-    $xa = utf8_decode($xa);    
+    $xa = utf8_decode($xa);
     $xa = troca($xa,', ,',',');
 
-    if (strpos($xa, ',') > 0) 
+    if (strpos($xa, ',') > 0)
     {
         $xb = trim(substr($xa, strpos($xa, ',') + 1, 100));
         $xa = trim(substr($xa, 0, strpos($xa, ',')));
@@ -17,9 +17,9 @@ function nbr_author($xa, $tp)
     $xx = "";
     for ($qk = 0; $qk < strlen($xa); $qk++)
     {
-        if (substr($xa, $qk, 1) == ' ') 
+        if (substr($xa, $qk, 1) == ' ')
         {
-            if (strlen(trim($xx)) > 0) 
+            if (strlen(trim($xx)) > 0)
             {
                 array_push($xp, trim($xx));
                 $xx = '';
@@ -28,51 +28,51 @@ function nbr_author($xa, $tp)
             $xx = $xx . substr($xa, $qk, 1);
         }
     }
-    
-    $xa = "";    
+
+    $xa = "";
     /////////////////////////////
     $xp1 = "";
     $xp2 = "";
     $er1 = array(utf8_decode('JÚNIOR'),"JUNIOR", "NETTO", "NETO", "SOBRINHO", "FILHO", "JR.", "JR");
-    
+
     ///////////////////////////// SEPARA NOMES
     $xop = 0;
-    for ($qk = count($xp) - 1; $qk >= 0; $qk--) 
+    for ($qk = count($xp) - 1; $qk >= 0; $qk--)
     {
         $xa = trim($xa . ' - ' . $xp[$qk]);
 
         /* Primeira operação */
-        if ($xop == 0) 
-        { 
+        if ($xop == 0)
+        {
             $xp1 = trim($xp[$qk] . ' ' . $xp1);
             $xop = -1;
-        } else { 
+        } else {
             $xp2 = trim($xp[$qk] . ' ' . $xp2);
-        }  
-        /* Checa os nomes */ 
-        if ($xop == -1) 
+        }
+        /* Checa os nomes */
+        if ($xop == -1)
             {
             $xop = 1;
-            for ($kr = 0; $kr < count($er1); $kr++) 
+            for ($kr = 0; $kr < count($er1); $kr++)
             {
-                if (trim(UpperCaseSQL($xp[$qk])) == trim($er1[$kr])) 
+                if (trim(UpperCaseSQL($xp[$qk])) == trim($er1[$kr]))
                 {
                     $xop = 0;
                 }
             }
         }
     }
-    
+
     ////////// 1 e 2
     $xp2a = strtolower($xp2);
     $xa = trim(trim($xp2) . ' ' . trim($xp1));
-    if (($tp == 1) or ($tp == 2)) 
+    if (($tp == 1) or ($tp == 2))
     {
         if ($tp == 1) { $xp1 = UpperCase($xp1);
         }
         $xa = trim(trim($xp1) . ', ' . trim($xp2));
-        if ($tp == 2) 
-        { 
+        if ($tp == 2)
+        {
             $xa = UpperCaseSQL(trim(trim($xp1) . ', ' . trim($xp2)));
         }
     }
@@ -80,55 +80,55 @@ function nbr_author($xa, $tp)
         if ($tp == 4) { $xa = UpperCaseSQL($xa);
         }
     }
-    
-    if (($tp >= 5) or ($tp <= 6)) 
+
+    if (($tp >= 5) or ($tp <= 6))
     {
         $xp2a = str_word_count(lowerCaseSQL($xp2), 1);
         $xp2 = '';
-        for ($k = 0; $k < count($xp2a); $k++) 
+        for ($k = 0; $k < count($xp2a); $k++)
         {
-            if ($xp2a[$k] == 'do') 
-            { 
+            if ($xp2a[$k] == 'do')
+            {
                 $xp2a[$k] = '';
             }
-            if ($xp2a[$k] == 'da') 
-            { 
+            if ($xp2a[$k] == 'da')
+            {
                 $xp2a[$k] = '';
             }
-            if ($xp2a[$k] == 'de') 
-            { 
+            if ($xp2a[$k] == 'de')
+            {
                 $xp2a[$k] = '';
             }
-            if (strlen($xp2a[$k]) > 0) 
-            { 
+            if (strlen($xp2a[$k]) > 0)
+            {
                 $xp2 = $xp2 . substr($xp2a[$k], 0, 1) . '. ';
             }
         }
         $xp2 = trim($xp2);
-        if ($tp == 6) 
-        { 
+        if ($tp == 6)
+        {
             $xa = UpperCaseSQL(trim(trim($xp2) . ' ' . trim($xp1)));
         }
-        if ($tp == 5) 
-        { 
+        if ($tp == 5)
+        {
             $xa = UpperCaseSQL(trim(trim($xp1) . ', ' . trim($xp2)));
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////
-    if (($tp == 7) or ($tp == 8)) 
+    if (($tp == 7) or ($tp == 8))
     {
         $mai = 1;
         $xa = strtolower($xa);
-        for ($r = 0; $r < strlen($xa); $r++) 
+        for ($r = 0; $r < strlen($xa); $r++)
         {
-            if ($mai == 1) 
-            { 
+            if ($mai == 1)
+            {
                 $xa = substr($xa, 0, $r) . UpperCase(substr($xa, $r, 1)) . substr($xa, $r + 1, strlen($xa));
                 $mai = 0;
             } else {
-                if ((substr($xa, $r, 1) == ' ') or (substr($xa, $r, 1) == '-')) 
-                { 
+                if ((substr($xa, $r, 1) == ' ') or (substr($xa, $r, 1) == '-'))
+                {
                     $mai = 1;
                 }
             }
@@ -146,14 +146,14 @@ function nbr_author($xa, $tp)
         $xa = troca($xa, ' To ', ' to ');
         $xa = troca($xa, ' For ', ' for ');
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////
-    if (($tp == 17) or ($tp == 18)) 
+    if (($tp == 17) or ($tp == 18))
     {
         $mai = 1;
         $xa = substr($xa,0,1).strtolower(substr($xa,1,strlen($xa)));
-    }  
-    $xa = utf8_encode($xa);  
+    }
+    $xa = utf8_encode($xa);
     return $xa;
 }
 
@@ -194,10 +194,10 @@ function check_dir($dir) {
         $rlt = fopen($dir . '/index.php', 'w+');
         fwrite($rlt, '<TT>Acesso negado</tt>');
         fclose($rlt);
-        
+
         /* conteudo do arquivo */
         $content = 'deny from all';
-        
+
         /* Bloqueia todo acesso */
         $rlt = fopen($dir . '/.htaccess', 'w');
         fwrite($rlt, $content);
@@ -206,7 +206,7 @@ function check_dir($dir) {
 }
 function redirect2($url,$time=0)
 {
-    
+
     if ($time <= 0)
     {
         redirect($url);
@@ -216,15 +216,15 @@ function redirect2($url,$time=0)
         <script>
         var count = '.$time.';
         var countdown = setInterval(
-            function() 
-            { 
+            function()
+            {
                 html = "'.msg('return_in').'";
                 $("#countdown").html(html + " " + count + "s");
                 if (count == 1) { clearInterval(countdown); window.open(\''.$url.'\', "_self"); }
                 count--;
             }, 1000
         );
-        </script>     
+        </script>
         ';
         return($sx);
     }
@@ -237,34 +237,34 @@ function romano($n)
     $d = array('','X','XX','XXX','XL','L','LX','LXX','LXXX','XC');
     $c = array('','C','CC','CCC','CD','D,','DC','DCC','DCCC','CM');
     $m = array('','M','MM','MMM');
-    
+
     if ($n < 3000)
     {
-        $v1 = round(substr($n,strlen($n)-1,1));
+        $v1 = sround(substr($n,strlen($n)-1,1));
         $r .= $u[$v1];
         $n = substr($n,0,strlen($n)-1);
         if (strlen($n) > 0)
         {
-            $v1 = round(substr($n,strlen($n)-1,1));
+            $v1 = sround(substr($n,strlen($n)-1,1));
             $r = $d[$v1].$r;
-            $n = substr($n,0,strlen($n)-1);                        
+            $n = substr($n,0,strlen($n)-1);
         }
         if (strlen($n) > 0)
         {
-            $v1 = round(substr($n,strlen($n)-1,1));
+            $v1 = sround(substr($n,strlen($n)-1,1));
             $r = $c[$v1].$r;
-            $n = substr($n,0,strlen($n)-1);                        
-        }                
+            $n = substr($n,0,strlen($n)-1);
+        }
         if (strlen($n) > 0)
         {
-            $v1 = round(substr($n,strlen($n)-1,1));
+            $v1 = sround(substr($n,strlen($n)-1,1));
             $r = $m[$v1].$r;
-            $n = substr($n,0,strlen($n)-1);                        
+            $n = substr($n,0,strlen($n)-1);
         }
     } else {
         $r = 'ERRO '.$n;
     }
-    return($r);               
+    return($r);
 }
 
 function isbn10to13($isbn)
@@ -317,17 +317,17 @@ function genchksum13($isbn)
         $isbn = substr($isbn, 0, -1);
         $tb = $tb + $ta + $tci;
     }
-    
+
     $tg = ($tb / 10);
     $tint = intval($tg);
     if ($tint == $tg) { return 0; }
     $ts = substr($tg, -1, 1);
     $tsum = (10 - $ts);
     return $tsum;
-} 
+}
 
 function message($l,$t=0)
-{    
+{
     $sx = '';
     $cl = array('success','success','secondary','danger','warning','info','light','dark');
     if (!isset($cl[$t]))
@@ -351,7 +351,7 @@ function refresh($url='',$time=0)
     } else {
         $sx = '<meta http-equiv="refresh" content="'.$time.';url='.$url.'" />';
     }
-    
+
     return($sx);
 }
 
@@ -362,17 +362,17 @@ function age($data)
     $dia = substr($data,6,2);
     $mes = substr($data,4,2);
     $ano = substr($data,0,4);
-    
+
     // Descobre que dia é hoje e retorna a unix timestamp
     $hoje = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-    
+
     // Descobre a unix timestamp da data de nascimento do fulano
     $nascimento = mktime( 0, 0, 0, $mes, $dia, $ano);
-    
+
     // Depois apenas fazemos o cálculo já citado :)
-    $idade = floor((((($hoje - $nascimento) / 60) / 60) / 24) / 365.25);        
+    $idade = floor((((($hoje - $nascimento) / 60) / 60) / 24) / 365.25);
     return($idade);
-} 
+}
 
 function view_body($sx,$dt=array())
 {
@@ -398,7 +398,7 @@ function le($par,$wh='')
         if (count($rlt) > 0)
         {
             return($rlt[0]);
-        }        
+        }
     } else {
         $sql = "select * from ".$par.' where '.$wh." limit 1";
         $rlt = $CI->db->query($sql);
@@ -406,7 +406,7 @@ function le($par,$wh='')
         if (count($rlt) > 0)
         {
             return($rlt[0]);
-        }        
+        }
     }
     return(array());
 }
@@ -445,7 +445,7 @@ function show($d)
                     $(frame).html($h);
                 }
             function cancelar($vlr,$id,frame)
-                {                    
+                {
                     alert(frame);
                     $(frame).html("xx");
                 }

@@ -29,7 +29,7 @@ class r
             $line = $rlt[0];
             return($line['r_algoritmo'].cr().cr());
         }
-    
+
     function library($l)
         {
             $sc = '#install.packages('.$l.')'.cr();
@@ -65,12 +65,12 @@ class r
             $sx .= '<a class="btn btn-outline-primary" onclick="$(\'#'.$qd.'\').toggle(\'slow\');">'.msg('Show_script_code').'</a>';
             $sx .= '<a href="#" onclick="myCopy(\''.$qd.'\');" class="btn btn-outline-primary">'.msg('Copy_code_to_clipboard').'</a>';
             $sx .= '<div>';
-            $sx .= '<textarea id="'.$qd.'" style="height: 250px; display: none; font-size: 12px; color: blue;" class="form-control">';            
+            $sx .= '<textarea id="'.$qd.'" style="height: 250px; display: none; font-size: 12px; color: blue;" class="form-control">';
             $sx .= $sc;
             $sx .= '</textarea>';
             $sx .= '</div>';
 
-  
+
             return($sx);
         }
 
@@ -88,7 +88,7 @@ class r
 
     function image_name($n=0)
         {
-            $n = round($n);
+            $n = sround($n);
             /*********** Arquivos de saida */
             $task = $_SESSION['__ci_last_regenerate'];
             $task = md5(date("YmdHis").$task);
@@ -152,8 +152,8 @@ class r
             return($sc);
         }
     function test()
-        {   
-            $sx = $this->delete_temp();  
+        {
+            $sx = $this->delete_temp();
 
             $file = '/var/www/html/brapci2.1/_repository/125240/2020/12/oai_ojs_pkp_sfu_ca_article_15770#00080.txt';
 
@@ -180,7 +180,7 @@ class r
             ############################ MANIPULANDO ARQUIVOS
             f <- \''.$file.'\'
             t <- scan(f, what="character", sep=\';\', encoding="UTF-8")
-            
+
             write(t,"'.$out.'");
 
             ############################ Grafico
@@ -196,7 +196,7 @@ class r
             $rst .= '<hr>';
             $rst .= file_get_contents($out);
             $sx .= '<pre>'.$rst.'</pre>';
-            return($sx);            
+            return($sx);
         }
     function html_image($img)
         {

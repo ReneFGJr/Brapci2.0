@@ -29,7 +29,7 @@ class ias_checks extends CI_Model
             $rlt = $rlt->result_array();
             $idc = $rlt[0]['id_cc'];
 
-            $sql = "select * from rdf_data 
+            $sql = "select * from rdf_data
                             where d_r2 = $idc
                             limit 20";
             $rlt = $this->db->query($sql);
@@ -82,9 +82,9 @@ class ias_checks extends CI_Model
                 }
 
                 $idn = $rdf->rdf_name($v1);
-                $sql = "update rdf_data 
-                                set d_literal = $idn 
-                                where d_r1 = $d1 
+                $sql = "update rdf_data
+                                set d_literal = $idn
+                                where d_r1 = $d1
                                 and d_p = $class
                                 AND d_literal = $d3";
                 $rlt = $this->db->query($sql);
@@ -105,7 +105,7 @@ class ias_checks extends CI_Model
             group by n_name, d_literal
             ) as tabela
             where total > 1
-            order by total 
+            order by total
             limit 1
             ";
         $rlt = $this->db->query($sql);
@@ -116,7 +116,7 @@ class ias_checks extends CI_Model
             $line = $rlt[$r];
             $idl = $line['d_literal'];
 
-            $sql = "SELECT * FROM rdf_data 
+            $sql = "SELECT * FROM rdf_data
                             INNER JOIN rdf_name ON d_literal = id_n
                             where d_literal = $idl
                             and d_p = $prop
@@ -159,8 +159,8 @@ class ias_checks extends CI_Model
             if (($n[3] > 0) and (count($fl) > 0)) {
                 $sx .= '<h4>Fase Ia</h4>';
                 /********************** Anos da publicação */
-                $a1 = round($this->recupera_dados($fl[0], 'PY'));
-                $a2 = round($this->recupera_dados($fl[1], 'PY'));
+                $a1 = sround($this->recupera_dados($fl[0], 'PY'));
+                $a2 = sround($this->recupera_dados($fl[1], 'PY'));
                 $ano = $a2;
                 if ($a1 == $a2) {
                     $n[0] = 1;

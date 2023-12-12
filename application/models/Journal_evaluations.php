@@ -29,38 +29,38 @@ class journal_evaluations extends CI_Model
             case 'report':
                 $sx = $this->report($d2);
             break;
-            
+
             case 'set':
                 $sx = $this->set();
             break;
-            
+
             case 'identify':
                 $sx .= $this->identify();
                 $sx .= '<br>' . $this->back();
             break;
-            
+
             case 'sets':
                 $sx .= $this->sets();
                 $sx .= '<br>' . $this->back();
             break;
-            
+
             case 'sources':
                 $sx .= $this->sources($d2, $d3, $d4);
                 $sx .= '<br>' . $this->back();
                 /* Atualiza data das publicações */
                 $this->set_years();
             break;
-            
+
             case 'source':
                 $sx .= $this->source($d2, $d3);
                 $sx .= '<br>' . $this->back();
             break;
-            
+
             case 'politics':
                 $sx .= $this->politics($d2, $d3);
                 $sx .= '<br>' . $this->back();
             break;
-            
+
             case 'listsets':
                 $sx .= $this->listsets();
                 $sx .= '<br>' . $this->back();
@@ -68,7 +68,7 @@ class journal_evaluations extends CI_Model
             case 'system':
                 $id = $this->rset();
                 $dt = le($this->sources->table, 'id_jnl=' . $id);
-                
+
                 $link = trim($dt['jnl_url']);
                 if (strlen($link) > 0) {
                     $txt = read_link($link);
@@ -76,7 +76,7 @@ class journal_evaluations extends CI_Model
                 }
                 $sx .= '<br>' . $this->back();
             break;
-            
+
             default:
             $sx .= '<h1>' . msg('journal_evaluation') . '</h1>';
             $sx .= '<ul>';
@@ -86,7 +86,7 @@ class journal_evaluations extends CI_Model
             $sx .= ' ' . msg('or') . ' ';
             $sx .= '<a href="' . base_url(PATH . 'evaluation/sources') . '">' . msg('source_journal') . '</a>';
             $sx .= '</li>';
-            
+
             if ($jnl > 0) {
                 $sx .= '<li>' . '<a href="' . base_url(PATH . 'evaluation/identify') . '">' . msg('ev_identify_journal') . '</a>' . '</li>';
                 $sx .= '<li>' . '<a href="' . base_url(PATH . 'evaluation/sets') . '">' . msg('ev_sets_journal') . '</a>' . '</li>';
@@ -105,16 +105,16 @@ class journal_evaluations extends CI_Model
         $sx = '<a href="' . base_url(PATH . 'evaluation') . '" class="btn btn-outline-primary">' . msg('return') . '</a>';
         return ($sx);
     }
-    
+
     function set_years()
     {
-        $sql = "update " . $this->base . "source_listidentifier 
+        $sql = "update " . $this->base . "source_listidentifier
         set li_year = year(li_datestamp)
         where li_year = 0 limit 1000";
         $rlt = $this->db->query($sql);
         return ($sql);
     }
-    
+
     function listsets()
     {
         //set_time_limit(60000);
@@ -125,11 +125,11 @@ class journal_evaluations extends CI_Model
         $sx .= '<div class="row">';
         $sx .= '<div class="col-12 text-center" style="border-top: 1px solid #000; border-bottom: 1px solid #000;">' . msg("Sections_journal") . '</div>';
         $sx .= $dt;
-        
+
         $sx .= '</div>';
         return ($sx);
     }
-    
+
     function sets()
     {
         $sx = '';
@@ -137,7 +137,7 @@ class journal_evaluations extends CI_Model
         $dt = $this->oai_pmh->getListSets(0, $data);
         $sx .= '<div class="row">';
         $sx .= '<div class="col-12 text-center" style="border-top: 1px solid #000; border-bottom: 1px solid #000;">' . msg("Sections_journal") . '</div>';
-        
+
         for ($r = 0; $r < count($dt); $r++) {
             $line = (array)$dt[$r];
             $setEsp = (string)$line['setSpec'];
@@ -149,7 +149,7 @@ class journal_evaluations extends CI_Model
         $sx .= '</div>';
         return ($sx);
     }
-    
+
     function update_sets($id, $cod, $setName)
     {
         if (strpos($setName, 'Ã') > 0) {
@@ -168,7 +168,7 @@ class journal_evaluations extends CI_Model
             $rrr = $this->db->query($sql);
         }
     }
-    
+
     function sources()
     {
         $sx = '';
@@ -176,7 +176,7 @@ class journal_evaluations extends CI_Model
         $sx = row3($par);
         return ($sx);
     }
-    
+
     function source($d1, $d2)
     {
         $sx = '';
@@ -186,17 +186,17 @@ class journal_evaluations extends CI_Model
         $sx .= show($dt);
         return ($sx);
     }
-    
+
     function identify()
     {
         //$this->load->model('sources');
-        
+
         $id = $this->rset();
         $dt = $this->oai_pmh->identify($id);
         $sx = $this->journal_update($dt);
         return ($sx);
     }
-    
+
     function journal_update($dt)
     {
         $sx = '';
@@ -205,38 +205,38 @@ class journal_evaluations extends CI_Model
             $url_oai = $dt['baseURL'];
             $url = troca($url_oai, '/oai', '');
             $sx .= '<div class="row">';
-            
+
             $sx .= '<div class="col-12 text-center" style="border-top: 1px solid #000; border-bottom: 1px solid #000;">' . msg("About_journal") . '</div>';
             $sx .= '<div class="col-2 text-right small">' . msg("journal_name") . '</div>';
             $sx .= '<div class="col-10"><b>' . $name . '</b></div>';
-            
+
             $sx .= '<div class="col-2 text-right small">' . msg("journal_administrator") . '</div>';
             $sx .= '<div class="col-10"><b>' . $dt['adminEmail'] . '</b></div>';
-            
+
             $sx .= '<div class="col-12 text-center" style="border-top: 1px solid #000; border-bottom: 1px solid #000;">' . msg("OAI Protocol") . '</div>';
             $var = array('protocolVersion', 'deletedRecord', 'granularity', 'baseURL');
             for ($r = 0; $r < count($var); $r++) {
                 $sx .= '<div class="col-4 text-right small">' . msg($var[$r]) . '</div>';
                 $sx .= '<div class="col-8"><b>' . msg($dt[$var[$r]]) . '</b></div>';
             }
-            
+
             $sx .= '</div>';
         }
         $id = $dt['id_jnl'];
         $sql = "update " . $this->sources->table . "
-        set jnl_oai_last_harvesting = '" . date("Y/m/d-H:i:s") . "', 
+        set jnl_oai_last_harvesting = '" . date("Y/m/d-H:i:s") . "',
         jnl_active = 1,
         jnl_name = '$name'
         where id_jnl = " . $id;
         $rrr = $this->db->query($sql);
         return ($sx);
     }
-    
+
     function oai_data()
     {
         $data = array();
         if (isset($_SESSION['jnl_id'])) {
-            $id = round($_SESSION['jnl_id']);
+            $id = sround($_SESSION['jnl_id']);
             $data = $this->sources->le($id);
         } else {
             echo "OPS 554";
@@ -261,7 +261,7 @@ class journal_evaluations extends CI_Model
         $form = new form;
         $cp = array();
         if (get("dd1") == '') {
-            //$_POST['dd1'] = $this->rset();                        
+            //$_POST['dd1'] = $this->rset();
         }
         array_push($cp, array('$H8', '', '', false, false));
         array_push($cp, array('$S100', '', msg('journal_url'), true, true));
@@ -278,12 +278,12 @@ class journal_evaluations extends CI_Model
                 //echo substr($url,strlen($url)-6,5);
             }
             $url_oai = $url . '/oai';
-            $sql = "select * from " . $this->sources->table . " 
+            $sql = "select * from " . $this->sources->table . "
             where jnl_url = '$url'";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             if (count($rlt) == 0) {
-                $xsql = "insert into " . $this->sources->table . " 
+                $xsql = "insert into " . $this->sources->table . "
                 (jnl_name, jnl_url, jnl_url_oai)
                 values
                 ('no name yet','$url','$url_oai')";
@@ -298,7 +298,7 @@ class journal_evaluations extends CI_Model
         }
         return ($sx);
     }
-    
+
     function politics($id)
     {
         $sx = '';
@@ -310,19 +310,19 @@ class journal_evaluations extends CI_Model
         $dt = le($this->sources->table, 'id_jnl=' . $id);
         #authorGuidelines
         for ($r = 0; $r < count($tp); $r++) {
-            $sql = "select * from " . $this->base . "source_politics 
+            $sql = "select * from " . $this->base . "source_politics
             where sp_journal = $id and sp_class = '" . $tp[$r] . "'";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
             $sx .= '<br>Verificando ' . $tp[$r];
-            
+
             if (count($rlt) == 0) {
                 $url = $dt['jnl_url'] . '/' . $tp[$r];
                 $txt = file_get_contents($url);
                 $txt = troca($txt, "'", "\'");
                 $sql = "insert into " . $this->base . "source_politics
                 (sp_journal, sp_class, sp_text)
-                values 
+                values
                 ($id,'$tp[$r]','$txt')";
                 $rrr = $this->db->query($sql);
                 $sx .= '<span style="color: green;">INSERTERD</span>';
@@ -333,11 +333,11 @@ class journal_evaluations extends CI_Model
         $sx .= $this->politics_analyse($id);
         return ($sx);
     }
-    
+
     function politics_analyse($id)
     {
         $sx = '';
-        $sql = "select * from " . $this->base . "source_politics 
+        $sql = "select * from " . $this->base . "source_politics
         where sp_journal = $id";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -365,7 +365,7 @@ class journal_evaluations extends CI_Model
                     $sx .= $this->politics_recover($txt, 'privacyStatement');
                     $sx .= $this->politics_recover($txt, 'copyrightNotice');
                     $sx .= $this->politics_recover($txt, 'copyrightNotice');
-                    
+
                 break;
                 case 'about/editorialPolicies':
                     $sx .= $this->politics_recover($txt, 'focusAndScope');
@@ -384,7 +384,7 @@ class journal_evaluations extends CI_Model
         }
         return ($sx);
     }
-    
+
     function politics_recover($txt, $type)
     {
         $id = '<div id="' . $type . '">';
@@ -400,18 +400,18 @@ class journal_evaluations extends CI_Model
     }
     #supportContact
     #pageFooter
-    
+
     function politics_authorGuidelines($txt)
     {
     }
-    
+
     function version_software($jnl, $txt)
     {
         $version = $this->recover_metadata($txt, "generator", "content");
         $this->report_update($jnl, 'software', $version);
         return ($version);
     }
-    
+
     function recover_metadata($txt, $name, $meta)
     {
         $str = 'name="' . $name . '" ' . $meta . '="';
@@ -423,32 +423,32 @@ class journal_evaluations extends CI_Model
         }
         return ('undefined');
     }
-    
+
     function report_coauthor($id)
     {
         $dt_fim = date("Y");
         $dt_ini = $dt_fim - 20;
-        
+
         $t = array();
         /**************************************************** Legendas */
         for($r=0;$r < ($dt_fim - $dt_ini);$r++)
         {
             $t['s'][$r] = $r+$dt_ini;
-        }     
+        }
         /**************************************************** Matriz */
         $t['eixo_y'] = 'Percentual (%)';
         $t['eixo_x'] = 'Ano';
-        
+
         /* Series */
         for ($y = 1; $y <= 5; $y++) {
             /* Anos */
             for ($r = 0; $r <= ($dt_fim - $dt_ini); $r++)
             {
-                if ($y==1) 
+                if ($y==1)
                 {
                     $label = $y .' '.msg('author_unique');
                 } else {
-                    if ($y >= 5)                                                    
+                    if ($y >= 5)
                     {
                         $label = '+5 '.msg('authors');
                     } else {
@@ -472,22 +472,22 @@ class journal_evaluations extends CI_Model
             ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             for ($r = 0; $r < count($rlt); $r++) {
                 $line = $rlt[$r];
                 $year = $line['year'] - $dt_ini;
                 $auths = $line['authors'];
                 $total = $line['total'];
-                
+
                 if ($auths > 5) {
                     $auths = 5;
                 }
-                $t['x'][$auths][$year] = $t['x'][$auths][$year] + $total;            
+                $t['x'][$auths][$year] = $t['x'][$auths][$year] + $total;
             }
-            
+
             $hc = new highchart;
             $t['title'] = 'Tipos de autorias dos trabalhos (normalizado 100%) ('.$dt_ini.'-'.$dt_fim.')';
-            
+
             /* Normalizar */
             for($y=0;$y < count($t['x'][1]);$y++)
             {
@@ -502,35 +502,35 @@ class journal_evaluations extends CI_Model
                     for ($r=1;$r <= count($t['x']); $r++)
                     {
                         $v = $t['x'][$r][$y];
-                        $t['x'][$r][$y] = round(($v/$tt)*100);
+                        $t['x'][$r][$y] = sround(($v/$tt)*100);
                     }
-                }                
+                }
             }
             //echo '<pre>'; print_r($t); echo '</pre>';
             $sx = $hc->show($t);
             return ($sx);
         }
-        
+
         function report_update($jnl, $field, $text)
         {
             $sql = "select * from " . $this->base . "source_report
             where rp_jnl = $jnl and rp_field = '$field' ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             if (count($rlt) == 0) {
-                $sql = "insert into " . $this->base . "source_report 
+                $sql = "insert into " . $this->base . "source_report
                 (rp_jnl, rp_field, rp_text)
                 value
                 ($jnl,'$field','$text')";
             } else {
-                $sql = "update " . $this->base . "source_report 
+                $sql = "update " . $this->base . "source_report
                 set rp_text = '$text'
                 where id_rp = " . $rlt[0]['id_rp'];
             }
             $rlt = $this->db->query($sql);
         }
-        
+
         function report($id = 0)
         {
             $this->load->helper("highchart");
@@ -546,7 +546,7 @@ class journal_evaluations extends CI_Model
             $sx .= $this->report_keywords($id);
             return ($sx);
         }
-        
+
         function report_journal($id)
         {
             $dt = le($this->sources->table, 'id_jnl=' . $id);
@@ -558,7 +558,7 @@ class journal_evaluations extends CI_Model
             $sx .= '</table>';
             return ($sx);
         }
-        
+
         function report_author($id)
         {
             $dt_fim = date("Y") + 1;
@@ -573,7 +573,7 @@ class journal_evaluations extends CI_Model
             ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             $sx = '<br><br>';
             $sx .= '<h2>' . msg('report_authors') . ' - TOP ' . $limit . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
             $sx .= '<div class="row">';
@@ -587,7 +587,7 @@ class journal_evaluations extends CI_Model
             $sx .= '</div></div>';
             return ($sx);
         }
-        
+
         function report_keywords($id)
         {
             $dt_fim = date("Y") + 1;
@@ -602,7 +602,7 @@ class journal_evaluations extends CI_Model
             ";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             $sx = '<br><br>';
             $sx .= '<h2>' . msg('report_keywords') . ' - TOP ' . $limit . ' (' . $dt_ini . '-' . $dt_fim . ')</h2>';
             $sx .= '<div class="row">';
@@ -614,7 +614,7 @@ class journal_evaluations extends CI_Model
             }
             $sx .= '</ol>';
             $sx .= '</div></div>';
-            
+
             $sql = "select a_name, count(*) as total from " . $this->base . "source_subject
             where a_jnl = $id
             and (a_year >= $dt_ini and a_year <= $dt_fim)
@@ -636,20 +636,20 @@ class journal_evaluations extends CI_Model
             $sx .= $this->load->view("brapci/cloud_tags_3", $data, true);
             return ($sx);
         }
-        
+
         function report_publications($id)
         {
             $dt_fim = date("Y") + 1;
             $dt_ini = $dt_fim - 15;
-            
+
             $sql = "select ar_year, ar_lang, count(*) as total
-            from " . $this->base . "source_article 
+            from " . $this->base . "source_article
             where ar_jnl = $id and (ar_year >= $dt_ini and ar_year <= $dt_fim)
             group by ar_year, ar_lang
             order by ar_lang";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             /* Zera os anos */
             $t = array();
             $sh = '<th>ano</th>';
@@ -678,12 +678,12 @@ class journal_evaluations extends CI_Model
                 }
             }
             $sx .= '</table>';
-            
-            
-            $sql = "select count(*) as total, ar_year 
+
+
+            $sql = "select count(*) as total, ar_year
             from (
-                select ar_article, ar_year 
-                from " . $this->base . "source_article 
+                select ar_article, ar_year
+                from " . $this->base . "source_article
                 where ar_jnl = $id and
                 (ar_year >= $dt_ini and ar_year <= $dt_fim)
                 group by ar_article, ar_year
@@ -698,7 +698,7 @@ class journal_evaluations extends CI_Model
                 $sx1 = '';
                 $sx2 = '';
                 $sx3 = '';
-                
+
                 $max = 10;
                 for ($r = 0; $r < count($rlt); $r++) {
                     if ($rlt[$r]['total'] > $max) {
@@ -707,7 +707,7 @@ class journal_evaluations extends CI_Model
                 }
                 for ($r = 0; $r < count($rlt); $r++) {
                     $line = $rlt[$r];
-                    $sz = round(200 * ($line['total'] / $max));
+                    $sz = sround(200 * ($line['total'] / $max));
                     $bar = '<img src="' . base_url('img/point/point_blue.png') . '" style="height: ' . $sz . 'px; width: 100%;">';
                     $sx1 .= '<td width="5%" valign="bottom">' . $bar . '</td>';
                     $sx2 .= '<td width="5%" valign="bottom">' . $line['total'] . '</td>';
@@ -719,14 +719,14 @@ class journal_evaluations extends CI_Model
                 $sx .= '</table>';
                 return ($sx);
             }
-            
+
             function report_production($id)
             {
                 $dt_fim = date("Y") + 1;
                 $dt_ini = $dt_fim - 10;
-                $sql = "select sets_name, year(li_datestamp) as year, 
+                $sql = "select sets_name, year(li_datestamp) as year,
                 month(li_datestamp) as month,
-                count(*) as total, li_setSpec 
+                count(*) as total, li_setSpec
                 from " . $this->base . "source_listidentifier
                 left join " . $this->base . "source_sets ON li_setSpec = sets_session and sets_journal = $id
                 where li_jnl = $id and li_status = 'active'
@@ -734,7 +734,7 @@ class journal_evaluations extends CI_Model
                 order by li_setSpec, year";
                 $rlt = $this->db->query($sql);
                 $rlt = $rlt->result_array();
-                
+
                 $t = array();
                 $sec = array();
                 for ($r = $dt_ini; $r <= $dt_fim; $r++) {
@@ -742,7 +742,7 @@ class journal_evaluations extends CI_Model
                         $t[$r][$y] = 0;
                     }
                 }
-                
+
                 /*************************************** DATA DE PUBLICAÇÃO NO SISTEMA ***/
                 $max = 10;
                 for ($r = 0; $r < count($rlt); $r++) {
@@ -756,14 +756,14 @@ class journal_evaluations extends CI_Model
                             $max = ($t[$year][$month] * 1.1);
                         }
                     }
-                    
+
                     if (isset($sec[$section])) {
                         $sec[$section] = $sec[$section] + $line['total'];
                     } else {
                         $sec[$section] = $line['total'];
                     }
                 }
-                
+
                 $sx = '<br><br>';
                 $sx .= '<h2>' . msg('report_distribution') . '</h2>';
                 $sx .= '<div class="row">';
@@ -783,7 +783,7 @@ class journal_evaluations extends CI_Model
                 $sx .= $st;
                 $sx .= '</table>';
                 $sx .= '</div></div>';
-                
+
                 /***********************************************/
                 $sx .= '<br><br>';
                 $sx .= '<h2>' . msg('report_distribution_month') . '</h2>';
@@ -792,7 +792,7 @@ class journal_evaluations extends CI_Model
                 for ($r = 1; $r <= 12; $r++) {
                     $sx .= '<th class="text-center small">' . meses($r) . '</th>';
                 }
-                
+
                 foreach ($t as $year => $totais) {
                     $sx .= '<tr>';
                     $sx .= '<td width="4%">' . $year . '</td>';
@@ -806,7 +806,7 @@ class journal_evaluations extends CI_Model
                     $sx .= '</tr>';
                 }
                 $sx .= '</table>';
-                
+
                 return ($sx);
             }
             function getRecord($id = 0)
@@ -816,9 +816,9 @@ class journal_evaluations extends CI_Model
                 if ($id == 0) {
                     $id = $this->rset();
                 }
-                
+
                 $data = le($this->sources->table, 'id_jnl=' . $id);
-                $sql = "select * from " . $this->base . "source_listidentifier 
+                $sql = "select * from " . $this->base . "source_listidentifier
                 where li_jnl = $id and li_s = 1 and li_status = 'active'
                 order by li_update desc
                 limit 20";
@@ -834,7 +834,7 @@ class journal_evaluations extends CI_Model
                     if ($year == '[????]') {
                         $year = substr($ds['date'][0], 0, 4);
                     }
-                    
+
                     /* title */
                     if (isset($ds['title'])) {
                         for ($y = 0; $y < count($ds['title']); $y++) {
@@ -844,7 +844,7 @@ class journal_evaluations extends CI_Model
                             $this->title_update($idh, $name, $lang, $year, $id);
                         }
                     }
-                    
+
                     /* Autores */
                     if (isset($ds['authors'])) {
                         for ($y = 0; $y < count($ds['authors']); $y++) {
@@ -853,7 +853,7 @@ class journal_evaluations extends CI_Model
                             $this->authors_update($idh, $name, $year, $id);
                         }
                     }
-                    
+
                     /* Subject */
                     if (isset($ds['subject'])) {
                         for ($y = 0; $y < count($ds['subject']); $y++) {
@@ -862,7 +862,7 @@ class journal_evaluations extends CI_Model
                             $this->subject_update($idh, $name, $year, $id);
                         }
                     }
-                    $sql = "update " . $this->base . "source_listidentifier 
+                    $sql = "update " . $this->base . "source_listidentifier
                     set li_s = 2
                     where id_li = $idh";
                     $rrr = $this->db->query($sql);
@@ -874,7 +874,7 @@ class journal_evaluations extends CI_Model
                 }
                 return ($sx);
             }
-            
+
             function authors_update($article, $author, $year, $journal)
             {
                 $sql = "select * from " . $this->base . "source_autores

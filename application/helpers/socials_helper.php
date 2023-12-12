@@ -14,25 +14,25 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 
 /*
-no MENU PRINCIPAL 
+no MENU PRINCIPAL
 <li class="nav-item navbar-toggler-right">
-<?php 
+<?php
 $socials = new socials;
-echo $socials -> menu_user(); 
+echo $socials -> menu_user();
 ?>
 </li>
 
 Controller
 function social($act = '',$id='',$chk='') {
     $this -> cab();
-    $socials = new socials;        
+    $socials = new socials;
     $data['content'] = $socials->social($act,$id,$chk);
     if (strlen($data['content']) > 0)
     {
         $this->load->view('content',$data);
     }
     return('');
-}             
+}
 */
 /****************** Security login ****************/
 function perfil($p, $trava = 0)
@@ -55,9 +55,9 @@ function perfil($p, $trava = 0)
 
 class socials
 {
-    
+
     var $table = "users";
-    
+
     /* Google */
     var $auth_google = 1;
     var $google_redirect = 'http://www.brapci.inf.br/oauth_google.php';
@@ -67,14 +67,14 @@ class socials
     var $auth_microsoft = 1;
     var $microsoft_id = 'xx';
     var $microsoft_key = 'xx-aXZrUboW21';
-    
+
     /* Facebook */
     var $auth_facebook = 1;
     var $face_id = 'xx';
     var $face_app = 'xx';
     var $face_url = 'https://www.facebook.com/dialog';
     var $face_redirect = 'http://www.brapci.inf.br/oauth_facebook.php';
-    
+
     /* Linked in*/
     var $auth_linkedin = 1;
     var $linkedin_url = "https://www.linkedin.com/uas/oauth2/authorization";
@@ -85,7 +85,7 @@ class socials
     var $linkedin_redirect = 'http://www.brapci.inf.br/oauth_linkedin.php';
 
     var $user_picture_dir = '_repositorio/users/';
-    
+
     function captcha()
     {
         $sx = '
@@ -108,7 +108,7 @@ class socials
             echo '</pre>';
             return($sx);
         }
-    
+
     function social($act = '', $id = '', $chk = '')
     {
         $sx = '';
@@ -118,7 +118,7 @@ class socials
         if ($act == 'form') {
             $act = 'login';
         }
-        
+
         switch ($act) {
             case 'about':
                 $sx .= $this->about();
@@ -148,7 +148,7 @@ class socials
             case 'login':
                 $this->login();
             break;
-            
+
             case 'login_local':
                 $this->login_local();
             break;
@@ -158,12 +158,12 @@ class socials
             break;
 
             case 'group':
-                $this->groups($id, $chk);                
-            break;  
+                $this->groups($id, $chk);
+            break;
 
             case 'group_members':
                 if (perfil("#ADM#GER"))
-                {            
+                {
                     $this->groups_members($id);
                 }
             break;
@@ -173,25 +173,25 @@ class socials
                 {
                     $this->group_edit($id);
                 }
-            break;  
-            
+            break;
+
             case 'attrib':
                 $this->attributes($id, $chk);
                 redirect(base_url(PATH . 'social/perfil/' . $id));
             break;
-            
+
             case 'users':
                 $this->row();
             break;
-            
+
             case 'user_edit':
                 $this->editar($id, $chk);
             break;
-            
+
             case 'user_password':
                 $this->change_password($id, $chk);
             break;
-            
+
             default:
             if (perfil("#ADMIN")) {
                 $sx = '<h1>Socials Menu</h1>';
@@ -216,7 +216,7 @@ class socials
 
             $CI = &get_instance();
             $form = new form;
-            $form->id = round($id);
+            $form->id = sround($id);
             $cp = array();
             array_push($cp,array('$H8','id_gr','',false,false));
             array_push($cp,array('$S100','gr_name',msg('gr_name'),true,true));
@@ -226,35 +226,35 @@ class socials
                     array_push($cp,array('$HV','gr_library',LIBRARY,true,true));
                 } else {
                     array_push($cp,array('$S20','gr_library',msg('gr_library'),false,false));
-                }       
+                }
             $sx .= $form->editar($cp,'users_group');
             $sx .= '</div></div>';
 
             /* Saved */
             if ($form->saved > 0) { redirect(base_url(PATH.'social/group')); }
             $data['content'] = $sx;
-            $CI->load->view('content',$data);            
+            $CI->load->view('content',$data);
         }
 
-    function groups_members($id)         
+    function groups_members($id)
         {
             $CI = &get_instance();
-            $id = round($id);
+            $id = sround($id);
             $sx = $this->group_show($id);
             $sx .= $this->group_members_show($id);
 
             $data['content'] = $sx;
-            $CI->load->view('content',$data); 
+            $CI->load->view('content',$data);
         }
 
-    
+
     function group_show($id)
         {
             $CI = &get_instance();
-            $sql = "select * from users_group 
+            $sql = "select * from users_group
                         where gr_library = '".LIBRARY."' and id_gr = $id";
             $rlt = $CI->db->query($sql);
-            $rlt = $rlt->result_array();            
+            $rlt = $rlt->result_array();
             $line = $rlt[0];
             $sx = '<div class="row" style="border-bottom: 1px solid #000000">';
             $sx .= '<div class="'.bscol(11).'  big">'.$line['gr_name'].'</div>';
@@ -281,7 +281,7 @@ class socials
                     $rlt = $CI->db->query($sql);
                     return(TRUE);
                 }
-            return(FALSE);            
+            return(FALSE);
         }
 
     function group_members_show($id)
@@ -301,7 +301,7 @@ class socials
                         inner join users ON id_us = grm_user
                         where grm_library = '".LIBRARY."' and grm_group = $id";
             $rlt = $CI->db->query($sql);
-            $rlt = $rlt->result_array();            
+            $rlt = $rlt->result_array();
             $sx = '<div class="row" style="margin-bottom: 50px;">';
             for ($r=0;$r < count($rlt);$r++)
             {
@@ -311,7 +311,7 @@ class socials
                 $sx .= '<div class="'.bscol(5).'">'.$line['us_login'].'</div>';
                 $sx .= '<div class="'.bscol(1).'">'.$link.'</div>';
                 //$sx .= '<div class="'.bscol(1).'">'.$line['gr_hash'].'</div>';
-            } 
+            }
             if (count($rlt) == 0)
                 {
                     $sx .= message('Sem usuários atribuídos',3);
@@ -319,7 +319,7 @@ class socials
             $sx .= '</div>';
 
             if (perfil("#ADM#GES") > 0)
-            {                
+            {
                 $form = new form;
                 $form->id = 0;
                 $cp = array();
@@ -352,22 +352,22 @@ class socials
                     $sx .= '</div>';
                     $sx .= '</div>';
                 }
-            }                    
-            
-            return($sx);
-        }        
+            }
 
-    function groups($id='',$chk='') 
+            return($sx);
+        }
+
+    function groups($id='',$chk='')
         {
             $CI = &get_instance();
             $sx = '
             <div class="row">
             <div class="'.bscol(12).'">
             <h1>Grupos de usuários</h1>';
-            
+
             $this->check_sql_tables();
-            $sql = "select * from users_group 
-                        where gr_library = '".LIBRARY."' 
+            $sql = "select * from users_group
+                        where gr_library = '".LIBRARY."'
                         ORDER BY gr_name";
             $rlt = $CI->db->query($sql);
             $rlt = $rlt->result_array();
@@ -402,12 +402,12 @@ class socials
                             if (perfil("#ADM#GES"))
                             {
                                 $sx .= '<a class="small" href="'.base_url(PATH.'social/group_members/'.$line['id_gr']).'">'.msg('edit_member').'</a>';
-                            } 
+                            }
 
                         }
                     $sx .= '</ul>';
-                }           
-            
+                }
+
             for($r=0;$r < count($rlt);$r++)
                 {
 
@@ -450,13 +450,13 @@ class socials
 
             $sql = "
             SELECT COUNT(*) as total
-            FROM information_schema.tables 
-            WHERE table_schema = '$db' 
+            FROM information_schema.tables
+            WHERE table_schema = '$db'
             AND table_name = 'users_group'
             ";
             $rlt = $CI->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             if ($rlt[0]['total'] == 0)
                 {
                     $sql = "CREATE TABLE users_group (
@@ -472,13 +472,13 @@ class socials
             /************************************************* users_group */
             $sql = "
             SELECT COUNT(*) as total
-            FROM information_schema.tables 
-            WHERE table_schema = '$db' 
+            FROM information_schema.tables
+            WHERE table_schema = '$db'
             AND table_name = 'users_group_members'
             ";
             $rlt = $CI->db->query($sql);
             $rlt = $rlt->result_array();
-            
+
             if ($rlt[0]['total'] == 0)
                 {
                     $sql = "CREATE TABLE users_group_members (
@@ -537,19 +537,19 @@ class socials
                 $CI = &get_instance();
                 $CI->load->helper("email");
                 $sender = Array('smtp_protocol' => 'PHPMailer',
-                        'smtp_host' => get("dd3"), 
-                        'smtp_port' => get("dd4"), 
-                        'smtp_user' => get("dd1"), 
-                        'smtp_pass' => get("dd2"), 
-                        'mailtype' => 'html', 
-                        'charset' => 'iso-8859-1', 
-                        'wordwrap' => TRUE); 
+                        'smtp_host' => get("dd3"),
+                        'smtp_port' => get("dd4"),
+                        'smtp_user' => get("dd1"),
+                        'smtp_pass' => get("dd2"),
+                        'mailtype' => 'html',
+                        'charset' => 'iso-8859-1',
+                        'wordwrap' => TRUE);
                 $r = enviaremail(get("dd7"),'Teste - '.date("Y-m-d H:i:s"),'<b>HTML</b>teste');
                 print_r($r);
                 }
             return($sx);
         }
-    
+
     function npass()
     {
         $CI = &get_instance();
@@ -557,7 +557,7 @@ class socials
         $chk = get("chk");
         $chk2 = checkpost_link($email . $email);
         $chk3 = checkpost_link($email . date("Ymd"));
-        
+
         if ((($chk != $chk2) and ($chk != $chk3)) and (!isset($_POST['dd1']))) {
             $data['content'] = 'Erro de Check';
             $CI->load->view('content', $data);
@@ -578,8 +578,8 @@ class socials
         }
         return ('');
     }
-    
-    
+
+
     function logout()
     {
         /* Salva session */
@@ -593,7 +593,7 @@ class socials
                 {
                     $id = $id['id_us'];
                 }
-            
+
             $imgt = $this->user_picture_dir.'/user_'.strzero($id,7).'.jpg';
             if (file_exists($imgt))
                 {
@@ -601,12 +601,12 @@ class socials
                 }
 			$img = 'img/no_image.png';
 			return($img);
-		}    
+		}
 
 	function user_tela($dt)
 		{
 			$sx = '';
-			$img = $this->user_image($dt);		
+			$img = $this->user_image($dt);
 
 			$sx .= '<div class="'.bscol(8).'">';
 			$sx .= '<span class="small">'.msg('us_nome').'</span><br/>';
@@ -621,12 +621,12 @@ class socials
 			$sx .= '<img src="'.base_url($img).'" class="img-fluid">';
 			$sx .= '</div>';
 			return($sx);
-		}    
-    
+		}
+
     function ac($id = '')
     {
         $this->load->model('users');
-        
+
         $line = $this->users->le($id);
         /* Salva session */
         $ss_id = $line['id_us'];
@@ -638,13 +638,13 @@ class socials
         $this->session->set_userdata($data);
         redirect(base_url('index.php/home'));
     }
-    
+
     function perfil($id)
     {
         $CI = &get_instance();
         if (strlen($id) == 0) {
             if (isset($_SESSION['id'])) {
-                $id = round($_SESSION['id']);
+                $id = sround($_SESSION['id']);
             } else {
                 $id = 0;
             }
@@ -655,7 +655,7 @@ class socials
             exit;
         }
         $sx = $this->show_perfil($dt);
-        
+
         $cnt = '<ul>';
         $link = '<a href="' . base_url(PATH . 'social/user_password/' . $dt['id_us'] . '/' . md5($dt['us_login'])) . '">';
         $linka = '</a>';
@@ -664,18 +664,18 @@ class socials
         $link = '<a href="' . base_url(PATH . 'social/api_key/' . $dt['id_us'] . '/' . md5($dt['us_login'])) . '">';
         $cnt .= '<li>' . $link . msg('gerate_api_key') . $linka . '</li>';
         $cnt .= '</ul>';
-        
+
         $cnt .= $this->show_attri($id);
-        
+
         $sx = troca($sx, '<cnt/>', $cnt);
-        
+
         $d['content'] = $sx;
         $CI->load->view('content', $d);
         return ($sx);
     }
-    
+
     function menu_user()
-    {        
+    {
         if (isset($_SESSION['user']) and (strlen($_SESSION['user']) > 0)) {
             $name = $_SESSION['user'];
             $sx = '
@@ -694,7 +694,7 @@ class socials
         }
         return ($sx);
     }
-    
+
     function button_login_modal()
     {
         $CI = &get_instance();
@@ -717,7 +717,7 @@ class socials
         <br>
         <span>' . msg("form_user_password") . '</span><br>
         <input type="password" name="user_password" value="" class="form-control">
-        
+
         <br>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">' . msg('cancel') . '</button>
         &nbsp;|&nbsp;
@@ -732,7 +732,7 @@ class socials
         //$sx = $CI->load->view('social/login/login.php', $data, true);
         return ($sx);
     }
-    
+
     function login_local()
     {
         $dd1 = get('dd1') . get("user_login");
@@ -752,7 +752,7 @@ class socials
         }
         return ($ok);
     }
-    
+
     function login($simple = 0)
     {
         $CI = &get_instance();
@@ -763,10 +763,10 @@ class socials
             $data['content'] = $this->view_login_signin();
             $CI -> load->view('content',$data);
         }
-        
+
         //$this -> load -> view('auth_social/login_horizontal', null);
     }
-    
+
     function view_login_signin($data=array())
     {
         $sx = '';
@@ -775,7 +775,7 @@ class socials
         {
             $sx .= message(msg($err),3);
         }
-        
+
         $sx .= '
         <!---- Social Login ---->
         <style>
@@ -801,14 +801,14 @@ class socials
         <br/>
         <br/>
         <h2 class="text-center">'.msg('SignIn').'</h2>
-        
+
         <!--- email login social --->
         <div class="" data-validate = "Valid email is: a@b.c">
         <span>'.msg('e-mail').'</span>
         <input class="form-control" type="text" name="user_login">
         <span class="focus-input100" data-placeholder="Email"></span>
         </div>
-        
+
         <!--- password login social --->
         <br/>
         <div class="" data-validate="Enter password">
@@ -821,7 +821,7 @@ class socials
         <input type="submit" class="btn btn-primary" style="width: 100%;" value="'.msg('login').'">
         </div>
         <br/>';
-        
+
         if (!isset($data['forgot']))
         {
         $sx .= '
@@ -837,7 +837,7 @@ class socials
         $sx .= '
         <!--- Create a Passwrod --->
         <div class="text-center p-t-115">
-        <span class="txt1">'.msg('Don’t have an account?').'</span>                
+        <span class="txt1">'.msg('Don’t have an account?').'</span>
         <a class="txt2 text-dark" href="'.base_url(PATH.'social/signup').'"> '.msg('SignUp').' </a>
         </div>
         <br/>';
@@ -850,12 +850,12 @@ class socials
         </div>
         </div>
         ';
-        
+
         /* Scripts */
         $sx .= "
         <script>
         (function($) {
-            'use strict';                    
+            'use strict';
             /*==================================================================
             [ Focus input ]*/
             $('.input100').each(function() {
@@ -870,25 +870,25 @@ class socials
             /*==================================================================
             [ Validate ]*/
             var input = $('.validate-input .input100');
-            
+
             $('.validate-form').on('submit', function() {
                 var check = true;
-                
+
                 for (var i = 0; i < input.length; i++) {
                     if (validate(input[i]) == false) {
                         showValidate(input[i]);
                         check = false;
                     }
-                }                        
+                }
                 return check;
             });
-            
+
             $('.validate-form .input100').each(function() {
                 $(this).focus(function() {
                     hideValidate(this);
                 });
             });
-            
+
             function validate(input) {
                 if ($(input).attr('type') == 'email' || $(input).attr('name') == 'email') {
                     if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
@@ -900,17 +900,17 @@ class socials
                     }
                 }
             }
-            
+
             function showValidate(input) {
-                var thisAlert = $(input).parent();                        
+                var thisAlert = $(input).parent();
                 $(thisAlert).addClass('alert-validate');
             }
-            
+
             function hideValidate(input) {
-                var thisAlert = $(input).parent();                        
+                var thisAlert = $(input).parent();
                 $(thisAlert).removeClass('alert-validate');
             }
-            
+
             /*==================================================================
             [ Show pass ]*/
             var showPass = 0;
@@ -927,12 +927,12 @@ class socials
                     showPass = 0;
                 }
             });
-        })(jQuery); 
-        </script>        
+        })(jQuery);
+        </script>
         ";
         return($sx);
-    }    
-    
+    }
+
     function session($provider)
     {
         $CI = &get_instance();
@@ -947,18 +947,18 @@ class socials
         }
         //google
         else if ($provider == 'google') {
-            
+
             //$app_id = $this -> config -> item('googleplus_appid');
             $app_id = $this->google_key;
-            
+
             //$app_secret = $this -> config -> item('googleplus_appsecret');
             $app_secret = $this->google_key_client;
             $provider = $this->oauth2->provider($provider, array('id' => $app_id, 'secret' => $app_secret,));
         }
-        
+
         //foursquare
         else if ($provider == 'foursquare') {
-            
+
             $app_id = $this->config->item('foursquare_appid');
             $app_secret = $this->config->item('foursquare_appsecret');
             $provider = $this->oauth2->provider($provider, array('id' => $app_id, 'secret' => $app_secret,));
@@ -972,7 +972,7 @@ class socials
             try {
                 $token = $provider->access($_GET['code']);
                 $user = $provider->get_user_info($token);
-                
+
                 /* Ativa sessão ID */
                 $ss_user = $user['name'];
                 $ss_email = trim($user['email']);
@@ -980,29 +980,29 @@ class socials
                 $ss_nome = $user['name'];
                 $ss_link = $user['urls']['Facebook'];
                 $ss_nivel = 0;
-                
+
                 $sql = "select * from users where us_email = '$ss_email' ";
                 $query = $CI->db->query($sql);
                 $query = $query->result_array();
                 $data = date("Ymd");
-                
+
                 if (count($query) > 0) {
                     /* Atualiza quantidade de acessos */
                     $line = $query[0];
                     $ss_nivel = $line['us_nivel'];
                     $id_us = $line['id_us'];
                     $id = $line['id_us'];
-                    
+
                     $sql = "update users set us_last = '$data',
-                    us_acessos = (us_acessos + 1) 
+                    us_acessos = (us_acessos + 1)
                     where us_email = '$ss_email' ";
                     $CI->db->query($sql);
                 } else {
-                    $sql = "insert into users 
+                    $sql = "insert into users
                     (
-                        us_nome, us_email, us_cidade, 
+                        us_nome, us_email, us_cidade,
                         us_pais, us_codigo, us_link,
-                        us_ativo, us_nivel, us_genero, us_verificado, 
+                        us_ativo, us_nivel, us_genero, us_verificado,
                         us_cadastro, us_last
                         ) values (
                             '$ss_nome','$ss_email','',
@@ -1012,14 +1012,14 @@ class socials
                             )";
                             $CI = &get_instance();
                             $CI->db->query($sql);
-                            
+
                             $c = 'us';
                             $c1 = 'id_' . $c;
                             $c2 = $c . '_codigo';
                             $c3 = 7;
                             $sql = "update users set us_codigo = lpad($c1,$c3,0) where $c2='' ";
                             $rlt = $CI->db->query($sql);
-                            
+
                             $sql = "select * from users where us_email = '$ss_email' ";
                             $query = $CI->db->query($sql);
                             $query = $query->result_array();
@@ -1027,20 +1027,20 @@ class socials
                             $id = $line['id_us'];
                         }
                         $ss_perfil = $line['us_perfil'];
-                        
+
                         /* Salva session */
                         $data = array('id' => $id, 'user' => $ss_user, 'email' => $ss_email, 'image' => $ss_image, 'nivel' => $ss_nivel, 'perfil' => $ss_perfil);
                         $this->session->set_userdata($data);
-                        
+
                         if ($this->uri->segment(3) == 'google') {
                             //Your code stuff here
                         } elseif ($this->uri->segment(3) == 'facebook') {
                             //your facebook stuff here
-                            
+
                         } elseif ($this->uri->segment(3) == 'foursquare') {
                             // your code stuff here
                         }
-                        
+
                         $this->session->set_flashdata('info', $message);
                         redirect('social?tabindex=s&status=sucess');
                     } catch (OAuth2_Exception $e) {
@@ -1048,7 +1048,7 @@ class socials
                     }
                 }
             }
-            
+
             function cp($id)
             {
                 $cp = array();
@@ -1064,7 +1064,7 @@ class socials
                 array_push($cp, array('$O 1:SIM&0:NÃO', 'us_ativo', 'Ativo', True, True));
                 return ($cp);
             }
-            
+
             function create_admin_user()
             {
                 $dt = array();
@@ -1074,25 +1074,25 @@ class socials
                 $dt['us_autenticador'] = 'MD5';
                 $this->insert_new_user($dt);
             }
-            
+
             function row($id = '')
             {
                 $CI = &get_instance();
                 $form = new form;
-                
+
                 $form->fd = array('id_us', 'us_nome', 'us_login');
                 $form->lb = array('id', msg('us_name'), msg('us_login'));
                 $form->mk = array('', 'L', 'L', 'L');
-                
+
                 $form->tabela = $this->table;
                 $form->see = true;
                 $form->novo = true;
                 $form->edit = true;
-                
+
                 $form->row_edit = base_url(PATH . 'social/user_edit');
                 $form->row_view = base_url(PATH . 'social/perfil');
                 $form->row = base_url(PATH . 'social/users');
-                
+
                 $sx = '<div class="container">';
                 $sx .= '<div class="row">';
                 $sx .= '<div class="col-12">';
@@ -1104,7 +1104,7 @@ class socials
                 $CI->load->view('content', $data);
                 return ("");
             }
-            
+
             function editar($id, $chk)
             {
                 $CI = &get_instance();
@@ -1114,13 +1114,13 @@ class socials
                 $data['title'] = '';
                 $data['content'] = $form->editar($cp, $this->table);
                 $CI->load->view('content', $data);
-                
+
                 if ($form->saved > 0) {
                     redirect(base_url(PATH . 'social/users'));
                 }
                 return ($form->saved);
             }
-            
+
             function insert_new_user($data)
             {
                 $CI = &get_instance();
@@ -1132,12 +1132,12 @@ class socials
                 if (isset($data['us_institution'])) {
                     $inst = $data['us_institution'];
                 }
-                
+
                 $sql = "select * from " . $this->table . " where us_email = '$email' ";
                 $rlt = $CI->db->query($sql);
                 $rlt = $rlt->result_array();
                 if (count($rlt) == 0) {
-                    $sql = "insert into " . $this->table . " 
+                    $sql = "insert into " . $this->table . "
                     (us_nome, us_email, us_password, us_ativo, us_autenticador,
                     us_perfil, us_perfil_check, us_institution,
                     us_login, us_badge)
@@ -1154,7 +1154,7 @@ class socials
                     return (-1);
                 }
             }
-            
+
             function resend()
             {
                 $email = get("dd0");
@@ -1166,20 +1166,20 @@ class socials
                     $this->load->view('error', $data);
                 }
             }
-            
+
             function le($id, $fld = 'id')
             {
                 $CI = &get_instance();
                 $sql = "select * from " . $this->table;
                 switch ($fld) {
                     case 'id':
-                        $sql .= ' where id_us = ' . round($id);
+                        $sql .= ' where id_us = ' . sround($id);
                     break;
                     case 'login':
                         $sql .= " where us_email = '$id' ";
                     break;
                     default:
-                    $sql .= ' where id_us = ' . round($id);
+                    $sql .= ' where id_us = ' . sround($id);
                 break;
             }
             $rlt = $CI->db->query($sql);
@@ -1190,14 +1190,14 @@ class socials
                 return ($rlt[0]);
             }
         }
-        
+
         function updatex()
         {
             $CI = &get_instance();
             $sql = "update " . $this->table . " set us_badge = lpad(id_us,5,0) where us_badge = '' or us_badge is null ";
             $CI->db->query($sql);
         }
-        
+
         function update_perfil_check($data)
         {
             $CI = &get_instance();
@@ -1222,21 +1222,21 @@ class socials
                 return ('1');
             }
         }
-        
+
         /****************** Security login ****************/
         function security()
         {
             $ok = 0;
             if (isset($_SESSION['id'])) {
-                $id = round($_SESSION['id']);
+                $id = sround($_SESSION['id']);
                 if ($id > 0) {
                     return ('');
                 }
             }
-            
+
             redirect(base_url('index.php/social/login'));
         }
-        
+
         function security_logout()
         {
             $CI = &get_instance();
@@ -1244,12 +1244,12 @@ class socials
             $CI->session->set_userdata($data);
             return ('');
         }
-        
+
         function xxx_action($path, $d1, $d2)
         {
             $CI = &get_instance();
             $path = troca($path, 'form', 'signin');
-            
+
             switch ($path) {
                 case 'login':
                     $user = get("user_login");
@@ -1269,29 +1269,29 @@ class socials
                     exit;
                 }
             }
-            
+
             function security_login($login = '', $pass = '')
             {
                 $CI = &get_instance();
                 /****************************** FORCA LOGIN **************/
                 $forced = 0;
-                
-                $sql = "select * from " . $this->table . " 
+
+                $sql = "select * from " . $this->table . "
                         where (us_email = '$login' OR us_login = '$login')
-                        OR (1=$forced) 
+                        OR (1=$forced)
                         limit 1";
                 $rlt = $CI->db->query($sql);
                 $rlt = $rlt->result_array();
-                
+
                 if (count($rlt) > 0) {
                     $line = $rlt[0];
-                    
+
                     $dd2 = $this->password_cripto($pass, $line['us_autenticador']);
                     $dd3 = trim($line['us_password']);
-                    
+
                     if (($dd2 == $dd3) or ($pass == $dd3) or ($forced == 1)) {
                         /* Salva session */
-                        
+
                         $ss_id = $line['id_us'];
                         $ss_user = $line['us_nome'];
                         $ss_email = $line['us_email'];
@@ -1317,8 +1317,8 @@ class socials
                     $this->check_sql_tables();
                     $perfil = $line['us_perfil'];
                     $sql = "select * from users_group_members
-                            INNER JOIN users_group 
-                            where grm_user = $id 
+                            INNER JOIN users_group
+                            where grm_user = $id
                             and grm_library = '".LIBRARY."'";
                     $rlt = $CI->db->query($sql);
                     $rlt = $rlt->result_array();
@@ -1333,20 +1333,20 @@ class socials
                         }
                     return($perfil);
                 }
-            
+
             function my_account($id)
             {
                 $CI = &get_instance();
                 $this->load->model('user_drh');
-                
+
                 $data1 = $this->le($id);
                 $data2 = $this->user_drh->le($id);
                 $data = array_merge($data1, $data2);
-                
+
                 $tela = $this->load->view('auth_social/myaccount', $data, true);
                 return ($tela);
             }
-            
+
             function password_cripto($pass, $tipo)
             {
                 $pass = trim($pass);
@@ -1354,14 +1354,14 @@ class socials
                     case 'TXT':
                         $dd2 = trim($pass);
                     break;
-                    
+
                     default:
                     $dd2 = md5($pass);
                 break;
             }
             return ($dd2);
         }
-        
+
         function change_password($id, $new = 0)
         {
             $CI = &get_instance();
@@ -1375,15 +1375,15 @@ class socials
             }
             array_push($cp, array('$P20', '', 'Nova senha', True, True));
             array_push($cp, array('$P20', '', 'Confirme nova senha', True, True));
-            
+
             array_push($cp, array('$B', '', 'Alterar senha', false, True));
-            
+
             $dt = $this->le($id);
-            
+
             $tela = $this->show_perfil($dt);
             $tela .= '<hr>';
             $tela .= $form->editar($cp, '');
-            
+
             /* REGRAS DE VALIDACAO */
             $data = $this->le($id);
             $pass = get("dd1");
@@ -1391,7 +1391,7 @@ class socials
             $p1 = get("dd2");
             $p2 = get("dd3");
             $dd2 = get("dd2");
-            
+
             if ($form->saved > 0) {
                 if (($dd2 == $dd2) and (strlen($dd2) > 0)) {
                     if (($p1 == $p2) or ($new == 1)) {
@@ -1412,17 +1412,17 @@ class socials
             $CI->load->view('content', $d);
             return ('');
         }
-        
+
         function user_id()
         {
             if (!isset($_SESSION['id'])) {
                 return (0);
             }
-            
-            $us = round($_SESSION['id']);
+
+            $us = sround($_SESSION['id']);
             return ($us);
         }
-        
+
         function user_email_send($para, $nome, $code)
         {
             $CI = &get_instance();
@@ -1449,7 +1449,7 @@ class socials
                     $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
                     $de = 1;
                 break;
-                
+
                 case 'FORGOT':
                     $data = $this->le_email($para);
                     $link = base_url(PATH . 'social/user_password_new/?dd0=' . $para . '&chk=' . checkpost_link($para . date("Ymd")));
@@ -1460,7 +1460,7 @@ class socials
                     $texto .= '<a href="' . $link . '" target="_new">' . $link . '</a>';
                     $de = 1;
                 break;
-                
+
                 default:
                 $assunto = 'Enviado de e-mail';
                 $texto .= ' Vinculo não informado ' . $code;
@@ -1475,7 +1475,7 @@ class socials
             echo 'e-mail não enviado - ' . $code;
         }
     }
-    
+
     /***** EMAIL */
     function email_cab()
     {
@@ -1487,7 +1487,7 @@ class socials
         $sx .= '<hr>';
         return ($sx);
     }
-    
+
     function email_foot()
     {
         $sx = '';
@@ -1495,7 +1495,7 @@ class socials
         $sx .= '</td></tr></table>';
         return ($sx);
     }
-    
+
     function signup()
     {
         $CI = &get_instance();
@@ -1503,7 +1503,7 @@ class socials
         $name = get("fullName");
         $email = get("email");
         $inst = get("Institution");
-        
+
         if ((strlen($name) > 0) and (strlen($email))) {
             $dt = array();
             $dt['us_nome'] = $name;
@@ -1514,7 +1514,7 @@ class socials
             $rs = $this->insert_new_user($dt);
             //$rs = 1;
             $data['erro'] = $rs;
-            
+
             if ($rs == 1) {
                 $code = 'SIGNUP';
                 $this->user_email_send($email, $name, $code);
@@ -1522,16 +1522,16 @@ class socials
                 return ("");
             }
         }
-        
+
         $CI->load->view('social/login/login_signup', $data);
     }
-    
+
     function forgot()
     {
         $CI = &get_instance();
         $data = array();
         $email = get("user_login");
-        
+
         if (strlen($email) > 0) {
             $dt = array();
             $rs = 1;
@@ -1548,11 +1548,11 @@ class socials
                 }
             }
         }
-        
+
         $CI->load->view('social/login/login_forgot', $data);
     }
-    
-    
+
+
     function le_email($e)
     {
         $CI = &get_instance();
@@ -1580,7 +1580,7 @@ class socials
             return (array());
         }
     }
-    
+
     function attributes($id, $ack)
     {
         $CI = &get_instance();
@@ -1591,7 +1591,7 @@ class socials
                     $sql = "delete from users_perfil_attrib where id_pa = " . sonumero($ack);
                     echo $sql;
                 break;
-                
+
                 case 'A':
                     $idf = sonumero($ack);
                     $sql = "insert into users_perfil_attrib ( pa_user, pa_perfil ) values ( $id,$ipf )";
@@ -1600,16 +1600,16 @@ class socials
             }
         }
     }
-    
+
     function show_attri($id)
     {
         $CI = &get_instance();
-        $sql = "select * from users_group_members 
+        $sql = "select * from users_group_members
                     inner join users_group ON id_gr = grm_group
                     where grm_user = " . $id." and grm_library = '".LIBRARY."'" ;
         $rlt = $CI->db->query($sql);
         $rlt = $rlt->result_array();
-        
+
         $sx = '';
         $sx .= '<table class="table">';
         $sx .= '<tr>';
@@ -1630,7 +1630,7 @@ class socials
             $sx .= '<tr>';
             $sx .= '<td>' . $line['gr_hash'] . '</td>';
             $sx .= '<td>' . $line['gr_name'] . '</td>';
-            $sx .= '<td>' . stodbr($line['gr_created']) . '</td>';           
+            $sx .= '<td>' . stodbr($line['gr_created']) . '</td>';
             $sx .= '</tr>';
         }
         $sx .= '</table>';
@@ -1639,7 +1639,7 @@ class socials
         {
             $sx .= 'SESSÃO: '.$_SESSION['perfil'];
         }
-        
+
         return ($sx);
     }
     function show_perfil($dt)
@@ -1654,11 +1654,11 @@ class socials
         $sx .= '<h2>' . $dt['us_nome'] . '</h2>';
         $sx .= '<h6>' . msg('login') . ': <b>' . $dt['us_login'] . '</b></h6>';
         $sx .= '</div>';
-        
+
         if (strlen($dt['us_perfil_check']) == 0) {
             $this->update_perfil_check($dt);
         }
-        
+
         $sx .= '<div class="col-2">';
         if ($dt['us_ativo'] == 1) {
             $sx .= '<span class="btn btn-success fluid">' . msg('active') . '</span>';
@@ -1672,7 +1672,7 @@ class socials
 
         $sx .= '<div class="'.bscol(2).'"></div>';
         $sx .= '<div class="'.bscol(10).'"><cnt/></div>';
-        
+
         $sx .= '</div>';
         return ($sx);
     }

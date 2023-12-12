@@ -17,7 +17,7 @@ Acesso APP menos seguro
 
 function email_menu($path)
     {
-        $sx = '';        
+        $sx = '';
         $sx .= '<li>'.'<a href="'.base_url(PATH.'admin/email_ed/').'">'.msg("Email_edit").'</a></li>';
         $sx .= '<li>'.'<a href="'.base_url(PATH.'admin/email_test/').'">'.msg("Email_test").'</a></li>';
         return($sx);
@@ -25,7 +25,7 @@ function email_menu($path)
 
 function email_le($id=1)
     {
-    $sql = "select * from mensagem_own where id_m = " . round($id);
+    $sql = "select * from mensagem_own where id_m = " . sround($id);
     $CI = &get_instance();
     $rlt = $CI -> db -> query($sql);
     $rlt = $rlt -> result_array();
@@ -43,7 +43,7 @@ function email_test($act, $d1)
     {
         $CI = &get_instance();
         $sx = '';
-        
+
         switch ($d1) {
             case 'confirm':
                 $para = 'renefgj@gmail.com';
@@ -79,9 +79,9 @@ function email_edit($id=1)
         $op = 'html:html&text:text';
         array_push($cp,array('$O'.$op,'mailtype',msg('mailtype'),True,True));
 
-        array_push($cp,array('$T80:6','m_header',msg('m_header'),false,True));        
-        array_push($cp,array('$T80:6','m_foot',msg('m_foot'),false,True));        
-        
+        array_push($cp,array('$T80:6','m_header',msg('m_header'),false,True));
+        array_push($cp,array('$T80:6','m_foot',msg('m_foot'),false,True));
+
         $sx = $form->editar($cp,'mensagem_own');
         return(array($sx,$form));
     }
@@ -136,9 +136,9 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
 
     $CI = &get_instance();
     if (!isset($sem_copia)) { $sem_copia = 0; }
-    if (!is_array($para)) { $para = array($para);}    
-    
-    if (isset($sender)) 
+    if (!is_array($para)) { $para = array($para);}
+
+    if (isset($sender))
         {
             $config = $sender;
             $email_footer = '';
@@ -152,13 +152,13 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
             /* de */
             $line = email_le($de);
 
-            $config = Array('protocol' => $line['smtp_protocol'], 
-                        'smtp_host' => $line['smtp_host'], 
-                        'smtp_port' => $line['smtp_port'], 
-                        'smtp_user' => $line['smtp_user'], 
-                        'smtp_pass' => $line['smtp_pass'], 
-                        'mailtype' => 'html', 
-                        'charset' => 'iso-8859-1', 
+            $config = Array('protocol' => $line['smtp_protocol'],
+                        'smtp_host' => $line['smtp_host'],
+                        'smtp_port' => $line['smtp_port'],
+                        'smtp_user' => $line['smtp_user'],
+                        'smtp_pass' => $line['smtp_pass'],
+                        'mailtype' => 'html',
+                        'charset' => 'iso-8859-1',
                         'wordwrap' => TRUE);
 
                 /* Header & footer */
@@ -175,9 +175,9 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
                 }
                 if (strlen($email_footer) > 0) {
                     $email_footer = '</td></tr><tr><td><img src="' . base_url($email_footer) . '"></td></tr></table>';
-                }                        
+                }
         }
-    
+
 
     $CI -> load -> library('email', $config);
     $CI -> email -> subject($assunto);
@@ -235,9 +235,9 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
 
                 $headers = array();
                 $headers[] = 'MIME-Version: 1.0';
-                $headers[] = 'Content-type: text/html; charset=iso-8859-1';   
+                $headers[] = 'Content-type: text/html; charset=iso-8859-1';
                 $headers[] = 'To: '.$para[0];
-                $headers[] = 'From: '.$line['m_descricao'].' <'.$line['m_email'].'>'; 
+                $headers[] = 'From: '.$line['m_descricao'].' <'.$line['m_email'].'>';
                 $headers = implode("\r\n", $headers);
 
                 //$real_sender = '-f brapcici@gmail.com';
@@ -248,9 +248,9 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
                     $sx .= 'Send to '.$to;
                 } else {
                     $sx = 'Erro ao enviar para '.$to;
-                }            
+                }
                 return($sx);
-            break; 
+            break;
 
             case 'PHPMailer':
                 echo 'PHPmailer';
@@ -282,10 +282,10 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
                     //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
 
                     //Content
-                    $mail->isHTML(true);  
+                    $mail->isHTML(true);
                     $to      = $para[0];
                     $subject = $assunto;
-                    $message = $email_header . $texto . $email_footer;                     
+                    $message = $email_header . $texto . $email_footer;
                     $mail->Subject = $subject;
                     $mail->Body    = $message;
                     $mail->AltBody = $headers;
@@ -294,7 +294,7 @@ function enviaremail($para, $assunto, $texto, $de=1, $anexos = array()) {
                     echo 'Message has been sent';
                 } catch (Exception $e) {
                     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-                }          
+                }
 
             /************ OUtros protocolos */
             default:

@@ -6,7 +6,7 @@ class sources extends CI_Model {
         {
                 $date = date("Y-m-d H:m:s");
                 $sql = "update ".$this->table."
-                            set 
+                            set
                             jnl_oai_status = '$sta',
                             jnl_oai_last_harvesting = '$date'
                             where id_jnl = $id";
@@ -40,7 +40,7 @@ class sources extends CI_Model {
         for ($r = 0; $r < count($cl); $r++) {
             $sa .= '<li>' . date("d-m-Y H:i:s") . ' - ' . $cl[$r] . '</li>';
             $f = $this -> frbr_core -> find_class($cl[$r]);
-            $sql = "select C1.id_cc as id_cc        
+            $sql = "select C1.id_cc as id_cc
                         FROM rdf_concept as C1
                         where C1.cc_class = " . $f . " $wh  and cc_use = 0";
 
@@ -55,7 +55,7 @@ class sources extends CI_Model {
         for ($r = 0; $r < count($cl); $r++) {
             $sa .= '<li>' . date("d-m-Y H:i:s") . ' - ' . $cl[$r] . '</li>';
             $f = $this -> frbr_core -> find_class($cl[$r]);
-            $sql = "select C1.id_cc as id_cc        
+            $sql = "select C1.id_cc as id_cc
                         FROM rdf_concept as C1
                         where C1.cc_class = " . $f . " $wh  and cc_use <> 0";
 
@@ -134,7 +134,7 @@ class sources extends CI_Model {
         } else {
             $sx .= '<pre style="color: red;">Status not found</pre>';
         }
-        $sx .= '</li>';        
+        $sx .= '</li>';
 
         $sx .= '<li><h5>PDF Status</h5>';
         $filename = $dir . 'script/cron.pdf.html';
@@ -155,13 +155,13 @@ class sources extends CI_Model {
     function next_harvesting($p = '') {
         if (strlen($p) == 0) { $p = 0;
         }
-        $p = round($p);
+        $p = sround($p);
 
-        $sql = "SELECT * FROM source_source 
-                    WHERE jnl_url_oai <> '' 
+        $sql = "SELECT * FROM source_source
+                    WHERE jnl_url_oai <> ''
                     and id_jnl > $p
                     and jnl_scielo = 0
-                    and jnl_active = 1 
+                    and jnl_active = 1
                     order by id_jnl limit 1 ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -233,7 +233,7 @@ class sources extends CI_Model {
         $op .= '&2:' . msg('yes, without OAI');
         $op .= '&3:' . msg('No, finished');
         $op .= '&0:' . msg('canceled');
-        array_push($cp, array('$O 1:Yes&0:No', 'jnl_active', msg('active'), True, True));  
+        array_push($cp, array('$O 1:Yes&0:No', 'jnl_active', msg('active'), True, True));
         return ($cp);
     }
 
@@ -244,7 +244,7 @@ class sources extends CI_Model {
         if ($line['jnl_frbr'] > 0)
             {
                 $link = '<a href="' . base_url(PATH . 'v/' . $line['jnl_frbr']) . '">';
-            } else {        
+            } else {
                 $link = '<a href="' . base_url(PATH . 'jnl/' . $line['id_jnl']) . '">';
             }
         $sx = $link . $line['jnl_name'] . '</a>';
@@ -284,7 +284,7 @@ class sources extends CI_Model {
         } else {
             return ( array());
         }
-    }    
+    }
 
     function button_new_issue($id = '') {
         $sx = ' | ';
@@ -303,9 +303,9 @@ class sources extends CI_Model {
         return ($sx);
     }
 
-    function list_sources_link($url='') 
+    function list_sources_link($url='')
     {
-        $sql = "select * from " . $this -> table . " 
+        $sql = "select * from " . $this -> table . "
                             where jnl_active = 1
                             order by jnl_name
                         ";
@@ -319,16 +319,16 @@ class sources extends CI_Model {
             $linka = '</a>';
             $sx .= '<li>'.$link.$line['jnl_name'].$linka.'</li>';
         }
-        
+
         $sx .= '</ul>';
         return($sx);
-    }        
+    }
 
 
     function list_sources() {
         $limit_dias = 10;
         $this->load->model("oai_pmh");
-        $sql = "select * from " . $this -> table . " 
+        $sql = "select * from " . $this -> table . "
                             where jnl_active = 1
                             order by jnl_collection, jnl_name
                         ";
@@ -375,7 +375,7 @@ class sources extends CI_Model {
             /**************** Data */
             $sx .= '<td>'.stodbr($line['jnl_oai_last_harvesting']).'</td>';
             $dias = dataDiff($line['jnl_oai_last_harvesting'],date("Y-m-d"));
-            
+
 
             /*************** Status da Coleta */
             $code = $line['jnl_oai_status'];
@@ -387,7 +387,7 @@ class sources extends CI_Model {
                 } else {
                     $sx .= '<td class="text-center small"></td>';
                 }
-            
+
 
             if ($code > 200)
                 {
@@ -400,7 +400,7 @@ class sources extends CI_Model {
                         $status = '<span style="color: green"><b>OK</b></span>';
                     }
                 }
-            
+
             if ($hist == 1)
                 {
                     $status = '<span style="color: blue"><b>Histórica</b></span>';
@@ -414,19 +414,19 @@ class sources extends CI_Model {
             $linka = '</a>';
             if ($to > 0)
                 {
-                    
+
                     $sx .= '<td align="center"><span style="color: red">'.$link.'+'.$to.$linka.'</span></td>';
                 } else {
                     $sx .= '<td align="center">'.$link.'-'.$linka.'</td>';
                 }
-            
-            
+
+
             $sx .= '</tr>';
         }
         $sx .= '</table>';
         $sx .= '<br>Legenda:';
         $sx .= '<br><span style="color: blue"><b>OK</b></span> - Coletado normalmente.';
-        $sx .= '<br><span style="color: orange"><b>OLD</b></span> - Coletado a mais de '.$limit_dias.' dias.';        
+        $sx .= '<br><span style="color: orange"><b>OLD</b></span> - Coletado a mais de '.$limit_dias.' dias.';
         $sx .= '<br><span style="color: red"><b>ERRO</b></span> - Erro na Coletada.';
 
         $sx .= '</div>' . CR;
@@ -448,7 +448,7 @@ class sources extends CI_Model {
         $sx .= '<span class="h3">' . $this -> jnl_name($line) . '</span>' . CR;
         if (strlen($line['jnl_name_abrev']) > 0) {
             $sx .= '<br>(' . $line['jnl_name_abrev'] . ')';
-        }        
+        }
         $sx .= '<br>';
         $sx .= '<span>ISSN: ' . $line['jnl_issn'] . '</span>' . CR;
         if (isset($line['jnl_eissn'])) {
@@ -482,11 +482,11 @@ class sources extends CI_Model {
                 }
         } else {
             $sx .= '<br>';
-            $sx .= $this -> frbr -> journal_manual($line['id_jnl'],$line['jnl_frbr']);            
+            $sx .= $this -> frbr -> journal_manual($line['id_jnl'],$line['jnl_frbr']);
         }
 
         $sx .= '<br>WebSemantic (Brapci):'.$line['jnl_frbr'];
-        
+
 
         $sx .= $this -> oai_pmh -> cache_resume($line['id_jnl']);
 
@@ -508,7 +508,7 @@ class sources extends CI_Model {
     /*********************************************************** Timeline *********/
     function timelines($i = 0) {
         $sql = "select * from " . $this -> table . "
-                            where jnl_ano_inicio >= $i 
+                            where jnl_ano_inicio >= $i
                             order by jnl_ano_inicio desc";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -568,11 +568,11 @@ class sources extends CI_Model {
             if ($line['c_class'] == 'hasIssueProceeding') {
                 $n = $line['n_name'] . '#' . $line['d_r2'];
                 array_push($ar, $n);
-            }            
+            }
             if ($line['c_class'] == 'hasIssueProceedingOf') {
                 $n = $line['n_name'] . '#' . $line['d_r2'];
                 array_push($ar, $n);
-            }            
+            }
         }
         rsort($ar);
 
@@ -611,9 +611,9 @@ class sources extends CI_Model {
                 $sx .= '<td style="background-color: #f0f0f0;">';
                 $ed++;
             }
-            $sx .= '<a href="' . base_url(PATH . 'v/' . $idx) . '">';            
+            $sx .= '<a href="' . base_url(PATH . 'v/' . $idx) . '">';
             $sx .= '<div style="width: 120px; text-align: center; height: 60px; border: 1px solid #808080; margin: 1px 5px; float: left;">';
-            $sx .= $name_use;            
+            $sx .= $name_use;
             $sx .= '</div>';
             $sx .= '</a>';
 

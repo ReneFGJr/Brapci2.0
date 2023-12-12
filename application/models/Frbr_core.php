@@ -25,7 +25,7 @@ class frbr_core extends CI_model {
 
     function prefTerm_chage($c = '', $t1 = '') {
         $sql = "select * from rdf_concept
-                    INNER JOIN rdf_name on id_n = cc_pref_term  
+                    INNER JOIN rdf_name on id_n = cc_pref_term
                     where id_cc = $c ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -93,7 +93,7 @@ class frbr_core extends CI_model {
         }
 
         $sql = "select d_r1, c_class, d_r2, n_name from rdf_name
-                        INNER JOIN rdf_data on d_literal = id_n 
+                        INNER JOIN rdf_data on d_literal = id_n
                         INNER JOIN rdf_class ON d_p = id_c
                         INNER JOIN rdf_concept ON id_cc = d_r1
                         where $wh";
@@ -139,12 +139,12 @@ class frbr_core extends CI_model {
         }
 
         $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
                         FROM rdf_concept as C1
                         INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                         LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                        where C1.cc_class = " . $f . " $wh 
+                        where C1.cc_class = " . $f . " $wh
                         ORDER BY N1.n_name";
 
         $rlt = $this -> db -> query($sql);
@@ -214,7 +214,7 @@ class frbr_core extends CI_model {
         return ($sx);
     }
 
-function index_list_csv($class = 'Person', $nouse = 0) 
+function index_list_csv($class = 'Person', $nouse = 0)
         {
         $f = $this -> find_class($class);
         $this -> check_language();
@@ -223,12 +223,12 @@ function index_list_csv($class = 'Person', $nouse = 0)
             $wh .= " and C1.cc_use = 0 ";
         }
         $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
                         FROM rdf_concept as C1
                         INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                         LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0                        
+                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0
                         ORDER BY N1.n_name";
 
         $rlt = $this -> db -> query($sql);
@@ -259,7 +259,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
             }
         }
         return ($csv);
-    }    
+    }
 
     function index_list_style_2($lt = 'G', $class = 'Person', $nouse = 0) {
         $f = $this -> find_class($class);
@@ -273,12 +273,12 @@ function index_list_csv($class = 'Person', $nouse = 0)
         }
 
         $sql = "select N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
                         FROM rdf_concept as C1
                         INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                         LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0                        
+                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0
                         ORDER BY N1.n_name";
 
         $rlt = $this -> db -> query($sql);
@@ -333,12 +333,12 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
         $sql = "select length(trim(N1.n_name)) as sz,
                         N1.n_name as n_name, N1.n_lang as n_lang, C1.id_cc as id_cc,
-                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use         
+                       N2.n_name as n_name_use, N2.n_lang as n_lang_use, C2.id_cc as id_cc_use
                         FROM rdf_concept as C1
                         INNER JOIN rdf_name as N1 ON C1.cc_pref_term = N1.id_n
                         LEFT JOIN rdf_concept as C2 ON C1.cc_use = C2.id_cc
                         LEFT JOIN rdf_name as N2 ON C2.cc_pref_term = N2.id_n
-                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0                        
+                        where C1.cc_class = " . $f . " $wh  and C1.cc_use = 0
                         ORDER BY sz desc";
 
         $rlt = $this -> db -> query($sql);
@@ -359,13 +359,13 @@ function index_list_csv($class = 'Person', $nouse = 0)
             $name_use = troca($name_use,'{','');
             $name_use = troca($name_use,'}','');
             try {
-                $name_use = iconv('UTF-8','ISO-8859-1',$name_use);    
+                $name_use = iconv('UTF-8','ISO-8859-1',$name_use);
             } catch (\Exception $e) {
                 echo 'Erro em:'.$name_use.'<br>';
-            }           
-            
+            }
+
             $name_use = troca($name_use,'¿','');
-            $name_use = troca($name_use,'¼','');            
+            $name_use = troca($name_use,'¼','');
             $name_use = trim(LowerCaseSQL($name_use));
 
             if (strlen($name_use) > 0)
@@ -374,7 +374,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     }
         }
         return ($sx);
-    }    
+    }
 
     /***  FIND CLASS **/
     function find_class($class) {
@@ -392,7 +392,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
     /******************************************************************* RDF NAME ***/
     function frbr_name($n = '', $lang = 'pt-BR', $new = 1) {
-        
+
         if (is_array($n))
             {
                 return(0);
@@ -437,8 +437,8 @@ function index_list_csv($class = 'Person', $nouse = 0)
         /*********************** recupera propriedade ID ***/
         $pr = $this -> find_class($prop);
         $sql = "select * from (
-                    select * from rdf_data 
-                        WHERE 
+                    select * from rdf_data
+                        WHERE
                     (d_p = $pr and d_literal = $lit)
                     ) as table1
                 where
@@ -643,7 +643,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                 case 'Proceeding' :
                     $tela = $this -> frbr -> show_article($id);
                     $tela .= $this -> cited->show_ref($id);
-                    $tela .= $this -> view_data($id);                                        
+                    $tela .= $this -> view_data($id);
                     break;
                 case 'Issue' :
                     if (perfil("#ADM"))
@@ -663,7 +663,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                 case 'Person' :
                     $tela = $this -> person_show($id);
                     $data = $this -> frad -> production($id);
-                    
+
 
                     //$tela .= $this->load->view("brapci/cloud_tags_2",$data,true);
                     //$tela .= $this -> load -> view("brapci/cloud_tags", $data, true);
@@ -687,7 +687,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     $tela = $this -> journal_show($id);
                     $tela .= $this -> view_data($id);
                     break;
-                   
+
                 default :
                     $tela .= $this -> view_data($id);
                     $tela .= $this -> related($id);
@@ -705,8 +705,8 @@ function index_list_csv($class = 'Person', $nouse = 0)
         $dt = date("Y/m/d H:i:s");
         $date = date("Y-m-d");
         /*********** checar se não existe um termo já iserido *********************/
-        $sql = "select * from rdf_concept 
-                        WHERE 
+        $sql = "select * from rdf_concept
+                        WHERE
                         cc_class = $cl AND cc_pref_term = $term ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -775,7 +775,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
     /******************************************************************** LE ************/
     function le($id) {
-        $sql = "select * from rdf_concept 
+        $sql = "select * from rdf_concept
                     INNER JOIN rdf_class ON cc_class = id_c
                     LEFT JOIN rdf_name ON cc_pref_term = id_n
                         WHERE id_cc = $id";
@@ -809,21 +809,21 @@ function index_list_csv($class = 'Person', $nouse = 0)
         $cp = 'd_r2, d_r1, c_order, c_class, id_d, n_name, n_lang';
         $cp_reverse = 'd_r2 as d_r1, d_r1 as d_r2, c_order, c_class, id_d, n_name, n_lang';
         $sql = "select $cp,1 as rule from rdf_data as rdata
-                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-                        INNER JOIN rdf_concept ON d_r2 = id_cc 
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c
+                        INNER JOIN rdf_concept ON d_r2 = id_cc
                         INNER JOIN rdf_name on cc_pref_term = id_n
                         WHERE d_r1 = $id and d_r2 > 0 " . $wh . cr() . cr();
         $sql .= ' union ' . cr() . cr();
         /* TRABALHOS */
         $sql .= "select $cp_reverse,2 as rule from rdf_data as rdata
-                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-                        INNER JOIN rdf_concept ON d_r1 = id_cc 
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c
+                        INNER JOIN rdf_concept ON d_r1 = id_cc
                         INNER JOIN rdf_name on cc_pref_term = id_n
                         WHERE d_r2 = $id and d_r1 > 0 " . $wh . cr() . cr();
         $sql .= ' union ' . cr() . cr();
         $sql .= "select $cp,3 as rule from rdf_data as rdata
-                        LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
-                        LEFT JOIN rdf_concept ON d_r2 = id_cc 
+                        LEFT JOIN rdf_class as prop ON d_p = prop.id_c
+                        LEFT JOIN rdf_concept ON d_r2 = id_cc
                         LEFT JOIN rdf_name on d_literal = id_n
                         WHERE d_r1 = $id and d_r2 = 0 " . $wh . cr() . cr();
 
@@ -842,8 +842,8 @@ function index_list_csv($class = 'Person', $nouse = 0)
             }
             $sql .= ' union ' . cr() . cr();
             $sql .= "select $cp_reverse, " . (10 + $r) . " as rule from rdf_data as rdata
-                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-                        INNER JOIN rdf_concept ON d_r1 = id_cc 
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c
+                        INNER JOIN rdf_concept ON d_r1 = id_cc
                         INNER JOIN rdf_name on cc_pref_term = id_n
                         WHERE d_r2 = $iduse and d_r1 > 0 and d_p <> $prop" . cr() . cr();
         }
@@ -856,7 +856,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
     function person_work($id) {
         $r = array();
-        $sql = "select d_r1, d_p, d_r2 from rdf_data 
+        $sql = "select d_r1, d_p, d_r2 from rdf_data
                     where (d_r1 = $id or d_r2 = $id)
                        AND NOT (d_r1 = 0 OR d_r2 = 0)
                 ORDER BY d_r1, d_p, d_r2";
@@ -889,7 +889,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
     /*********************************************************************************************/
     /*********************************************************************************************/
     function related($id) {
-        $pg = round('0' . get("pg"));
+        $pg = sround('0' . get("pg"));
         $limit = $this -> limit;
         $offset = $limit * $pg;
         /******************************************** by manifestation ********/
@@ -900,9 +900,9 @@ function index_list_csv($class = 'Person', $nouse = 0)
         $sx = '<div class="container">' . cr();
         $sx .= '<div class="row">' . cr();
 
-        $sql = "SELECT dd3.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 
-                    left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
-                    left JOIN rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 
+        $sql = "SELECT dd3.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1
+                    left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2
+                    left JOIN rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2
                     LEFT JOIN rdf_class ON dd2.d_p = id_c
                 where dd1.d_r2 = $id and dd2.d_p = 88 and dd3.d_p = 37
                 group by w";
@@ -927,9 +927,9 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
         /******************************************** by expression ***********/
         if (count($rlt) == 0) {
-            $sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1 
-                    left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2 
-                    /* left JOIN rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 */ 
+            $sql = "SELECT dd2.d_r1 as w, count(*) as mn FROM `rdf_data` as dd1
+                    left JOIN rdf_data as dd2 ON dd1.d_r1 = dd2.d_r2
+                    /* left JOIN rdf_data as dd3 ON dd2.d_r1 = dd3.d_r2 */
                     LEFT JOIN rdf_class ON dd2.d_p = id_c
                 where dd1.d_r2 = $id and dd2.d_p = 37
                 group by w ";
@@ -961,7 +961,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
     }
 
     function pagination($t) {
-        $pg = round('0' . get("pg"));
+        $pg = sround('0' . get("pg"));
         $t = count($t);
         $l = $this -> limit;
         /***************************** math *************/
@@ -975,7 +975,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
         $sx = '<div class="container">' . cr();
         $sx .= '<div class="row">' . cr();
-        $sx .= '  
+        $sx .= '
             <nav aria-label="Page navigation example">
               <ul class="pagination">' . cr();
         $ds = 'disabled';
@@ -1071,21 +1071,21 @@ function index_list_csv($class = 'Person', $nouse = 0)
             default :
                 $cp = 'n_name, cpt.id_cc as idcc, d_p as prop, id_d';
                 $sqla = "select $cp from rdf_data as rdata
-                                INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-                                INNER JOIN rdf_concept as cpt ON d_r2 = id_cc 
+                                INNER JOIN rdf_class as prop ON d_p = prop.id_c
+                                INNER JOIN rdf_concept as cpt ON d_r2 = id_cc
                                 INNER JOIN rdf_name on cc_pref_term = id_n
                                 WHERE d_r1 = $id and d_r2 > 0";
                 $sqla .= ' union ';
                 $sqla .= "select $cp from rdf_data as rdata
-                                LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
-                                LEFT JOIN rdf_concept as cpt ON d_r2 = id_cc 
+                                LEFT JOIN rdf_class as prop ON d_p = prop.id_c
+                                LEFT JOIN rdf_concept as cpt ON d_r2 = id_cc
                                 LEFT JOIN rdf_name on d_literal = id_n
                                 WHERE d_r1 = $id and d_r2 = 0";
                 /*****************/
                 $sql = "select * from rdf_form_class
                             INNER JOIN rdf_class ON id_c = sc_propriety
-                            LEFT JOIN (" . $sqla . ") as table1 ON id_c = prop 
-                        where sc_class = $class 
+                            LEFT JOIN (" . $sqla . ") as table1 ON id_c = prop
+                        where sc_class = $class
                         order by sc_ord, id_sc, c_order";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
@@ -1121,10 +1121,10 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     }
                     $sx .= '</td>';
                     $sx .= '</tr>';
-                    $js .= 'jQuery("#action_' . trim($line['c_class']) . '").click(function() 
+                    $js .= 'jQuery("#action_' . trim($line['c_class']) . '").click(function()
                       {
                           carrega("' . trim($line['c_class']) . '");
-                          jQuery("#dialog").modal("show"); 
+                          jQuery("#dialog").modal("show");
                       });' . cr();
                 }
                 $sx .= '</table>';
@@ -1140,7 +1140,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                         })  .done(function( html ) {
                             jQuery( "#model_texto" ).html( html );
                         });
-                    }                    
+                    }
                 </script>';
         $sx .= '<div id="dialog" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
                               <div class="modal-dialog modal-lg" role="document">
@@ -1157,7 +1157,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
             return ('');
         }
         $sx = '';
-        $sql = "select * from rdf_concept 
+        $sql = "select * from rdf_concept
                         INNER JOIN rdf_class as prop ON cc_class = id_c
                         WHERE id_cc = " . $r;
         $rlt = $this -> db -> query($sql);
@@ -1173,14 +1173,14 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
         $cp = '*';
         $sql = "select $cp from rdf_data as rdata
-                        INNER JOIN rdf_class as prop ON d_p = prop.id_c 
-                        INNER JOIN rdf_concept ON d_r2 = id_cc 
+                        INNER JOIN rdf_class as prop ON d_p = prop.id_c
+                        INNER JOIN rdf_concept ON d_r2 = id_cc
                         INNER JOIN rdf_name on cc_pref_term = id_n
                         WHERE d_r1 = $r and d_r2 > 0";
         $sql .= ' union ';
         $sql .= "select $cp from rdf_data as rdata
-                        LEFT JOIN rdf_class as prop ON d_p = prop.id_c 
-                        LEFT JOIN rdf_concept ON d_r2 = id_cc 
+                        LEFT JOIN rdf_class as prop ON d_p = prop.id_c
+                        LEFT JOIN rdf_concept ON d_r2 = id_cc
                         LEFT JOIN rdf_name on d_literal = id_n
                         WHERE d_r1 = $r and d_r2 = 0";
         $sql .= " order by c_order, c_class";
@@ -1245,10 +1245,10 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary">Save changes</button>
                   </div>
-                </div>            
+                </div>
             ';
         $sx = '
-                 <div class="modal-header" >                    
+                 <div class="modal-header" >
                     <h4 class="modal-title" id="myModalLabel">Modal - ' . $path . '</h4>
                     <button type="button" class="close text-right" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                   </div>
@@ -1262,7 +1262,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-warning" style="display: none;" id="save">Incluir</button>
                     <button type="button" class="btn btn-primary" id="submt" disabled>Salvar</button>
-                  </div>                  
+                  </div>
             ';
         return ($sx);
     }
@@ -1319,7 +1319,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                 $sql = "update rdf_data set
                                 d_r1 = " . ((-1) * $line['d_r1']) . " ,
                                 d_r2 = " . ((-1) * $line['d_r2']) . " ,
-                                d_p  = " . ((-1) * $line['d_p']) . " 
+                                d_p  = " . ((-1) * $line['d_p']) . "
                                 where id_d = " . $line['id_d'];
                 $rlt = $this -> db -> query($sql);
             }
@@ -1364,8 +1364,8 @@ function index_list_csv($class = 'Person', $nouse = 0)
                 $sql = "select * from rdf_name
                                     INNER JOIN rdf_data ON id_n = d_literal
                                     INNER JOIN rdf_concept ON d_r1 = id_cc
-                                    INNER JOIN rdf_class ON id_c = d_p 
-                                    WHERE ($wh) and (n_name <> '') $wh2 
+                                    INNER JOIN rdf_class ON id_c = d_p
+                                    WHERE ($wh) and (n_name <> '') $wh2
                                     LIMIT 50";
                 $rlt = $this -> db -> query($sql);
                 $rlt = $rlt -> result_array();
@@ -1378,12 +1378,12 @@ function index_list_csv($class = 'Person', $nouse = 0)
         }
 
         $tela .= '</select>' . cr();
-        $tela .= '  <script>                 
+        $tela .= '  <script>
                         function change()
                             {
                                 jQuery("#submt").removeAttr("disabled");
                             }
-                            
+
                         jQuery("#submt").attr("disabled","disabled");
                     </script>';
         return ($tela);
@@ -1406,10 +1406,10 @@ function index_list_csv($class = 'Person', $nouse = 0)
         $tela .= '
                     <script>
                         /************ keyup *****************/
-                        jQuery("#dd50").keyup(function() 
+                        jQuery("#dd50").keyup(function()
                             {
                                 var $key = jQuery("#dd50").val();
-                                
+
                                 $.ajax({
                                     type: "POST",
                                     url: "' . base_url(PATH . 'ajax/ajax2/' . $path . '/' . $id . '/' . $type) . '",
@@ -1417,7 +1417,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                                     success: function(data){
                                         $("#dd51a").html(data);
                                     }
-                                });                                            
+                                });
                             });
                          /************ submit ***************/
                          jQuery("#submt").click(function() {
@@ -1429,7 +1429,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
                                     success: function(data){
                                         $("#dd51a").html(data);
                                     }
-                                });                           
+                                });
                             /*
                             jQuery("#dialog").modal("toggle");
                             */
@@ -1454,7 +1454,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
     function data_classes($d) {
         $id = $this -> find_class($d);
-        $sql = "select * from rdf_concept 
+        $sql = "select * from rdf_concept
                         INNER JOIN rdf_name ON cc_pref_term = id_N
                         WHERE cc_class = $id
                         ORDER BY n_name ";
@@ -1526,7 +1526,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
         $admin = perfil("#ADM");
 
         $cp = 'id_sc, sc_ativo, sc_ord, tb1.c_class as c1, tb2.c_class as c2, tb3.c_class as c3';
-        $sql = "select $cp from rdf_form_class 
+        $sql = "select $cp from rdf_form_class
                         INNER JOIN rdf_class as tb1 ON sc_class = tb1.id_c
                         INNER JOIN rdf_class as tb2 ON sc_propriety = tb2.id_c
                         LEFT JOIN rdf_class as tb3 ON sc_range = tb3.id_c
@@ -1658,7 +1658,7 @@ function index_list_csv($class = 'Person', $nouse = 0)
 
 function person_work($id) {
     $r = array();
-    $sql = "select d_r1, d_p, d_r2 from rdf_data 
+    $sql = "select d_r1, d_p, d_r2 from rdf_data
                     where (d_r1 = $id or d_r2 = $id)
                        AND NOT (d_r1 = 0 OR d_r2 = 0)
                 ORDER BY d_r1, d_p, d_r2";

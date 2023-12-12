@@ -5,28 +5,28 @@ class genero extends CI_model
     {
         $class = 'hasGender';
         $sql = "se";
-    }        
-    
+    }
+
     function starter()
     {
         $class = 'Gender';
         /************** MALE *****************/
-        $term = $this->frbr_core->frbr_name('Genero indefinido (pelo nome)','pt-BR');            
-        $r1 = $this->frbr_core->rdf_concept($term, $class,'');
-        $prop = 'prefLabel';
-        $this->frbr_core->set_propriety($r1, $prop, 0, $term);           
-        
-        
-        /************** MALE *****************/
-        $term = $this->frbr_core->frbr_name('Masculino','pt-BR');            
+        $term = $this->frbr_core->frbr_name('Genero indefinido (pelo nome)','pt-BR');
         $r1 = $this->frbr_core->rdf_concept($term, $class,'');
         $prop = 'prefLabel';
         $this->frbr_core->set_propriety($r1, $prop, 0, $term);
-        
+
+
+        /************** MALE *****************/
+        $term = $this->frbr_core->frbr_name('Masculino','pt-BR');
+        $r1 = $this->frbr_core->rdf_concept($term, $class,'');
+        $prop = 'prefLabel';
+        $this->frbr_core->set_propriety($r1, $prop, 0, $term);
+
         $prop = 'altLabel';
         $term = $this->frbr_core->frbr_name('Male','en');
         $this->frbr_core->set_propriety($r1, $prop, 0, $term);
-        
+
         /************** FEMALE ***************/
         $term = $this->frbr_core->frbr_name('Feminino','pt-BR');
         $r1 = $this->frbr_core->rdf_concept($term, $class,'');
@@ -36,12 +36,12 @@ class genero extends CI_model
         $prop = 'altLabel';
         $term = $this->frbr_core->frbr_name('Female','en');
         $this->frbr_core->set_propriety($r1, $prop, 0, $term);
-        
+
     }
     function update($id)
     {
             //$this->starter();
-        
+
         $data = $this->frbr_core->le_data($id);
         $no_genere = true;
         for ($r=0;$r < count($data);$r++)
@@ -54,10 +54,10 @@ class genero extends CI_model
             }
             if ($line['c_class'] == 'hasGender')
             {
-             $no_genere = false; 
+             $no_genere = false;
          }
      }
-     
+
      /* genero não definido */
      if ($no_genere == true)
      {
@@ -71,10 +71,10 @@ class genero extends CI_model
             }
         }
   }
-  
+
 }
 function author_check_instituicoes()
-{        
+{
     $rdf = new rdf;
     $t = 0;
     $sx = '<div class="col-md-12">';
@@ -82,7 +82,7 @@ function author_check_instituicoes()
     $id = $rdf->find($q,'Gender');
     $idg = $rdf->find('Outro (instituição)','Gender');
 
-    $wh = " (n_name like '%editor%') OR (n_name like '%grupo%') OR (n_name like '%revista%') 
+    $wh = " (n_name like '%editor%') OR (n_name like '%grupo%') OR (n_name like '%revista%')
     OR (n_name like '%comissao%') OR (n_name like '%instituto%')
     OR (n_name like '%equipe%')  OR (n_name like '%bibliotec%')
     OR (n_name like '%arquivist%')  OR (n_name like '%departament%')
@@ -95,7 +95,7 @@ function author_check_instituicoes()
     $sql = "SELECT * FROM rdf_data
     INNER JOIN rdf_concept ON id_cc = d_r1
     INNER JOIN rdf_name ON cc_pref_term = id_n
-    where d_r2 = $id  
+    where d_r2 = $id
     AND ($wh)
     order by id_d
     limit 20
@@ -110,7 +110,7 @@ function author_check_instituicoes()
         $sx .= '<li>'.$link.$line['n_name'].'</a>'.'</li>';
 
         $sql = "update rdf_data set d_r2 = ".$idg." where id_d = ".$line['id_d'];
-        $rrr = $this->db->query($sql);                   
+        $rrr = $this->db->query($sql);
     }
     $sx .= '</ul>';
     $sx .= '</div>';
@@ -123,14 +123,14 @@ function author_check_instituicoes()
 }
 function author_check($p,$i)
 {
-    $off = round($i);
+    $off = sround($i);
     $rdf = new rdf;
     $t = 0;
     $sx = '<div class="col-md-12">';
     $q = 'Genero indefinido';
     $id = $rdf->find($q,'Gender');
-    $sql = "SELECT * FROM `rdf_data` 
-    where d_r2 = $id  
+    $sql = "SELECT * FROM `rdf_data`
+    where d_r2 = $id
     and id_d > $off
     order by id_d
     limit 20
@@ -144,7 +144,7 @@ function author_check($p,$i)
         $line = $rlt[$r];
         $idr = $line['d_r1'];
         $off = $line['id_d'];
-        
+
         $data = $rdf->le_data($idr);
         $nome = '';
         for ($y=0;$y < count($data);$y++)
@@ -174,7 +174,7 @@ function author_check($p,$i)
     }
     $sx .= '</ul>';
     $sx .= '</div>';
-    
+
     if ($t > 0)
     {
         $sx .= '<br><hr><a href="'.base_url(PATH.'tools/genere/'.$off).'" class="btn btn-primary">'.msg('next').'</a>';
@@ -187,7 +187,7 @@ function author_check($p,$i)
     }
     return($sx);
 }
-function export()   
+function export()
 {
     $sx = '';
     $sql = "select * from genre order by gn_first_name";
@@ -199,7 +199,7 @@ function export()
         $line = $rlt[$r];
         $lt = strtolower(substr($line['gn_first_name'],0,1));
         if ($xlt != $lt)
-        {                        
+        {
             if (strlen($xlt) > 0) { fclose($file); }
             $file = fopen('_blnp/genere_'.$lt.'.txt','w');
             $sx .= '_blnp/genere_'.$lt.'.txt'.'<br>';
@@ -209,7 +209,7 @@ function export()
         $s .= $line['gn_genre_o'].";";
         $s .= $line['gn_genre'].";";
         $s .= $line['gn_frequency_female'].";";
-        $s .= $line['gn_frequency_male'].";";             
+        $s .= $line['gn_frequency_male'].";";
         $s .= cr();
         $xlt = $lt;
         fwrite($file,$s);
@@ -227,7 +227,7 @@ function consulta($name)
     $name = trim(nbr_autor($name,7));
     $p = null;
     $g = 'Genero indefinido';
-    
+
     if (strpos($name,' ') > 0)
     {
         $name1 = trim(substr($name,0,strpos($name,' ')));
@@ -283,6 +283,6 @@ function consulta($name)
 
     }
     return($g);
-}        
+}
 }
 ?>

@@ -35,7 +35,7 @@ class article extends CI_Controller {
         /* Language */
         $this -> load -> helper('language');
         $language = new language;
-        $this -> lang -> load("brapci", $language->language());		
+        $this -> lang -> load("brapci", $language->language());
 
 		date_default_timezone_set('America/Sao_Paulo');
 	}
@@ -49,17 +49,17 @@ class article extends CI_Controller {
 		$data['title'] = '';
         if (!isset($data['nocab'])) {
             $this -> load -> view('header/menu_top.php', $data);
-        }        
+        }
 	}
 
 	function index() {
 		global $dd;
 		$this -> load -> view("brapci/article");
 	}
-	
+
 	function test()
 		{
-			$sql = "SELECT * FROM `mar_works` 
+			$sql = "SELECT * FROM `mar_works`
 						left join bdoi_doi ON m_obra_bdoi = id_doi
 						WHERE m_ref like '%BOURDIEU%' and m_obra_bdoi > 0";
 			$rlt = $this->db->query($sql);
@@ -71,7 +71,7 @@ class article extends CI_Controller {
 					$arx = $line['m_work'];
 					$ref = $line['doi_ref'];
 					$ref = troca($ref,';','-');
-					
+
 					if ($ar != $arx)
 						{
 							$ar = $arx;
@@ -80,9 +80,9 @@ class article extends CI_Controller {
 						}
 					echo $ref.';';
 				}
-			
-			return('');			
-			$sql = "SELECT doi_ref, autor_nome_abrev 
+
+			return('');
+			$sql = "SELECT doi_ref, autor_nome_abrev
 					FROM `mar_works`
 					INNER JOIN brapci_article_author on m_work = ae_article
 					INNER JOIN brapci_autor ON ae_author = autor_codigo
@@ -201,13 +201,13 @@ class article extends CI_Controller {
 				$this -> load -> view('content', $data);
 			}
 		}
-		
+
 
 		$this -> load -> view('header/footer', $data);
 
 	}
 
-	function download_view($id = '') {		
+	function download_view($id = '') {
 		$this -> load -> model('articles');
 		$this -> articles -> view_pdf($id);
 	}
@@ -218,7 +218,7 @@ class article extends CI_Controller {
 	}
 
 	function email($id) {
-		$id = round($id);
+		$id = sround($id);
 		$this -> load -> model('articles');
 		$data = $this -> articles -> le($id);
 		$content = $this -> load -> view('article/article_email', $data, true);

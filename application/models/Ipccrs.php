@@ -63,7 +63,7 @@ class ipccrs extends CI_model {
 
                 $data['type'] = 'column';
                 $data['LEG_HOR'] = 'Identidade de Citações';
-                $sx .= $this->show_citation_idententify($d2,$d3,$d4);                    
+                $sx .= $this->show_citation_idententify($d2,$d3,$d4);
 
                 $data['type'] = 'column';
                 $data['LEG_HOR'] = 'Identidade de Citações';
@@ -73,7 +73,7 @@ class ipccrs extends CI_model {
 
                 $data['type'] = 'column';
                 $data['LEG_HOR'] = 'Citações';
-                $sx .= $this->show_citation($d2);                
+                $sx .= $this->show_citation($d2);
                 $sx .= '</div>';
             break;
 
@@ -109,7 +109,7 @@ class ipccrs extends CI_model {
             $sql = "
             SELECT count(*) as total, ca_year_origem, ca_tipo, ct_name
                 FROM `cited_article`
-                INNER JOIN cited_type ON ca_tipo = id_ct 
+                INNER JOIN cited_type ON ca_tipo = id_ct
                 where ca_journal_origem = 2 and ca_year_origem > 1900
                 group by ca_year_origem, ca_tipo, ct_name
                 order by ca_year_origem, ca_tipo, ct_name
@@ -155,7 +155,7 @@ class ipccrs extends CI_model {
     function show_citation_by_author($ida)
         {
                 $sx = $this->show_citation($ida,'author');
-                return($sx);    
+                return($sx);
         }
 
     function show_citation_idententify($jnl,$ini,$fim)
@@ -165,9 +165,9 @@ class ipccrs extends CI_model {
             $limit = 50;
             $wh = '';
             $wh = " AND ((ca_year_origem >= $ini) AND (ca_year_origem <= $fim))";
-            
+
             $sx = '<h1>'.msg('Identidade de Citação').' '.$ini.'-'.$fim.'</h1>';
-            $sql = "select count(*) as total 
+            $sql = "select count(*) as total
                         FROM ".$this->baseCited."cited_article
                         INNER JOIN ".$this->baseCited."cited_journal ON ca_journal = id_cj
                         where (ca_journal_origem = $jnl)
@@ -183,7 +183,7 @@ class ipccrs extends CI_model {
                     return($sx);
                 }
 
-            $sql = "select cj_name, count(*) as total 
+            $sql = "select cj_name, count(*) as total
                         FROM ".$this->baseCited."cited_article
                         INNER JOIN ".$this->baseCited."cited_journal ON ca_journal = id_cj
                         where ca_journal_origem = $jnl
@@ -199,7 +199,7 @@ class ipccrs extends CI_model {
             $pos = 0;
             $xtotal = 0;
             $show = 1;
-            $perc_acum = 0;            
+            $perc_acum = 0;
             for ($r=0;$r < count($rlt);$r++)
                 {
                     $line = $rlt[$r];
@@ -220,7 +220,7 @@ class ipccrs extends CI_model {
                                     $show = 0;
                                 }
                         }
-                    if ($show == 1) 
+                    if ($show == 1)
                     {
                         $per = $line['total'] / $gtotal;
                         $perc_acum = $perc_acum + $per;
@@ -249,7 +249,7 @@ class ipccrs extends CI_model {
             $sx .= '</table>';
             return($sx);
         }
-    
+
     function citation_by_author($ida)
         {
                 $rdf = new rdf;
@@ -293,10 +293,10 @@ class ipccrs extends CI_model {
             foreach($au as $ida=>$nome)
                 {
                     $x = '<li>'.substr($nome,5,strlen($nome)).' - (';
-                    $x .= round(substr($nome,0,5));
+                    $x .= sround(substr($nome,0,5));
                     $x .= ')</li>';
                     $sz = $x . $sz;
-                }     
+                }
             $sz = ' <div class="'.bscol(11).'">
                     <h4>Autores com cinco ou mais citações</h4>
                     <ol>'.$sz.'</ol>
@@ -307,7 +307,7 @@ class ipccrs extends CI_model {
             $lk['service'] = 'cited/author/';
             $lk['format'] = 'csv';
             $lk['id'] = $id;
-            
+
             $link = $this->api_brapci->link($lk);
             $sz .= $link.'<img src="'.base_url('img/icon/icon_dataset.png').'" class="img-fluid">'.'</a>';
             $sz .= '</div>';
@@ -332,7 +332,7 @@ class ipccrs extends CI_model {
                 }
             return($auth);
         }
-    
+
     function link_article($l)
         {
             $sx = '<a href="'.base_url(PATH.'/v/'.$l['ca_rdf']).'" target="_new'.$l['ca_rdf'].'">[A]</a>';
@@ -346,13 +346,13 @@ class ipccrs extends CI_model {
             $sql = "select ind_descricao as descr, ind_valor as valor
                         from ".$this->base."icr_indicadores
                         where ind_jnl = $jnl and ind_indicador = '$ind'
-                        order by ind_descricao 
+                        order by ind_descricao
                         $limit";
             $rlt = $this->db->query($sql);
             $rlt = $rlt->result_array();
 
             $hc = new highcharts;
-            
+
             $data['DATA'] = array();
             $data['CATS'] = array();
             for ($r=0;$r < count($rlt);$r++)
@@ -361,7 +361,7 @@ class ipccrs extends CI_model {
                     array_push($data['DATA'],$line['valor']);
                     array_push($data['CATS'],$line['descr']);
                 }
-            
+
             $sx = $hc->grapho($data);
             return($sx);
         }
@@ -381,9 +381,9 @@ class ipccrs extends CI_model {
         {
             $j = $this->sources->le($id);
             $this->jnlrdf = $j['jnl_frbr'];
-            $this->jnl = $j['id_jnl'];   
+            $this->jnl = $j['id_jnl'];
             $this->j = $j;
-            return(1);         
+            return(1);
         }
 
     function calc_jnl($id)
@@ -393,7 +393,7 @@ class ipccrs extends CI_model {
         $this->load->model('frbr_core');
         $this->load->model('frbr');
 
-        $this->le_jnl($id);    
+        $this->le_jnl($id);
         $jnlrdf = $this->jnlrdf;
 
         $sx = '';
@@ -418,7 +418,7 @@ class ipccrs extends CI_model {
         $dsec = array();
         $de = array();
         /* Seções não indexadas */
-        $no_sections = array(            
+        $no_sections = array(
         'APRESENTACAO'=>0,
         'EDITORIAL'=>0,
         'EDICAO ANTERIORE'=>0,
@@ -426,10 +426,10 @@ class ipccrs extends CI_model {
         'NORMA DA REVISTA ACB'=>0,
         'NORMA DE PUBLICACAO'=>0,
         'NORMA EDITORIAL'=>0,
-        'NORMA PARA PUBLICACAO'=>0,        
-        'PRATICA EDITORIAL'=>0   
+        'NORMA PARA PUBLICACAO'=>0,
+        'PRATICA EDITORIAL'=>0
         );
-        
+
         /* Calcula producao */
         for ($r = 0; $r < count($c); $r++) {
             $file = 'c/' . $c[$r] . '/name.ABNT';
@@ -440,7 +440,7 @@ class ipccrs extends CI_model {
                 /* Recupera secao da publicaçao */
                 $type = substr($t, strpos($t, 'M3 - '), 100);
                 $type = trim(UpperCaseSql(trim(substr($type, 5, strpos($type, chr(10)) - 5))));
-                
+
                 /* Verifica se indexa */
                 if (!isset($no_sections[$type])) {
                 if (isset($dsec[$type]))
@@ -486,17 +486,17 @@ class ipccrs extends CI_model {
             $sql = "delete from " . $this->base . "icr_indicadores
                                 where ind_jnl = $jnl
                                 and ind_indicador = '$ind'";
-            $this->db->query($sql);            
+            $this->db->query($sql);
 
             foreach($dt as $desc=>$valor)
                 {
                     $sql = "insert into " . $this->base . "icr_indicadores
-                                (ind_indicador, ind_descricao, ind_valor, 
+                                (ind_indicador, ind_descricao, ind_valor,
                                     ind_jnl, ind_jnlrdf)
                                 values
                                 ('$ind','$desc','$valor',
                                 $jnl,$jnlrdf)";
-                    $this->db->query($sql); 
+                    $this->db->query($sql);
                 }
         }
 

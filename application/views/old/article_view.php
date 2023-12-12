@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="col-md-8">
 			<h3><?php echo $jnl_nome; ?></h3>
-			<a href="<?php echo base_url('index.php//admin/issue_view/' . round($ar_edition) . '/' . checkpost_link(round($ar_edition))); ?>">
+			<a href="<?php echo base_url('index.php//admin/issue_view/' . sround($ar_edition) . '/' . checkpost_link(round($ar_edition))); ?>">
 			<span class="middle">v. <?php echo $ed_vol . ', n.' . $ed_nr . ', ' . $ed_ano . $pages; ?></span>
 			</a>
 		</div>
@@ -40,12 +40,12 @@
 	if (perfil("#BIB")) {
 		echo '<div role="tabpanel" class="tab-pane" id="setting">' . $tab_author .$tab_editar . '</div>';
 		if (isset($tab_support)) {
-			echo '<div role="tabpanel" class="tab-pane" id="support">' .		 
-				$tab_support . 
+			echo '<div role="tabpanel" class="tab-pane" id="support">' .
+				$tab_support .
 			'</div>';
 		}
 	}
-    ?>    
+    ?>
   </div>
 
 </div>

@@ -93,7 +93,7 @@ class ias_cited extends CI_Model
                 case 'DEL':
                 $sql = "DELETE from " . $this->base . "cited_article where id_ca = $idz ";
                 $this->db->query($sql);
-                break;                
+                break;
             }
         if (strlen($offset) == '') {
             $offset = 0;
@@ -152,15 +152,15 @@ class ias_cited extends CI_Model
         $dd1 = get("dd1");
         $dd2 = get("dd2");
         if (strlen($dd2) > 0) {
-            $sql = "update " . $this->base . "cited_article 
+            $sql = "update " . $this->base . "cited_article
                                 set ca_journal = $d1
                                 where ca_journal = $dd2
                                 ";
             $this->db->query($sql);
 
-            $sql = "update " . $this->base . "cited_journal 
+            $sql = "update " . $this->base . "cited_journal
                             set cj_use = " . $d1 . " where
-                            id_cj = " . round($dd2) . " or cj_use = " . round($dd2);
+                            id_cj = " . sround($dd2) . " or cj_use = " . sround($dd2);
             $this->db->query($sql);
         }
         $dt = $this->le_journal_cited($d1);
@@ -173,7 +173,7 @@ class ias_cited extends CI_Model
         $name = get("dd1");
         if (strlen($name) > 0) {
             $name = UpperCaseSQL(ASCII($name));
-            $sql = "select * from " . $this->base . "cited_journal 
+            $sql = "select * from " . $this->base . "cited_journal
                         where cj_name_asc like '%" . $name . "%'
                         and cj_use = 0 and id_cj <> " . $d1 . "
                         order by cj_name";
@@ -282,7 +282,7 @@ class ias_cited extends CI_Model
     /******************************************************************/
     function nlp2()
     {
-        $sql = "select * from " . $this->base . "cited_article 
+        $sql = "select * from " . $this->base . "cited_article
                         where ca_tipo = 1 and ca_journal = 0
                         limit 1";
         $rlt = $this->db->query($sql);
@@ -335,7 +335,7 @@ class ias_cited extends CI_Model
                 $sx .= '<br>' . $l;
                 if (count($rlt) == 0) {
                     $sx .= ' <b><span style="color: green">NEW</span></b>';
-                    $sql = "insert into  " . $this->base . "cited_journal 
+                    $sql = "insert into  " . $this->base . "cited_journal
                                                 (cj_name, cj_issn, cj_qualis)
                                                 values
                                                 ('$la','','')";
@@ -376,7 +376,7 @@ class ias_cited extends CI_Model
 
         /******************************************************** Periódicos */
         $sql = "select * from (
-                    select ca_journal, cj_name, id_cj, count(*) as total 
+                    select ca_journal, cj_name, id_cj, count(*) as total
                     from " . $this->base . "cited_article
                     inner join " . $this->base . "cited_journal ON ca_journal = id_cj
                     where ca_tipo = 1
@@ -410,8 +410,8 @@ class ias_cited extends CI_Model
     function status_all()
     {
         $sx = '';
-        $sql =  "select count(*) as toDO, ca_tipo, ct_name 
-                    from " . $this->base . "cited_article 
+        $sql =  "select count(*) as toDO, ca_tipo, ct_name
+                    from " . $this->base . "cited_article
                     LEFT JOIN " . $this->base . "cited_type ON  ca_tipo = id_ct
                     group by ca_tipo, ct_name
                     order by toDO desc ";
@@ -438,11 +438,11 @@ class ias_cited extends CI_Model
 
     function cited_update()
     {
-        $sql = "select * from " . $this->base . "cited_article 
-                    where 
-                    (ca_text like '%" . chr(10) . "%') 
+        $sql = "select * from " . $this->base . "cited_article
+                    where
+                    (ca_text like '%" . chr(10) . "%')
                     or
-                    (ca_text like '%" . chr(13) . "%') 
+                    (ca_text like '%" . chr(13) . "%')
                     limit 100
                     ";
         $rlt = $this->db->query($sql);
@@ -472,11 +472,11 @@ class ias_cited extends CI_Model
 
     function journal_update()
     {
-        $sql = "select * from " . $this->base . "cited_journal 
-                    where 
-                    (cj_name like '%" . chr(10) . "%') 
+        $sql = "select * from " . $this->base . "cited_journal
+                    where
+                    (cj_name like '%" . chr(10) . "%')
                     or
-                    (cj_name like '%" . chr(13) . "%') 
+                    (cj_name like '%" . chr(13) . "%')
                     ";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -486,7 +486,7 @@ class ias_cited extends CI_Model
             exit;
         }
 
-        $sql = "select * from " . $this->base . "cited_journal 
+        $sql = "select * from " . $this->base . "cited_journal
                     where cj_name_asc = ''";
         $rlt = $this->db->query($sql);
         $rlt = $rlt->result_array();
@@ -526,7 +526,7 @@ class ias_cited extends CI_Model
                 $wh = '1=1';
             }
             /* SQL */
-            $sql = "select * from " . $this->base . "cited_journal 
+            $sql = "select * from " . $this->base . "cited_journal
                 where (" . $wh . ") and (cj_name <> '') and (cj_use = 0)
                 ";
             $sql .= " order by cj_name";
@@ -653,12 +653,12 @@ class ias_cited extends CI_Model
                     (
                     ca_rdf, ca_journal, ca_vol,
                     ca_year, ca_nr, ca_pag,
-                    ca_tipo, ca_text, ca_status, 
-                    ca_update_at, ca_ordem 
+                    ca_tipo, ca_text, ca_status,
+                    ca_update_at, ca_ordem
                     )
                     values
                     (
-                    $rdf, 0, 0, 
+                    $rdf, 0, 0,
                     0, 0, 0,
                     0, '$ca_text', 0,
                     '$data','$ca_ordem'
@@ -674,13 +674,13 @@ class ias_cited extends CI_Model
 
     function nlp_cited($d1, $d2)
     {
-        $d2 = round($d2);
+        $d2 = sround($d2);
         //echo '==>' . $d1 . '-->' . $d2;
         $this->export_journals();
         $sx = '<h3>Process Cited</h3>';
         $sql = "select * from " . $this->base . "cited_article
                     where ca_tipo = 1 and ca_journal = 0
-                    order by ca_text 
+                    order by ca_text
                     limit 5
                     offset $d2";
         $rlt = $this->db->query($sql);
@@ -713,7 +713,7 @@ class ias_cited extends CI_Model
             if ((strpos($txt,' v.') > 0) or (strpos($txt,' V.') > 0))
                 {
                     $pos = strpos($txt,', v.');
-                    $pos = round($pos) + round(strpos($txt,'. V.')) + round(strpos($txt,'. v.')) + round(strpos($txt,', v.'))  + round(strpos($txt,', V.'));
+                    $pos = sround($pos) + sround(strpos($txt,'. V.')) + sround(strpos($txt,'. v.')) + sround(strpos($txt,', v.'))  + sround(strpos($txt,', V.'));
                     if ($pos <= 0)
                     {
                     echo $txt.'<hr>';
@@ -724,11 +724,11 @@ class ias_cited extends CI_Model
                     $sql = "update " . $this->base . "cited_article set
                                     ca_text = '$txt'
                                     where id_ca = " . $line['id_ca'];
-                    $this->db->query($sql); 
+                    $this->db->query($sql);
                     //echo $txt;
                     //exit;
                     }
-                                       
+
                 }
             //$txt = utf8_decode($txt);
             //echo '<pre>';
@@ -899,7 +899,7 @@ class ias_cited extends CI_Model
 
         $sx = 0;
 
-        /********************************* Regras 
+        /********************************* Regras
          * 1 - Journal
          * 5 - Event
          * 6 - Tese
@@ -1345,8 +1345,8 @@ class ias_cited extends CI_Model
         if (strlen($offset) == 0) {
             $offset = '0';
         }
-        $sql = "select * 
-                        from " . $this->base . "cited_article 
+        $sql = "select *
+                        from " . $this->base . "cited_article
                         where ca_year = 0
                         limit 100
                         offset $offset
@@ -1403,8 +1403,8 @@ class ias_cited extends CI_Model
         if (strlen($offset) == 0) {
             $offset = '0';
         }
-        $sql = "select * 
-                        from " . $this->base . "cited_article 
+        $sql = "select *
+                        from " . $this->base . "cited_article
                         inner join brapci.rdf_concept ON id_cc  = ca_rdf
                         where ca_journal_origem = 0 and cc_status < 90
                         limit 100
@@ -1433,20 +1433,20 @@ class ias_cited extends CI_Model
                     $eve = $rdf->recupera_id($deve, 'hasIssueProceeding');
                     $ano = $rdf->recupera_id($deve, 'hasDateTime');
                     $id_jnl = $eve['d_r1'];
-                } else {    
+                } else {
                     echo '<pre>';
-                    print_r($jnl);   
+                    print_r($jnl);
                     print_r($dt);
                     $id_jnl = $jnl['d_r2'];
                 }
-            
+
             if (!isset($src[$id_jnl]))
                 {
                     echo "OPS - ".$id_jnl."<br>";
                     exit;
                 }
-            
-            if (!isset($iss['d_r1'])) { 
+
+            if (!isset($iss['d_r1'])) {
                 $issue = 0;
             } else {
                 $issue = $iss['d_r1'];
@@ -1462,7 +1462,7 @@ class ias_cited extends CI_Model
                 $ano = array();
                 $ano['n_name'] = 9999;
             }
-            $ano = round($ano['n_name']);
+            $ano = sround($ano['n_name']);
             if ($ano < 1950) {
                 $ano = 9998;
             }
@@ -1476,8 +1476,8 @@ class ias_cited extends CI_Model
 
             if ($idj != '')
             {
-            $sql = "update " . $this->base . "cited_article 
-                                set 
+            $sql = "update " . $this->base . "cited_article
+                                set
                                 ca_journal_origem = $idj,
                                 ca_year_origem = $ano
                                 where id_ca = " . $idca;
@@ -1579,7 +1579,7 @@ class ias_cited extends CI_Model
                             }
                         }
                         if ($ex == 1) {
-                            //echo "FIM-'"; 
+                            //echo "FIM-'";
                             break;
                         }
                     } else
@@ -1608,7 +1608,7 @@ class ias_cited extends CI_Model
             $wh .= "(ca_text like '%($r)%')";
         }
         $sql = "select * from " . $this->base . "cited_article
-                    where ca_tipo = 0 
+                    where ca_tipo = 0
                     and ($wh)
                     limit 1";
         $rlt = $this->db->query($sql);
@@ -1642,7 +1642,7 @@ class ias_cited extends CI_Model
 
     function type_not_identified($phase = 0)
     {
-        $phase = round($phase);
+        $phase = sround($phase);
         $sx = '<h2>' . msg('Phase ' . romano($phase + 1)) . '</h2>';
         switch ($phase) {
             case '1':
@@ -1678,7 +1678,7 @@ class ias_cited extends CI_Model
             $nr =  substr($t, strpos($t, '(') + 1);
             $nr = substr($nr, 0, strpos($nr, ')'));
             echo '<br>==>' . $t . '=v=>' . $vol . '=n=>' . $nr;
-            $vol = round($vol);
+            $vol = sround($vol);
 
             if ((sonumero($nr) == $nr) and ($vol > 0)) {
                 return ('v. ' . $vol . ', n. ' . $nr);

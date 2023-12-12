@@ -18,8 +18,8 @@ class patents extends CI_model {
                 $sx = $this->check_duplicatas($id);
                 break;
             }
-        
-        
+
+
         return($sx);
     }
 
@@ -28,7 +28,7 @@ class patents extends CI_model {
         $sx = '';
         /**** Consulta SQL ********************/
         $sql = "select * from (
-        select p_nrn, count(*) as total FROM patent.patent 
+        select p_nrn, count(*) as total FROM patent.patent
             where not p_nrn like '%*%'
             group by p_nrn
         ) as tabela
@@ -39,10 +39,10 @@ class patents extends CI_model {
         for ($r=0;$r < count($rlt);$r++)
         {
             $line = $rlt[$r];
-            $np = $line['p_nrn'];            
+            $np = $line['p_nrn'];
 
             /**** Consulta SQL ********************/
-            $sql = "select * from patent.patent 
+            $sql = "select * from patent.patent
                         where p_nrn = '".$np."'";
             echo cr().date("Ymd-H:i:s").' 1. '.$np.' ('.$r.'/'.count($rlt).') ##############';
             $xrlt = $this->db->query($sql);
@@ -60,20 +60,20 @@ class patents extends CI_model {
                     {
                         if (strpos($title,'?') > 0)
                         {
-                            $title = $xline['p_title'];    
+                            $title = $xline['p_title'];
                         }
                     } else {
                         $title = $xline['p_title'];
-                    }                    
+                    }
                 }
                 if (strlen($xline['p_resumo']) > 0)
                 {
                     $abstract = $xline['p_resumo'];
                 }
-                array_push($ids,$xline['id_p']);  
+                array_push($ids,$xline['id_p']);
                 //$sx .= $xline['id_p'].' ';
             }
-            
+
             $idi = $ids[0];
             for ($x=0;$x < count($ids);$x++)
             {
@@ -98,31 +98,31 @@ class patents extends CI_model {
                     echo cr().date("Ymd-H:i:s").' 4. ';
 
                     $sql = "update patent.patent_pct set pct_patent = $idi where pct_patent = ".$ids[$x];
-                    $xrlt = $this->db->query($sql);  
-                    echo cr().date("Ymd-H:i:s").' 5. ';                                      
+                    $xrlt = $this->db->query($sql);
+                    echo cr().date("Ymd-H:i:s").' 5. ';
 
                     $sql = "update patent.patent_prioridade set prior_patent = $idi where prior_patent = ".$ids[$x];
-                    $xrlt = $this->db->query($sql);  
-                    echo cr().date("Ymd-H:i:s").' 6. ';                                      
+                    $xrlt = $this->db->query($sql);
+                    echo cr().date("Ymd-H:i:s").' 6. ';
 
                     $sql = "update patent.patent_pub set pub_patent = $idi where pub_patent = ".$ids[$x];
-                    $xrlt = $this->db->query($sql);                                        
+                    $xrlt = $this->db->query($sql);
                     echo cr().date("Ymd-H:i:s").' 7. ';
                 }
                 $sql = "update patent.patent set p_title = '$title', p_resumo = '$abstract' $compl where id_p = ".$ids[$x];
                 $xrlt = $this->db->query($sql);
                 echo cr().date("Ymd-H:i:s").' 8. ';
             }
-        }  
+        }
 
         if (count($rlt) > 0)
         {
             //$sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=1').'">';
         } else {
             //$sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=2').'">';
-        }   
-        exit; 
-        return($sx);          
+        }
+        exit;
+        return($sx);
     }
 
     function check_names()
@@ -141,13 +141,13 @@ class patents extends CI_model {
             {
                 if (strpos($nr,$c[$y]) > 0)
                 {
-                    $nr = substr($nr,0,strpos($nr,'-'));        
-                }                
+                    $nr = substr($nr,0,strpos($nr,'-'));
+                }
             }
             $sql = "update patent.patent set p_nrn = '".$nr."' where id_p = ".$line['id_p'];
             $rltq = $this->db->query($sql);
             $sx .= '<li>'.$nr.' <span style="color: green"><b>Updated</b></span></li>';
-        }        
+        }
         $sx .= '</ul>';
         if (count($rlt) > 0)
         {
@@ -155,15 +155,15 @@ class patents extends CI_model {
         } else {
             $sx .= '<meta http-equiv="refresh" content="5; url='.base_url(PATH.'check/0?dd1=1').'">';
         }
-        
+
         return($sx);
     }
     function check_duplicate() {
         $sql = "select * from (
-        SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent 
+        SELECT count(*) as total, max(id_prior) as id_prior, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent
         FROM patent.patent_prioridade
         group by prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent
-        ) as tabela 
+        ) as tabela
         where total > 1 limit 500";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -184,7 +184,7 @@ class patents extends CI_model {
         }
         /************ Classificaction *************/
         $sql = "select * from (
-        SELECT count(*) as total, max(id_c) as id_c, c_patent, c_c, c_cod 
+        SELECT count(*) as total, max(id_c) as id_c, c_patent, c_c, c_cod
         FROM patent.patent_classification
         group by c_patent, c_c, c_cod
         ) as tabela
@@ -208,10 +208,10 @@ class patents extends CI_model {
         }
         /********************************* autoria **************************/
         $sql = "select * from (
-        SELECT count(*) as total, max(id_rl) as id_rl, rl_patent, rl_agent, rl_relation 
+        SELECT count(*) as total, max(id_rl) as id_rl, rl_patent, rl_agent, rl_relation
         FROM patent.patent_agent_relation
         group by rl_patent, rl_agent, rl_relation
-        ) as tabela 
+        ) as tabela
         where total > 1
         limit 500";
         $rlt = $this -> db -> query($sql);
@@ -304,7 +304,7 @@ class patents extends CI_model {
         }
         echo cr() . '#########FIM DO PROCESSO#############';
         if ($ok == 1) {
-            $sql = "update patent.patent_source set 
+            $sql = "update patent.patent_source set
             ps_last_harvesting = '" . date("Y-m-d") . "',
             ps_issue = ($id)
             where id_ps = $ids ";
@@ -321,7 +321,7 @@ class patents extends CI_model {
         $sql = "select * from (
         SELECT count(*) as total, max(id_prior) as max, prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent FROM `patent_prioridade`
         group by prior_seq, prior_numero_prioridade, prior_sigla_pais, prior_patent
-        ) as tabela 
+        ) as tabela
         where total > 1";
     }
 
@@ -343,7 +343,7 @@ class patents extends CI_model {
         $sql = "select * from patent.patent_despacho
         INNER JOIN patent.patent_issue ON pd_issue = id_issue
         LEFT  JOIN patent.patent_section ON pd_section = ps_acronic
-        WHERE pd_patent = $id 
+        WHERE pd_patent = $id
         order by issue_number desc, pd_section";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -352,7 +352,7 @@ class patents extends CI_model {
         /* patent_classification */
         $sql = "select * from patent.patent_classification
         LEFT JOIN patent.patent_class ON cc_class = c_c
-        WHERE c_patent = $id 
+        WHERE c_patent = $id
         order by c_c";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -361,7 +361,7 @@ class patents extends CI_model {
         /* prioritaria */
         $sql = "select * from patent.patent_prioridade
         LEFT JOIN patent.patent_pais_sigla on prior_sigla_pais = ps_sigla
-        WHERE prior_patent = $id 
+        WHERE prior_patent = $id
         order by prior_seq";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -741,9 +741,9 @@ class patents extends CI_model {
                 echo $result.cr();
                 switch ($tp) {
                     case 'No ' :
-                    $result = trim($result);                    
+                    $result = trim($result);
                     $numero = sonumero(substr($result,3,4));
-                    $ano = round(substr($result, strlen($result) - 4, 4));
+                    $ano = sround(substr($result, strlen($result) - 4, 4));
                     $dta = substr($result, strlen($result) - 10, 10);
                     $dt['year'] = $ano;
                     $dt['num'] = $numero;
@@ -754,7 +754,7 @@ class patents extends CI_model {
                     case 'NRS' :
                     $result = trim($result);
                     $numero = sonumero($nr);
-                    $ano = round(substr($result, strlen($result) - 2, 2));
+                    $ano = sround(substr($result, strlen($result) - 2, 2));
                     if ($ano > 90) { $ano = 1900 + $ano;
                     }
                     $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
@@ -767,7 +767,7 @@ class patents extends CI_model {
                     case 'REV' :
                     $result = trim($result);
                     $numero = sonumero(substr($result, 0, strpos($result, 'COM')));
-                    $ano = round(substr($result, strlen($result) - 2, 2));
+                    $ano = sround(substr($result, strlen($result) - 2, 2));
                     if ($ano > 90) { $ano = 1900 + $ano;
                     }
                     $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
@@ -785,7 +785,7 @@ class patents extends CI_model {
                         $numero = sonumero(substr($result, 0, 9));
                     }
 
-                    $ano = round(substr($result, strlen($result) - 2, 2));
+                    $ano = sround(substr($result, strlen($result) - 2, 2));
                     if ($ano > 90) { $ano = 1900 + $ano;
                     }
                     $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
@@ -794,7 +794,7 @@ class patents extends CI_model {
                     $dt['vol'] = '';
                     $dt['pusblished'] = brtos($dta);
                     $dt['jid'] = '1';
-                    break;                        
+                    break;
                     case 'Rpi' :
                     $result = trim($result);
                     if (substr($result, 0, 6) == 'Rpi No') {
@@ -803,7 +803,7 @@ class patents extends CI_model {
                         $numero = sonumero(substr($result, 0, 9));
                     }
 
-                    $ano = round(substr($result, strlen($result) - 2, 2));
+                    $ano = sround(substr($result, strlen($result) - 2, 2));
                     if ($ano > 90) { $ano = 1900 + $ano;
                     }
                     $dta = substr($result, strlen($result) - 8, 6) . strzero($ano, 4);
@@ -938,7 +938,7 @@ class patents extends CI_model {
             $max = 11;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
         break;
         case '(21)' :
@@ -947,7 +947,7 @@ class patents extends CI_model {
             $max = 21;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
 
         break;
@@ -961,7 +961,7 @@ class patents extends CI_model {
             $max = 22;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
 
         break;
@@ -985,7 +985,7 @@ class patents extends CI_model {
             $max = 30;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
 
         break;
@@ -1019,7 +1019,7 @@ class patents extends CI_model {
             $max = 51;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
 
         break;
@@ -1031,9 +1031,9 @@ class patents extends CI_model {
             $p['patent_titulo'] = $v;
         } else {
             $result = $cmdo . ' ' . $result;
-            $cmd = $cmdo;                        
+            $cmd = $cmdo;
         }
-        
+
         break;
         case '(57)' :
         $v = troca($v, '"', '');
@@ -1051,9 +1051,9 @@ class patents extends CI_model {
                 $name = substr($v, 0, strpos($v, '('));
                 $pais = substr($v, strpos($v, '('), strlen($v));
                 if (strpos(' '.$pais,'(') > 1)
-                {                                    
+                {
                     $pais = substr($pais, strpos($pais, ')')+1, strlen($pais));
-                    $name = substr($v, 0, strpos($v, ')')+1); 
+                    $name = substr($v, 0, strpos($v, ')')+1);
                 }
                 $a['nome'] = $name;
                 $a['pais'] = substr($pais, 1, 2);
@@ -1069,7 +1069,7 @@ class patents extends CI_model {
             $a['nome_seq'] = $seq + 1;
             $p['depositante'][$seq] = $a;
         }
-        break;                
+        break;
         case '(72)' :
         $a = array();
         $nn = $v . ';';
@@ -1492,7 +1492,7 @@ function sessions($sec = '', $desc = '') {
         $rlt = $rlt -> result_array();
     }
     if (count($rlt) == 0) {
-        $sql = "insert into patent.patent_section 
+        $sql = "insert into patent.patent_section
         (ps_name, ps_acronic, ps_description, ps_source, ps_active)
         values
         ('$desc','$sec','',1,1)";
@@ -1540,15 +1540,15 @@ function despacho($issue, $d, $id) {
     $cot = troca($d['comentario'], "'", '');
     $cot = troca($cot, "\\", '-');
     $sec = $d['section'];
-    $sql = "select * from patent.patent_despacho 
-    where pd_patent = $id 
-    and pd_section = '$sec' 
-    and pd_comentario    = '$cot' 
+    $sql = "select * from patent.patent_despacho
+    where pd_patent = $id
+    and pd_section = '$sec'
+    and pd_comentario    = '$cot'
     and pd_issue = '$issue'";
     $rlt = $this -> db -> query($sql);
     $rlt = $rlt -> result_array();
     if (count($rlt) == 0) {
-        $sql = "insert into patent.patent_despacho 
+        $sql = "insert into patent.patent_despacho
         (pd_patent, pd_section, pd_comentario, pd_issue, pd_method)
         values
         ('$id','$sec','$cot','$issue','INPI')";
@@ -1563,7 +1563,7 @@ function relacao_agente_patent($idp, $age, $relacao, $seq) {
     if (strlen($seq) == 0) {
         $seq = 1;
     }
-    $sql = "select * from patent.patent_agent_relation 
+    $sql = "select * from patent.patent_agent_relation
     WHERE rl_patent = $idp
     AND rl_agent = $age
     AND rl_relation = '$relacao' ";
@@ -1587,10 +1587,10 @@ function pct($id, $pct, $pct_dt) {
         {
             $pct_dt = '19'.substr($pct_dt,0,2).'-'.substr($pct_dt,2,2).'-'.substr($pct_dt,4,2);
         } else {
-            $pct_dt = '0001-02-02';        
+            $pct_dt = '0001-02-02';
         }
-        
-    }        
+
+    }
     $sql = "select * from patent.patent_pct
     where pct_nr = '$pct'
     AND pct_data = '$pct_dt'
@@ -1615,9 +1615,9 @@ function pub($id, $pct, $pct_dt) {
         {
             $pct_dt = '19'.substr($pct_dt,0,2).'-'.substr($pct_dt,2,2).'-'.substr($pct_dt,4,2);
         } else {
-            $pct_dt = '0001-02-02';        
+            $pct_dt = '0001-02-02';
         }
-        
+
     }
     $sql = "select * from patent.patent_pub
     where pub_nr = '$pct'
@@ -1829,7 +1829,7 @@ function classification($id, $l) {
 
     $data = substr($l['cip_ano'], 0, 7);
     $seq = $l['cip_seq'];
-    
+
     $sql = "select * from patent.patent_classification
     WHERE c_patent = $id
     AND c_class = '$c1'
@@ -2018,7 +2018,7 @@ function prioritario($idp, $d) {
     $rlt = $rlt -> result_array();
     if (count($rlt) == 0) {
         $sql = "insert into patent.patent_prioridade
-        (prior_seq, prior_numero_prioridade, prior_sigla_pais, 
+        (prior_seq, prior_numero_prioridade, prior_sigla_pais,
         prior_data_prioridade,   prior_patent)
         values
         ($seq,'$prioc','$pais',
@@ -2030,7 +2030,7 @@ function prioritario($idp, $d) {
 }
 
 function s($n, $t = '') {
-    $p = round(get("p"));
+    $p = sround(get("p"));
     if ($p == 0) { $p = 1;
     }
     $type = 'patent';
@@ -2145,12 +2145,12 @@ function save_history($data) {
         $user = $_SESSION['id_us'];
     }
     $q = UpperCase($data['q']);
-    $t = round($data['type']);
-    $total = round($data['total']);
-    $page = round(GET("p"));
+    $t = sround($data['type']);
+    $total = sround($data['total']);
+    $page = sround(GET("p"));
 
-    $sql = "select * from patent._search 
-    where s_date = '$date' 
+    $sql = "select * from patent._search
+    where s_date = '$date'
     and s_hour = '$hour'
     and s_query = '$q'
     and s_type = $t
@@ -2178,7 +2178,7 @@ function pages($n = 0, $t = 0) {
     $q = troca($q, '"', '¢');
     $link = base_url('index.php/res/?q=' . $q . '&type=' . get("type"));
 
-    $p = round(get("p"));
+    $p = sround(get("p"));
     if ($p == 0) { $p = 1;
     }
     /********* PAGINA INICIAL ******************/
@@ -2216,7 +2216,7 @@ function instituicao($id) {
     where id_pa = $id";
     $rlt = $this -> db -> query($sql);
     $rlt = $rlt -> result_array();
-    
+
     $name = $rlt[0]['pa_nome'];
 
     $sx = '';
@@ -2228,7 +2228,7 @@ function instituicao($id) {
 
 function instituicao_list($id) {
     $sql = "select * from patent.patent_agent_relation
-    INNER JOIN patent.patent ON id_p = rl_patent 
+    INNER JOIN patent.patent ON id_p = rl_patent
     where rl_agent = $id";
     $rlt = $this -> db -> query($sql);
     $rlt = $rlt -> result_array();
@@ -2285,9 +2285,9 @@ function zera() {
 
 function summary() {
     $sx = '<h1>' . msg('summary') . '</h1>';
-    $sql = "select count(*) as total,  
+    $sql = "select count(*) as total,
     max(issue_published) as issue_published,
-    max(issue_created ) as issue_created                            
+    max(issue_created ) as issue_created
     from patent.patent_issue";
     $rlt = $this -> db -> query($sql);
     $rlt = $rlt -> result_array();
@@ -2312,8 +2312,8 @@ function summary() {
     $sx = '<div class="row"><div class="col-md-12">' . $sx . '</div></div>';
     return ($sx);
 }
-function rel($tipo=1)    
-{   
+function rel($tipo=1)
+{
     /*
     SELECT pd_section, ps_name, count(*) as total FROM `patent_despacho`
     INNER JOIN patent_issue on issue_source = pd_issue

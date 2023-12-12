@@ -37,13 +37,13 @@ class elasticsearch extends CI_model {
      * @throws Exception
      */
 
-    private function call($path, $method = 'GET', $data = null) {
+    public function call($path, $method = 'GET', $data = null) {
         if (strlen($this -> index) == 0) {
             echo('index needs a value');
             return ( array());
         }
 
-        $url = $this -> server . '/' . $this -> index . '/' . $path;                
+        $url = $this -> server . '/' . $this -> index . '/' . $path;
         $headers = array('Accept: application/json', 'Content-Type: application/json', );
 
         $ch = curl_init();
@@ -125,12 +125,13 @@ class elasticsearch extends CI_model {
         return $this -> call($type . '/_mapping', 'PUT', $data);
     }
 
-    public function fulltext($type='fulltext',$id,$dt)
+    public function fulltext($type='fulltext',$id=0,$dt=[])
         {
+            pre($type,false);
             $this -> index = 'full';
-            $rst = $this -> call($type . '/' . $id, 'PUT', $dt);        
+            $rst = $this -> call($type . '/' . $id, 'PUT', $dt);
         }
-    
+
 
     /**
      * set the mapping for the index
@@ -182,7 +183,7 @@ class elasticsearch extends CI_model {
                     break;
                 case 'hasIssueOf' :
                     $id_jnl = $line['n_name'];
-                    $id_jnl = round(sonumero(substr($id_jnl, 0, strpos($id_jnl, '-'))));
+                    $id_jnl = sround(sonumero(substr($id_jnl, 0, strpos($id_jnl, '-'))));
                     $id_jnl = (string)$id_jnl;
                     $source .= LowerCaseSql($line['n_name']) . '; ';
                     break;
@@ -222,7 +223,7 @@ class elasticsearch extends CI_model {
         if (file_exists($file_full))
             {
                 $dt['full'] = file_get_contents($file_full);
-            }        
+            }
 
         if ($status == 'N') {
             $rst = $this -> delete($type, $id);
@@ -275,7 +276,7 @@ class elasticsearch extends CI_model {
         $dt['subject'] = $subject;
         $dt['journal'] = $data['jnl_name'];
         $dt['id_jnl'] = $data['id_jnl'];
-        $dt['year'] = round($data['issue']['year']);
+        $dt['year'] = sround($data['issue']['year']);
         $dt['issue'] = $data['issue']['issue_id'];
         return $this -> call($type . '/' . $id, 'PUT', $dt);
     }
@@ -320,12 +321,12 @@ class elasticsearch extends CI_model {
         /******************* PAGINACAO *******/
         if ($full == 0)
         {
-            $sz = $this -> searchs -> sz;    
+            $sz = $this -> searchs -> sz;
         } else {
             $sz = 10000;
         }
-        
-        $p = round(get("p"));
+
+        $p = sround(get("p"));
         $fr = ($p - 1);
         if ($fr < 0) { $fr = 0;
         }
@@ -350,7 +351,7 @@ class elasticsearch extends CI_model {
             default :
                 $ord = '';
                 break;
-        }        
+        }
         switch($t) {
             case '2' :
                 $fld = 'authors';
@@ -366,7 +367,7 @@ class elasticsearch extends CI_model {
                 break;
             case '6' :
                 $fld = 'full';
-                break;                
+                break;
             default :
                 $fld = 'all';
                 break;
@@ -406,7 +407,7 @@ class elasticsearch extends CI_model {
         $year2 = $_SESSION['year_e'];
         $range = '"range" : { "year" : { "gte": "' . $year1 . '", "lte": "' . $year2 . '" } }' . cr();
         $ttt .= ', { ' . $range . ' }';
-        
+
         /********* OPERADOR BOOLEANO **************/
         if ($OR == 0) {
             $ooo = ' "must" : [ ' . $ttt . ' ] ';
@@ -425,8 +426,8 @@ class elasticsearch extends CI_model {
                           "from": "' . $fr . '",
                           "size": "' . $sz . '",
                           ' . $ord . '
-                          ' . $qqq . '                          
-                        }              
+                          ' . $qqq . '
+                        }
                 ';
                        /* echo '<pre>'.$data.'</pre>'; */
         $rq = $this -> call($type . '/_search?' . $qs, $method, $data);

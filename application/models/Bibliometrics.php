@@ -1,7 +1,7 @@
 <?php
 class bibliometrics extends CI_model {
-    var $file_name = '';  
-    var $pqs = array();  
+    var $file_name = '';
+    var $pqs = array();
     function index($ac)
     {
         $tela = '<h3>'.msg($ac).'</h3>';
@@ -17,8 +17,8 @@ class bibliometrics extends CI_model {
                     $tela .= $this -> bibliometrics -> form_1();
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
-                }            
-                
+                }
+
             break;
             case 'half_live':
                 if (strlen($dd1) == 0) {
@@ -28,8 +28,8 @@ class bibliometrics extends CI_model {
                     $tela .= $this -> bibliometrics -> form_1();
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= $rst;
-                }            
-            break;            
+                }
+            break;
             case 'cited_analyse':
                 if (strlen($dd1) == 0) {
                     $tela .= $this -> bibliometrics -> form_1();
@@ -38,7 +38,7 @@ class bibliometrics extends CI_model {
                     $tela .= $this -> bibliometrics -> form_1();
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= $rst;
-                }            
+                }
             break;
             case 'csv_to_net' :
                 if (!(isset($_FILES['userfile']['tmp_name']))) {
@@ -56,11 +56,11 @@ class bibliometrics extends CI_model {
                     $tela .= $this -> bibliometrics -> form_file(msg($ac));
                 } else {
                     $txt = $this -> bibliometrics -> readfile($_FILES['userfile']['tmp_name']);
-                    $rst = $this -> bibliometrics -> net_to_gephi($txt);   
-                    exit;             
+                    $rst = $this -> bibliometrics -> net_to_gephi($txt);
+                    exit;
                     return ('');
                 }
-            break;        
+            break;
             case 'csv_to_matrix' :
                 if (!(isset($_FILES['userfile']['tmp_name']))) {
                     $tela .= $this -> bibliometrics -> form_file(msg($ac));
@@ -81,7 +81,7 @@ class bibliometrics extends CI_model {
                     $this -> bibliometrics -> download_file($rst);
                     return ('');
                 }
-            break;                
+            break;
             case 'semicolon_to_list' :
                 if (strlen($dd1) == 0) {
                     $tela .= $this -> bibliometrics -> form_1();
@@ -100,7 +100,7 @@ class bibliometrics extends CI_model {
                     $tela .= $this -> bibliometrics -> form_1();
                     $tela .= '<h4>' . msg('result') . '</h4>';
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
-                }            
+                }
             break;
             case 'change_to' :
                 if ((strlen($dd1) == 0) or (strlen($dd2) == 0)) {
@@ -123,11 +123,11 @@ class bibliometrics extends CI_model {
                     $tela .= '<textarea class="form-control" style="height: 300px;">' . $rst . '</textarea>';
                 }
             break;
-            
+
             default :
             $tela = $this -> bibliometrics -> tools_menu();
         }
-        return($tela);            
+        return($tela);
     }
     function tools_menu()
     {
@@ -136,31 +136,31 @@ class bibliometrics extends CI_model {
         $sx .= '<div class="col-12">';
         $sx .= '<h4>'.msg('bibliometric_menu').'</h4>';
         $sx .= '<ul>';
-        
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/semicolon_to_list').'">';
         $sx .= msg('semicolon_to_list');
         $sx .= '</a>';
         $sx .= '</li>';
-        
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_net').'">';
         $sx .= msg('csv_to_net');
         $sx .= '</a>';
         $sx .= '</li>';
-        
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/net_to_gephi').'">';
         $sx .= msg('net_to_gephi');
         $sx .= '</a>';
-        $sx .= '</li>';        
-        
+        $sx .= '</li>';
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix').'">';
         $sx .= msg('csv_to_matrix');
         $sx .= '</a>';
-        $sx .= '</li>';    
-        
+        $sx .= '</li>';
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/csv_to_matrix_ocorrencia').'">';
         $sx .= msg('csv_to_matrix_ocorrencia');
@@ -170,27 +170,27 @@ class bibliometrics extends CI_model {
         $sx .= '<li>'.msg('Text_process').'</li>';
 
         $sx .= '<ul>';
-        
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/change_to').'">';
         $sx .= msg('change_to');
         $sx .= '</a>';
-        $sx .= '</li>'; 
-        
+        $sx .= '</li>';
+
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/remove_tags').'">';
         $sx .= msg('remove_tags');
         $sx .= '</a>';
-        $sx .= '</li>'; 
+        $sx .= '</li>';
 
         $sx .= '<li>';
         $sx .= '<a href="'.base_url(PATH.'bibliometric/list_row').'">';
         $sx .= msg('list_row');
         $sx .= '</a>';
-        $sx .= '</li>';          
+        $sx .= '</li>';
 
         $sx .= '</ul>';
-        
+
         $sx .= '<li>';
         $sx .= '<b>'.msg('citation_index').'</b>';
         $sx .= '<ul>';
@@ -211,11 +211,11 @@ class bibliometrics extends CI_model {
         $sx .= '<a href="'.base_url(PATH.'bibliometric/basket_cited').'">';
         $sx .= msg('basket_cited');
         $sx .= '</a>';
-        $sx .= '</li>';        
-        
+        $sx .= '</li>';
+
         $sx .= '</ul>';
-        $sx .= '</li>';                       
-        
+        $sx .= '</li>';
+
         $sx .= '</ul>';
         $sx .= '</div>';
         $sx .= '</div>';
@@ -225,7 +225,7 @@ class bibliometrics extends CI_model {
         {
             /****/
             $dd1 = troca($d1,chr(13),';');
-            $dd1 = splitx(';',$dd1);            
+            $dd1 = splitx(';',$dd1);
             $wh2 = '';
             for ($r=0;$r < count($dd1);$r++)
                 {
@@ -235,16 +235,16 @@ class bibliometrics extends CI_model {
                 }
             $this->load->model("Cited");
             $ob = $this->bs->sels();
-            $wh = '';            
+            $wh = '';
             for ($r=0;$r < count($ob);$r++)
                 {
                     if (strlen($wh) > 0) { $wh .= ' or '; }
                     $wh .= '( ca_rdf = '.$ob[$r].') ';
                 }
-                
+
             $sql = "SELECT * FROM ".$this->Cited->base."cited_article where ($wh) and ($wh2) ORDER BY ca_text";
             $rlt = $this->db->query($sql);
-            $rlt = $rlt->result_array();            
+            $rlt = $rlt->result_array();
             return($rlt);
         }
     function half_live($d1)
@@ -266,7 +266,7 @@ class bibliometrics extends CI_model {
                     $rst .= $y.cr();
                     if (strlen($mr) > 0) { $mr .= ', '; }
                     $mr .= ''.$y.'';
-                }                            
+                }
             }
         }
         $rsn = '';
@@ -302,12 +302,12 @@ class bibliometrics extends CI_model {
         {
             $ln = troca($d2,chr(13),';');
             $ln = troca($ln,chr(10),'');
-        }        
+        }
     function change_text_to($d1,$d2)
     {
         $ln = troca($d2,chr(13),';');
         $ln = troca($ln,chr(10),'');
-        
+
         $lns = splitx(';',$ln);
         for ($r=0;$r < count($lns);$r++)
         {
@@ -318,22 +318,22 @@ class bibliometrics extends CI_model {
                     $d1 = '[erro] linha: '.$r.' => '.$m[0];
                 } else {
                     $d1 = troca($d1,$m[0],$m[1]);
-                }            
+                }
         }
         return($d1);
     }
-    
+
     function form_1()
     {
         $form = new form;
         $cp = array();
         array_push($cp,array('$H8','','',False,False));
         array_push($cp,array('$T80:10','',msg('text_to_process'),True,True));
-        array_push($cp,array('$B8','',msg('process'),False,True));        
+        array_push($cp,array('$B8','',msg('process'),False,True));
         $sx = $form->editar($cp,'');
         return($sx);
     }
-    
+
     function form_2()
     {
         $form = new form;
@@ -344,7 +344,7 @@ class bibliometrics extends CI_model {
         array_push($cp,array('$B8','',msg('process'),False,True));
         $sx = $form->editar($cp,'');
         return($sx);
-    }        
+    }
     function form_file($title='')
     {
         if (strlen($title) > 0)
@@ -360,8 +360,8 @@ class bibliometrics extends CI_model {
         Enviar esse arquivo: <input name="userfile" type="file" />
         <br><br>
         <input type="submit" value="Enviar arquivo" class="btn btn-primary" />
-        </form>               
-        ';                
+        </form>
+        ';
         if (isset($_FILES['userfile']['tmp_name']))
         {
             $file_name = $_FILES['userfile']['tmp_name'];
@@ -371,10 +371,10 @@ class bibliometrics extends CI_model {
             }
         }
         return($sx);
-    }        
-    
-    
-    
+    }
+
+
+
     function semicolon_to_list($txt) {
         for ($r=1;$r < 32;$r++)
         {
@@ -390,7 +390,7 @@ class bibliometrics extends CI_model {
         $te = splitx(';', $t);
         $sx = '';
         asort($te);
-        foreach ($te as $key => $value) {          
+        foreach ($te as $key => $value) {
             if (strlen($value) > 0) {
                 $id = $this->detect_language($value);
                 $sx .= $value . $id.cr();
@@ -398,16 +398,16 @@ class bibliometrics extends CI_model {
         }
         return ($sx);
     }
-    
+
     function readfile($file='')
     {
         $tx = '';
-        
+
         if ($file == '') { $file = $this->file_name; }
         if (is_file($file))
         {
             $fl = fopen($file,'r+');
-            
+
             while (!feof($fl))
             {
                 $tx .= fread($fl,1024);
@@ -416,17 +416,17 @@ class bibliometrics extends CI_model {
         }
         return($tx);
     }
-    
+
     function net_to_gephi($txt)
     {
         $sx = '';
         $sx .= '<pre>';
         $sx .= $txt;
         $sx .= '</pre>';
-        
+
         $ln = troca($txt,chr(13),'#');
         $ln = splitx('#',$ln);
-        
+
         $nodes = array();
         $edges = array();
         $n = 0;
@@ -443,10 +443,10 @@ class bibliometrics extends CI_model {
                 $name = substr($name,0,strpos($name,$char));
                 array_push($nodes,array($nr,$name));
             }
-            
+
             if ($e == 1)
             {
-                $ll = troca($ln[$r],' ',';'); 
+                $ll = troca($ln[$r],' ',';');
                 $lla = splitx(';',$ll);
                 if (count($lla) == 3)
                 {
@@ -462,9 +462,9 @@ class bibliometrics extends CI_model {
             {
                 $n = 0;
                 $e = 1;
-            }                    
+            }
         }
-        $sx = '';            
+        $sx = '';
         $sx .= 'graph'.cr();
         $sx .= '['.cr();
         $sx .= '    Creator "Brapci '.date("Y-m-d H:i:s").'"'.cr();
@@ -489,8 +489,8 @@ class bibliometrics extends CI_model {
         }
         $this -> bibliometrics -> download_file($sx, '.gml');
         return($sx);
-    }    
-    
+    }
+
     function csv_to_net($txt)
     {
         set_time_limit(3600);
@@ -500,7 +500,7 @@ class bibliometrics extends CI_model {
         $txt = troca($txt,chr(10),';');
         $txt = troca($txt,chr(13),';');
         $lns = splitx(';',$txt);
-        
+
         $nx = array();
         $ns = array();
         $nf = array();
@@ -510,22 +510,22 @@ class bibliometrics extends CI_model {
             $mn = $lns[$r];
             $mn = troca($mn,'£',';');
             $au = splitx(';',$mn.';');
-            
+
             for ($a=0;$a < count($au);$a++)
             {
                 if (get("dd1")=='1')
                 {
-                    $mm = nbr_autor($au[$a],5);     
+                    $mm = nbr_autor($au[$a],5);
                 } else {
                     $mm = $au[$a];
-                }                               
-                
+                }
+
                 $mm = troca($mm,',','');
                 $mm = troca($mm,'. ','');
                 $mm = troca($mm,'.','');
-                $au[$a] = $mm;                              
-            }                       
-            
+                $au[$a] = $mm;
+            }
+
             for ($a=0;$a < count($au);$a++)
             {
                 $mm = $au[$a];
@@ -559,10 +559,10 @@ class bibliometrics extends CI_model {
                             $nx[$ma][$mm] = 1;
                             $nx[$mm][$ma] = 1;
                         }
-                    }                                                           
-                }                               
+                    }
+                }
             }
-            
+
         }
         sort($nf);
         /*  matriz */
@@ -571,7 +571,7 @@ class bibliometrics extends CI_model {
         foreach ($nf as $key => $val1) {
             if ($ns[$val1] > $max)
             {
-                $max = $ns[$val1]; 
+                $max = $ns[$val1];
             }
         }
         foreach ($nf as $key => $val1) {
@@ -579,9 +579,9 @@ class bibliometrics extends CI_model {
             //$sx .= ($key+1).' "'.$val1.'" '.$n1.' '.$ns[$val1].' '.$ns[$val1].' '.cr();
             $sx .= ($key+1).' "'.$val1.'" ellipse x_fact '.$n1.' y_fact '.$n1.' fos 1 ic LightYellow lc Blue '.cr();
         }
-        
+
         $sx .= '*Edges'.cr();
-        
+
         foreach ($nf as $key1 => $val1) {
             foreach ($nf as $key2 => $val2 ) {
                 if ($val1 < $val2)
@@ -596,17 +596,17 @@ class bibliometrics extends CI_model {
                         }
                         $sx .= ($key1+1).' '.($key2+1).' '.$tot.cr();
                     } else {
-                        
+
                     }
                 }
             }
         }
-        
+
         return($sx);
     }
-    
-    
-    
+
+
+
     function csv_to_matrix_ocorrencia($txt)
     {
         $txt = $this->trata($txt);
@@ -615,17 +615,17 @@ class bibliometrics extends CI_model {
         $txt = troca($txt,chr(10),';');
         $txt = troca($txt,chr(13),';');
         $lns = splitx(';',$txt);
-        
+
         $nx = array();
         $ns = array();
         $nf = array();
-        
+
         for ($r=0;$r < count($lns);$r++)
         {
             $mn = $lns[$r];
             $mn = troca($mn,'£',';');
             $au = splitx(';',$mn.';');
-            
+
             $ax = array();
             $ai = array();
             for ($z=0;$z < count($au);$z++)
@@ -637,27 +637,27 @@ class bibliometrics extends CI_model {
                     $ax[$nn] = $nn;
                 }
             }
-            
+
             $au = $ai;
-            
+
             for ($a=0;$a < count($au);$a++)
             {
                 if (get("dd1")=='1')
                 {
-                    $mm = nbr_autor($au[$a],5);     
+                    $mm = nbr_autor($au[$a],5);
                 } else {
                     $mm = $au[$a];
                 }
-                
+
                 $mm = troca($mm,',','');
                 $mm = troca($mm,'. ','');
                 $mm = troca($mm,'.','');
-                $au[$a] = $mm;                              
+                $au[$a] = $mm;
             }
-            
+
             for ($a=0;$a < count($au);$a++)
             {
-                $mm = $au[$a];                              
+                $mm = $au[$a];
                 if (isset($ns[$mm]))
                 {
                     $ns[$mm] = $ns[$mm] + 1;
@@ -665,7 +665,7 @@ class bibliometrics extends CI_model {
                     $ns[$mm] = 1;
                     array_push($nf,$mm);
                 }
-                
+
                 /* monta matriz */
                 if ($a == 0)
                 {
@@ -681,7 +681,7 @@ class bibliometrics extends CI_model {
                     for ($b=0;$b < $a;$b++)
                     {
                         $ma = $au[$b];
-                        
+
                         if (isset($nx[$ma][$mm]))
                         {
                             $nx[$ma][$mm] = $nx[$ma][$mm] + 1;
@@ -690,12 +690,12 @@ class bibliometrics extends CI_model {
                             $nx[$ma][$mm] = 1;
                             $nx[$mm][$ma] = 1;
                         }
-                    }                                                           
-                }                               
+                    }
+                }
             }
-            
+
         }
-        
+
         /*  matriz */
         $sx = '#;';
         foreach ($nf as $key => $val1) {
@@ -716,8 +716,8 @@ class bibliometrics extends CI_model {
         }
         $sx  .= '';
         return($sx);
-    } 
-    
+    }
+
     function detect_language($t)
     {
         $t = ' '.lowercase($t).' ';
@@ -732,7 +732,7 @@ class bibliometrics extends CI_model {
         'hers','ks','ts','ds','brazil','like','class','ools','rcis','lente',
         'ange','ex','ors','w','ws','ship','ires','nces','role',
         'rvice', 'bus','line','use','ies','face','sis','ens');
-        
+
         $pt = array('ário','afia','mana','ção','são',' de',' da',' do',
         'gia','lica','ico', 'logo',' para','tica',
         'sil','mia',' vro','rvo','sal', 'nto','rie','ria',
@@ -746,7 +746,7 @@ class bibliometrics extends CI_model {
         'rara','quisa','ursos','anta','ina','ida','ída', 'cola',
         'ema','uro','ano','ião','iao','nio','nia','rede','todos','grafia',
         'asica','nomia','dulo','orma','nal','ormas','nais','egal','sito');
-        
+
         $es = array(' le',' la',' lo',' los', 'ción','cion','del','sión','sion',
         'gía','ana','ura','ueva','eva','fía','blografía','ales',
         'ctos','datos','tos','cación','ipción','ctura','sidad','dad',
@@ -765,33 +765,33 @@ class bibliometrics extends CI_model {
         {
             if (strpos($t,$pt[$r].' ')) { $ppt++; }
         }
-        /* ESPANHOL */                     
+        /* ESPANHOL */
         for ($r=0;$r < count($es);$r++)
         {
             if (strpos($t,$es[$r].' ')) { $pes++; }
-        } 
-        
-        
+        }
+
+
         $sx = '==>EN='.$pen.'==PT='.$ppt.'<br>';
         if (($ppt >= $pen) and ($ppt >= $pes))
         {
-            $sx = " (PT); en:$pen, pt:$ppt, es:$pes"; 
+            $sx = " (PT); en:$pen, pt:$ppt, es:$pes";
         }
         if (($pen > $ppt) and ($pen > $pes))
         {
-            $sx = " (EN); en:$pen, pt:$ppt, es:$pes"; 
+            $sx = " (EN); en:$pen, pt:$ppt, es:$pes";
         }
         if (($pes > $ppt) and ($pes >= $pen))
         {
-            $sx = " (ES); en:$pen, pt:$ppt, es:$pes"; 
-        } 
+            $sx = " (ES); en:$pen, pt:$ppt, es:$pes";
+        }
         if (($pen == 0) and ($ppt == 0) and ($pes == 0))
         {
             $sx = '(??);(---'.$t.'---)';
         }
         return(';'.$sx);
     }
-    
+
     function trata($txt)
     {
         $txt = troca($txt,'; ',';');
@@ -801,9 +801,9 @@ class bibliometrics extends CI_model {
             if (($r != 13) and ($r != 10))
             {
                 $txt = troca($txt,chr($r),' ');
-            }       
+            }
         }
-        
+
         $t  = array('á','é','í','ó','ú','Á','É','Í','Ó','Ú','ã','õ','Â','Ô','ä','ë','ï','ö','ü','Ä','Ë','Ï','Ö','Ü','â','ê','î','ô','û','Â','Ê','Ô','Û','ç','Ç');
         $tr = array('a','e','i','o','u','A','E','I','O','U','a','o','A','O','a','e','i','o','u','A','E','I','O','U','a','e','i','o','u','A','E','O','U','c','C');
         for ($r=0;$r < count($tr);$r++)
@@ -811,26 +811,26 @@ class bibliometrics extends CI_model {
             $t1 = $t[$r];
             $t2 = $tr[$r];
             $txt = troca($txt,$t1,$t2);
-            $txt = troca($txt,utf8_decode($t1),$t2);        
+            $txt = troca($txt,utf8_decode($t1),$t2);
         }
         for ($r=128;$r < 255;$r++)
         {
-            $txt = troca($txt,chr($r),' ');     
+            $txt = troca($txt,chr($r),' ');
         }
         $txt = troca($txt,'  ',' ');
         return($txt);
     }
-    
+
     function download_file($txt,$type='.csv')
     {
         $arquivo = 'brapci_'.date("Ymd_His").$type;
         //header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         //header ("Pragma: no-cache");
         header ("Content-type: application/x-msexcel");
-        header ("Content-Disposition: attachment; filename=\"{$arquivo}\"" );       
+        header ("Content-Disposition: attachment; filename=\"{$arquivo}\"" );
         echo $txt;
     }
-    
+
     function cited_analyse($txt)
     {
         $ln = troca($txt,';','.,');
@@ -840,7 +840,7 @@ class bibliometrics extends CI_model {
         $sx = '<ol>';
         $years = array();
         $source = array('JOURNAL'=>0,'BOOK'=>0,'PROCEEDINGS'=>0, 'TD'=>0,'SITE'=>0,'LAW'=>0,'NC'=>0);
-        
+
         for ($r=0;$r < count($lns);$r++)
         {
             $sx .= '<li>';
@@ -853,11 +853,11 @@ class bibliometrics extends CI_model {
                 {
                     $years[$year] = $years[$year] + 1;
                 } else {
-                    $years[$year] = 1;    
+                    $years[$year] = 1;
                 }
-            }            
+            }
             $sx .= '<br>'.$year;
-            
+
             /**************************************** ARTICLE *****/
             $tp = 'NC';
             if ($this->is_law($lns[$r])) { $tp = 'LAW'; }
@@ -865,24 +865,24 @@ class bibliometrics extends CI_model {
             {
                 if ($this->is_tese_dissertacao($lns[$r]))
                 {
-                    $tp = 'TD'; 
+                    $tp = 'TD';
                 } else {
-                    if ($this->is_journal($lns[$r])) 
-                    { 
-                        $tp = 'JOURNAL'; 
-                    }
-                    else 
+                    if ($this->is_journal($lns[$r]))
                     {
-                        if ($this->is_proceedings($lns[$r])) 
-                        { 
-                            $tp = 'PROCEEDINGS'; 
-                        } 
+                        $tp = 'JOURNAL';
+                    }
+                    else
+                    {
+                        if ($this->is_proceedings($lns[$r]))
+                        {
+                            $tp = 'PROCEEDINGS';
+                        }
                         else
                         {
-                            if ($this->is_http($lns[$r])) 
-                            { 
-                                $tp = 'SITE'; 
-                            } 
+                            if ($this->is_http($lns[$r]))
+                            {
+                                $tp = 'SITE';
+                            }
                             else
                             {
                                 if ($this->is_book($lns[$r])) { $tp = 'BOOK'; }
@@ -891,49 +891,49 @@ class bibliometrics extends CI_model {
                     }
                 }
             }
-            
+
             /******************************** PROCESSA FONTS **************/
             if (isset($source[$tp]))
-            { $source[$tp] = $source[$tp] + 1;} 
-            else 
+            { $source[$tp] = $source[$tp] + 1;}
+            else
             { $source[$tp] = 1; }
-            
+
             $sx .= ' - '.$tp;
             $sx .= '</li>';
         }
         $sx .= '</ol>';
-        
+
         $sa = '<div class="row">';
-        
+
         $sa .= '<div class="col-md-2 text-center">';
         $sa .= msg('Cites').'<br>';
         $sa .= '<span style="font-size: 250%">'.count($lns).'</span>';
         $sa .= '<br/><span class="font-size: 70%;">'.msg('cites').'</span>';
         $sa .= '</div>';
-        
-        /***************** Half Live *****************/        
+
+        /***************** Half Live *****************/
         $sa .= '<div class="col-md-2 text-center">';
         $sa .= msg('Half Live').'-'.date("Y").'<br>';
         $sa .= '<span style="font-size: 250%">'.$this->halflive($years).'</span>';
         $sa .= '<br/><span class="font-size: 70%;">anos</span>';
         $sa .= '</div>';
-        
+
         $sa .= '</div>';
         $sa .= '<div class="row">';
-        /***************** Sources *****************/ 
+        /***************** Sources *****************/
         foreach ($source as $key => $value) {
             $sa .= '<div class="col-md-2 text-center">';
             $sa .= msg($key).'<br>';
             $sa .= '<span style="font-size: 250%">'.$value.'</span>';
             $sa .= '<br/><span class="font-size: 70%;">itens</span>';
-            $sa .= '</div>';        
-        }            
-        
+            $sa .= '</div>';
+        }
+
         $sa .= '</row>';
-        
+
         return($sa.$sx);
     }
-    
+
     function is_http($txt)
     {
         $bc = array('Disponível em');
@@ -943,16 +943,16 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
-        }            
+        }
     }
-    
+
     function is_book($txt)
     {
         $bc = array(': ');
@@ -962,16 +962,16 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
-        }            
-    }   
-    
+        }
+    }
+
     function is_proceedings($txt)
     {
         $bc = array('Anais...','Actas...','Proceedings...','Proceedings [...]');
@@ -981,16 +981,16 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
-        }            
+        }
     }
-    
+
     function is_tese_dissertacao($txt)
     {
         $bc = array(' Tese',' Dissertação','Tesis','(Doctorado)');
@@ -1000,16 +1000,16 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
-        }            
+        }
     }
-    
+
     function is_law($txt)
     {
         $bc = array('Lei n.');
@@ -1019,16 +1019,16 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
         }
     }
-    
+
     function is_journal($txt)
     {
         $txt = substr($txt,strlen($txt)/2,strlen($txt));
@@ -1039,23 +1039,23 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $ct++;
-            }                    
-        }            
+            }
+        }
         if ($ct > 0)
         {
-            return(1);    
+            return(1);
         } else {
             return(0);
         }
     }
-    
+
     function halflive($dt,$year='')
     {
         if (strlen($year) == 0)
         {
             $year = date("Y");
         }
-        
+
         $tot = 0;
         $tov = 0;
         foreach ($dt as $y => $v) {
@@ -1063,10 +1063,10 @@ class bibliometrics extends CI_model {
             $tov = $tov+$v;
         }
         $hl = ((int)($tot/$tov*10))/10;
-        $hl = round(($year - $hl)*10)/10;
+        $hl = sround(($year - $hl)*10)/10;
         return($hl);
     }
-    
+
     function recover_year($txt)
     {
         $bc = array('Acesso em','Disponível em','DOI:','Disponible en:','Acceso en:');
@@ -1075,9 +1075,9 @@ class bibliometrics extends CI_model {
             if (strpos($txt,$bc[$r]))
             {
                 $txt = substr($txt,0,strpos($txt,$bc[$r]));
-            }                    
+            }
         }
-        
+
         /************************* so anos */
         $nr2 = sonumero($txt);
         $ok = strlen($nr2);
@@ -1093,9 +1093,9 @@ class bibliometrics extends CI_model {
         }
         $nr = '<span class="alert">ERRO</span>';
         return($nr);
-    }     
-    
-    /******************************** Painel Bibliometrico */       
+    }
+
+    /******************************** Painel Bibliometrico */
     function metrics_basket($tp='')
     {
         $this->load->helper('R');
@@ -1118,7 +1118,7 @@ class bibliometrics extends CI_model {
             if (count($pqs) == 0)
             {
                 $this->load->model("Pqs");
-                $this->pqs = $this->Pqs->lista();            
+                $this->pqs = $this->Pqs->lista();
             }
             echo '==>'.$id;
             return(0);
@@ -1143,7 +1143,7 @@ class bibliometrics extends CI_model {
             $au = array();
             $aaa = array();
             $csv = 'id,author,value,percente,acumulate'.cr();
-            $ip = troca(ip(),'.','_');            
+            $ip = troca(ip(),'.','_');
             $pq = get("pq");
             $case = '';
             if (strlen($pq) > 0)
@@ -1154,7 +1154,7 @@ class bibliometrics extends CI_model {
 
             for ($r=0;$r < count($ob);$r++)
                 {
-                    
+
                 switch($case)
                     {
                         /* PQ */
@@ -1173,7 +1173,7 @@ class bibliometrics extends CI_model {
                                 $nr = 0;
                                 foreach ($aaa as $aa2=>$aa3)
                                     {
-                                        $pq = $this->Pqs->is_pq($aa2); 
+                                        $pq = $this->Pqs->is_pq($aa2);
                                         if ($pq == 1)
                                             {
                                             $key = $lst[$nr];
@@ -1188,7 +1188,7 @@ class bibliometrics extends CI_model {
                                     }
                                 }
                                 break;
-                        default:                        
+                        default:
                             $nr = 0;
                             $rst = $this->metadata($ob[$r],'AU');
                             foreach($rst as $key => $value)
@@ -1219,7 +1219,7 @@ class bibliometrics extends CI_model {
             foreach($aut as $key => $value)
                 {
                     $name = substr($value,4,strlen($value));
-                    $vlr = round(substr($value,0,4));
+                    $vlr = sround(substr($value,0,4));
                     $au[$name] = $vlr;
                     $totn++;
                     $tot = $tot + $vlr;
@@ -1242,7 +1242,7 @@ class bibliometrics extends CI_model {
             $R->exec($sc);
 
             $sx .= '<div class="'.bscol(12).'">';
-            $sx .= $R->html_image($R->img);            
+            $sx .= $R->html_image($R->img);
             $sx .= '</div>';
 
             $sx .= '<div class="'.bscol(12).'">';
@@ -1355,7 +1355,7 @@ class bibliometrics extends CI_model {
             $sc .= $R->datasets($jnl,0,15);
             $sc .= $R->fcn('journals');
             $sc .= $R->image(2);
-            $R->exec($sc);            
+            $R->exec($sc);
 
             $nr = 0;
             $acm = 0;
@@ -1366,13 +1366,13 @@ class bibliometrics extends CI_model {
             $sx = '';
 
             $sx .= '<div class="'.bscol(12).'">';
-            $sx .= $R->html_image($R->img);            
+            $sx .= $R->html_image($R->img);
             $sx .= '</div>';
 
             $sx .= '<div class="'.bscol(12).'">';
             $sx .= $R->show_script($sc,1);
-            $sx .= '</div>';            
-            
+            $sx .= '</div>';
+
             $sx .= '<span class="legend">Tabela 1 - Local de Publicação (n='.($tot).')</span>';
             $sx .= '<table width="100%">';
             $sx .= '<tr>';
@@ -1382,7 +1382,7 @@ class bibliometrics extends CI_model {
             $sx .= '<td align="center"><b>'.msg('perc.').'</b></td>';
             $sx .= '<td align="center"><b>'.msg('acum.').'</b></td>';
             $sx .= '</tr>'.cr();
-            
+
             foreach($jnl as $key => $value)
                 {
                     $nr++;
@@ -1397,7 +1397,7 @@ class bibliometrics extends CI_model {
                     $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
                     $sx .= '</tr>';
                     $nr++;
- 
+
                     $csv .= $nr.',"'.$key.'",'.$value.',';
                     $csv .= '"'.number_format($per*100,1,',','.').'%",';
                     $csv .= '"'.number_format($acm*100,1,',','.').'%"';
@@ -1428,7 +1428,7 @@ class bibliometrics extends CI_model {
             file_put_contents($file_csv,utf8_decode($csv));
             $sx .= '<br><br><a href="'.base_url($file_csv).'" class="btn btn-outline-primary">Export .CSV Journal</a>';
             return($sx);
-        }        
+        }
 
     function bibliotetric_year($ob)
         {
@@ -1450,7 +1450,7 @@ class bibliometrics extends CI_model {
                     $rst = $this->metadata($ob[$r],'PY');
                     foreach($rst as $key => $value)
                         {
-                            $xkey = round($key);
+                            $xkey = sround($key);
                             if ($xkey > 1950)
                             {
                                 if (isset($au[$key]))
@@ -1461,7 +1461,7 @@ class bibliometrics extends CI_model {
                                     }
                             }
                         }
-                    
+
                     if ($xkey > 1950)
                     {
                         if ($xkey < $min) { $min = $xkey; }
@@ -1489,7 +1489,7 @@ class bibliometrics extends CI_model {
             $sx .= '<td align="center"><b>'.msg('perc.').'</b></td>';
             $sx .= '<td align="center"><b>'.msg('acum.').'</b></td>';
             $sx .= '</tr>'.cr();
-            $ano = round($min);
+            $ano = sround($min);
             foreach($au as $key => $value)
                 {
                     $nr++;
@@ -1505,10 +1505,10 @@ class bibliometrics extends CI_model {
                             $sx .= '<td with="10%" align="center">'.number_format($per*100,1,',','.').'%</td>';
                             $sx .= '<td with="10%" align="center">'.number_format($acm*100,1,',','.').'%</td>';
                             //$sx .= '<td with="10%" align="center">'..'</td>';
-                            $sx .= '</tr>';              
+                            $sx .= '</tr>';
                             $ano++;
                             $nr++;
-                            if ($ano > 2099) { exit; }              
+                            if ($ano > 2099) { exit; }
                         }
 
                     $sx .= '<tr>';
@@ -1520,11 +1520,11 @@ class bibliometrics extends CI_model {
                     $sx .= '</tr>';
                     $last = $value;
 
-                    $xkey = round($key);
+                    $xkey = sround($key);
                     if ($xkey > 1900)
                         {
                             $ano = $key+1;
-                        }                    
+                        }
 
                     $csv .= $nr.',"'.$key.'",'.$value.',';
                     $csv .= '"'.number_format($per*100,1,',','.').'%",';

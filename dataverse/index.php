@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Titillium+Web" rel="stylesheet">
   <link rel="stylesheet" href="https://www.ufrgs.br/redd/css/bootstrap.css#v4.4.1">
   <link rel="stylesheet" href="https://www.ufrgs.br/redd/css/style.css">
-  
+
   <script type="text/javascript" src="https://www.ufrgs.br/redd/js/jquery-3.1.1.js"></script>
   <script type="text/javascript" src="https://www.ufrgs.br/redd/js/bootstrap.js#v4.4.1"></script>
 </head><!--- content--->
@@ -60,7 +60,7 @@ if (($handle = fopen($fileUrl, "r")) !== FALSE) {
 	} else {
 	       echo '<tr>';
 	       echo '<td>'.$row.'</td>';
-	       for ($c=0; $c < $num; $c++) 
+	       for ($c=0; $c < $num; $c++)
 			{
 	                echo '<td>';
 	//                echo utf8_decode($data[$c]);
@@ -93,7 +93,7 @@ echo chr(13).chr(10);
 echo '<th width="2%">';
 foreach($cols as $cs=>$size)
         {
-		$sz = round($size/$tot*100);
+		$sz = sround($size/$tot*100);
 		echo '<th width="'.$sz.'%">&nbsp;</th>';
         }
 echo '</tr>';

@@ -19,7 +19,7 @@ class articles extends CI_model {
 
 	var $table = 'brapc607_base.brapci_article';
 	var $saved = 0;
-	
+
 	function excluir_suportes()
 		{
 			$sql = "delete from brapc607_base.brapci_article_suporte where bs_status = 'Z' ";
@@ -35,7 +35,7 @@ class articles extends CI_model {
 
 	function inserir_historico($ar, $acao) {
 		$user = $_SESSION['id'];
-		$sql = "insert into brapc607_base.brapci_historico 
+		$sql = "insert into brapc607_base.brapci_historico
 					( h_artigo, h_user, h_acao)
 					values
 					('$ar','$user','$acao')	";
@@ -64,7 +64,7 @@ class articles extends CI_model {
 				$sx .= '<a href="' . base_url('index.php/admin/article_alterar_status/' . $id . '/C') . '" class="btn btn-primary">Enviar para Revisão(II)</a>';
 				$sx .= ' | ';
 				$sx .= '<a href="' . base_url('index.php/admin/article_alterar_status/' . $id . '/A') . '" class="btn btn-warning">Reenviar para Edição</a>';
-				break;				
+				break;
 			case 'X' :
 				$sx .= '<a href="' . base_url('index.php/admin/article_alterar_status/' . $id . '/A') . '" class="btn btn-warning">Reenviar para Edição</a>';
 		}
@@ -122,9 +122,9 @@ class articles extends CI_model {
 		for ($r = 0; $r < count($rlt); $r++) {
 			$line = $rlt[$r];
 			$id = $line['id_bs'];
-			
+
 			$sx .= '<tr bgcolor="#f0f0f0">';
-			
+
 			$sx .= '<td>';
 			$sx .= $line['bs_type'];
 			$sx .= '</td>';
@@ -136,16 +136,16 @@ class articles extends CI_model {
 			$sx .= '<td>';
 			$sx .= $line['bs_status'];
 			$sx .= '</td>';
-			
+
 			$divm = 'id' . $r;
-			
+
 			$sx .= '<td align="right">';
 			$link = '<a href="#">';
 			$sx .= $link.'<span id="' . $divm . 'a"  class="glyphicon glyphicon-refresh" aria-hidden="true"></span>'.'</a>';
-						
-			$pag= '1';			
+
+			$pag= '1';
 			$sx .= '</td>';
-			
+
 			$sx .= '<td>';
 			$sx .= '<div id="' . $divm . '" style="width:150px; height: 30px; border:1px solid #333;" class="lt1"></div>';
 			$sx .= '</td>' . cr();
@@ -153,7 +153,7 @@ class articles extends CI_model {
 			$sx .= '<script>' . cr();
 			$sx .= '
 				$("#' . $divm . 'a").click(function() {
-						$("#' . $divm . '").html("Coletando...");					
+						$("#' . $divm . '").html("Coletando...");
 						$.ajax({
 		  					method: "POST",
 		  					url: "' . base_url('index.php/oai/coletar_pdf/' . $id . '/' . ($pag + 1)) . '",
@@ -164,18 +164,18 @@ class articles extends CI_model {
 		  					});
 					});
 			' . cr();
-			$sx .= '</script>' . cr();			
-					
-			$sx .= '</td>';			
+			$sx .= '</script>' . cr();
+
+			$sx .= '</td>';
 
 			$sx .= '<td>';
 			$sx .= stodbr($line['bs_update']);
 			$sx .= '</td>';
-						
+
 			$sx .= '<td align="right">';
 			$link = 'onclick="newxy(\'' . base_url('index.php/admin/support_editar/' . $line['id_bs'] . '/' . $line['bs_article']) . '\',600,400);"';
 			$sx .= '<span ' . $link . ' class="btn btn-primary">editar</span>';
-			
+
 			$sx .= '</td>';
 
 			$sx .= '</tr>' . cr();
@@ -185,7 +185,7 @@ class articles extends CI_model {
 	}
 
 	function task_next($id) {
-		$sql = "select * from brapc607_base.brapci_article 
+		$sql = "select * from brapc607_base.brapci_article
 						where ar_status = '$id'
 						order by ar_section, id_ar desc
 						limit 50
@@ -260,8 +260,8 @@ class articles extends CI_model {
 		$sx .= '<div class="col-md-6">';
 		if (perfil('#ADM'))
 			{
-				$sx .= $this -> oai_pmh -> oai_resumo();		
-			}		
+				$sx .= $this -> oai_pmh -> oai_resumo();
+			}
 		$sx .= '</div>';
 		$sx .= '</div>';
 		return ($sx);
@@ -269,9 +269,9 @@ class articles extends CI_model {
 
 	function double_articles() {
 		$sql = "select * from ( SELECT ar_oai_id, count(*) as total, max(id_ar) as idmax
-									FROM brapc607_base.brapci_article 
+									FROM brapc607_base.brapci_article
 								WHERE ar_oai_id <> '' and ar_status <> 'X'
-								GROUP by ar_oai_id 
+								GROUP by ar_oai_id
 								) as tabela where total > 1
 								ORDER BY total desc";
 		$rlt = $this -> db -> query($sql);
@@ -287,10 +287,10 @@ class articles extends CI_model {
 			$sx .= ' ('.$line['total'].')';
 			$sx .= ' - '.$line['idmax'];
 			$sx .= '</li>';
-			
+
 			$oaiid = $line['ar_oai_id'];
 			$max = $line['idmax'];
-			$sql = "update brapc607_base.brapci_article set ar_status = 'X' 
+			$sql = "update brapc607_base.brapci_article set ar_status = 'X'
 						where ar_oai_id = '$oaiid' and ar_oai_id <> '' and id_ar < $max ";
 			$rrr = $this->db->query($sql);
 		}
@@ -299,8 +299,8 @@ class articles extends CI_model {
 			{
 				$sx .= '<span color="green">Nenhum OAI ID duplicado</span>';
 			}
-			
-			
+
+
 		/*** METODO II **/
 		$sx .= '<h2>Método II - Título, fascículo duplicados</h2>';
 		$sql = "select * from (
@@ -322,7 +322,7 @@ class articles extends CI_model {
 			$sx .= ' ('.$line['total'].')';
 			$sx .= ' - '.$line['idmax'];
 			$sx .= '</li>';
-			
+
 			$max = $line['idmax'];
 			$journal = $line['ar_journal_id'];
 			$ed = $line['ar_edition'];
@@ -335,7 +335,7 @@ class articles extends CI_model {
 					$i = strlen($title)-1;
 				}
 			$title = trim($title);
-			$sql = "update brapc607_base.brapci_article set ar_status = 'X' 
+			$sql = "update brapc607_base.brapci_article set ar_status = 'X'
 							where ar_journal_id = '$journal'
 						    AND ar_edition = '$ed'
 						    AND ar_titulo_1 LIKE '$title%'
@@ -360,14 +360,14 @@ class articles extends CI_model {
 			if (substr($link, 0, 3) == '10.') { $type = 'DOI';
 			}
 
-			$sql = "insert into brapc607_base.brapci_article_suporte 
+			$sql = "insert into brapc607_base.brapci_article_suporte
 							(
 							bs_article, bs_type, bs_adress,
 							bs_status, bs_journal_id, bs_update
 							) values (
 							'$codigo','$type','$link',
-							'A','$jid',$data							
-							)					
+							'A','$jid',$data
+							)
 					";
 			$this -> db -> query($sql);
 			return (1);
@@ -383,7 +383,7 @@ class articles extends CI_model {
 			$cod = $line['ar_codigo'];
 			$section = $article['section'];
 			$edition = $article['issue_id'];
-			$sql = "update brapc607_base.brapci_article set 
+			$sql = "update brapc607_base.brapci_article set
 					ar_edition= '$edition',
 					ar_section = '$section'
 					where id_ar = " . $line['id_ar'];
@@ -432,14 +432,14 @@ class articles extends CI_model {
 			$titulo_asc = UpperCaseSql($titulo);
 
 			$sql = "insert into brapc607_base.brapci_article
-			
+
 			(ar_journal_id, ar_codigo, ar_titulo_1,
 			ar_titulo_1_asc, ar_titulo_2,
 			ar_idioma_1, ar_idioma_2,
 			ar_status, ar_resumo_1, ar_resumo_2,
-			
+
 			ar_edition, ar_section,
-			
+
 			ar_doi, ar_oai_id, ar_brapci_id,
 			ar_ano, ar_bdoi, at_citacoes
 			) values (
@@ -447,11 +447,11 @@ class articles extends CI_model {
 			'$titulo_asc','$titulo2',
 			'$idioma','$idioma2',
 			'A', '$ar_resumo_1','$ar_resumo_2',
-			
+
 			'$edition','$section',
-			
+
 			'','$id','',
-			'$ano','',0)			
+			'$ano','',0)
 			";
 			$this -> db -> query($sql);
 			$this -> updatex();
@@ -479,7 +479,7 @@ class articles extends CI_model {
 					ar_pg_final = '$p2',
 					ar_edition = '$issue',
 					ar_section = '$sec',
-					ar_doi = '$doi' 
+					ar_doi = '$doi'
 					where id_ar = " . $id;
 		$this -> db -> query($sql);
 	}
@@ -500,7 +500,7 @@ class articles extends CI_model {
 					ar_titulo_1 = '$title_1',
 					ar_titulo_2 = '$title_2',
 					ar_idioma_1 = '$idioma_1',
-					ar_idioma_2 = '$idioma_2' 
+					ar_idioma_2 = '$idioma_2'
 					where id_ar = " . $id;
 		$this -> db -> query($sql);
 	}
@@ -534,7 +534,7 @@ class articles extends CI_model {
 		$id = strzero($id, 10);
 		$sql = "select * from brapc607_base.brapci_article
 						left join brapc607_base.brapci_journal on ar_journal_id = jnl_codigo
-						left join brapc607_base.brapci_edition on ar_edition = ed_codigo 
+						left join brapc607_base.brapci_edition on ar_edition = ed_codigo
 						left join brapc607_base.brapci_section on ar_section = se_codigo
 						left join brapc607_base.ajax_cidade on cidade_codigo = jnl_cidade
 						where ar_codigo = '$id' ";
@@ -588,7 +588,7 @@ class articles extends CI_model {
 		$sql = "select * from brapc607_base.brapci_article_suporte where bs_article = '$id' and bs_adress like '_repo%' order by bs_type ";
 		$rlt = db_query($sql);
 		$line = db_read($rlt);
-		$link = round($line['id_bs']);
+		$link = sround($line['id_bs']);
 		if ($link > 0) { $fl = base_url('index.php/article/download/' . $link);
 		} else {$fl = '';
 		}
@@ -654,10 +654,10 @@ class articles extends CI_model {
 		array_push($cp, array('$S10', 'ar_pg_inicial', msg('ar_pg_inicial'), false, true));
 		array_push($cp, array('$S10', 'ar_pg_final', msg('ar_pg_final'), false, true));
 		array_push($cp, array('$S80', 'ar_doi', msg('ar_doi'), false, true));
-		
+
 		$sql = "select * from brapc607_base.brapci_section where se_ativo = 1 order by se_descricao";
 		array_push($cp, array('$Q se_codigo:se_descricao:'.$sql, 'ar_section', msg('ar_section'), true, true));
-		
+
 		$sql = "select ed_codigo, concat(ed_ano,', v.',ed_vol,', ',ed_nr) as description from brapc607_base.brapci_edition where ed_journal_id = '".$jid."' order by description desc";
 		array_push($cp, array('$Q ed_codigo:description:'.$sql, 'ar_edition', msg('ar_edition'), true, true));
 
@@ -699,7 +699,7 @@ class articles extends CI_model {
 	function cited($id) {
 
 		$sql = "select * from brapc607_base.mar_works
-						where m_work = '$id' 
+						where m_work = '$id'
 					order by m_ref";
 		$query = $this -> db -> query($sql);
 		$query = $query -> result();
@@ -717,10 +717,10 @@ class articles extends CI_model {
 
 	function authors($id, $line) {
 		$sql = "
-				SELECT * FROM brapc607_base.brapci_article_author 
+				SELECT * FROM brapc607_base.brapci_article_author
 				inner join brapc607_base.brapci_autor on autor_codigo = ae_author
 				where ae_article = '$id'
-				order by ae_pos	, id_ae		
+				order by ae_pos	, id_ae
 				 ";
 		$rlt2 = $this -> db -> query($sql);
 		$rlt2 = $rlt2 -> result_array();
@@ -751,10 +751,10 @@ class articles extends CI_model {
 
 	function author_article($id) {
 		$sql = "
-				SELECT * FROM brapc607_base.brapci_article_author 
+				SELECT * FROM brapc607_base.brapci_article_author
 				inner join brapc607_base.brapci_autor on autor_codigo = ae_author
 				where ae_article = '$id'
-				order by ae_pos			
+				order by ae_pos
 				 ";
 		$query = $this -> db -> query($sql);
 		$query = $query -> result();
@@ -777,10 +777,10 @@ class articles extends CI_model {
 
 	function author_article_row($id) {
 		$sql = "
-				SELECT * FROM brapc607_base.brapci_article_author 
+				SELECT * FROM brapc607_base.brapci_article_author
 				inner join brapc607_base.brapci_autor on autor_codigo = ae_author
 				where ae_article = '$id'
-				order by ae_pos			
+				order by ae_pos
 				 ";
 		$query = $this -> db -> query($sql);
 		$query = $query -> result_array();
@@ -795,11 +795,11 @@ class articles extends CI_model {
 
 	function articles_author($codigo) {
 		$sql = "
-				SELECT * FROM brapc607_base.brapci_article_author 
+				SELECT * FROM brapc607_base.brapci_article_author
 				inner join brapc607_base.brapci_article on ae_article = ar_codigo
 				inner join brapc607_base.brapci_edition on ar_edition = ed_codigo
-				inner join brapc607_base.brapci_journal on jnl_codigo = ar_journal_id 
-				where ae_author = '$codigo' and ar_status <> 'X'			
+				inner join brapc607_base.brapci_journal on jnl_codigo = ar_journal_id
+				where ae_author = '$codigo' and ar_status <> 'X'
 				order by ae_pos, ed_ano desc ";
 
 		$query = $this -> db -> query($sql);
@@ -862,11 +862,11 @@ class articles extends CI_model {
 	}
 	function autoindex_linguage() {
 				$sql = "update " . $this -> table . " set
-						ar_idioma_1 = 'pt_BR', 
-						ar_idioma_2 = 'en' 
+						ar_idioma_1 = 'pt_BR',
+						ar_idioma_2 = 'en'
 					where (ar_idioma_1 = '0' or ar_idioma_1 = '' or ar_idioma_1 is null)";
 		$rlt = $this -> db -> query($sql);
-		
+
 	}
 
 	function autoindex_linguage_second() {
@@ -890,7 +890,7 @@ class articles extends CI_model {
 	}
 
 	function view_pdf($id) {
-		$sql = "select * from brapc607_base.brapci_article_suporte where id_bs = " . round($id);
+		$sql = "select * from brapc607_base.brapci_article_suporte where id_bs = " . sround($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		if (count($rlt) > 0) {
@@ -905,7 +905,7 @@ class articles extends CI_model {
 	}
 
 	function download_pdf($id) {
-		$sql = "select * from brapc607_base.brapci_article_suporte where id_bs = " . round($id);
+		$sql = "select * from brapc607_base.brapci_article_suporte where id_bs = " . sround($id);
 		$rlt = $this -> db -> query($sql);
 		$rlt = $rlt -> result_array();
 		if (count($rlt) > 0) {
@@ -929,9 +929,9 @@ class articles extends CI_model {
 				$session = date("YmdHis");
 				$_SESSION['bp_session'] = $session;
 			}
-		
+
 		$ip = ip();
-		$sql = "insert into pdf_download 
+		$sql = "insert into pdf_download
 						(
 						pdf_ip, pdf_id, pdf_session, pdf_session_type
 						) values (
@@ -940,7 +940,7 @@ class articles extends CI_model {
 	}
     function retrieve_keywords($id, $idioma = 'pt_BR') {
         $sql = "select * from brapc607_base.brapci_article_keyword
-                    inner join brapc607_base.brapci_keyword on kw_keyword = kw_codigo 
+                    inner join brapc607_base.brapci_keyword on kw_keyword = kw_codigo
                     where kw_article = '$id' and kw_idioma = '$idioma'
                     order by kw_ord
             ";
@@ -959,8 +959,8 @@ class articles extends CI_model {
 
     function retrieve_keywords_all($id) {
         $sql = "select * from brapc607_base.brapci_article_keyword
-                    inner join brapc607_base.brapci_keyword on kw_keyword = kw_codigo 
-                    where kw_article = '$id' 
+                    inner join brapc607_base.brapci_keyword on kw_keyword = kw_codigo
+                    where kw_article = '$id'
                     order by kw_idioma, kw_ord
             ";
         $rlt = $this -> db -> query($sql);
@@ -1025,7 +1025,7 @@ class articles extends CI_model {
         $autor = troca($ln['authores_row'], chr(13), ';') . ';';
         $au = splitx(';', $autor);
         $autor = '';
-    
+
         $vol = trim($ln['ed_vol']);
         $num = trim($ln['ed_nr']);
         $ano = trim($ln['ed_ano']);
@@ -1073,7 +1073,7 @@ class articles extends CI_model {
             $doi .= '. DOI:<a href="#">' . $doi . '</a>';
             $link = '';
         } else {
-            
+
         }
 
         switch ($tipo) {
@@ -1123,7 +1123,7 @@ class articles extends CI_model {
                     $onclick = ' onclick="converter('.$line['id_bs'].',\'converter'.$line['id_bs'].'\');" ';
                     $ajax = '<div id="converter'.$line['id_bs'].'" style="color: blue; cursor: pointer; width: 100px; border: 1px #A0A0A0 solid; text-align: center;" '.$onclick.'>converter</div>';
                     $idbs = $line['id_bs'];
-                }               
+                }
             }
 
             $sx .= '<tr>';
@@ -1145,7 +1145,7 @@ class articles extends CI_model {
             $sx .= '
             <script>
             function coletar($id,$div) {
-                $("#"+$div).html("coletando..."); 
+                $("#"+$div).html("coletando...");
                 $.ajax({
                     method: "POST",
                     url: "' . base_url('index.php/oai/coletar_pdf'). '/" + $id,
@@ -1156,7 +1156,7 @@ class articles extends CI_model {
                     });
             };
             function converter($id,$div) {
-                $("#"+$div).html("converter..."); 
+                $("#"+$div).html("converter...");
                 $.ajax({
                     method: "POST",
                     url: "' . base_url('index.php/oai/converter'). '/" + $id,
@@ -1165,7 +1165,7 @@ class articles extends CI_model {
                     .done(function( data ) {
                             $("#"+$div).html(data);
                     });
-            };          
+            };
             </script>
             ';
         }
@@ -1182,16 +1182,16 @@ class articles extends CI_model {
             {
                 if ($_SESSION['nivel'] > 1)
                     {
-                        $admin = 1;             
+                        $admin = 1;
                     }
             }
-        
+
         $link = '';
         $link_a = '';
-        
+
         for ($r = 0; $r < count($rlt); $r++) {
             $line = $rlt[$r];
-            
+
             if ($admin == 1)
                 {
                     $link = '<a href="#" onclick="newwin(\''.base_url('index.php/cited/ref_edit/'.$line['id_m'].'/'.checkpost_link($line['id_m'])).'\',600,800);">';
@@ -1239,7 +1239,7 @@ class articles extends CI_model {
                                 <B>' . $pb[$r][1] . '</B>
                                 <br><span class="lt0">' . $pb[$r][2] . '</span>
                             </div>
-                        
+
                         ';
         }
         $sx .= '</div>';
@@ -1265,7 +1265,7 @@ class articles extends CI_model {
             case 'C' :
                 $btns[0] = '';
                 $btns[1] = '';
-                break;              
+                break;
             case 'X' :
                 $btns[0] = '';
                 $btns[1] = '';

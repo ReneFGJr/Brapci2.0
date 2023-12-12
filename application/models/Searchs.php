@@ -12,11 +12,11 @@ class searchs extends CI_Model {
             if (!isset($_SESSION['s'])) {
                 if (isset($_SESSION['__ci_last_regenerate']))
                 {
-                    $_SESSION['s'] = $_SESSION['__ci_last_regenerate'];    
+                    $_SESSION['s'] = $_SESSION['__ci_last_regenerate'];
                 } else {
                     $_SESSION['s'] = date("Ymdihs");
                 }
-                
+
             }
         }
         $this -> s = $_SESSION['s'];
@@ -68,9 +68,9 @@ class searchs extends CI_Model {
         $q = get("q");
         $q = troca($q, '"', '¢');
         $link = base_url('index.php/res/?q=' . $q . '&type=' . get("type"));
-        if (strlen(get("year_s")) > 0) { $link .= '&year_s='.round(get("year_s")); }
-        if (strlen(get("year_e")) > 0) { $link .= '&year_e='.round(get("year_e")); }
-        $p = round(get("p"));
+        if (strlen(get("year_s")) > 0) { $link .= '&year_s='.sround(get("year_s")); }
+        if (strlen(get("year_e")) > 0) { $link .= '&year_e='.sround(get("year_e")); }
+        $p = sround(get("p"));
         if ($p == 0) { $p = 1;
         }
         /********* PAGINA INICIAL ******************/
@@ -106,9 +106,9 @@ class searchs extends CI_Model {
 
     function historic($limit = 10) {
         $session = $this -> s;
-        $sql = "select * from ".$this->base."_search 
-                        where s_session = $session 
-                        order by s_date desc, s_hour desc 
+        $sql = "select * from ".$this->base."_search
+                        where s_session = $session
+                        order by s_date desc, s_hour desc
                         limit $limit ";
         $rlt = $this -> db -> query($sql);
         $rlt = $rlt -> result_array();
@@ -156,14 +156,14 @@ class searchs extends CI_Model {
             $user = $_SESSION['id_us'];
         }
         $q = UpperCase($data['q']);
-        $t = round($data['type']);
+        $t = sround($data['type']);
         if (!isset($data['total'])) { $data['total'] = 0; }
         $total = $data['total'];
-        $page = round(GET("p"));
-        $order = round('0'.$data['order']);
+        $page = sround(GET("p"));
+        $order = sround('0'.$data['order']);
 
-        $sql = "select * from ".$this->base."_search 
-					where s_date = '$date' 
+        $sql = "select * from ".$this->base."_search
+					where s_date = '$date'
 						and s_hour = '$hour'
 						and s_query = '$q'
 						and s_type = $t
@@ -178,6 +178,25 @@ class searchs extends CI_Model {
                 $sql .= " values ";
                 $sql .= "('$date', '$hour', '$q',$t,$user,$total,$session,'$ip','$order')";
                 $this -> db -> query($sql);
+
+                /************* Elastic Search */
+                $d = [];
+                $d['query'] = $q;
+                $d['ip'] = $ip;
+                $d['ano'] = date("Y");
+                $d['mes'] = date("m");
+                $d['dia'] = date("d");
+                $d['hora'] = date("H");
+                $d['minuto'] = date("i");
+
+                /*
+                $this->load->model('elasticsearch');
+                $this->elasticsearch->index = 'consultas';
+                $this->elasticsearch->server = 'http://143.54.112.91:9200';
+                print_r($d);
+                $id = 1;
+                print_r($this->elasticsearch->call('_doc/'.$id,'POST',$d));
+                */
             }
         }
         return ('');
@@ -257,7 +276,7 @@ class searchs extends CI_Model {
     }
 
     function s($n, $t = '') {
-        $p = round(get("p"));
+        $p = sround(get("p"));
         if ($p == 0) { $p = 1;
         }
 
@@ -278,7 +297,7 @@ class searchs extends CI_Model {
                 } else {
                     $data['order'] = '0';
                 }
-        }        
+        }
 
         if (!isset($q['hits'])) {
             $total = 0;

@@ -5,7 +5,7 @@ function wclose()
         return($sx);
     }
 
-function newxy($url, $xx, $yy) 
+function newxy($url, $xx, $yy)
 {
     $sx = "
     NewWindow = window.open($url, 'newwin', 'scrollbars=yes,resizable=no,width=$xx,height=$yy,top=10,left=10');
@@ -13,7 +13,18 @@ function newxy($url, $xx, $yy)
     void (0);
     ";
     return($sx);
-}    
+}
+
+function sround($v)
+    {
+        $v = sonumero($v);
+        if ($v == '')
+            {
+                return 0;
+            }
+        return sround($v);
+
+    }
 function menus()
     {
 

@@ -58,7 +58,7 @@ class res extends CI_Controller
                 $data = array('simple' => true);
             }
             /* Google DialogFlow - IA - ChatBot*/
-            
+
             $data['complement'] = $this->GoogleDialogFlow->bot();
             $this->load->view('header/footer.php', $data);
         }
@@ -215,24 +215,24 @@ class res extends CI_Controller
 
         $this->footer();
 
-        /*    
+        /*
                         $this -> load -> model('ias');
                         $this -> load -> model('frbr');
-                        $this -> load -> model('frbr_core');  
-                        
+                        $this -> load -> model('frbr_core');
+
                         $this->cab();
-                        
+
                         if ($id == 0)
                         {
-                            
+
                         } else {
                             $vv = $this -> frbr_core -> le_data($id);
                             echo '<pre>';
                             print_r($vv);
-                            exit;    
+                            exit;
                             $data['content'] = $this->ias->v($vv);
                             $data['title'] = '';
-                            
+
                             $this -> load -> view('show', $data);
                         }
                         */
@@ -244,7 +244,7 @@ class res extends CI_Controller
             $this->cab();
             $data['content'] = $this->ipccrs->index($d1,$d2,$d3,$d4,$d5);
             $data['title'] = '';
-            $this->load->view('show', $data);            
+            $this->load->view('show', $data);
 
             $this->footer();
         }
@@ -745,7 +745,7 @@ class res extends CI_Controller
                                                                                                         <span class="input-group-btn">
                                                                                                         <input type="submit" name="acao"  class="btn btn-danger" value="' . msg('inport') . '">
                                                                                                         </span>
-                                                                                                        
+
                                                                                                         </div>';
         $tela .= '          </form>' . CR;
         $tela .= '          <span class="small">Ex: https://viaf.org/viaf/122976/#Souza,_Herbert_de</span>';
@@ -808,7 +808,7 @@ class res extends CI_Controller
                 $this->cab();
                 $data['content'] = $this->bibliometrics->metrics_basket($arg);
                 $this->load->view('show', $data);
-                $this->footer();                
+                $this->footer();
                 break;
 
                 /* Export */
@@ -825,9 +825,9 @@ class res extends CI_Controller
                         break;
                     case 'docaks':
                         $this->bs->mark_export_docaks();
-                        break; 
+                        break;
                     case 'cited':
-                        
+
                         if (isset($_SESSION['order']))
                             {
                                 $file = 'brapci_cited_csv_' . date("YmdHi") . '.csv';
@@ -835,23 +835,23 @@ class res extends CI_Controller
                                 header('Content-type: text/csv; charset=UTF-8');
                                 header('Content-Disposition: attachment; filename=' . $file);
                                 $this->load->model("cited");
-                                $ob = $this->bs->sels();                               
+                                $ob = $this->bs->sels();
                                 $sx = $this->cited->refs_group($ob,2);
                                 echo utf8_decode($sx);
                                 exit;
                             } else {
                                 $sx = 'Empty selection';
                             }
-                        
+
                         exit;
-                        
-                        break;                                                                                              
+
+                        break;
                     case 'ris':
                         $this->bs->mark_export_ris();
                         break;
                     case 'bib':
                         $this->bs->mark_export_bib();
-                        break;    
+                        break;
                     default:
                         redirect(base_url(PATH . 'basket'));
                         break;
@@ -882,7 +882,7 @@ class res extends CI_Controller
 
             case 'active':
                 $this->cab();
-                $this->bs->mark_active($arg);                
+                $this->bs->mark_active($arg);
                 redirect(base_url(PATH.'basket'));
                 break;
 
@@ -1019,7 +1019,7 @@ class res extends CI_Controller
                 break;
             case 'basepq':
                 $tela = $this->export->export_basepq();
-                break;                
+                break;
             case 'subject':
                 if ($pg == 0) {
                     $pg = 65;
@@ -1057,7 +1057,7 @@ class res extends CI_Controller
                 $tela .= '<li><a href="' . base_url(PATH . 'export/basepq') . '">' . msg('basepq') . '</a></li>' . cr();
                 $tela .= '</ul>' . cr();
         }
-        
+
         $data['content'] = $tela;
         $data['title'] = '';
         $this->load->view('show', $data);
@@ -1078,7 +1078,7 @@ class res extends CI_Controller
 
     function download($d1 = '')
     {
-        $d1 = round($d1);
+        $d1 = sround($d1);
         $this->load->model('pdfs');
         $this->load->model('frbr');
         $this->load->model('frbr_core');
@@ -1087,7 +1087,7 @@ class res extends CI_Controller
 
     function txt($d1 = '')
     {
-        $d1 = round($d1);
+        $d1 = sround($d1);
         $this->load->model('pdfs');
         $this->load->model('frbr');
         $this->load->model('frbr_core');
@@ -1347,7 +1347,7 @@ class res extends CI_Controller
             <div class="col-md-8">
             <h5>' . msg('class') . ': ' . $data['c_class'] . '</h5>
             </div>
-            
+
             <div class="col-md-4 text-right">';
         if ((perfil("#ADM") > 0)) {
             $tela .= $linkd . msg('delete') . $linkda . ' ';
@@ -1823,11 +1823,11 @@ class res extends CI_Controller
         $h = array();
         $h['nocab'] = true;
         $h['title'] = 'Web Semantic';
-        $this->cab($h); 
+        $this->cab($h);
         $ws = new wsc;
         $ws->dir = 'ws/source/';
         $data['title'] = '';
         $data['content'] = $ws->web();
         $this->load->view('content', $data);
-    }    
+    }
 }

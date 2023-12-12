@@ -87,7 +87,7 @@ class Ias extends CI_model
 			$url = 'https://www.ufrgs.br/tesauros/index.php/thesa/terms_from_to/309/txtb';
 			$file = '_ia/domain_abrev.txt';
 			$this->import_thesa($url, $file);
-			$sx .= '<li>Abbreviations <span style="color: green"><b>Update</b></span></li>';			
+			$sx .= '<li>Abbreviations <span style="color: green"><b>Update</b></span></li>';
 
 			$sx .= '<li>Dates Gerate <span style="color: green"><b>Update</b></span></li>';
 			$file = '_ia/domain_datas_g.txt';
@@ -164,7 +164,7 @@ class Ias extends CI_model
 
 		$sx .= '<li><a href="' . base_url(PATH . 'ia/check_abstract') . '">';
 		$sx .= 'Excluir trabalhos da Seção (Resumos de artigos)';
-		$sx .= '</a></li>';		
+		$sx .= '</a></li>';
 
 		$sx .= '<li><a href="' . base_url(PATH . 'ia/thesa') . '">';
 		$sx .= 'Atualiza vocabulários';
@@ -176,15 +176,15 @@ class Ias extends CI_model
 
 		$sx .= '<li><a href="' . base_url(PATH . 'ia/R') . '">';
 		$sx .= 'Ferramentas R';
-		$sx .= '</a></li>';		
+		$sx .= '</a></li>';
 
 		$sx .= '<li><a href="' . base_url(PATH . 'pq') . '">';
 		$sx .= 'Base PQ';
-		$sx .= '</a></li>';			
+		$sx .= '</a></li>';
 
 
 		$sx .= '</ul>';
-		$sx .= '</div>';		
+		$sx .= '</div>';
 		}
 
 
@@ -217,7 +217,7 @@ class Ias extends CI_model
 			case 'R':
 				$this->load->model("ias_r");
 				$sx .= $this->ias_r->index($d1,$d2,$d3);
-				break;				
+				break;
 			case 'thesa':
 				$sx = $this->check(1);
 				$sx .= '<a href="' . base_url(PATH . 'ia') . '" class="btn btn-outline-primary">' . msg('return') . '</a>';
@@ -254,7 +254,7 @@ class Ias extends CI_model
 						$vv = $this->frbr_core->le_data($d2);
 						$sx = '<h3>' . msg("Inteligência Artificial - IA Brapci (Robots)") . '</h3>';
 						$sx .= $this->ias->nlp_v($vv,$d2);
-						break;				
+						break;
 
 					default:
 						$sx = '<h1>' . msg("NLP") . ' <sup>v.' . $this->version_nlp . '</sup></h1>';
@@ -339,7 +339,7 @@ class Ias extends CI_model
 					}
 				}
 			return($sx);
-		}		
+		}
 
 	function nlp($d1 = '', $d2 = '', $d3 = '')
 	{
@@ -363,7 +363,7 @@ class Ias extends CI_model
 				$sx .= 'Process CharSet <sup><i>alfa</i></sup>';
 				$sx .= $this->nlp_form();
 				$sx .= $this->process_charset(get("dd1"));
-				break;	
+				break;
 
 			case 'genere':
 				$this->load->model('ias_cited');
@@ -371,7 +371,7 @@ class Ias extends CI_model
 				$sx .= '<br><tt>API: https://brapci.inf.br/ws/api/?verb=genere&q=NOME</tt>';
 				$sx .= $this->nlp_form();
 				$sx .= $this->process_genere(get("dd1"));
-				break;							
+				break;
 
 			case 'cited_analyse':
 				$this->load->model('ias_cited');
@@ -384,7 +384,7 @@ class Ias extends CI_model
 						$sx .= '<li>'.$au[$r].'</li>';
 					}
 				$sx .= '</ul>';
-				break;				
+				break;
 
 			case 'singular':
 				$sx .= $this->nlp_form();
@@ -603,7 +603,7 @@ class Ias extends CI_model
 	{
 		$this->load->model('ias_cited');
 		$this->load->model('ias_abstract');
-		
+
 		$this->check();
 		$rdf = new rdf;
 		$vv = $rdf->extract_content($d, 'hasFileStorage');
@@ -621,7 +621,7 @@ class Ias extends CI_model
 			} else {
 				$data['pi'] = '0';
 				$data['pf'] = '0';
-			}	
+			}
 		if (isset($vv[0]))
 			{
 				$file = troca($vv[0], '.pdf', '.txt');
@@ -629,10 +629,10 @@ class Ias extends CI_model
 			} else {
 				$file = 'file_not_found.pdf';
 			}
-		
+
 		if (file_exists($file)) {
 			$txtf = $this->file_get($file);
-			$txtf = troca($txtf,'&nbsp;',' ');	
+			$txtf = troca($txtf,'&nbsp;',' ');
 
 			$txt = '';
 			if (perfil("#ADM") > 0)
@@ -649,7 +649,7 @@ class Ias extends CI_model
 			$txt = message(msg('File not found') . ' ' . $file, 3);
 			$cmd = 'pdftotext '.$fileo.' '.$file;
 			$txt .= $cmd;
-			shell_exec($cmd);			
+			shell_exec($cmd);
 			$this->pdfs->pdftotext_index_file($file,$id);
 			echo '<meta http-equiv="refresh" content="0;" />';
 		}
@@ -703,7 +703,7 @@ class Ias extends CI_model
 		{
 			$txt = '';
 			if (file_exists($file))
-				{			
+				{
 				$txt = file_get_contents($file);
 				$l = explode(chr(10),$txt);
 				$rst = array();
@@ -805,7 +805,7 @@ class Ias extends CI_model
 		$col1 = '';
 		$col2 = '';
 		for ($r = (count($qt) - 1); $r >= 0; $r--) {
-			$value = round(substr($qt[$r], 0, 5));
+			$value = sround(substr($qt[$r], 0, 5));
 			$key = substr($qt[$r], 5, strlen($qt[$r]));
 
 			if ($value > $min) {
@@ -981,7 +981,7 @@ class Ias extends CI_model
 			$tc = substr($t,strlen($t)-1,1);
 			if ($tc == $c) { return(1); }
 			return(0);
-		}	
+		}
 	function tem_titulacao($t)
 		{
 			$ar = array(
@@ -1004,7 +1004,7 @@ class Ias extends CI_model
 							return(1);
 						}
 				}
-			return(0);			
+			return(0);
 		}
 
 	function linha_com_string($t,$ar = array())
@@ -1018,7 +1018,7 @@ class Ias extends CI_model
 				}
 			return(0);
 		}
-	
+
 	function year_find($c)
 		{
 			$ano = -1;
@@ -1033,13 +1033,13 @@ class Ias extends CI_model
 							$c = substr($c,0,strpos($c,$lk[$r]));
 						}
 				}
-		
+
 			$tm = array('.',',','-','!','?');
 			$c = str_replace($tm,' ',$c);
 			$l = explode(' ',$c);
 			for ($r=0;$r < count($l);$r++)
 				{
-					$v = round($l[$r]);
+					$v = sround($l[$r]);
 					if (($v > $ini) and ($v < $fim))
 						{
 							$ano = $v;
@@ -1086,7 +1086,7 @@ class Ias extends CI_model
 						$nm = $names;
 						if (!isset($n[$names]))
 						{
-							
+
 							$names = trim($names);
 							$names = rawurlencode($names);
 							$url = 'https://brapci.inf.br/ws/api/?verb=genere&q='.$names;
@@ -1110,10 +1110,10 @@ class Ias extends CI_model
 					$sx .= '</div>';
 					$sx .= '</form>';
 				}
-				
+
 
 				return($sx);
-			}			
+			}
 
 	function neuro_email($t)
 	{

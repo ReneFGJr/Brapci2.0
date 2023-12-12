@@ -5,15 +5,15 @@ class schedule extends CI_model
 	var $roboti_path = 'script/roboti/';
 	var $roboti_name = 'Bob';
 	VAR $bots = array();
-	
+
 	function __construct()
 	{
 		$this->bots();
 	}
-	
+
 	/******************************
 	* CRON
-	*/	
+	*/
 	function cron($path='',$bot='')
 	{
 		switch($path)
@@ -22,40 +22,40 @@ class schedule extends CI_model
 				$dt = $this->cron_status('json');
 				echo $dt;
 			break;
-			
+
 			case 'exec':
 				$dt = $this->bot_execute($bot);
 				echo $dt;
-			break;			
-			
+			break;
+
 			/****************** Default **************/
 			default:
 			$this->cron_execute();
 			$this->last_task(1,'roboti');
-		}		
-	}	
-	
+		}
+	}
+
 	/*************************************************
 	* MENU DO ADMINISTRADOR
-	*/	
+	*/
 	function admin($act='',$d1='',$d2='',$d3='')
 	{
 		$serv = array();
 		array_push($serv,'Robots');
 		$sx = '<h1>'.msg('Admin').'</h1>';
-		
+
 		$sx .= '<div class="row">';
 		for ($r=0;$r < count($serv);$r++)
-		{			
+		{
 			$sx .= '<div class="col-md-3" style="paddin: 5px 5px; border: 1px solid #000000; border-radius: 10px; height: 120px;">';
 			$sx .= '<a href="'.base_url(PATH.'admin/'.strtolower($serv[$r])).'">';
 			$sx .= '<h2>'.$serv[$r].'</h2>';
 			$sx .= '</a>';
 			$sx .= '<i>'.msg($serv[$r].'_info').'</i>';
-			$sx .= '</div>';			
+			$sx .= '</div>';
 		}
 		$sx .= '</div>';
-		
+
 		switch($act)
 		{
 			case 'robots':
@@ -63,10 +63,10 @@ class schedule extends CI_model
 				$sx .= '<a href="'.base_url(PATH.'admin/robots/edit/0').'" class="btn btn-primary">';
 				$sx .= msg('roboti_create_bot');
 				$sx .= '</a>';
-				
+
 				switch($d1)
 				{
-					case 'edit':						
+					case 'edit':
 						$sx .= $this->bot_edit();
 					break;
 				}
@@ -74,7 +74,7 @@ class schedule extends CI_model
 		}
 		return($sx);
 	}
-	
+
 	/*********************************************
 	* BOT EDIT & CREATE
 	*/
@@ -84,8 +84,8 @@ class schedule extends CI_model
 		array_push($cp,array('$H8','','',false,false));
 		array_push($cp,array('$S50','',msg('bot_name'),true,true));
 		array_push($cp,array('$T80:5','',msg('bot_cmd'),true,true));
-		
-		array_push($cp,array('$A','',msg('week_day'),false,true));		
+
+		array_push($cp,array('$A','',msg('week_day'),false,true));
 		array_push($cp,array('$C','',msg('monday'),false,true));
 		array_push($cp,array('$C','',msg('tuesday'),false,true));
 		array_push($cp,array('$C','',msg('wedesney'),false,true));
@@ -99,7 +99,7 @@ class schedule extends CI_model
 		$form = new form;
 		$form->id = 0;
 		$sx = $form->editar($cp,'');
-		
+
 		if ($form->saved > 0)
 		{
 			$bot = array();
@@ -123,31 +123,31 @@ class schedule extends CI_model
 		}
 		return($sx);
 	}
-	
+
 	/***********************
 	* SAVE BOT
 	*/
-	
+
 	function bot_save($bot)
-	{	
+	{
 		$file = $this->roboti_path.'config/'.$bot['bot'].'.roboti';
 		echo $file;
 		$txt = json_encode($bot);
 		file_put_contents($file,$txt);
 		return(1);
 	}
-	
+
 	/***************************
 	* BOTS
 	*/
-	
+
 	function bots()
 	{
 
 	}
-	
+
 	/****************************************
-	* HELP */		
+	* HELP */
 	function help()
 	{
 		$sx = '<div class="container"><div class="row"><div class="col-md-12">';
@@ -157,47 +157,47 @@ class schedule extends CI_model
 		$sx .= '<h2>Schedule</h2>';
 		$sx .= '<pre>';
 		$sx .= '<a href="'.base_url(PATH.'service/schedule/status').'">:status</a> - situacao do serviço</a>'.cr();
-		$sx .= '<a href="'.base_url(PATH.'service/schedule/config').'">:config</a> - lista tarefas agendadas</a>'.cr();		
+		$sx .= '<a href="'.base_url(PATH.'service/schedule/config').'">:config</a> - lista tarefas agendadas</a>'.cr();
 		$sx .= '</pre>';
-		
+
 		$sx .= '<h2>Cron</h2>';
 		$sx .= '<pre>';
 		$sx .= '<a href="'.base_url(PATH.'cron/status').'">:status</a> - status dos Robots</a>'.cr();
 		$sx .= '</pre>';
-		
+
 		$sx .= '</div>';
 		$sx .= '</div>';
 		$sx .= '</div>';
-		return($sx);			
+		return($sx);
 	}
-	
+
 	/****************************************
 	* CRON STATUS
 	*/
-	
+
 	function cron_status($form='')
 	{
 		$json = '';
 		$bots = $this->bots;
 		$form = substr(strtolower(get("format").$form),0,4);
 		$rsp = '';
-		
-		
+
+
 		for ($r=0;$r < count($bots);$r++)
 		{
 			$bot =$bots[$r];
 			$stlc = 'style="background-color: #ffd0d0; border: 1px solid #000000; border-radius: 10px; box-shadow: 5px 5px 8px #888; margin: 5px;"';
 			$botf = $this->roboti_path.'log/'.$bot.'.live';
-			
+
 			$link = base_url(PATH.'bots/'.$bot);
 			$link = '<a href="'.$link.'" class="col-md-4" style="color: black; text-decoration: none;">';
 			$linka = '</a>';
-			
+
 			if (strlen($json) > 0)
 			{
 				$json .= ',';
-			}			
-			
+			}
+
 			if (file_exists($botf))
 			{
 				$content = file_get_contents($botf);
@@ -205,7 +205,7 @@ class schedule extends CI_model
 				$dta = json_decode($content);
 				$txt = '';
 				$dias = 0;
-				
+
 				foreach ($dta as $key => $value) {
 					if ($key=='robot')
 					{
@@ -231,12 +231,12 @@ class schedule extends CI_model
 						$txt .= '<br/>';
 						$txt .= '<h3 style="color: green">'.$value.'</h3>';
 						$stlc = 'style="background-color: '.$color.'; border: 1px solid #000000; border-radius: 10px; box-shadow: 5px 5px 8px #888; margin: 5px;"';
-					}						
+					}
 					if ($key=='task')
 					{
 						$txt .= '<h5 style="color: green">'.$value.'</h5>';
-					}						
-				}					
+					}
+				}
 				/**************************************** Ajustes **********************/
 				if ($form == 'html')
 				{
@@ -245,7 +245,7 @@ class schedule extends CI_model
 					$linka = '</a>';
 
 					$txt = $link.'<div class="text-center" '.$stlc.'>'.$txt.'</div>'.$linka;
-				}		
+				}
 				$json .= $content;
 			} else {
 				{
@@ -254,19 +254,19 @@ class schedule extends CI_model
 					$txt .= '<h3 style="color: red">dead</h3>';
 					$txt = $link.'<div class="text-center" '.$stlc.'>'.$txt.'</div>'.$linka;
 					$json .= '{"data":"0000-00-00 00:00:00","status":"dead","robot":"'.$bot.'"}';
-				}				
-				
+				}
+
 			}
-			$rsp .= $txt;			
+			$rsp .= $txt;
 		}
 		if ($form == 'json') { $rsp = '['.$json.']'; }
 		return($rsp);
 	}
-	
+
 	/*********************
 	* CROM EXECUTE
 	*/
-	
+
 	function cron_execute()
 	{
 		$cmd = '';
@@ -289,10 +289,10 @@ class schedule extends CI_model
 			$ok = 1;
 			if ($hour > 0)
 				{
-					if ($hour != round(date("h"))) { $ok = 0; }
+					if ($hour != sround(date("h"))) { $ok = 0; }
 				}
 
-			$dtx = round(date("w"));
+			$dtx = sround(date("w"));
 			if (substr($day,$dtx,1) != '1')
 				{
 					$ok = 0;
@@ -308,7 +308,7 @@ class schedule extends CI_model
 		}
 		return($sx);
 	}
-	
+
 	/***************************************************************
 	* Execute Command Bot
 	*/
@@ -327,8 +327,8 @@ class schedule extends CI_model
 	/********************************
 	* BOT SAVE LOG
 	*/
-	
-	
+
+
 	function save_log($bot,$txt2)
 	{
 		$file = $this->roboti_path.'log/'.$bot;
@@ -340,21 +340,21 @@ class schedule extends CI_model
 		} else {
 			$txt = '';
 		}
-		
+
 		$sp = '------------------------------------------------------------------------------------'.cr();
 		$txt = date("Y-m-d H:i:s").' - '.$bot.cr().$txt2.cr().$sp.$txt;
 		file_put_contents($file, $txt);
 	}
-	
-	
 
 
-	
+
+
+
 	function last_task($new=0,$bot='roboti')
 	{
 		$file = $this->roboti_path.'/log/';
 		check_dir($file);
-		
+
 		if ($new == 1)
 		{
 			$rst['data'] = date("Y-m-d H:i:s");
@@ -372,7 +372,7 @@ class schedule extends CI_model
 			$t = file_get_contents($this->file);
 			$sx .= '<h3>'.$this->file.'</h3>';
 			$sx .= '<pre>'.$t.'</pre>';
-			
+
 			if (!strpos($t,'roboti'))
 			{
 				$sx .= cr().'<b>Robot<i>i</i></b> not found, append the this line in crontab';
@@ -380,9 +380,9 @@ class schedule extends CI_model
 			} else {
 				$sx .= cr().'<h3><b>Robot<i>i</i></b> <span class="color:#008000">service <b>live</b></span></h3>';
 			}
-			
+
 			$file = '/usr/local/roboti';
-			
+
 			if (!file_exists($file))
 			{
 				$sx .= cr().'<hr>';
@@ -390,13 +390,13 @@ class schedule extends CI_model
 				$sx .= cr().'Criar o arqui '.$this->roboti_path.' com o conteúdo de:<br>';
 				$sx .= cr().'<tt>curl "http://brapci.inf.br/index.php/roboti/cron/" --max-time 60</tt>';
 			}
-			
+
 		} else {
 			$sx = 'File not found in '.$this->file;
 		}
 		return($sx);
 	}
-	
+
 	function bot_read($act)
 	{
 		$file = $this->roboti_path.'config/'.$act.'.roboti';
@@ -420,19 +420,19 @@ class schedule extends CI_model
 		} else {
 			return(array());
 		}
-	}		
-	
+	}
+
 	function bot_check($act)
 	{
 		$sx = '';
-		
+
 		/* Bot name */
 		$sx .= '<div class="row"><div class="col-md-12">';
 		$sx .= 'Bot name:<br/><h2>'.$act.'</h2>';
 		$sx .= '</div></div>';
-		
+
 		//$sx .= '<style> div { border: 1px solid #000000; } </style>';
-		
+
 		/* Dados do Arquivo */
 		$sx .= '<div class="row"><div class="col-md-8">';
 		$file = $this->schedule->roboti_path.'config/'.$act.'.roboti';
@@ -441,10 +441,10 @@ class schedule extends CI_model
 		$stl = '';
 		$ok = ' - <span style="color: #006000;"><b>OK</b></span>';
 		$erro = ' - <span style="color: #ff0000;"><b>ERROR</b></span>';
-		
+
 		$sx .= '<a href="'.base_url(PATH.'cron/exec/'.$act).'" class="btn btn-outline-primary" target="roboti_iframe">'.msg('execute_now').'</a>';
 		$sx .= '<iframe name="roboti_iframe" style="width: 100%; height: 400px;"></iframe>';
-		
+
 		/* Checa arquivo */
 		if (file_exists($file))
 		{
@@ -452,7 +452,7 @@ class schedule extends CI_model
 		} else {
 			$sta .= '<li>'.msg('file').$erro.'</li>';
 		}
-		
+
 		$bots = $this->bot_read($act);
 		$logs = $this->bot_read_logs($act);
 		if (count($logs) == 0)
@@ -461,25 +461,25 @@ class schedule extends CI_model
 		} else {
 			$stl .= '<li>Executed in: '.stodbr($logs['data']).'</li>';
 		}
-		
+
 		$sx .= '<hr>';
 		$sx .= 'bot name: '.$bots['bot'];
 		$sx .= '<br>cmd: <tt>'.$bots['cmd'].'</tt>';
 		$sta .= '<li>'.msg('created').': '.stodbr($bots['created']).'</li>';
 		$sta .= '<li>'.msg('last_update').': '.stodbr($bots['lastupdate']).'</li>';
 		$sx .= '</div>';
-		
+
 		/***************************************** CHECKIT */
 		$sx .= '<div class="col-md-4">';
 		$sx .= 'Check-It';
 		$sx .= '<ul>'.$sta.'</ul>';
-		
+
 		$sx .= 'Live';
 		$sx .= '<ul>'.$stl.'</ul>';
 		$sx .= '</div>';
 		$sx .= '</div>';
 		$sx .= '</div>';
-		return($sx);			
+		return($sx);
 	}
 }
 ?>

@@ -8,7 +8,7 @@
 	</div>
 	<div class="col-md-12 text-center">
 		<h4><i><?php echo $ar_titulo_3; ?></i></h4>
-	</div>	
+	</div>
 </div>
 
 <div class="row">
@@ -78,7 +78,7 @@ if (perfil("#BIB") == 1) {
 	echo '<div>';
 	echo '<br>';
 	echo 'Tools<br>';
-	echo '<a href="' . base_url("index.php/admin/article_change/" . round($id_ar) . '/' . checkpost_link(round($id_ar))) . '" title="' . msg("change_language") . '">';
+	echo '<a href="' . base_url("index.php/admin/article_change/" . sround($id_ar) . '/' . checkpost_link(round($id_ar))) . '" title="' . msg("change_language") . '">';
 	echo '<span class="glyphicon glyphicon-refresh superbig" aria-hidden="true"></span>';
 	echo '</a>';
 	echo '</div>';
